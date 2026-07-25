@@ -408,7 +408,269 @@ footer { text-align:center; padding:2rem; color:#999; font-size:0.85rem; border-
 <div class="diagram-caption">六阶梯的依赖链：认知能力（①—⑤）走在前面，具身化（⑥）是认知成熟之后的自然延伸。</div>
 </div>
 
-<h2>八、路线图的启示</h2>
+<h2>八、支线一：多模态——AI 如何"看"世界</h2>
+
+<p>前面六阶路线图在讨论 Agent 时提到过：Agent 的感知模块可以接收视觉信息。但有一个更深层的问题没有展开：<strong>AI 到底是怎么"看"图片和视频的？它跟人眼看东西是一回事吗？</strong></p>
+
+<p>答案可能会让你意外：<strong>目前的多模态大模型（比如 GPT-4V、Claude Vision）跟人眼的"看"完全不同。</strong> 它不是真的在看，而是在——读。</p>
+
+<h3>8.1 人是怎么"看"的</h3>
+
+<p>人的视觉系统经过了数亿年的演化，是一条高度专用的处理通道：</p>
+
+<ul>
+  <li><strong>视网膜</strong>接收光信号</li>
+  <li><strong>初级视觉皮层（V1）</strong>检测边缘和线条方向</li>
+  <li><strong>高级视觉皮层</strong>组合边缘为形状、形状为物体、物体为场景</li>
+  <li><strong>顶叶和颞叶</strong>处理空间关系和物体识别</li>
+</ul>
+
+<p>这个过程中，人不是一次性"截屏"整张图。人眼会快速扫视（saccade），目光在不同区域之间跳跃，大脑将多次注视的信息拼接成完整的场景理解。</p>
+
+<p>更重要的是，人的视觉思考是<strong>独立于语言的</strong>。你想象一个苹果旋转 90 度后的样子时，你的视觉皮层在工作，你的语言区几乎不参与。这就是为什么即使你"说不出话来"，也仍然能"看得懂"——视觉和语言是两套并行的认知系统。</p>
+
+<h3>8.2 多模态模型是怎么"看"的</h3>
+
+<p>多模态大模型的视觉处理流程完全不同。我们一步步拆解：</p>
+
+<div class="diagram-container">
+<svg viewBox="0 0 700 180" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="mmArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#636e72"/>
+    </marker>
+  </defs>
+  <rect x="15" y="10" width="100" height="45" rx="6" fill="#dfe6e9" stroke="#b2bec3" stroke-width="1"/>
+  <text x="65" y="28" text-anchor="middle" fill="#636e72" font-size="10">原始图片</text>
+  <text x="65" y="45" text-anchor="middle" fill="#636e72" font-size="10">1024×1024 px</text>
+
+  <line x1="118" y1="32" x2="148" y2="32" stroke="#636e72" stroke-width="1.5" marker-end="url(#mmArrow)"/>
+
+  <rect x="150" y="10" width="100" height="45" rx="6" fill="#dfe6e9" stroke="#b2bec3" stroke-width="1"/>
+  <text x="200" y="28" text-anchor="middle" fill="#636e72" font-size="10">切分为 Patch</text>
+  <text x="200" y="45" text-anchor="middle" fill="#636e72" font-size="10">16×16 小方块</text>
+
+  <line x1="253" y1="32" x2="283" y2="32" stroke="#636e72" stroke-width="1.5" marker-end="url(#mmArrow)"/>
+
+  <rect x="285" y="10" width="120" height="45" rx="6" fill="#eef6ff" stroke="#0984e3" stroke-width="1.5"/>
+  <text x="345" y="28" text-anchor="middle" fill="#0984e3" font-size="10" font-weight="bold">Vision Encoder</text>
+  <text x="345" y="45" text-anchor="middle" fill="#636e72" font-size="10">每个 Patch → 一个 Embedding</text>
+
+  <line x1="408" y1="32" x2="438" y2="32" stroke="#636e72" stroke-width="1.5" marker-end="url(#mmArrow)"/>
+
+  <rect x="440" y="10" width="120" height="45" rx="6" fill="#e8f8e8" stroke="#27ae60" stroke-width="1.5"/>
+  <text x="500" y="28" text-anchor="middle" fill="#27ae60" font-size="10" font-weight="bold">LLM 推理</text>
+  <text x="500" y="45" text-anchor="middle" fill="#636e72" font-size="10">Embedding + 文本 → 推理</text>
+
+  <line x1="563" y1="32" x2="593" y2="32" stroke="#636e72" stroke-width="1.5" marker-end="url(#mmArrow)"/>
+
+  <rect x="595" y="10" width="90" height="45" rx="6" fill="#fde8e8" stroke="#e74c3c" stroke-width="1"/>
+  <text x="640" y="28" text-anchor="middle" fill="#e74c3c" font-size="10" font-weight="bold">输出</text>
+  <text x="640" y="45" text-anchor="middle" fill="#636e72" font-size="10">文字回答</text>
+
+  <rect x="100" y="80" width="530" height="80" rx="8" fill="#f8f9fa" stroke="#dfe6e9" stroke-width="1"/>
+  <text x="365" y="102" text-anchor="middle" fill="#2d3436" font-size="12" font-weight="bold">什么是 Embedding？一个帮你理解的小例子</text>
+  <line x1="120" y1="112" x2="610" y2="112" stroke="#dfe6e9" stroke-width="0.5"/>
+  <text x="365" y="132" text-anchor="middle" fill="#636e72" font-size="10">人类的语言："苹果是一种水果，红色或绿色，口感脆甜。"</text>
+  <text x="365" y="150" text-anchor="middle" fill="#636e72" font-size="10">AI 的 Embedding：一个长度为 1024 的数字列表，比如 [0.23, -0.87, 0.41, ...]</text>
+</svg>
+<div class="diagram-caption">多模态模型的视觉处理流程。每一步都在做"翻译"：图片 → 小方块 → 数字列表 → 参与语言推理。</div>
+</div>
+
+<p>具体来说：</p>
+<ul>
+  <li><strong>第一步：切图。</strong> 把一张图片切成十几个到几百个小方块（patch），每个方块 16×16 像素。</li>
+  <li><strong>第二步：编码。</strong> 每个小方块经过 Vision Encoder（一个神经网络），变成一个<strong>Embedding</strong>——其实就是一长串数字。</li>
+  <li><strong>第三步：混合。</strong> 这些数字序列被放进 Transformer（LLM 的核心架构）的输入中，和文本的 token 放在一起。</li>
+  <li><strong>第四步：推理。</strong> Transformer 在这些数字和文本之间做 attention（注意力计算），"理解"图片内容，然后生成文字回答。</li>
+</ul>
+
+<h3>8.3 所以 Embedding 到底是什么？</h3>
+
+<p>这是理解 AI 最核心也最容易困惑的概念。请记住这个比喻：</p>
+
+<div class="highlight-box">
+<strong>Embedding = 一个东西的"数字身份证"。</strong> 只不过这张身份证上写的不是文字，而是一长串数字。这些数字编码了这个东西的"含义"——它是什么、它跟什么有关、它像什么。两个相似的"东西"会有相似的数字串。
+</div>
+
+<p>举个例子：如果我们要给三种水果做 Embedding——</p>
+<ul>
+  <li><strong>"苹果"的 Embedding</strong> 可能类似于：<code>[0.2, 0.8, -0.3, 0.1, ...]</code></li>
+  <li><strong>"梨"的 Embedding</strong> 可能接近于：<code>[0.3, 0.7, -0.2, 0.0, ...]</code>（和苹果很接近）</li>
+  <li><strong>"手机"的 Embedding</strong> 则完全不同：<code>[-0.9, 0.1, 0.8, -0.6, ...]</code>（和苹果相距很远）</li>
+</ul>
+
+<p>在 AI 内部，所有东西都被转换成了这种数字形式——文字、图片、声音、代码。然后 AI 通过计算这些数字之间的距离来判断"它们是不是相关的"。这就是为什么多模态模型能"看懂"图片：它把图片也翻译成了同一种数字语言。</p>
+
+<div class="info-box">
+<strong>一句话总结：</strong>多模态模型不是真的在"看"图片，而是把图片翻译成跟文本一样的"数字语言"，然后在同一个数字空间里做推理。视觉信息在进入推理核心之前，已经被"语言化"了。
+</div>
+
+<h3>8.4 多模态在六阶梯中的位置</h3>
+
+<p>理解多模态的运作机制后，你会发现一个重要的规律：</p>
+
+<p>在当前的 AI 架构中，<strong>视觉不是独立于语言的推理通道——它是语言推理的一个输入源。</strong> 图片和文字最终在同一个 Embedding 空间中汇合，由同一个 Transformer 统一处理。这与人类的认知结构（视觉→视觉皮层独立处理，语言→语言区独立处理，两者在高层融合）有根本性的不同。</p>
+
+<p>这个现象反过来支撑了本文的核心论点：<strong>语言是当前 AI 的唯一推理介质。</strong> 不管是文字对话、代码生成，还是图片理解、视频分析——所有的信息在进入推理核心之前，都被翻译成语言空间的表示。视觉没有自己的"思考回路"。</p>
+
+<p>这也意味着：第③阶（LLM-based Agent）加挂视觉感知的能力，本质上是在 Agent 的语言推理引擎上再接一个"翻译器"——把摄像头信号翻译成 Embedding，供语言模型理解。这与人类视觉系统的工作方式有本质区别，但在工程层面非常有效。</p>
+
+<h2>九、支线二：世界模型——AI 如何"预测"世界</h2>
+
+<p>六阶梯之路的终点是第⑥阶（具身智能）——AI 走进物理世界，操控机器人。但涉及物理世界，一个关键的缺失能力就浮现出来了：<strong>AI 需要理解物理世界的因果规律。</strong></p>
+
+<p>一个简单的例子：如果你看到一个杯子放在桌边，你马上能判断"再推一下就会掉下去摔碎"。这个判断你不需要试错就能做出——因为你的大脑里有一个<strong>世界模型</strong>，它告诉你"悬空的东西会下落"、"玻璃碰到硬地会碎"。你把这个模型应用到了当前场景中，预测了结果。</p>
+
+<h3>9.1 世界模型是什么？一个直观理解</h3>
+
+<p>想象你在玩一个超级马里奥的游戏。你按"跳"键，马里奥跳起来；你按"右"键，马里奥向右移动。你之所以能玩这个游戏，是因为你的大脑在玩的过程中建立了一个简化的世界模型：</p>
+
+<ul>
+  <li>"按跳跃键 → 人物上升 → 重力作用下落"</li>
+  <li>"掉到坑里 → 死亡"</li>
+  <li>"踩到蘑菇怪 → 怪物消失"</li>
+</ul>
+
+<p>你不需要知道游戏源代码，也不需要逐帧计算物理方程。你的大脑内部有一个简化的因果模拟器——这就是世界模型的核心思想。</p>
+
+<div class="highlight-box">
+<strong>世界模型 = AI 内部的一个"因果模拟器"。</strong> 它能回答一个问题：<strong>"如果我做 A，接下来会发生什么？"</strong> 不需要真实地执行 A，只需要在"脑中"模拟一遍。
+</div>
+
+<p>更技术一点的定义：世界模型是一个能根据当前状态和智能体的行动，预测下一时刻世界状态的系统。</p>
+
+<div class="diagram-container">
+<svg viewBox="0 0 600 130" xmlns="http://www.w3.org/2000/svg">
+  <rect x="20" y="15" width="130" height="50" rx="8" fill="#eef6ff" stroke="#0984e3" stroke-width="1.5"/>
+  <text x="85" y="38" text-anchor="middle" fill="#0984e3" font-size="11" font-weight="bold">当前世界状态</text>
+  <text x="85" y="55" text-anchor="middle" fill="#636e72" font-size="10">杯子在桌边</text>
+
+  <text x="158" y="43" text-anchor="middle" fill="#636e72" font-size="14">+</text>
+
+  <rect x="170" y="15" width="100" height="50" rx="8" fill="#fef9e7" stroke="#f39c12" stroke-width="1.5"/>
+  <text x="220" y="38" text-anchor="middle" fill="#f39c12" font-size="11" font-weight="bold">智能体行动</text>
+  <text x="220" y="55" text-anchor="middle" fill="#636e72" font-size="10">推杯子</text>
+
+  <text x="278" y="43" text-anchor="middle" fill="#636e72" font-size="14">→</text>
+
+  <rect x="290" y="15" width="170" height="50" rx="8" fill="#e8f8e8" stroke="#27ae60" stroke-width="2"/>
+  <text x="375" y="35" text-anchor="middle" fill="#27ae60" font-size="11" font-weight="bold">世界模型 → 预测</text>
+  <text x="375" y="55" text-anchor="middle" fill="#636e72" font-size="10">"杯子会掉下去，可能摔碎"</text>
+
+  <text x="468" y="43" text-anchor="middle" fill="#636e72" font-size="14">→</text>
+
+  <rect x="480" y="15" width="110" height="50" rx="8" fill="#fde8e8" stroke="#e74c3c" stroke-width="1.5"/>
+  <text x="535" y="38" text-anchor="middle" fill="#e74c3c" font-size="11" font-weight="bold">决策</text>
+  <text x="535" y="55" text-anchor="middle" fill="#636e72" font-size="10">不要推！</text>
+
+  <rect x="100" y="80" width="400" height="40" rx="6" fill="#f8f9fa" stroke="#dfe6e9" stroke-width="1"/>
+  <text x="300" y="105" text-anchor="middle" fill="#636e72" font-size="11">关键：不需要真的去推杯子来知道结果——在"头脑中"模拟就行</text>
+</svg>
+<div class="diagram-caption">世界模型的工作方式：先模拟，再行动。不用试错也能做出正确决策。</div>
+</div>
+
+<p>这跟大语言模型有什么区别？</p>
+
+<table>
+<tr><th></th><th>大语言模型（LLM）</th><th>世界模型</th></tr>
+<tr>
+  <td>预测对象</td><td>下一个文本 token</td><td>下一个世界状态</td>
+</tr>
+<tr>
+  <td>推理介质</td><td>语言（文字序列）</td><td>潜在状态（连续数字空间）</td>
+</tr>
+<tr>
+  <td>能处理什么</td><td>文本可描述的一切</td><td>有物理规律的空间和时间</td>
+</tr>
+<tr>
+  <td>强项</td><td>知识、对话、创作、推理</td><td>物理因果、空间关系、运动预测</td>
+</tr>
+<tr>
+  <td>弱项</td><td>不理解物理世界</td><td>难以处理抽象知识</td>
+</tr>
+</table>
+
+<h3>9.2 为什么世界模型很重要？</h3>
+
+<p>你可能会问：LLM 已经能做这么多了，为什么还需要世界模型？两个原因：</p>
+<ul>
+  <li><strong>语言模型不理解物理世界。</strong> 它能回答"杯子会掉下去"是因为在训练数据中见过这句话，不是因为它理解重力、材质、硬度和碰撞——它的知识来自文本统计，不是因果理解。</li>
+  <li><strong>物理世界需要因果推理。</strong> 当你让一个机器人端水杯时，它需要的不是"该怎么回答"，而是"怎么移动手臂、手指施加多少力、保持平衡、避开障碍物"。这些都是物理问题，不是语言问题。</li>
+</ul>
+
+<p>世界模型就是为了解决这个问题而生的——它是 AI 理解物理世界的关键组件。</p>
+
+<h3>9.3 现在的进展如何？卡在哪？</h3>
+
+<p>目前世界模型的研究进展可以用一句话概括：</p>
+
+<div class="info-box">
+<strong>在简单环境中有进展，在复杂世界中还差得远。</strong> 目前的几个代表性工作：
+</div>
+
+<ul>
+  <li><strong>DreamerV3（Google DeepMind，2023）：</strong> 在 Minecraft、Atari 等游戏环境中，让 AI 先在"梦境"（模拟的世界模型）中训练，再在实际环境中执行。在简单游戏中效果显著。</li>
+  <li><strong>Daydreamer（Google，2023）：</strong> 同样的思路应用于机器人控制——机器人在"闭眼想象"中练习走路，比不用的机器人学得更快。</li>
+  <li><strong>JEPA（Yann LeCun / Meta，2022-至今）：</strong> 提出"在潜在空间而非像素空间做预测"的思路——不预测具体的画面，只预测抽象的表示。目标是让世界模型更高效。目前还在研究阶段。</li>
+</ul>
+
+<p><strong>卡住的瓶颈有两个：</strong></p>
+<ul>
+  <li><strong>计算的代价太高。</strong> 要预测一帧高清画面，需要的计算量远大于预测一个文本 token。虽然在"潜在空间"做预测可以降低计算成本，但代价是精度和信息量的损失。</li>
+  <li><strong>世界的复杂度太高。</strong> 文字世界的规律是相对稳定的（语法规则不变、知识变化慢），而物理世界的状态空间是无穷的——每一帧画面、每一个物体、每一种材质、每一种光的反射都不一样。</li>
+</ul>
+
+<p><strong>产业界的投入也很有限。</strong> 相比于大语言模型和 Agent 系统的万亿美元级投资，世界模型赛道的研究投入要小几个数量级。大部分资金和人才在更容易变现的领域——对话模型、AI Agent、代码助手。</p>
+
+<h3>9.4 世界模型与六阶梯的关系</h3>
+
+<p>世界模型在 AGI 路线图中是一个<strong>补充性的研究方向</strong>，而不是与六阶梯竞争的另一条路径。两者在未来可能融合：</p>
+
+<ul>
+  <li><strong>在第③阶 LLM-based Agent 阶段</strong>，世界模型的主要作用是辅助 Agent 进行物理世界的规划——比如让 Agent 在行动之前先"想象"结果。目前这个思路主要停留在实验室。</li>
+  <li><strong>在第⑥阶具身智能阶段</strong>，世界模型几乎是必不可少的。没有世界模型的机器人就是"盲操作"——每次伸手、走路、抓取都需要实时计算，没有预测能力。有了世界模型，机器人可以在行动之前在内部模拟中"试验"不同的方案，选择最安全的。</li>
+  <li><strong>远期理想</strong>：语言模型（处理抽象知识和推理）+ 世界模型（处理物理因果和空间） + Agent（自主行动和控制循环），三者融合为统一的智能系统。</li>
+</ul>
+
+<div class="diagram-container">
+<svg viewBox="0 0 650 140" xmlns="http://www.w3.org/2000/svg">
+  <rect x="15" y="20" width="150" height="100" rx="8" fill="#eef6ff" stroke="#0984e3" stroke-width="1.5"/>
+  <text x="90" y="50" text-anchor="middle" fill="#0984e3" font-size="12" font-weight="bold">语言模型</text>
+  <text x="90" y="70" text-anchor="middle" fill="#636e72" font-size="10">抽象推理 · 知识</text>
+  <text x="90" y="88" text-anchor="middle" fill="#636e72" font-size="10">对话 · 创作</text>
+  <text x="90" y="106" text-anchor="middle" fill="#636e72" font-size="10">语言理解</text>
+
+  <text x="178" y="70" text-anchor="middle" fill="#636e72" font-size="16">+</text>
+
+  <rect x="195" y="20" width="150" height="100" rx="8" fill="#e8f8e8" stroke="#27ae60" stroke-width="1.5"/>
+  <text x="270" y="50" text-anchor="middle" fill="#27ae60" font-size="12" font-weight="bold">世界模型</text>
+  <text x="270" y="70" text-anchor="middle" fill="#636e72" font-size="10">物理因果 · 预测</text>
+  <text x="270" y="88" text-anchor="middle" fill="#636e72" font-size="10">空间推理 · 模拟</text>
+  <text x="270" y="106" text-anchor="middle" fill="#636e72" font-size="10">运动规划</text>
+
+  <text x="358" y="70" text-anchor="middle" fill="#636e72" font-size="16">+</text>
+
+  <rect x="375" y="20" width="150" height="100" rx="8" fill="#fef9e7" stroke="#f39c12" stroke-width="1.5"/>
+  <text x="450" y="50" text-anchor="middle" fill="#f39c12" font-size="12" font-weight="bold">Agent 系统</text>
+  <text x="450" y="70" text-anchor="middle" fill="#636e72" font-size="10">自主行动 · 规划</text>
+  <text x="450" y="88" text-anchor="middle" fill="#636e72" font-size="10">工具调用 · 记忆</text>
+  <text x="450" y="106" text-anchor="middle" fill="#636e72" font-size="10">控制循环</text>
+
+  <text x="538" y="70" text-anchor="middle" fill="#636e72" font-size="16">→</text>
+
+  <rect x="555" y="20" width="80" height="100" rx="8" fill="#fde8e8" stroke="#e74c3c" stroke-width="1.5"/>
+  <text x="595" y="50" text-anchor="middle" fill="#e74c3c" font-size="12" font-weight="bold">AGI</text>
+  <text x="595" y="72" text-anchor="middle" fill="#636e72" font-size="10">完整的</text>
+  <text x="595" y="90" text-anchor="middle" fill="#636e72" font-size="10">智能</text>
+  <text x="595" y="108" text-anchor="middle" fill="#636e72" font-size="10">系统</text>
+</svg>
+<div class="diagram-caption">理想的 AGI = 语言模型（抽象推理）+ 世界模型（物理因果）+ Agent 系统（自主行动）。三者各司其职，形成完整的智能系统。</div>
+</div>
+
+<p>但这只是理想。现实中，世界模型的研究进度远远落后于语言模型。产业界有句玩笑话："世界模型离实用大约还需要两个世界模型突破。"短期内，AGI 路线的核心推进力仍然来自语言模型和 Agent 系统的快速迭代，世界模型则是一个关键但还未成熟的补充。</p>
+
+<h2>十、路线图的启示</h2>
 
 <p>回顾整条路线图，我们可以提炼出几个核心启示：</p>
 
