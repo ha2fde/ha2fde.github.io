@@ -107,84 +107,62 @@ footer { text-align:center; padding:2rem; color:#999; font-size:0.85rem; border-
 <p>综合当前学术界的主流共识和产业界的前沿实践，我们可以提炼出一条清晰、递进的 AGI 路线图。这条路从语言模型出发，经过推理能力的增强、自主行动能力的获得、持续学习机制的建立，最终走向自我进化和物理世界的具身化。</p>
 
 <div class="diagram-container">
-<svg viewBox="0 0 750 440" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <marker id="arrowDown" viewBox="0 0 10 10" refX="5" refY="9" markerWidth="6" markerHeight="6" orient="auto">
-      <path d="M0,0 L5,10 L10,0 Z" fill="#636e72"/>
-    </marker>
-  </defs>
+<svg viewBox="0 0 700 480" xmlns="http://www.w3.org/2000/svg">
+  <rect x="10" y="10" width="680" height="460" rx="10" fill="none" stroke="#dfe6e9" stroke-width="1"/>
+  <text x="350" y="38" text-anchor="middle" fill="#2d3436" font-size="15" font-weight="bold">AGI 六阶梯</text>
 
-  <rect x="15" y="10" width="720" height="420" rx="10" fill="none" stroke="#dfe6e9" stroke-width="1"/>
-  <text x="375" y="38" text-anchor="middle" fill="#2d3436" font-size="15" font-weight="bold">AGI 六阶梯：每一步都站在前一步的肩膀上</text>
-
-  <!-- Timeline on left -->
-  <rect x="30" y="70" width="90" height="340" rx="6" fill="#f8f9fa" stroke="#dfe6e9" stroke-width="1"/>
-  <text x="75" y="92" text-anchor="middle" fill="#636e72" font-size="10" font-weight="bold">时间线</text>
-  <line x1="45" y1="102" x2="105" y2="102" stroke="#dfe6e9" stroke-width="0.5"/>
-
-  <rect x="40" y="115" width="70" height="25" rx="4" fill="#0984e3" opacity="0.15"/>
-  <text x="75" y="132" text-anchor="middle" fill="#0984e3" font-size="9">2022-2025</text>
-
-  <rect x="40" y="195" width="70" height="25" rx="4" fill="#27ae60" opacity="0.15"/>
-  <text x="75" y="212" text-anchor="middle" fill="#27ae60" font-size="9">2025-2026</text>
-
-  <rect x="40" y="290" width="70" height="25" rx="4" fill="#f39c12" opacity="0.15"/>
-  <text x="75" y="307" text-anchor="middle" fill="#f39c12" font-size="9">2026-2027</text>
-
-  <rect x="40" y="375" width="70" height="25" rx="4" fill="#e74c3c" opacity="0.15"/>
-  <text x="75" y="392" text-anchor="middle" fill="#e74c3c" font-size="9">2027+</text>
-
-  <!-- Staircase blocks from top-left to bottom-right -->
   <!-- Step 1 -->
-  <rect x="145" y="105" width="240" height="50" rx="8" fill="#eef6ff" stroke="#0984e3" stroke-width="1.5"/>
-  <text x="265" y="128" text-anchor="middle" fill="#0984e3" font-size="13" font-weight="bold">① 语言模型基础</text>
-  <text x="265" y="147" text-anchor="middle" fill="#636e72" font-size="10">大规模预训练 + 指令微调 + RLHF</text>
+  <rect x="180" y="60" width="340" height="44" rx="8" fill="#eef6ff" stroke="#0984e3" stroke-width="1.5"/>
+  <text x="350" y="80" text-anchor="middle" fill="#0984e3" font-size="13" font-weight="bold">① 语言模型基础</text>
+  <text x="350" y="97" text-anchor="middle" fill="#636e72" font-size="10">大规模预训练 + 指令微调 + RLHF</text>
+  <text x="530" y="82" text-anchor="middle" fill="#0984e3" font-size="10">2022-2025</text>
 
-  <!-- Arrow from step 1 to step 2 -->
-  <line x1="390" y1="130" x2="420" y2="130" stroke="#0984e3" stroke-width="2" marker-end="url(#arrowDown)"/>
-  <text x="405" y="123" text-anchor="middle" fill="#0984e3" font-size="9">依赖</text>
+  <line x1="350" y1="106" x2="350" y2="126" stroke="#0984e3" stroke-width="2"/>
+  <polygon points="345,126 350,135 355,126" fill="#0984e3"/>
 
   <!-- Step 2 -->
-  <rect x="425" y="105" width="240" height="50" rx="8" fill="#eef6ff" stroke="#0984e3" stroke-width="1.5"/>
-  <text x="545" y="128" text-anchor="middle" fill="#0984e3" font-size="13" font-weight="bold">② Chain-of-Thought 推理</text>
-  <text x="545" y="147" text-anchor="middle" fill="#636e72" font-size="10">思维链 · 数学推理 · 代码生成</text>
+  <rect x="180" y="137" width="340" height="44" rx="8" fill="#eef6ff" stroke="#0984e3" stroke-width="1.5"/>
+  <text x="350" y="157" text-anchor="middle" fill="#0984e3" font-size="13" font-weight="bold">② Chain-of-Thought 推理</text>
+  <text x="350" y="174" text-anchor="middle" fill="#636e72" font-size="10">思维链 · 数学推理 · 代码生成</text>
+  <text x="530" y="159" text-anchor="middle" fill="#0984e3" font-size="10">2022-2025</text>
 
-  <!-- Step 3 - highlighted, centered below -->
-  <rect x="225" y="185" width="340" height="60" rx="10" fill="#e8f8e8" stroke="#27ae60" stroke-width="2.5"/>
-  <text x="395" y="212" text-anchor="middle" fill="#27ae60" font-size="15" font-weight="bold">③ LLM-based Agent</text>
-  <text x="395" y="233" text-anchor="middle" fill="#636e72" font-size="11">语言推理引擎 + Scaffold 控制循环 + 工具/记忆/感知</text>
-  <text x="395" y="178" text-anchor="middle" fill="#27ae60" font-size="11" font-weight="bold">▼ 当前阶段</text>
+  <line x1="350" y1="183" x2="350" y2="203" stroke="#27ae60" stroke-width="2"/>
+  <polygon points="345,203 350,212 355,203" fill="#27ae60"/>
 
-  <!-- Arrows from 1 and 2 pointing down to 3 -->
-  <path d="M 265 155 L 265 170 L 395 170 L 395 183" stroke="#27ae60" stroke-width="1.5" fill="none" stroke-dasharray="4,3" marker-end="url(#arrowDown)"/>
-  <path d="M 545 155 L 545 170 L 395 170 L 395 183" stroke="#27ae60" stroke-width="1.5" fill="none" stroke-dasharray="4,3" marker-end="url(#arrowDown)"/>
-  <text x="395" y="168" text-anchor="middle" fill="#27ae60" font-size="9">建立在 CoT + 语言模型之上</text>
+  <!-- Step 3 (current) -->
+  <rect x="150" y="215" width="400" height="50" rx="10" fill="#e8f8e8" stroke="#27ae60" stroke-width="2.5"/>
+  <text x="350" y="238" text-anchor="middle" fill="#27ae60" font-size="15" font-weight="bold">③ LLM-based Agent ◄ 当前阶段</text>
+  <text x="350" y="256" text-anchor="middle" fill="#636e72" font-size="10">语言推理引擎 + 工具/记忆/感知 + Scaffold 控制循环</text>
+  <text x="530" y="240" text-anchor="middle" fill="#27ae60" font-size="10">2025-2026</text>
+
+  <line x1="350" y1="267" x2="350" y2="287" stroke="#f39c12" stroke-width="2"/>
+  <polygon points="345,287 350,296 355,287" fill="#f39c12"/>
 
   <!-- Step 4 -->
-  <rect x="225" y="280" width="340" height="50" rx="8" fill="#fef9e7" stroke="#f39c12" stroke-width="1.5"/>
-  <text x="395" y="303" text-anchor="middle" fill="#f39c12" font-size="13" font-weight="bold">④ 持续学习</text>
-  <text x="395" y="322" text-anchor="middle" fill="#636e72" font-size="10">跨任务经验积累 · 技能内化 · 策略进化</text>
-  <text x="395" y="273" text-anchor="middle" fill="#f39c12" font-size="10" font-weight="bold">▲ 下一个瓶颈</text>
+  <rect x="180" y="299" width="340" height="44" rx="8" fill="#fef9e7" stroke="#f39c12" stroke-width="1.5"/>
+  <text x="350" y="319" text-anchor="middle" fill="#f39c12" font-size="13" font-weight="bold">④ 持续学习 ▲ 下一个瓶颈</text>
+  <text x="350" y="336" text-anchor="middle" fill="#636e72" font-size="10">跨任务经验积累 · 技能内化 · 策略进化</text>
+  <text x="530" y="321" text-anchor="middle" fill="#f39c12" font-size="10">2026-2027</text>
 
-  <line x1="395" y1="247" x2="395" y2="278" stroke="#f39c12" stroke-width="2" marker-end="url(#arrowDown)"/>
+  <line x1="350" y1="345" x2="350" y2="365" stroke="#e74c3c" stroke-width="2"/>
+  <polygon points="345,365 350,374 355,365" fill="#e74c3c"/>
 
-  <!-- Step 5 -->
-  <rect x="145" y="365" width="240" height="50" rx="8" fill="#fde8e8" stroke="#e74c3c" stroke-width="1.5"/>
-  <text x="265" y="388" text-anchor="middle" fill="#e74c3c" font-size="13" font-weight="bold">⑤ AI 自我迭代</text>
-  <text x="265" y="407" text-anchor="middle" fill="#636e72" font-size="10">自行开发下一代模型 · 加速飞轮启动</text>
-  <text x="265" y="358" text-anchor="middle" fill="#e74c3c" font-size="10">奇点</text>
+  <!-- Step 5 + Step 6 side by side -->
+  <rect x="130" y="377" width="200" height="44" rx="8" fill="#fde8e8" stroke="#e74c3c" stroke-width="1.5"/>
+  <text x="230" y="397" text-anchor="middle" fill="#e74c3c" font-size="13" font-weight="bold">⑤ AI 自我迭代</text>
+  <text x="230" y="414" text-anchor="middle" fill="#636e72" font-size="10">自行开发下一代模型</text>
+  <text x="180" y="365" text-anchor="middle" fill="#e74c3c" font-size="10">奇点</text>
 
-  <line x1="395" y1="332" x2="395" y2="345" stroke="#e74c3c" stroke-width="2"/>
-  <line x1="395" y1="345" x2="265" y2="345" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrowDown)"/>
+  <rect x="370" y="377" width="200" height="44" rx="8" fill="#fde8e8" stroke="#e74c3c" stroke-width="1.5"/>
+  <text x="470" y="397" text-anchor="middle" fill="#e74c3c" font-size="13" font-weight="bold">⑥ 具身智能</text>
+  <text x="470" y="414" text-anchor="middle" fill="#636e72" font-size="10">走进物理世界 · 机器人载体</text>
 
-  <!-- Step 6 -->
-  <rect x="425" y="365" width="240" height="50" rx="8" fill="#fde8e8" stroke="#e74c3c" stroke-width="1.5"/>
-  <text x="545" y="388" text-anchor="middle" fill="#e74c3c" font-size="13" font-weight="bold">⑥ 具身智能</text>
-  <text x="545" y="407" text-anchor="middle" fill="#636e72" font-size="10">走进物理世界 · 机器人载体</text>
+  <line x1="330" y1="398" x2="368" y2="398" stroke="#e74c3c" stroke-width="2"/>
+  <polygon points="363,393 372,398 363,403" fill="#e74c3c"/>
 
-  <line x1="390" y1="390" x2="423" y2="390" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrowDown)"/>
+  <text x="530" y="399" text-anchor="middle" fill="#e74c3c" font-size="10">2027+</text>
 </svg>
-<div class="diagram-caption">AGI 六阶梯总览：①②已基本完成，③是当前阶段，④是下一个瓶颈，⑤⑥是远期目标。每一阶都建立在前一阶的基础之上，没有一步是白走的。</div>
+<div class="diagram-caption">六阶递进：①②已基本完成，③是当前阶段，④是下一个瓶颈，⑤⑥为远期目标。全部使用竖直箭头，干净清晰。</div>
 </div>
 
 <p>这六阶不是并行的技术方向，而是<strong>递进的依赖关系</strong>：Agent 要用到 CoT 推理，CoT 需要语言模型基础，持续学习需要 Agent 作为执行载体，自我迭代需要持续学习积累的经验数据，具身智能需要 AI 先具备完整的认知能力。没有一步是白走的。</p>
