@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026 菲尔兹奖与 AI 攻克的世纪数学难题：一个时代的转折点</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, 'Segoe UI', 'Noto Sans SC', system-ui, sans-serif;
+  background: #f8f9fa; color: #2d3436; line-height: 1.8;
+}
+.article-container { max-width: 780px; margin: 0 auto; padding: 1.5rem 1.2rem; }
+.article-header { padding: 2rem 0 1rem; }
+.article-header h1 { font-size: 1.8rem; color: #1a1a2e; line-height: 1.3; }
+.meta { color: #999; font-size: 0.9rem; margin-top: 0.5rem; }
+.back { display:inline-block; margin-bottom:0.5rem; color:#3498db; text-decoration:none; font-size:0.9rem; }
+.back:hover { text-decoration:underline; }
+p { margin: 1rem 0; font-size: 1rem; }
+h2 { font-size: 1.35rem; color: #1a1a2e; margin: 2rem 0 1rem; padding-bottom: 0.3rem; border-bottom: 2px solid #0984e3; }
+h3 { font-size: 1.1rem; color: #2d3436; margin: 1.5rem 0 0.8rem; }
+ul { margin: 0.8rem 0 0.8rem 1.5rem; }
+ul li { margin: 0.4rem 0; }
+.highlight-box {
+  background: #eef6ff; border-left: 4px solid #0984e3; padding: 1rem 1.2rem;
+  margin: 1.2rem 0; border-radius: 4px;
+}
+.info-box {
+  background: #fff3e0; border-left: 4px solid #f39c12; padding: 1rem 1.2rem;
+  margin: 1.2rem 0; border-radius: 4px;
+}
+.diagram-container {
+  background: #fff; border: 1px solid #dfe6e9; border-radius: 8px;
+  padding: 1rem; margin: 1.2rem 0; overflow-x: auto;
+}
+.diagram-caption { text-align: center; font-size: 0.85rem; color: #999; margin-top: 0.5rem; }
+table {
+  width: 100%; border-collapse: collapse; margin: 1rem 0;
+  font-size: 0.95rem;
+}
+th { background: #f1f2f6; padding: 0.6rem; text-align: left; border: 1px solid #dfe6e9; }
+td { padding: 0.6rem; border: 1px solid #dfe6e9; }
+.code-block {
+  background: #1a1a2e; color: #e8e8e8; padding: 1rem; border-radius: 6px;
+  overflow-x: auto; font-family: 'JetBrains Mono', 'Cascadia Code', monospace;
+  font-size: 0.85rem; line-height: 1.6; margin: 1rem 0;
+}
+.tag {
+  display: inline-block; padding: 0.1rem 0.5rem; border-radius: 3px;
+  font-size: 0.75rem; font-weight: 600; margin: 0 0.2rem;
+}
+.tag-blue { background: #eef6ff; color: #0984e3; }
+.tag-green { background: #e8f8e8; color: #27ae60; }
+.tag-orange { background: #fef9e7; color: #f39c12; }
+.tag-red { background: #fde8e8; color: #e74c3c; }
+footer { text-align:center; padding:2rem; color:#999; font-size:0.85rem; border-top:1px solid #dfe6e9; margin-top:2rem; }
+</style>
+</head>
+<body>
+<div class="article-container">
+<a href="../index.html" class="back">← 返回首页</a>
+<header class="article-header">
+<h1>2026 菲尔兹奖与 AI 攻克的世纪数学难题：一个时代的转折点</h1>
+<div class="meta">2026-07-25 · 约 20 分钟</div>
+</header>
+
+<div class="highlight-box">
+<strong>本文核心故事：</strong> 2026 年 7 月 20 日至 23 日，四天之内，数学界发生了两件看似独立却深刻交织的事件——菲尔兹奖颁发，其中一位获奖者当场宣布加入 OpenAI；而他的学生，仅三天前，刚用 AI 推翻了一个 87 年未解的数学猜想。这不是巧合，这是 AI 与数学关系进入新阶段的信号。
+</div>
+
+<h2>一、2026 年的四位菲尔兹奖得主</h2>
+
+<p>2026 年 7 月 23 日，国际数学家大会（ICM）在费城开幕，颁出了四年一度的菲尔兹奖——数学界的最高荣誉，只授予 40 岁以下的数学家。今年的四位得主是：</p>
+
+<table>
+<tr><th>获奖者</th><th>年龄</th><th>国籍/背景</th><th>主要贡献</th></tr>
+<tr>
+  <td><strong>邓煜</strong> (Yu Deng)</td><td>34</td><td>华人，芝加哥大学教授</td>
+  <td>偏微分方程，严格推导了玻尔兹曼方程，解决了希尔伯特第六问题的部分难题</td>
+</tr>
+<tr>
+  <td><strong>John Pardon</strong></td><td>36</td><td>美国，石溪大学教授</td>
+  <td>辛几何，虚拟基本圈与 Fukaya 范畴的新方法</td>
+</tr>
+<tr>
+  <td><strong>Jacob Tsimerman</strong></td><td>38</td><td>加拿大/以色列，多伦多大学教授</td>
+  <td>算术几何，证明安德烈-奥尔特猜想，建立 o-极小性理论框架</td>
+</tr>
+<tr>
+  <td><strong>王虹</strong> (Hong Wang)</td><td>35</td><td>华人，纽约大学教授 / IHES 教授</td>
+  <td>调和分析，证明三维 Kakeya 猜想，被誉为"世纪性证明"</td>
+</tr>
+</table>
+
+<p>这届菲尔兹奖本身就已经够有看头了：</p>
+<ul>
+  <li><strong>史上首次两位华人同时获奖</strong>——邓煜和王虹都在中国出生和长大</li>
+  <li><strong>王虹是历史上第三位女性菲尔兹奖得主</strong>——前两位是 Maryam Mirzakhani（2014）和 Maryna Viazovska（2022）</li>
+  <li><strong>三人出自普林斯顿</strong>——邓煜（博士）、Pardon（本科）、Tsimerman（博士）都是普林斯顿出身</li>
+  <li><strong>三位世纪难题在同一四年周期内被攻克</strong>——Kakeya 猜想（1917）、安德烈-奥尔特猜想（1980s）、希尔伯特第六问题的部分（1900）</li>
+</ul>
+
+<p>但真正让这届菲尔兹奖出圈的，是其中一位获奖者在颁奖后的发言。</p>
+
+<h2>二、那个去 OpenAI 的人</h2>
+
+<p>费城 ICM 开幕式后的新闻发布会上，新晋菲尔兹奖得主 Jacob Tsimerman 被问到下一步计划。他的回答让全场安静了一秒：</p>
+
+<div class="highlight-box">
+<strong>"我很快就去 OpenAI，做 AI 安全研究。"</strong><br>
+—— Jacob Tsimerman，2026 年 7 月 23 日，费城
+</div>
+
+<p>颁奖典礼变成了入职发布会。</p>
+
+<p>Tsimerman 接着说了一段让数学家们不安的话：</p>
+
+<blockquote>
+<p>"我认为世界正在改变。我们今天所知道的数学职业，我不认为它们会以现在的形式继续存在下去。"</p>
+</blockquote>
+
+<p>他的预测有多激进？早在 2025 年，他在接受美国数学学会《Notices》采访时就说：</p>
+
+<div class="info-box">
+<strong>"五年？我觉得两年之内，AI 在证明定理方面就会比人类更强。到时候我们只需要说：'这里有个命题，去证一下。'"</strong>
+</div>
+
+<h3>2.1 他的唯一一条 Twitter</h3>
+
+<p>Jacob Tsimerman 的 X（Twitter）账号注册于 2014 年。过了十多年，账号上只有一条帖子：</p>
+
+<p><strong>内容：</strong>一篇论文的链接。标题是：<em>"A Taxonomy of Existential Futures Involving AI"</em>（涉及 AI 的存在主义未来分类学）。</p>
+
+<p>这篇 2025 年发表在 arXiv 上的论文，不是数学论文。它用写学术论文的严谨，分类列举了 AI 可能导致人类灭绝的各种场景——不是科幻式警告，而是系统化的分类学分析。合作者是 AI 安全研究员 Andrew Critch。</p>
+
+<p>所以当 Tsimerman 说"我去 OpenAI 做安全研究"时，他不是心血来潮，也不是追逐名利——这件事他至少认真思考了一年多。</p>
+
+<h3>2.2 为什么一个数学家要去 AI 公司？</h3>
+
+<p>他在采访中给出了一个坦率的回答：</p>
+
+<p>"我支持暂停 AI 发展，但我也认为暂停不会发生。既然停不下来，与其站在外面抵抗，不如进去搞清楚，参与塑造它——否则我们可能被落在后面。"</p>
+
+<p>关于为什么选择离开数学学术界的另一个原因，他说得更实在：</p>
+
+<blockquote>
+<p>"我做数学主要是因为我喜欢，并且我擅长它。数学家也是人，需要钱、房子、食物、爱、锻炼和各种形式的意义。如果解决问题的乐趣消失了，即使还有其他路可以走，很多人可能也不再想做数学了。"</p>
+</blockquote>
+
+<p>这句话说出了一个数学家面对 AI 时代的核心焦虑：当 AI 比你更擅长你唯一擅长的事情时，你怎么办？</p>
+
+<div class="diagram-container">
+<svg viewBox="0 0 650 90" xmlns="http://www.w3.org/2000/svg">
+  <rect x="15" y="15" width="180" height="60" rx="8" fill="#eef6ff" stroke="#0984e3" stroke-width="1.5"/>
+  <text x="105" y="40" text-anchor="middle" fill="#0984e3" font-size="12" font-weight="bold">Jacob Tsimerman</text>
+  <text x="105" y="58" text-anchor="middle" fill="#636e72" font-size="10">菲尔兹奖得主 → OpenAI 安全部门</text>
+
+  <text x="210" y="50" text-anchor="middle" fill="#636e72" font-size="16">→</text>
+
+  <rect x="230" y="15" width="180" height="60" rx="8" fill="#fde8e8" stroke="#e74c3c" stroke-width="1.5"/>
+  <text x="320" y="40" text-anchor="middle" fill="#e74c3c" font-size="12" font-weight="bold">他的判断</text>
+  <text x="320" y="58" text-anchor="middle" fill="#636e72" font-size="10">AI 两年内超数学家 · 存在灭绝风险</text>
+
+  <text x="425" y="50" text-anchor="middle" fill="#636e72" font-size="16">→</text>
+
+  <rect x="445" y="15" width="190" height="60" rx="8" fill="#e8f8e8" stroke="#27ae60" stroke-width="1.5"/>
+  <text x="540" y="40" text-anchor="middle" fill="#27ae60" font-size="12" font-weight="bold">他的选择</text>
+  <text x="540" y="58" text-anchor="middle" fill="#636e72" font-size="10">加入 AI 公司 · 从内部影响方向</text>
+</svg>
+<div class="diagram-caption">一位菲尔兹奖得主的逻辑链：从判断到行动。</div>
+</div>
+
+<h2>三、AI 推翻了一个 87 年的数学猜想</h2>
+
+<p>如果 Tsimerman 的预言只是文字，那三天前发生的事就是这句话的注脚。</p>
+
+<p>2026 年 7 月 20 日，世界杯决赛之夜。当全世界都在看球时，数学家 <strong>Levent Alpöge</strong> 在 X 上发了一条帖文：</p>
+
+<div class="highlight-box">
+<strong>"hello there the jacobian conjecture is false"</strong><br>
+（嘿，雅可比猜想是错的）<br><br>
+"thanx to my close friend akhil for asking about it and my other close friend <strong>fable</strong> for working during the world cup final"<br>
+（感谢我的朋友 Akhil 提出这个问题，以及我的另一个朋友 Fable 在世界杯决赛期间加班工作）
+</div>
+
+<p>这个"Fable"不是人——它是 Anthropic 最新发布的模型 <strong>Claude Fable 5</strong>。</p>
+
+<h3>3.1 雅可比猜想是什么？</h3>
+
+<p>雅可比猜想（Jacobian conjecture）是 1939 年由德国数学家 Ott-Heinrich Keller 提出的问题，已经悬而未决 87 年。它被列为 Smale 提出的 21 世纪数学重大问题之一。</p>
+
+<p>让我用一个简化的类比来说明：</p>
+
+<p>想象你有一个神奇的公式，能把一个数字变成另一个数字。这个公式有一个性质：它的"变化率"在任何地方都不为零（用数学语言说，雅可比行列式是一个非零常数）。那么这个公式应该是"可逆"的——你能找到另一个公式，把输出变回输入。</p>
+
+<p>这个猜想在直觉上很合理：如果变化率处处不为零，那应该可以反向操作。但问题在于——<strong>对于多项式方程组来说，这是否总是成立？</strong></p>
+
+<p>87 年来，没有人能证明它，也没人能推翻它。</p>
+
+<h3>3.2 Fable 5 找到的反例</h3>
+
+<p>Alpöge 公布的反例只有短短的几行公式：</p>
+
+<div class="code-block">
+F(x, y, z) = ( <br>
+&nbsp; (1+xy)³z + y²(1+xy)(4+3xy),<br>
+&nbsp; y + 3x(1+xy)²z + 3xy²(4+3xy),<br>
+&nbsp; 2x − 3x²y − x³z<br>
+)
+</div>
+
+<p>这是一个从三维空间到三维空间的多项式映射。它的雅可比行列式计算出来是 <strong>-2</strong>——在任何点都是常数，非零——完全满足猜想的条件。</p>
+
+<p>但神奇的是：三个不同的输入点，经过这个映射，会落在同一点上。</p>
+
+<div class="code-block">
+F(1, 1, 1) = (−1/4, 0, 0)<br>
+F(p₁) = (−1/4, 0, 0)<br>
+F(p₂) = (−1/4, 0, 0)
+</div>
+
+<p>三个不同的输入得到相同输出——这意味着映射不是一一对应的，也就不可能存在一个全局的多项式逆映射。猜想的结论被推翻了。</p>
+
+<p>这个反例只有 <strong>216 个字符</strong>。任何一个数学家都可以手动验证。</p>
+
+<div class="info-box">
+<strong>重要澄清：</strong>AI 不是"自动"解决了这个问题。Alpöge（人类数学家）和 Claude Fable 5（AI）之间经历了多次迭代——数学家提出策略方向，AI 生成候选公式，数学家验证、调整、再尝试。参与验证的数学家 Bartósz Naskręcki 特别指出："这不是一句提示词就能搞定的事。" AI 是协作工具，不是独立解题者。
+</div>
+
+<h3>3.3 数学界的反应</h3>
+
+<p>反馈出奇地快。因为反例可以直接代入验证，几个小时内，全球数学家就开始独立确认。</p>
+
+<p>菲尔兹奖得主 <strong>Timothy Gowers</strong> 评论说：这是他第一次看到 LLM 解决了一个"领域内知名"的问题。注意这个措辞——不是竞赛级别的脑筋急转弯，而是真正的开放问题。</p>
+
+<p><strong>Terence Tao</strong>（陶哲轩）在博客上发表了详细的分析文章，从几何角度解释了为什么这个映射能以这样的方式存在。Tao 也是之前 OpenAI 用 AI 推翻 Erdos 单位距离猜想的合作者之一。</p>
+
+<p>Lean 形式化验证也迅速跟进——Google DeepMind 的 Formal Conjectures 仓库在一天之内就提交了 PR，用 Lean 定理证明器验证了这个反例。</p>
+
+<p>但也有人谨慎：</p>
+<ul>
+  <li>完整的论文还没有提交，同行评审尚未完成</li>
+  <li>AI 寻找反例的过程没有公开（用什么提示词、经历了多少次迭代？）</li>
+  <li>二维情况（n=2）是否成立仍然未知——它可能是唯一未被推翻的剩余情况</li>
+</ul>
+
+<h2>四、老师与学生：一个完美的叙事闭环</h2>
+
+<p>这个故事里最戏剧性的线索，藏在两个人的关系中。</p>
+
+<p>Levent Alpöge 在哈佛读本科时的论文导师是——<strong>Jacob Tsimerman</strong>。当时 Tsimerman 正好是哈佛的初级研究员（Junior Fellow）。</p>
+
+<p>老师唯一的 X 帖文预测 AI 会取代数学家解决问题；学生用 AI 推翻了一个世纪猜想。</p>
+
+<p>老师加入 OpenAI 做安全研究；学生去了 Anthropic 做数学家。</p>
+
+<div class="diagram-container">
+<svg viewBox="0 0 650 120" xmlns="http://www.w3.org/2000/svg">
+  <rect x="20" y="20" width="250" height="80" rx="8" fill="#eef6ff" stroke="#0984e3" stroke-width="1.5"/>
+  <text x="145" y="45" text-anchor="middle" fill="#0984e3" font-size="13" font-weight="bold">Jacob Tsimerman（老师）</text>
+  <text x="145" y="65" text-anchor="middle" fill="#636e72" font-size="10">菲尔兹奖 · 预测 AI 将超越数学家</text>
+  <text x="145" y="82" text-anchor="middle" fill="#636e72" font-size="10">→ 加入 <span class="tag tag-green">OpenAI 安全</span></text>
+
+  <text x="295" y="60" text-anchor="middle" font-size="14" fill="#636e72">师</text>
+  <text x="315" y="60" text-anchor="middle" font-size="14" fill="#636e72">↓</text>
+  <text x="335" y="60" text-anchor="middle" font-size="14" fill="#636e72">生</text>
+
+  <rect x="370" y="20" width="250" height="80" rx="8" fill="#fde8e8" stroke="#e74c3c" stroke-width="1.5"/>
+  <text x="495" y="45" text-anchor="middle" fill="#e74c3c" font-size="13" font-weight="bold">Levent Alpöge（学生）</text>
+  <text x="495" y="65" text-anchor="middle" fill="#636e72" font-size="10">哈佛本科（导师 Tsimerman）</text>
+  <text x="495" y="82" text-anchor="middle" fill="#636e72" font-size="10">→ 加入 <span class="tag tag-orange">Anthropic</span> → 用 Fable 5 推翻雅可比猜想</text>
+
+  <line x1="270" y1="50" x2="290" y2="50" stroke="#636e72" stroke-width="2"/>
+  <polygon points="290,45 300,50 290,55" fill="#636e72"/>
+  <line x1="330" y1="50" x2="365" y2="50" stroke="#636e72" stroke-width="2"/>
+  <polygon points="360,45 370,50 360,55" fill="#636e72"/>
+</svg>
+<div class="diagram-caption">老师预言，学生执行。老师去了 OpenAI，学生去了 Anthropic。这是 2026 年 7 月最精彩的故事弧线。</div>
+</div>
+
+<p>更巧合的是时间线：</p>
+<ul>
+  <li><strong>7 月 20 日</strong>：Alpöge 用 Fable 5 推翻雅可比猜想</li>
+  <li><strong>7 月 23 日</strong>：Tsimerman 获菲尔兹奖并宣布加入 OpenAI</li>
+</ul>
+<p>前后只有三天。</p>
+
+<h2>五、AI 正在系统性地改变数学研究</h2>
+
+<p>雅可比猜想不是孤例。2026 年，AI 已经多次在重大数学问题上取得突破：</p>
+
+<table>
+<tr><th>日期</th><th>问题</th><th>涉及 AI</th><th>年代</th></tr>
+<tr><td>2026 年 5 月</td><td><strong>Erdős 单位距离猜想</strong></td><td>OpenAI（具体模型未公开）</td><td>1946 年提出，80 年未解</td></tr>
+<tr><td>2026 年 7 月初</td><td><strong>Grothendieck 时代的群方案问题</strong></td><td>未公开</td><td>~1960s</td></tr>
+<tr><td>2026 年 7 月 20 日</td><td><strong>雅可比猜想</strong></td><td>Claude Fable 5 (Anthropic)</td><td>1939 年提出，87 年未解</td></tr>
+</table>
+
+<p>短短三个月内，AI 参与推翻（或协助推翻）了三个长期悬而未决的数学猜想。这个密度是历史上从未有过的。</p>
+
+<h3>5.1 两个模式</h3>
+
+<p>目前的 AI + 数学故事呈现出两种截然不同的模式：</p>
+
+<p><strong>模式一：AI 作为搜索引擎。</strong> 这是雅可比猜想案例的模式。人类数学家知道问题是什么，知道反例应该是什么样的结构，但搜索空间太大、计算太复杂，人脑无法穷举。AI 在这里充当了"超级搜索器"——在巨大的参数空间中快速筛选，锁定候选方案，人类再验证。这类似于数学家使用计算机代数系统（Computer Algebra System）的扩展版，但更具生成性和探索性。</p>
+
+<p><strong>模式二：AI 作为发现引擎。</strong> OpenAI 推翻 Erdős 单位距离猜想的案例更接近这个模式。AI 不仅仅是在搜索已知范围内的解，而是在构建全新的数学结构——一个高维的几何构造，其复杂度远超人类的直觉能力。研究员形容为："这个构造可以看作 Erdős 经典四方格下界的算术在高维空间的类比。"</p>
+
+<p>两种模式的共同特点是：<strong>AI 做生成/搜索，人类做验证/理解。</strong></p>
+
+<h3>5.2 但这还不是"AI 做数学"</h3>
+
+<p>需要冷静看待的是：目前的 AI 在数学上的能力，离 Tsimerman 描述的"你说个命题，AI 去证明"还有很大距离。</p>
+
+<p>2026 年 ACL 会议上的一篇系统研究论文指出：即使是最先进的大型推理模型（如 R1、o3），在生成完整数学证明的任务上，成功率仍然不到 20%。论文揭示了 10 种常见的推理失败模式，并提出关键问题：<strong>模型的推理过程缺乏严格性和正确性保障，纯粹的语言提示不足以解决当前的逻辑困境，需要领域知识和形式化验证。</strong></p>
+
+<p>换句话说：AI 在<strong>寻找反例</strong>方面表现惊艳——因为反例只需要找到"一个"例外，可以用搜索来解决。但 AI 在<strong>构建正向证明</strong>方面仍然困难——因为证明要求的是系统化的逻辑结构，不是搜索。</p>
+
+<div class="diagram-container">
+<svg viewBox="0 0 600 110" xmlns="http://www.w3.org/2000/svg">
+  <rect x="20" y="15" width="260" height="80" rx="8" fill="#e8f8e8" stroke="#27ae60" stroke-width="1.5"/>
+  <text x="150" y="40" text-anchor="middle" fill="#27ae60" font-size="13" font-weight="bold">✅ AI 擅长的</text>
+  <text x="150" y="62" text-anchor="middle" fill="#636e72" font-size="11">• 寻找反例（搜索+验证）</text>
+  <text x="150" y="80" text-anchor="middle" fill="#636e72" font-size="11">• 在巨大参数空间中筛选候选解</text>
+
+  <rect x="320" y="15" width="260" height="80" rx="8" fill="#fde8e8" stroke="#e74c3c" stroke-width="1.5"/>
+  <text x="450" y="40" text-anchor="middle" fill="#e74c3c" font-size="13" font-weight="bold">❌ AI 不擅长的</text>
+  <text x="450" y="62" text-anchor="middle" fill="#636e72" font-size="11">• 构建完整正向证明</text>
+  <text x="450" y="80" text-anchor="middle" fill="#636e72" font-size="11">• 保证推理过程的严格性</text>
+</svg>
+<div class="diagram-caption">AI 在数学上的当前能力分布：寻找反例已初见成效，构建正向证明仍是挑战。</div>
+</div>
+
+<h2>六、这意味着什么？</h2>
+
+<h3>6.1 对数学界</h3>
+
+<p>Tsimerman 的预言可能不是疯狂，而是早了一点。数学界需要面对几个现实：</p>
+<ul>
+  <li><strong>反例发现正在被 AI 接管</strong>——这是数学研究中一个具体、可定义的任务，它现在成为了 AI 的能力范围</li>
+  <li><strong>"问题解决型"数学家的价值可能被重新评估</strong>——正如 Tsimerman 所说，如果"给一个命题，去证一下"变成 AI 的工作，那人类数学家的角色是什么？</li>
+  <li><strong>"理论构建型"数学家短期内还安全</strong>——提出好的问题、构建理论框架、理解数学结构背后的深层含义，这些仍然是人类擅长的</li>
+</ul>
+
+<h3>6.2 对 AI 行业</h3>
+
+<p>这轮人才争夺战暴露了 AI 公司的核心需求：</p>
+<ul>
+  <li>Google DeepMind、OpenAI、Anthropic 三家之间的"数学家军备竞赛"已经白热化</li>
+  <li>需要数学家的原因：数学推理能力是训练下一代推理模型的关键——给你一个命题，判定它的真假并找到证明或反例，这正是训练和评估推理模型最需要的能力</li>
+  <li>Tsimerman 说"两年内 AI 在证明定理方面超越人类"——他加入 OpenAI 之后，这个时间线可能只会更快</li>
+</ul>
+
+<h3>6.3 对人类</h3>
+
+<p>这个故事的深层震撼在于：<strong>数学一直被认为是人类智力的最高成就</strong>——如果连这个领域都在被 AI 系统性地渗透，那还有什么是"人类专属"的？</p>
+
+<p>Tsimerman 在他的论文中给出的分类学里，提到了一个场景：当 AI 变成一个"数学神谕"——你提出一个问题，它能立即告诉你答案是真是假——那么数学研究的面貌会发生根本性的改变。</p>
+
+<blockquote>
+<p>"你提出一个定义，然后立刻问它一千个问题——从'这些基本性质成立吗'到'顺便问一下，这个深层猜想是真的吗'。答案不断回来，你不断调整定义。整个研究方向可以在几天内被创造和终结。"</p>
+</blockquote>
+
+<p>这听起来像科幻，但 2026 年 7 月的这四天告诉我们：<strong>科幻和现实之间的边界，正在以数学般的精确速度缩小。</strong></p>
+
+<h2>七、尾声</h2>
+
+<p>阿尔波格的帖文最后有一句感谢：</p>
+
+<p><em>"thanks to fable for working during the world cup final"</em></p>
+
+<p>2026 年的世界杯决赛那晚，AI 没有在看球。它在思考一个 87 年没人能回答的数学问题。</p>
+
+<p>而三天后，它的创造者的同行——地球上最聪明的人类之一——在领完数学界的最高奖项后，说的第一句话是："我要去 OpenAI 了，因为我觉得世界正在改变。"</p>
+
+<p>如果你是一个数学家，你应当感到不安。如果你是一个普通人，你也应当感到不安——因为你正在目睹一个时代的转折点，而它比你想象的要快得多。</p>
+
+<div class="info-box">
+<strong>后记：</strong>本文写作参考了 Nature、Quanta Magazine、Princeton News、Fortune、DataCamp、lilting.ch 等媒体的报道，以及 Jacob Tsimerman 和 Levent Alpöge 本人的公开发文。所有事实均可在 2026 年 7 月 20-24 日期间的公开资料中找到。二维雅可比猜想（n=2）目前仍然开放。
+</div>
+
+</div>
+<footer>&copy; 2026 Ha2fde</footer>
+</div>
+</body>
+</html>
