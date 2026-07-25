@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Agent 规划与推理深度解析：从 ReAct 到 Deep Research</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, 'Segoe UI', 'Noto Sans SC', system-ui, sans-serif;
+  background: #f5f6fa; color: #2d3436; line-height: 1.8;
+}
+.article-container { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem; }
+header.article-header { padding: 2rem 0 1.5rem; border-bottom: 2px solid #dfe6e9; margin-bottom: 2rem; }
+header.article-header h1 { font-size: 1.9rem; color: #2d3436; line-height: 1.3; }
+.meta { color: #636e72; font-size: 0.9rem; margin-top: 0.6rem; }
+.back { display:inline-block; margin-bottom:1rem; color:#0984e3; text-decoration:none; font-size:0.9rem; }
+.back:hover { text-decoration:underline; }
+
+h2 { font-size:1.5rem; margin:2.5rem 0 1rem; color:#2d3436; padding-bottom:0.3rem; border-bottom:2px solid #0984e3; display:inline-block; }
+h3 { font-size:1.2rem; margin:1.8rem 0 0.8rem; color:#2d3436; }
+h4 { font-size:1.05rem; margin:1.2rem 0 0.5rem; color:#636e72; }
+p { margin:0.8rem 0; color:#555; }
+.highlight-box {
+  background: #eef6ff; border-left: 4px solid #0984e3; padding: 1rem 1.2rem;
+  margin: 1.2rem 0; border-radius: 0 6px 6px 0;
+}
+.info-box {
+  background: #fef9e7; border-left: 4px solid #f39c12; padding: 1rem 1.2rem;
+  margin: 1.2rem 0; border-radius: 0 6px 6px 0;
+}
+.warn-box {
+  background: #fde8e8; border-left: 4px solid #e74c3c; padding: 1rem 1.2rem;
+  margin: 1.2rem 0; border-radius: 0 6px 6px 0;
+}
+pre {
+  background: #1e272e; color: #d2dae2; padding: 1rem 1.2rem;
+  border-radius: 6px; overflow-x: auto; font-size: 0.85rem; line-height: 1.5;
+  margin: 1rem 0;
+}
+code { font-family: 'Fira Code', 'Cascadia Code', monospace; }
+p code { background: #eee; padding: 0.15rem 0.4rem; border-radius: 3px; font-size: 0.9em; }
+
+table { width:100%; border-collapse:collapse; margin:1rem 0; font-size:0.92rem; }
+th { background:#0984e3; color:#fff; padding:10px 12px; text-align:left; font-weight:600; }
+td { padding:10px 12px; border-bottom:1px solid #dfe6e9; }
+tr:nth-child(even) td { background:#f8f9fa; }
+tr:hover td { background:#eef6ff; }
+
+ul, ol { margin:0.6rem 0; padding-left:1.5rem; color:#555; }
+li { margin:0.3rem 0; }
+
+.diagram-container {
+  text-align:center; margin: 1.5rem 0; padding: 1rem;
+  background: #fff; border: 1px solid #dfe6e9; border-radius: 8px;
+  overflow-x: auto;
+}
+.diagram-container svg { max-width:100%; height:auto; }
+.diagram-caption { font-size:0.85rem; color:#636e72; margin-top:0.6rem; }
+
+.tag {
+  display:inline-block; background:#dfe6e9; color:#636e72;
+  padding:0.1rem 0.6rem; border-radius:3px; font-size:0.8rem; margin-right:0.3rem;
+}
+
+footer { text-align:center; padding:2rem; color:#999; font-size:0.85rem; border-top:1px solid #dfe6e9; margin-top:2rem; }
+
+.summary-card {
+  background: #fff; border: 1px solid #dfe6e9; border-radius: 8px;
+  padding: 1.2rem; margin: 1rem 0;
+}
+.summary-card .sc-title { font-weight:600; color:#0984e3; margin-bottom:0.5rem; }
+.summary-card ul { margin:0; }
+</style>
+</head>
+<body>
+<div class="article-container">
+<a href="../index.html" class="back">← 返回首页</a>
+<header class="article-header">
+<h1>AI Agent 规划与推理深度解析：让 Agent 学会"思考"</h1>
+<div class="meta">
+  <span>2026-07-25 · 约 25 分钟</span>
+  <span style="margin-left:1rem;">
+    <span class="tag">规划与推理</span>
+    <span class="tag">ReAct</span>
+    <span class="tag">Agent</span>
+    <span class="tag">Deep Research</span>
+  </span>
+</div>
+</header>
+
+<p><strong>"真正智能的 Agent 不只是执行命令，而是能够独立规划、推理并完成复杂任务。"</strong></p>
+
+<p>如果工具调用是 Agent 的"双手"，记忆系统是它的"回忆"，那么规划与推理就是它的<strong>"大脑"</strong>。前几篇文章我们聊了 AI Agent 的整体架构，本篇聚焦最核心的环节——<strong>Agent 如何"思考"</strong>。</p>
+
+<p>本文基于 <a href="https://github.com/Haozhe-Xing/agent_learning">Agent Learning 开源教程</a> 第5章，结合多篇顶级论文（ReAct、Reflexion、DeepSeek-R1 等），为你系统梳理 Agent 规划与推理的技术全景。</p>
+
+<!-- ============================================ -->
+<h2>1. Agent 如何"思考"？</h2>
+
+<p>Agent 的"思考"本质上是在<strong>上下文中组织信息、推导结论、制定计划</strong>的过程。理解这个过程，是设计高效 Agent 的前提。</p>
+
+<h3>1.1 心理模型：为什么直接提问不够？</h3>
+
+<p>把 LLM 比作一个阅读速度极快的"阅读者"——直接提问就像让它在没看完题目时就给出结论。LLM 只有在输出每一个 Token 时，才在"思考"。因此，引导推理的关键是<strong>强制要求模型在输出最终答案前，先把思维过程展示出来</strong>（即 Chain-of-Thought 策略）。</p>
+
+<h3>1.2 OODA 决策循环</h3>
+
+<p>OODA 循环原本是军事决策模型，后来被广泛应用于 AI Agent 的决策过程设计。它包含四个阶段：</p>
+
+<div class="diagram-container">
+<svg viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#0984e3"/>
+    </marker>
+  </defs>
+  <rect x="20" y="30" width="110" height="80" rx="10" fill="#dfe6e9" stroke="#0984e3" stroke-width="2"/>
+  <text x="75" y="65" text-anchor="middle" fill="#2d3436" font-size="14" font-weight="bold">Observe</text>
+  <text x="75" y="85" text-anchor="middle" fill="#636e72" font-size="11">观察</text>
+
+  <rect x="180" y="30" width="110" height="80" rx="10" fill="#dfe6e9" stroke="#0984e3" stroke-width="2"/>
+  <text x="235" y="65" text-anchor="middle" fill="#2d3436" font-size="14" font-weight="bold">Orient</text>
+  <text x="235" y="85" text-anchor="middle" fill="#636e72" font-size="11">定位</text>
+
+  <rect x="340" y="30" width="110" height="80" rx="10" fill="#dfe6e9" stroke="#0984e3" stroke-width="2"/>
+  <text x="395" y="65" text-anchor="middle" fill="#2d3436" font-size="14" font-weight="bold">Decide</text>
+  <text x="395" y="85" text-anchor="middle" fill="#636e72" font-size="11">决策</text>
+
+  <rect x="500" y="30" width="80" height="80" rx="10" fill="#dfe6e9" stroke="#0984e3" stroke-width="2"/>
+  <text x="540" y="65" text-anchor="middle" fill="#2d3436" font-size="14" font-weight="bold">Act</text>
+  <text x="540" y="85" text-anchor="middle" fill="#636e72" font-size="11">行动</text>
+
+  <line x1="130" y1="70" x2="180" y2="70" stroke="#0984e3" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="290" y1="70" x2="340" y2="70" stroke="#0984e3" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="450" y1="70" x2="500" y2="70" stroke="#0984e3" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <path d="M 540 110 Q 540 160 300 160 Q 60 160 75 110" fill="none" stroke="#e17055" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrow)"/>
+  <text x="300" y="175" text-anchor="middle" fill="#e17055" font-size="11">循环（Loop）</text>
+</svg>
+<div class="diagram-caption">OODA 决策循环：观察 → 定位 → 决策 → 行动，往复循环</div>
+</div>
+
+<p>每个阶段对应 Agent 中的一个明确步骤：</p>
+<ul>
+  <li><strong>Observe（观察）</strong>——收集并整理当前环境信息，提取用户需求和关键条件</li>
+  <li><strong>Orient（定位）</strong>——在已有知识框架中理解当前情况，判断任务类型和可用工具</li>
+  <li><strong>Decide（决策）</strong>——制定行动计划，选择最优方案和备选方案</li>
+  <li><strong>Act（行动）</strong>——执行计划，生成最终响应</li>
+</ul>
+
+<h3>1.3 元认知：Agent 的自我意识</h3>
+
+<p>高级 Agent 具备元认知能力——能够思考自己的思考过程：</p>
+<ul>
+  <li>判断自己<strong>知道什么、不知道什么</strong>（置信度评估）</li>
+  <li>识别自己可能存在的<strong>盲区</strong></li>
+  <li>判断是否需要<strong>额外工具或信息</strong></li>
+  <li>明确回答所基于的<strong>假设</strong></li>
+</ul>
+
+<!-- ============================================ -->
+<h2>2. ReAct：推理 + 行动的经典框架</h2>
+
+<p>ReAct（Reasoning + Acting）来自 2022 年普林斯顿大学和 Google Brain 的论文，是 Agent 开发中<strong>最重要的框架之一</strong>。它的核心洞察是：<strong>推理为行动提供方向，行动为推理提供依据</strong>。</p>
+
+<div class="highlight-box">
+<strong>💡 历史背景：</strong>在 ReAct 之前，LLM 的推理（Chain-of-Thought）和行动（工具调用）是独立的研究方向。CoT 让模型"会想但不会做"——推理时无法获取外部信息；工具调用让模型"会做但不会想"——盲目执行而不解释理由。ReAct 将两者融为一体。
+</div>
+
+<h3>2.1 ReAct 循环</h3>
+
+<div class="diagram-container">
+<svg viewBox="0 0 480 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arr2" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#0984e3"/>
+    </marker>
+  </defs>
+
+  <rect x="160" y="10" width="140" height="50" rx="8" fill="#0984e3"/>
+  <text x="230" y="40" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">Thought（推理）</text>
+
+  <line x1="230" y1="60" x2="230" y2="95" stroke="#0984e3" stroke-width="2" marker-end="url(#arr2)"/>
+
+  <rect x="160" y="95" width="140" height="50" rx="8" fill="#e17055"/>
+  <text x="230" y="125" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">Action（行动）</text>
+
+  <line x1="230" y1="145" x2="230" y2="180" stroke="#0984e3" stroke-width="2" marker-end="url(#arr2)"/>
+
+  <rect x="160" y="180" width="140" height="50" rx="8" fill="#00b894"/>
+  <text x="230" y="210" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">Observation（观察）</text>
+
+  <path d="M 230 230 Q 230 260 230 260 L 230 60" fill="none" stroke="#0984e3" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arr2)"/>
+  <text x="270" y="270" fill="#636e72" font-size="11">循环直到得到最终答案</text>
+
+  <rect x="360" y="90" width="100" height="60" rx="30" fill="#fdcb6e"/>
+  <text x="410" y="120" text-anchor="middle" fill="#2d3436" font-size="12" font-weight="bold">🔧 工具</text>
+  <text x="410" y="138" text-anchor="middle" fill="#2d3436" font-size="10">搜索 / 计算 / API</text>
+  <line x1="300" y1="120" x2="360" y2="120" stroke="#636e72" stroke-width="1.5" stroke-dasharray="4,3"/>
+</svg>
+<div class="diagram-caption">ReAct 循环：思考 → 行动 → 观察 → 再思考…… 直到问题解决</div>
+</div>
+
+<h3>2.2 与传统 Agent 对比</h3>
+
+<table>
+<tr><th>特点</th><th>传统 Agent（黑盒）</th><th>ReAct Agent（透明）</th></tr>
+<tr><td>思考过程</td><td>隐藏</td><td>显式写入上下文</td></tr>
+<tr><td>可解释性</td><td>差</td><td>好</td></tr>
+<tr><td>自我纠错</td><td>难</td><td>容易</td></tr>
+<tr><td>幻觉风险</td><td>高</td><td>低（工具验证）</td></tr>
+</table>
+
+<h3>2.3 关键实验结果</h3>
+
+<table>
+<tr><th>任务</th><th>CoT（仅推理）</th><th>Act-only（仅行动）</th><th>ReAct</th><th>提升</th></tr>
+<tr><td>HotpotQA（多跳问答）</td><td>29.4%</td><td>25.7%</td><td><strong>35.1%</strong></td><td>+6pp vs CoT</td></tr>
+<tr><td>ALFWorld（交互式游戏）</td><td>—</td><td>45%</td><td><strong>79%</strong></td><td>+34pp vs Act</td></tr>
+<tr><td>WebShop（在线购物）</td><td>—</td><td>30.1%</td><td><strong>40.0%</strong></td><td>+10pp vs Act</td></tr>
+</table>
+
+<div class="info-box">
+<strong>🔑 为什么 1+1 > 2？</strong>
+<ul>
+  <li><strong>只推理（CoT）</strong>：会想但不会做——推理无法获取外部信息，容易产生幻觉</li>
+  <li><strong>只行动（Act-only）</strong>：会做但不会想——盲目调用工具，缺乏全局规划</li>
+  <li><strong>ReAct</strong>：推理为行动提供方向，行动为推理提供事实依据，形成闭环</li>
+</ul>
+</div>
+
+<!-- ============================================ -->
+<h2>3. 任务分解：化繁为简的艺术</h2>
+
+<p>复杂任务往往超出单个 LLM 调用的能力范围。任务分解是将大问题拆成可管理的小问题，然后逐步解决。</p>
+
+<h3>3.1 Plan-and-Execute 模式</h3>
+
+<p>核心思想：<strong>先制定完整计划，再逐步执行</strong>。</p>
+
+<div class="diagram-container">
+<svg viewBox="0 0 620 220" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arr3" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#0984e3"/>
+    </marker>
+  </defs>
+
+  <rect x="10" y="20" width="120" height="50" rx="8" fill="#0984e3"/>
+  <text x="70" y="50" text-anchor="middle" fill="#fff" font-size="13" font-weight="bold">📋 Planner</text>
+
+  <line x1="130" y1="45" x2="170" y2="45" stroke="#0984e3" stroke-width="2" marker-end="url(#arr3)"/>
+
+  <rect x="170" y="10" width="130" height="35" rx="6" fill="#dfe6e9" stroke="#0984e3" stroke-width="1"/>
+  <text x="235" y="33" text-anchor="middle" fill="#2d3436" font-size="12">步骤 1：搜索信息</text>
+
+  <rect x="170" y="50" width="130" height="35" rx="6" fill="#dfe6e9" stroke="#0984e3" stroke-width="1"/>
+  <text x="235" y="73" text-anchor="middle" fill="#2d3436" font-size="12">步骤 2：处理分析</text>
+
+  <rect x="170" y="90" width="130" height="35" rx="6" fill="#dfe6e9" stroke="#0984e3" stroke-width="1"/>
+  <text x="235" y="113" text-anchor="middle" fill="#2d3436" font-size="12">步骤 3：生成报告</text>
+
+  <rect x="170" y="130" width="130" height="35" rx="6" fill="#dfe6e9" stroke="#0984e3" stroke-width="1"/>
+  <text x="235" y="153" text-anchor="middle" fill="#2d3436" font-size="12">步骤 4：质量检查</text>
+
+  <line x1="300" y1="45" x2="340" y2="45" stroke="#0984e3" stroke-width="2" marker-end="url(#arr3)"/>
+
+  <rect x="340" y="10" width="120" height="50" rx="8" fill="#00b894"/>
+  <text x="400" y="40" text-anchor="middle" fill="#fff" font-size="13" font-weight="bold">⚡ Executor</text>
+
+  <line x1="460" y1="35" x2="500" y2="35" stroke="#0984e3" stroke-width="2" marker-end="url(#arr3)"/>
+
+  <rect x="500" y="10" width="100" height="50" rx="8" fill="#e17055"/>
+  <text x="550" y="40" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">🔄 重规划？</text>
+  <text x="550" y="150" fill="#e17055" font-size="11" text-decoration="underline">遇到问题触发重新规划</text>
+
+  <path d="M 550 60 Q 550 180 310 180 Q 70 180 70 70" fill="none" stroke="#e17055" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arr3)"/>
+</svg>
+<div class="diagram-caption">Plan-and-Execute 架构：规划器先生成完整计划，执行器逐步执行，遇到偏差触发重规划</div>
+</div>
+
+<h3>3.2 层次化任务分解（HTN）</h3>
+
+<p>对于更复杂的任务，可以采用层次化分解——将任务递归分解，直到达到"原子操作"级别：</p>
+
+<div class="diagram-container">
+<svg viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg">
+  <!-- 根节点 -->
+  <rect x="120" y="5" width="160" height="36" rx="6" fill="#0984e3"/>
+  <text x="200" y="28" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">开发天气预报 Python 应用</text>
+
+  <!-- 第二层 -->
+  <line x1="160" y1="41" x2="60" y2="75" stroke="#636e72" stroke-width="1.5"/>
+  <line x1="200" y1="41" x2="200" y2="75" stroke="#636e72" stroke-width="1.5"/>
+  <line x1="240" y1="41" x2="340" y2="75" stroke="#636e72" stroke-width="1.5"/>
+
+  <rect x="10" y="75" width="120" height="32" rx="5" fill="#dfe6e9" stroke="#0984e3" stroke-width="1"/>
+  <text x="70" y="95" text-anchor="middle" fill="#2d3436" font-size="11">获取天气 API 数据</text>
+
+  <rect x="150" y="75" width="100" height="32" rx="5" fill="#dfe6e9" stroke="#0984e3" stroke-width="1"/>
+  <text x="200" y="95" text-anchor="middle" fill="#2d3436" font-size="11">用户界面</text>
+
+  <rect x="270" y="75" width="120" height="32" rx="5" fill="#dfe6e9" stroke="#0984e3" stroke-width="1"/>
+  <text x="330" y="95" text-anchor="middle" fill="#2d3436" font-size="11">数据展示</text>
+
+  <!-- 叶子节点 -->
+  <line x1="40" y1="107" x2="20" y2="140" stroke="#636e72" stroke-width="1"/>
+  <line x1="70" y1="107" x2="60" y2="140" stroke="#636e72" stroke-width="1"/>
+  <line x1="100" y1="107" x2="110" y2="140" stroke="#636e72" stroke-width="1"/>
+  <line x1="200" y1="107" x2="200" y2="140" stroke="#636e72" stroke-width="1"/>
+  <line x1="330" y1="107" x2="330" y2="140" stroke="#636e72" stroke-width="1"/>
+
+  <rect x="5" y="140" width="40" height="28" rx="4" fill="#00b894"/>
+  <text x="25" y="158" text-anchor="middle" fill="#fff" font-size="9">注册</text>
+
+  <rect x="48" y="140" width="40" height="28" rx="4" fill="#00b894"/>
+  <text x="68" y="158" text-anchor="middle" fill="#fff" font-size="9">解析</text>
+
+  <rect x="95" y="140" width="40" height="28" rx="4" fill="#00b894"/>
+  <text x="115" y="158" text-anchor="middle" fill="#fff" font-size="9">缓存</text>
+
+  <rect x="170" y="140" width="60" height="28" rx="4" fill="#00b894"/>
+  <text x="200" y="158" text-anchor="middle" fill="#fff" font-size="9">输入城市</text>
+
+  <rect x="300" y="140" width="60" height="28" rx="4" fill="#00b894"/>
+  <text x="330" y="158" text-anchor="middle" fill="#fff" font-size="9">显示结果</text>
+</svg>
+<div class="diagram-caption">层次化任务分解（HTN）：从根任务递归分解到原子操作</div>
+</div>
+
+<div class="highlight-box">
+<strong>💡 任务分解的价值：</strong>
+<ul>
+  <li><strong>降低单次调用复杂度</strong>：每个子任务只需关注一个方面</li>
+  <li><strong>并行执行</strong>：无依赖的子任务可同时进行</li>
+  <li><strong>错误隔离</strong>：某个子任务失败不影响全局</li>
+  <li><strong>可追踪性</strong>：每个子任务的执行过程都可审计</li>
+</ul>
+</div>
+
+<!-- ============================================ -->
+<h2>4. 反思与自我纠错：让 Agent 自己改进</h2>
+
+<p>优秀的 Agent 不仅能完成任务，还能评估自己的输出质量，发现问题并自我改进。这种能力来自<strong>反思（Reflection）机制</strong>。</p>
+
+<h3>4.1 三大反思框架</h3>
+
+<div class="diagram-container">
+<svg viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
+  <rect x="10" y="10" width="180" height="180" rx="10" fill="#eef6ff" stroke="#0984e3" stroke-width="1.5"/>
+  <text x="100" y="35" text-anchor="middle" fill="#0984e3" font-size="14" font-weight="bold">🧠 Reflexion</text>
+  <text x="100" y="55" text-anchor="middle" fill="#636e72" font-size="11">语言强化学习</text>
+  <text x="20" y="80" fill="#2d3436" font-size="10">失败后写"反思笔记"</text>
+  <text x="20" y="100" fill="#2d3436" font-size="10">存入长期记忆</text>
+  <text x="20" y="120" fill="#2d3436" font-size="10">下次类似任务复用</text>
+  <text x="20" y="150" fill="#00b894" font-size="10">HumanEval: 80%→91%</text>
+  <text x="20" y="170" fill="#00b894" font-size="10">AlfWorld: 63%→97%</text>
+
+  <rect x="210" y="10" width="180" height="180" rx="10" fill="#fef9e7" stroke="#f39c12" stroke-width="1.5"/>
+  <text x="300" y="35" text-anchor="middle" fill="#f39c12" font-size="14" font-weight="bold">🔄 Self-Refine</text>
+  <text x="300" y="55" text-anchor="middle" fill="#636e72" font-size="11">迭代自我改进</text>
+  <text x="220" y="80" fill="#2d3436" font-size="10">同个 LLM 分饰两角</text>
+  <text x="220" y="100" fill="#2d3436" font-size="10">生成者 → 批评者 → 修改者</text>
+  <text x="220" y="120" fill="#2d3436" font-size="10">不保存长期记忆</text>
+  <text x="220" y="150" fill="#00b894" font-size="10">7 个任务平均 +20%</text>
+
+  <rect x="410" y="10" width="180" height="180" rx="10" fill="#fde8e8" stroke="#e74c3c" stroke-width="1.5"/>
+  <text x="500" y="35" text-anchor="middle" fill="#e74c3c" font-size="14" font-weight="bold">🔧 CRITIC</text>
+  <text x="500" y="55" text-anchor="middle" fill="#636e72" font-size="11">工具辅助纠错</text>
+  <text x="420" y="80" fill="#2d3436" font-size="10">引入外部工具验证</text>
+  <text x="420" y="100" fill="#2d3436" font-size="10">代码→跑单元测试</text>
+  <text x="420" y="120" fill="#2d3436" font-size="10">事实→搜索引擎核实</text>
+  <text x="420" y="150" fill="#e74c3c" font-size="10">⚠️ 纯自我反思可能</text>
+  <text x="420" y="170" fill="#e74c3c" font-size="10">  反而降低准确率！</text>
+</svg>
+<div class="diagram-caption">三大反思框架对比：Reflexion（长期记忆）、Self-Refine（迭代修改）、CRITIC（工具验证）</div>
+</div>
+
+<div class="warn-box">
+<strong>⚠️ 关键发现：自我纠错的边界</strong>
+<p>论文 <em>"Large Language Models Cannot Self-Correct Reasoning Yet"</em>（Huang et al., 2023）指出：<strong>在没有外部反馈的情况下，LLM 的纯自我反思可能反而降低推理准确率</strong>——模型容易"自信地犯错"，把正确答案改成错误答案。</p>
+<strong>实践启示</strong>：反思循环中一定要引入外部验证（如代码执行、搜索核实），而不是让模型自说自话。
+</div>
+
+<h3>4.2 反思循环的工作流程</h3>
+
+<div class="diagram-container">
+<svg viewBox="0 0 500 100" xmlns="http://www.w3.org/2000/svg">
+  <rect x="10" y="25" width="70" height="50" rx="6" fill="#0984e3"/>
+  <text x="45" y="55" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">生成</text>
+
+  <line x1="80" y1="50" x2="110" y2="50" stroke="#636e72" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="110" y="25" width="70" height="50" rx="6" fill="#f39c12"/>
+  <text x="145" y="55" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">反思</text>
+
+  <line x1="180" y1="50" x2="210" y2="50" stroke="#636e72" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="210" y="25" width="70" height="50" rx="6" fill="#00b894"/>
+  <text x="245" y="55" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">评估</text>
+
+  <line x1="280" y1="50" x2="310" y2="50" stroke="#636e72" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- 菱形判断 -->
+  <polygon points="345,10 380,50 345,90 310,50" fill="#dfe6e9" stroke="#636e72" stroke-width="1.5"/>
+  <text x="345" y="47" text-anchor="middle" fill="#e74c3c" font-size="10">通过?</text>
+
+  <line x1="380" y1="50" x2="420" y2="50" stroke="#e74c3c" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="420" y="25" width="70" height="50" rx="6" fill="#e17055"/>
+  <text x="455" y="55" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">修改</text>
+
+  <path d="M 455 25 Q 455 0 245 0 Q 35 0 45 25" fill="none" stroke="#e17055" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrow)"/>
+  <text x="250" y="12" text-anchor="middle" fill="#e17055" font-size="10">未通过 → 循环</text>
+
+  <rect x="10" y="25" width="70" height="50" rx="6" fill="#0984e3" opacity="0.5"/>
+  <text x="45" y="55" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">生成</text>
+
+  <line x1="310" y1="10" x2="310" y2="-5" stroke="#00b894" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="300" y="-10" text-anchor="end" fill="#00b894" font-size="11">通过 → 输出</text>
+</svg>
+<div class="diagram-caption">反思循环：生成 → 反思 → 评估 → (未通过)修改 → 重新生成 → …… → (通过)输出</div>
+</div>
+
+<!-- ============================================ -->
+<h2>5. ReAct 与 Plan-and-Execute 对比</h2>
+
+<p>ReAct 和 Plan-and-Execute 是两种主流的 Agent 推理范式，各有适用场景：</p>
+
+<div class="diagram-container">
+<svg viewBox="0 0 600 160" xmlns="http://www.w3.org/2000/svg">
+  <!-- ReAct -->
+  <rect x="20" y="10" width="260" height="140" rx="10" fill="#eef6ff" stroke="#0984e3" stroke-width="1.5"/>
+  <text x="150" y="35" text-anchor="middle" fill="#0984e3" font-size="14" font-weight="bold">ReAct：边想边做</text>
+  <text x="35" y="60" fill="#2d3436" font-size="11">思考1 → 行动1 → 观察1</text>
+  <text x="35" y="80" fill="#2d3436" font-size="11">思考2 → 行动2 → 观察2</text>
+  <text x="35" y="100" fill="#2d3436" font-size="11">思考3 → 行动3 → 观察3</text>
+  <text x="35" y="120" fill="#636e72" font-size="10">→ 逐步骤，先想后做，每步都决策</text>
+  <text x="35" y="140" fill="#e17055" font-size="10">⚠ 容易走偏，上下文膨胀快</text>
+
+  <!-- Plan-Execute -->
+  <rect x="320" y="10" width="260" height="140" rx="10" fill="#fef9e7" stroke="#f39c12" stroke-width="1.5"/>
+  <text x="450" y="35" text-anchor="middle" fill="#f39c12" font-size="14" font-weight="bold">Plan-Execute：先想再做</text>
+  <text x="335" y="60" fill="#2d3436" font-size="11">【规划阶段】</text>
+  <text x="335" y="78" fill="#2d3436" font-size="11">  步骤1 → 步骤2 → 步骤3 → ...</text>
+  <text x="335" y="100" fill="#2d3436" font-size="11">【执行阶段】</text>
+  <text x="335" y="118" fill="#2d3436" font-size="11">  按计划逐步执行，偏差时重规划</text>
+  <text x="335" y="140" fill="#00b894" font-size="10">✅ 全局视角，适合复杂任务</text>
+</svg>
+<div class="diagram-caption">ReAct vs Plan-and-Execute：两种推理范式的直观对比</div>
+</div>
+
+<table>
+<tr><th>维度</th><th>ReAct</th><th>Plan-and-Execute</th></tr>
+<tr><td>核心思想</td><td>边想边做</td><td>先规划后执行</td></tr>
+<tr><td>规划深度</td><td>单步</td><td>全局</td></tr>
+<tr><td>上下文消耗</td><td>高（每步都冗长）</td><td>中（计划与执行分离）</td></tr>
+<tr><td>适用场景</td><td>简单交互式任务</td><td>多步骤复杂任务</td></tr>
+<tr><td>错误恢复</td><td>难（易陷入循环）</td><td>好（可重新规划）</td></tr>
+<tr><td>典型实现</td><td>LangChain Agent</td><td>LangGraph PlanExecute</td></tr>
+</table>
+
+<!-- ============================================ -->
+<h2>6. DeepSeek-R1：强化学习激发推理能力</h2>
+
+<p>2025 年 1 月，DeepSeek 发布的 R1 论文引起了 AI 社区的轰动。它的核心突破是：<strong>让模型通过纯强化学习自主学会推理</strong>。</p>
+
+<div class="highlight-box">
+<strong>🎯 核心创新</strong>
+<p>传统的 LLM 推理增强依赖监督微调（SFT），需要人类标注"正确的推理步骤"。但高质量推理数据的标注成本极高。DeepSeek-R1 使用 <strong>GRPO（Group Relative Policy Optimization）</strong> 算法，让模型在训练中自主发现推理策略。</p>
+</div>
+
+<h3>6.1 "Aha Moment"</h3>
+
+<p>R1 的早期版本 R1-Zero 在训练过程中出现了一个惊人的现象——模型突然学会了<strong>自我反思</strong>。训练到某一步时，模型自发地在输出中写道：</p>
+
+<pre>"等等，我之前的推理可能有误。让我重新检查一下第三步的推导……"</pre>
+
+<p>这就是著名的<strong>"Aha Moment"（顿悟时刻）</strong>——模型在没有被明确教导的情况下，自发涌现出反思行为。这是强化学习与 LLM 结合时出现<strong>涌现能力</strong>的经典案例。</p>
+
+<h3>6.2 关键结果</h3>
+
+<table>
+<tr><th>基准</th><th>GPT-4.1</th><th>OpenAI o1</th><th>DeepSeek-R1</th></tr>
+<tr><td>AIME 2024（数学竞赛）</td><td>9.3%</td><td>79.2%</td><td><strong>79.8%</strong></td></tr>
+<tr><td>MATH-500</td><td>76.6%</td><td>96.4%</td><td><strong>97.3%</strong></td></tr>
+<tr><td>Codeforces Rating</td><td>759</td><td>1891</td><td><strong>2029</strong></td></tr>
+<tr><td>GPQA Diamond（科学推理）</td><td>49.9%</td><td>75.7%</td><td><strong>71.5%</strong></td></tr>
+</table>
+
+<h3>6.3 推理模型对 Agent 开发的启示</h3>
+
+<p>推理模型（o1/o3/R1）的出现，从根本上改变了 Agent 的开发方式：</p>
+
+<div class="summary-card">
+<div class="sc-title">传统 Agent vs 推理模型 Agent</div>
+<table>
+<tr><th>传统 Agent</th><th>推理模型 Agent</th></tr>
+<tr><td>需要精心设计 CoT Prompt</td><td>简洁的指令效果更好</td></tr>
+<tr><td>限制 thinking tokens</td><td>让模型自己决定推理深度</td></tr>
+<tr><td>工具调用由 LLM 自己规划</td><td>推理模型做规划，小模型做执行</td></tr>
+</table>
+</div>
+
+<!-- ============================================ -->
+<h2>7. Test-time Compute Scaling：推理时扩展计算</h2>
+
+<p>推理模型揭示了一个深刻发现：<strong>在推理时投入更多计算，比训练更大的模型更有效</strong>。</p>
+
+<pre>训练时扩展：更大的模型 + 更多数据 = 更强的能力（成本指数级增长）
+推理时扩展：同一个模型 + 更多推理步数 = 更强的结果（按需投入）</pre>
+
+<h3>7.1 三种策略</h3>
+
+<table>
+<tr><th>策略</th><th>原理</th><th>代表实现</th><th>使用场景</th></tr>
+<tr><td><strong>搜索式推理</strong></td><td>生成多条推理路径，搜索最优解</td><td>Tree of Thoughts, MCTS</td><td>有明确评估标准的决策问题</td></tr>
+<tr><td><strong>自我纠错</strong></td><td>生成→批评→修改→重复</td><td>Self-Refine, CRITIC</td><td>有客观验证的任务</td></tr>
+<tr><td><strong>思维链延长</strong></td><td>让模型生成更长的推理链</td><td>o1/o3, R1, Extended Thinking</td><td>复杂推理任务</td></tr>
+</table>
+
+<h3>7.2 自适应推理：按需分配计算</h3>
+
+<p>不是所有问题都需要深度推理。一个好的 Agent 应该<strong>根据问题难度自动调整</strong>推理策略：</p>
+
+<div class="diagram-container">
+<svg viewBox="0 0 600 130" xmlns="http://www.w3.org/2000/svg">
+  <rect x="20" y="10" width="80" height="50" rx="6" fill="#0984e3"/>
+  <text x="60" y="40" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">难度评估</text>
+
+  <line x1="100" y1="35" x2="140" y2="20" stroke="#00b894" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="100" y1="35" x2="140" y2="35" stroke="#f39c12" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="100" y1="35" x2="140" y2="50" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="140" y="5" width="100" height="35" rx="6" fill="#00b894"/>
+  <text x="190" y="27" text-anchor="middle" fill="#fff" font-size="11">Simple → 直接回答</text>
+
+  <rect x="140" y="17" width="100" height="35" rx="6" fill="#f39c12"/>
+  <text x="190" y="39" text-anchor="middle" fill="#fff" font-size="11">Medium → CoT</text>
+
+  <rect x="140" y="32" width="100" height="35" rx="6" fill="#e74c3c"/>
+  <text x="190" y="54" text-anchor="middle" fill="#fff" font-size="11">Hard → 多路径搜索</text>
+
+  <line x1="240" y1="22" x2="280" y2="22" stroke="#00b894" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="240" y1="35" x2="280" y2="35" stroke="#f39c12" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="240" y1="50" x2="280" y2="50" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <rect x="280" y="5" width="100" height="55" rx="6" fill="#dfe6e9" stroke="#636e72" stroke-width="1"/>
+  <text x="330" y="28" text-anchor="middle" fill="#636e72" font-size="10">max_tokens: 500</text>
+  <text x="330" y="48" text-anchor="middle" fill="#636e72" font-size="10">max_tokens: 2000</text>
+
+  <rect x="280" y="30" width="100" height="55" rx="6" fill="#dfe6e9" stroke="#636e72" stroke-width="1"/>
+  <text x="330" y="70" text-anchor="middle" fill="#636e72" font-size="10">max_tokens: 8000</text>
+</svg>
+<div class="diagram-caption">自适应推理：根据问题难度选择不同的推理深度和 Token 预算</div>
+</div>
+
+<!-- ============================================ -->
+<h2>8. AI 研究的发展脉络</h2>
+
+<p>从早期的模块化路由到今天的推理模型，Agent 规划与推理技术经历了清晰的演进路径：</p>
+
+<div class="diagram-container">
+<svg viewBox="0 0 600 280" xmlns="http://www.w3.org/2000/svg">
+  <!-- 时间轴 -->
+  <line x1="30" y1="30" x2="30" y2="260" stroke="#0984e3" stroke-width="3"/>
+  <text x="15" y="25" text-anchor="end" fill="#0984e3" font-size="10" font-weight="bold">2022</text>
+  <text x="15" y="85" text-anchor="end" fill="#0984e3" font-size="10" font-weight="bold">2023</text>
+  <text x="15" y="145" text-anchor="end" fill="#0984e3" font-size="10" font-weight="bold">2024</text>
+  <text x="15" y="200" text-anchor="end" fill="#0984e3" font-size="10" font-weight="bold">2025</text>
+  <text x="15" y="255" text-anchor="end" fill="#0984e3" font-size="10" font-weight="bold">2026</text>
+
+  <rect x="45" y="15" width="140" height="30" rx="5" fill="#dfe6e9"/>
+  <text x="115" y="35" text-anchor="middle" fill="#2d3436" font-size="10">MRKL（模块化路由）</text>
+
+  <rect x="200" y="15" width="120" height="30" rx="5" fill="#0984e3"/>
+  <text x="260" y="35" text-anchor="middle" fill="#fff" font-size="10">ReAct</text>
+
+  <rect x="45" y="50" width="140" height="30" rx="5" fill="#e17055"/>
+  <text x="115" y="70" text-anchor="middle" fill="#fff" font-size="10">Plan-and-Solve</text>
+
+  <rect x="200" y="50" width="120" height="30" rx="5" fill="#f39c12"/>
+  <text x="260" y="70" text-anchor="middle" fill="#fff" font-size="10">Self-Refine</text>
+
+  <rect x="335" y="50" width="120" height="30" rx="5" fill="#00b894"/>
+  <text x="395" y="70" text-anchor="middle" fill="#fff" font-size="10">Reflexion</text>
+
+  <rect x="45" y="90" width="140" height="30" rx="5" fill="#0984e3"/>
+  <text x="115" y="110" text-anchor="middle" fill="#fff" font-size="10">HuggingGPT</text>
+
+  <rect x="200" y="90" width="140" height="30" rx="5" fill="#fdcb6e"/>
+  <text x="270" y="110" text-anchor="middle" fill="#2d3436" font-size="10">MCTS/LATS</text>
+
+  <rect x="355" y="90" width="120" height="30" rx="5" fill="#e17055"/>
+  <text x="415" y="110" text-anchor="middle" fill="#fff" font-size="10">o1 推理模型</text>
+
+  <rect x="45" y="130" width="250" height="30" rx="5" fill="#0984e3"/>
+  <text x="170" y="150" text-anchor="middle" fill="#fff" font-size="10">DeepSeek-R1（GRPO）</text>
+
+  <rect x="310" y="130" width="140" height="30" rx="5" fill="#00b894"/>
+  <text x="380" y="150" text-anchor="middle" fill="#fff" font-size="10">Deep Research</text>
+
+  <rect x="45" y="170" width="180" height="28" rx="5" fill="#dfe6e9"/>
+  <text x="135" y="189" text-anchor="middle" fill="#2d3436" font-size="9">Open Deep Research</text>
+
+  <rect x="240" y="170" width="180" height="28" rx="5" fill="#dfe6e9"/>
+  <text x="330" y="189" text-anchor="middle" fill="#2d3436" font-size="9">Tongyi DeepResearch</text>
+
+  <rect x="45" y="205" width="180" height="28" rx="5" fill="#fef9e7" stroke="#f39c12" stroke-width="1"/>
+  <text x="135" y="224" text-anchor="middle" fill="#2d3436" font-size="9">BrowseComp 评测</text>
+
+  <rect x="240" y="205" width="180" height="28" rx="5" fill="#fef9e7" stroke="#f39c12" stroke-width="1"/>
+  <text x="330" y="224" text-anchor="middle" fill="#2d3436" font-size="9">RAO / GATS / ATG</text>
+
+  <rect x="45" y="240" width="530" height="30" rx="5" fill="#fde8e8" stroke="#e74c3c" stroke-width="1"/>
+  <text x="310" y="260" text-anchor="middle" fill="#e74c3c" font-size="11">趋势：推理模型 + Agent 框架融合 → 双模型架构（推理模型规划，小模型执行）</text>
+</svg>
+<div class="diagram-caption">Agent 规划与推理技术发展脉络（2022-2026）</div>
+</div>
+
+<!-- ============================================ -->
+<h2>9. 实战：自动化研究助手（Deep Research Agent）</h2>
+
+<p>综合以上规划与推理能力，我们可以构建一个<strong>自动化研究助手（Research Agent）</strong>。它的工作流是 Plan-and-Execute 模式的典型应用：</p>
+
+<h3>9.1 Auto Research 工作流</h3>
+
+<div class="diagram-container">
+<svg viewBox="0 0 600 140" xmlns="http://www.w3.org/2000/svg">
+  <rect x="10" y="10" width="90" height="34" rx="5" fill="#0984e3"/>
+  <text x="55" y="32" text-anchor="middle" fill="#fff" font-size="10" font-weight="bold">1. 制定计划</text>
+  <line x1="100" y1="27" x2="120" y2="27" stroke="#636e72" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="120" y="10" width="90" height="34" rx="5" fill="#00b894"/>
+  <text x="165" y="32" text-anchor="middle" fill="#fff" font-size="10" font-weight="bold">2. 搜索信息</text>
+  <line x1="210" y1="27" x2="230" y2="27" stroke="#636e72" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="230" y="10" width="90" height="34" rx="5" fill="#f39c12"/>
+  <text x="275" y="32" text-anchor="middle" fill="#fff" font-size="10" font-weight="bold">3. 提取证据</text>
+  <line x1="320" y1="27" x2="340" y2="27" stroke="#636e72" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="340" y="10" width="90" height="34" rx="5" fill="#e17055"/>
+  <text x="385" y="32" text-anchor="middle" fill="#fff" font-size="10" font-weight="bold">4. 交叉验证</text>
+  <line x1="430" y1="27" x2="450" y2="27" stroke="#636e72" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="450" y="10" width="80" height="34" rx="5" fill="#0984e3"/>
+  <text x="490" y="32" text-anchor="middle" fill="#fff" font-size="10" font-weight="bold">5. 生成报告</text>
+
+  <line x1="490" y1="44" x2="490" y2="70" stroke="#636e72" stroke-width="1.5"/>
+  <line x1="490" y1="70" x2="490" y2="90" stroke="#e17055" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="420" y="90" width="140" height="34" rx="5" fill="#e17055"/>
+  <text x="490" y="112" text-anchor="middle" fill="#fff" font-size="10" font-weight="bold">6. 自我审查</text>
+
+  <path d="M 420 107 L 400 107 L 400 27 L 10 27" fill="none" stroke="#e17055" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrow)"/>
+  <text x="300" y="127" text-anchor="middle" fill="#e17055" font-size="10">未通过 → 补充检索后重新生成</text>
+</svg>
+<div class="diagram-caption">Auto Research 工作流：从开放主题到结构化报告的完整研究流程</div>
+</div>
+
+<h3>9.2 研究缺口类型</h3>
+
+<p>好的研究 Agent 始终知道自己"为什么要搜这一次"。一次好的搜索应该对应一个明确的研究缺口：</p>
+
+<table>
+<tr><th>缺口类型</th><th>描述</th><th>例子</th></tr>
+<tr><td><strong>概念缺口</strong></td><td>还没有定义清楚核心概念</td><td>"什么是 Transformer 的注意力机制？"</td></tr>
+<tr><td><strong>事实缺口</strong></td><td>缺少关键数据、时间线或案例</td><td>"GPT-4 是什么时候发布的？"</td></tr>
+<tr><td><strong>证据缺口</strong></td><td>已有结论没有可靠来源支持</td><td>"谁说注意力机制是最好的？"</td></tr>
+<tr><td><strong>反例缺口</strong></td><td>只看到了支持观点，没看到反方</td><td>"注意力机制有什么缺点？"</td></tr>
+<tr><td><strong>时效缺口</strong></td><td>资料可能过旧，需要最新信息</td><td>"2026 年有什么新进展？"</td></tr>
+</table>
+
+<h3>9.3 从 Search Agent 到 Deep Research Agent</h3>
+
+<table>
+<tr><th>能力维度</th><th>搜索 Agent</th><th>Deep Research Agent</th></tr>
+<tr><td>任务目标</td><td>回答一个具体问题</td><td>研究一个开放主题并形成报告</td></tr>
+<tr><td>规划方式</td><td>一次性生成搜索词</td><td>动态拆解问题，持续补充子问题</td></tr>
+<tr><td>信息处理</td><td>摘要前几条结果</td><td>多来源交叉验证、冲突检测</td></tr>
+<tr><td>上下文管理</td><td>保存搜索结果</td><td>管理研究笔记、证据卡片、引用链</td></tr>
+<tr><td>质量控制</td><td>简单检查完整性</td><td>检查覆盖度、可信度、时效性、反方观点</td></tr>
+<tr><td>输出形式</td><td>简短回答</td><td>带引用和结构化论证的完整报告</td></tr>
+</table>
+
+<!-- ============================================ -->
+<h2>10. 总结：如何选择合适的规划策略？</h2>
+
+<div class="summary-card">
+<div class="sc-title">选型指南</div>
+<ul>
+  <li><strong>快速原型</strong> → <strong>ReAct</strong> — 实现简单，适合简单的交互式任务</li>
+  <li><strong>生产环境</strong> → <strong>Plan-and-Execute</strong> — 全局视角 + 灵活重规划，适合复杂多步骤任务</li>
+  <li><strong>高难度推理</strong> → <strong>Test-time Compute + MCTS</strong> — 多路径搜索找最优解</li>
+  <li><strong>混合场景</strong> → <strong>自适应推理</strong> — 根据问题难度自动切换策略（直接 / CoT / 搜索）</li>
+  <li><strong>2026 前沿</strong> → <strong>双模型架构</strong> — 推理模型（o3/R1）做规划和核心决策，普通模型做工具调用和执行</li>
+</ul>
+</div>
+
+<p>最后，记住一个原则：<strong>先想好，再动手</strong>——无论是 ReAct 的"边想边做"还是 Plan-and-Execute 的"先规划后执行"，核心都是让 Agent 通过显式推理来指导行动，而不是盲目调用工具。</p>
+
+<p>在 2026 年的今天，推理模型（o1/o3/R1）的出现正在改变 Agent 的开发范式。未来已来，理解这些规划与推理的底层原理，将帮助你构建更智能、更可靠的 AI Agent。</p>
+
+<hr style="margin:2rem 0; border:none; border-top:1px solid #dfe6e9;">
+
+<h2>参考资料</h2>
+<ol style="font-size:0.88rem;">
+  <li>Yao et al. <em>ReAct: Synergizing Reasoning and Acting in Language Models</em>. ICLR 2023.</li>
+  <li>Shinn et al. <em>Reflexion: Language Agents with Verbal Reinforcement Learning</em>. NeurIPS 2023.</li>
+  <li>Madaan et al. <em>Self-Refine: Iterative Refinement with Self-Feedback</em>. CMU, 2023.</li>
+  <li>Gou et al. <em>CRITIC: LLMs Can Self-Correct with Tool-Interactive Critiquing</em>. 2023.</li>
+  <li>Wang et al. <em>Plan-and-Solve Prompting</em>. ACL 2023.</li>
+  <li>DeepSeek-AI. <em>DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via RL</em>. 2025.</li>
+  <li>OpenAI. <em>Learning to Reason with LLMs</em>. 2024.</li>
+  <li>Haozhe-Xing. <em>Agent Learning: Learn Agent Development from Scratch</em>. GitHub, 2025-2026.</li>
+  <li>LangChain. <em>Open Deep Research</em>. GitHub, 2025.</li>
+  <li>Zhou et al. <em>Language Agent Tree Search Unifies Reasoning, Acting, and Planning</em>. 2024.</li>
+</ol>
+
+<footer>© 2026 Ha2fde · 基于 <a href="https://github.com/Haozhe-Xing/agent_learning">Agent Learning</a> 开源教程编写</footer>
+</div>
+</body>
+</html>
