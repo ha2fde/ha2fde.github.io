@@ -543,20 +543,20 @@ footer { text-align:center; padding:2rem; color:#999; font-size:0.85rem; border-
 
 <p>Language Agent 是通往 AGI 的必然路径，<strong>但它本身还不是 AGI</strong>。当前 Language Agent 面临几个根本性限制：</p>
 
-<h3>5.1 没有真正的"理解"</h3>
+<h3>6.1 没有真正的"理解"</h3>
 <p>LLM 的推理本质是基于统计分布的预测。虽然没有严格的理论证明语言模型"不可能"有理解，但当前的经验证据表明：模型的"理解"是脆弱的，在分布外（OOD）场景下极易崩塌。Sapkota et al. (2025) 将这个问题归入 Agentic AI 的核心挑战类别。</p>
 
-<h3>5.2 缺乏持续自我改进机制</h3>
+<h3>6.2 缺乏持续自我改进机制</h3>
 <p>人类智能的核心特征之一是持续的自我改进——你可以不断从经验中学习，昨天的任务完成方式会影响明天的策略。当前的 Language Agent 基本是"无状态的"：每个任务启动时，Agent 的记忆库为空或只包含静态的知识库。Rombaut (2026) 分析的 13 个 coding agent 中，<strong>没有一个实现了跨任务的持续学习</strong>。</p>
 
-<h3>5.3 记忆架构的瓶颈</h3>
+<h3>6.3 记忆架构的瓶颈</h3>
 <p>Shichun-Liu et al. (2025) 的综述"Memory in the Age of AI Agents"提出了一种统一的 Agent 记忆分类：事实性记忆（Factual）、经验性记忆（Experiential）和工作记忆（Working）。当前的 Language Agent 在工具层面已经有了一定的工作记忆管理（context window 管理、token 压缩），但在经验性记忆（跨 session 的学习）方面几乎空白。这也是 LangChain 和 LangGraph 等框架正在试图解决的问题——通过持久化状态图来替代无状态的对话式记忆。</p>
 
 <div class="info-box">
 <strong>关键观察：</strong>Language Agent vs. AGI 的区别，本质上就是"能用语言推理"vs."能通过语言学习并持续进化"的区别。前者是实现后者的必要条件，不是充分条件。
 </div>
 
-<h2>六、为什么要说"Language Agent"而不是"AI Agent"？</h2>
+<h2>七、为什么要说"Language Agent"而不是"AI Agent"？</h2>
 
 <p>现在让我们回到这个被回避的问题：为什么市场不使用"Language Agent"这个更精确的术语？</p>
 
@@ -572,7 +572,7 @@ footer { text-align:center; padding:2rem; color:#999; font-size:0.85rem; border-
 <strong>但区分是有用的。</strong> 说"Language Agent"而不是"AI Agent"，不是为了缩小范围，而是为了<strong>精确描述本质</strong>。它帮助我们理解：为什么这些系统的能力天花板取决于 LLM 的推理质量？为什么工具调用协议（MCP、Function Calling）如此重要？为什么记忆和持续学习是下一个关键突破点？因为<strong>核心是一个语言推理引擎，所有外围组件都在为这个引擎服务</strong>。
 </div>
 
-<h2>七、总结：一个统一的分析框架</h2>
+<h2>八、总结：一个统一的分析框架</h2>
 
 <p>综合我们讨论的所有材料，可以提炼出一个简洁的分析框架：</p>
 
