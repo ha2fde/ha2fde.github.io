@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>华为昇腾 950 系列：国产 AI 芯片的里程碑 - Ha2fde's Blog</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', monospace;
+            background: #f8f9fa; color: #333; line-height: 1.8;
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem; }
+        .nav-bar { padding: 1rem 0; margin-bottom: 1rem; }
+        .nav-bar a { color: #3498db; text-decoration: none; font-size: 0.95rem; }
+        .nav-bar a:hover { text-decoration: underline; }
+        .nav-bar .sep { color: #ccc; margin: 0 0.4rem; }
+        article h1 { font-size: 1.8rem; color: #1a1a2e; margin-bottom: 0.3rem; }
+        .subtitle { font-size: 1rem; color: #666; margin-bottom: 0.5rem; }
+        .meta { color: #999; font-size: 0.9rem; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #eee; }
+        article h2 { font-size: 1.3rem; color: #1a1a2e; margin: 2rem 0 0.8rem; padding-bottom: 0.3rem; border-bottom: 1px solid #eee; }
+        article h3 { font-size: 1.1rem; color: #2c3e50; margin: 1.5rem 0 0.5rem; }
+        article p { margin-bottom: 1rem; }
+        article ul, article ol { margin: 0.5rem 0 1rem 1.5rem; }
+        article li { margin-bottom: 0.3rem; }
+        .code-block {
+            background: #1e1e2e; color: #cdd6f4; border-radius: 8px;
+            margin: 1rem 0; overflow-x: auto;
+        }
+        .code-block pre { padding: 1rem; margin: 0; font-size: 0.85rem; line-height: 1.6; }
+        .code-block code { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+        .diagram {
+            background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
+            margin: 1.5rem 0; padding: 1rem; text-align: center;
+        }
+        .diagram svg { max-width: 100%; height: auto; }
+        .diagram-caption { font-size: 0.85rem; color: #666; margin-top: 0.5rem; }
+        .callout {
+            background: #eef6ff; border-left: 4px solid #3498db;
+            padding: 0.8rem 1rem; margin: 1rem 0; border-radius: 4px; font-size: 0.95rem;
+        }
+        .callout.warn { background: #fff8e6; border-left-color: #f39c12; }
+        .callout.green { background: #e8f8e8; border-left-color: #27ae60; }
+        .table-wrap { overflow-x: auto; margin: 1rem 0; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th, td { padding: 0.5rem 0.8rem; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f0f0f0; font-weight: 600; }
+        tr:hover { background: #f8f8f8; }
+        .spec-card {
+            background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
+            padding: 1rem; margin: 1rem 0;
+        }
+        .spec-card .row { display: flex; padding: 0.4rem 0; border-bottom: 1px solid #f0f0f0; }
+        .spec-card .row:last-child { border-bottom: none; }
+        .spec-card .label { width: 140px; color: #666; flex-shrink: 0; }
+        .spec-card .value { flex: 1; font-weight: 500; }
+        footer { text-align: center; padding: 2rem; color: #999; font-size: 0.85rem; margin-top: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-bar">
+            <a href="../">Home</a><span class="sep">/</span><span>华为昇腾 950</span>
+        </div>
+
+        <article>
+            <h1>华为昇腾 950 系列</h1>
+            <div class="subtitle">国产 AI 芯片的里程碑，万字长文读懂昇腾 950PR / 950DT</div>
+            <div class="meta">2026-07-25 · 约 10 分钟</div>
+
+            <p>2026 年 3 月，华为正式发布了搭载 <strong>昇腾 950PR</strong> 芯片的 Atlas 350 加速卡，单卡算力达到英伟达 H20 的 2.87 倍。这不仅是华为昇腾芯片的最新力作，更是中国自主 AI 芯片道路上的重要里程碑。</p>
+
+            <p>本文将用通俗易懂的方式，带你了解昇腾芯片的历史、950 系列的核心创新，以及它为什么值得关注。</p>
+
+            <h2>一、昇腾系列：从 910 到 950</h2>
+
+            <p>华为昇腾（Ascend）系列是华为自研的 AI 芯片，主要用于深度学习训练和推理。它的演进路径非常清晰——一年一代，算力翻倍：</p>
+
+            <div class="diagram">
+                <svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <marker id="arr3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                            <path d="M0,0 L10,5 L0,10 Z" fill="#666"/>
+                        </marker>
+                    </defs>
+
+                    <rect x="10" y="30" width="110" height="70" rx="6" fill="#fce4ec" stroke="#e74c3c" stroke-width="1.5"/>
+                    <text x="65" y="58" text-anchor="middle" fill="#c0392b" font-size="13" font-weight="bold">910C</text>
+                    <text x="65" y="77" text-anchor="middle" fill="#666" font-size="10">800 TFLOPS FP16</text>
+                    <text x="65" y="92" text-anchor="middle" fill="#999" font-size="9">2024 年</text>
+
+                    <line x1="120" y1="65" x2="155" y2="65" stroke="#999" stroke-width="1.5" marker-end="url(#arr3)"/>
+
+                    <rect x="160" y="30" width="130" height="70" rx="6" fill="#e8f4fd" stroke="#3498db" stroke-width="2"/>
+                    <text x="225" y="58" text-anchor="middle" fill="#2980b9" font-size="13" font-weight="bold">950PR</text>
+                    <text x="225" y="77" text-anchor="middle" fill="#666" font-size="10">1 PFLOPS FP8</text>
+                    <text x="225" y="92" text-anchor="middle" fill="#999" font-size="9">2026 Q1 ✓ 已上市</text>
+
+                    <line x1="290" y1="65" x2="325" y2="65" stroke="#999" stroke-width="1.5" marker-end="url(#arr3)"/>
+
+                    <rect x="330" y="30" width="130" height="70" rx="6" fill="#fef9e7" stroke="#f39c12" stroke-width="1.5"/>
+                    <text x="395" y="58" text-anchor="middle" fill="#d35400" font-size="13" font-weight="bold">950DT</text>
+                    <text x="395" y="77" text-anchor="middle" fill="#666" font-size="10">2 PFLOPS FP8</text>
+                    <text x="395" y="92" text-anchor="middle" fill="#999" font-size="9">2026 Q4 待发布</text>
+
+                    <line x1="460" y1="65" x2="495" y2="65" stroke="#999" stroke-width="1.5" marker-end="url(#arr3)"/>
+
+                    <rect x="500" y="30" width="110" height="70" rx="6" fill="#f0e6ff" stroke="#9b59b6" stroke-width="1.5"/>
+                    <text x="555" y="58" text-anchor="middle" fill="#8e44ad" font-size="13" font-weight="bold">960</text>
+                    <text x="555" y="77" text-anchor="middle" fill="#666" font-size="10">算力翻倍</text>
+                    <text x="555" y="92" text-anchor="middle" fill="#999" font-size="9">2027 规划中</text>
+
+                    <text x="350" y="140" text-anchor="middle" fill="#999" font-size="11">→ 时间 →</text>
+
+                    <rect x="10" y="160" width="600" height="80" rx="6" fill="#f0f0f0" stroke="#ddd" stroke-width="1"/>
+                    <text x="20" y="182" fill="#2c3e50" font-size="11" font-weight="bold">迭代节奏：一年一代 · 算力翻倍 · 精度持续下探</text>
+                    <text x="20" y="200" fill="#666" font-size="10">910C (FP16) → 950 系列 (FP8/FP4) → 960/970 (更高带宽、更大容量)</text>
+                    <text x="20" y="218" fill="#666" font-size="10">制造工艺：SMIC N+2 / N+3 · 自研 HBM 摆脱外部依赖</text>
+                </svg>
+                <div class="diagram-caption">昇腾芯片演进路线图：910C → 950PR → 950DT → 960 → 970</div>
+            </div>
+
+            <p>在此之前，910C 已经是国产 AI 芯片的标杆，双芯片合封设计达到 800 TFLOPS FP16 算力。而 950 系列则在架构层面进行了彻底的革新。</p>
+
+            <h2>二、950 系列：一芯双构</h2>
+
+            <p>950 系列最大的特点是 <strong>"一芯双构"</strong>——同一个芯片 Die，搭配不同的 HBM 内存，衍生出两款针对性产品：</p>
+
+            <div class="diagram">
+                <svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="250" y="20" width="200" height="60" rx="8" fill="#e8f4fd" stroke="#3498db" stroke-width="2"/>
+                    <text x="350" y="48" text-anchor="middle" fill="#2c3e50" font-size="14" font-weight="bold">Ascend 950 Die</text>
+                    <text x="350" y="65" text-anchor="middle" fill="#666" font-size="11">统一的核心计算架构</text>
+
+                    <line x1="280" y1="80" x2="220" y2="115" stroke="#999" stroke-width="1.5" marker-end="url(#arr3)"/>
+                    <line x1="420" y1="80" x2="480" y2="115" stroke="#999" stroke-width="1.5" marker-end="url(#arr3)"/>
+
+                    <rect x="100" y="120" width="220" height="55" rx="6" fill="#e8f8e8" stroke="#27ae60" stroke-width="1.5"/>
+                    <text x="210" y="145" text-anchor="middle" fill="#1e8449" font-size="13" font-weight="bold">950PR</text>
+                    <text x="210" y="162" text-anchor="middle" fill="#666" font-size="10">Prefill · 推荐 · HiBL 1.0 内存</text>
+
+                    <rect x="380" y="120" width="220" height="55" rx="6" fill="#fff8e6" stroke="#f39c12" stroke-width="1.5"/>
+                    <text x="490" y="145" text-anchor="middle" fill="#d35400" font-size="13" font-weight="bold">950DT</text>
+                    <text x="490" y="162" text-anchor="middle" fill="#666" font-size="10">Decode · 训练 · HiZQ 2.0 内存</text>
+                </svg>
+                <div class="diagram-caption">同芯异构：统一 Die + 不同 HBM → 两款差异化产品</div>
+            </div>
+
+            <p>为什么这样做？因为 AI 推理的 <strong>Prefill</strong>（预填充，处理输入）和 <strong>Decode</strong>（解码，逐 token 生成）阶段对硬件的要求完全不同：</p>
+            <ul>
+                <li><strong>Prefill</strong>：计算密集，需要高算力，对带宽要求相对较低</li>
+                <li><strong>Decode</strong>：访存密集，需要高带宽、大容量内存来降低延迟</li>
+            </ul>
+
+            <p>传统芯片用同一套配置去应对，必然有性能浪费。950 系列直接"分而治之"，两种场景各自最优。</p>
+
+            <h3>详细参数对比</h3>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>参数</th><th>950PR</th><th>950DT</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>算力 (FP8)</td><td>~1 PFLOPS</td><td>~2 PFLOPS</td></tr>
+                        <tr><td>算力 (FP4)</td><td>~2 PFLOPS</td><td>~4 PFLOPS</td></tr>
+                        <tr><td>HBM 容量</td><td>128 GB (HiBL 1.0)</td><td>144 GB (HiZQ 2.0)</td></tr>
+                        <tr><td>HBM 带宽</td><td>1.6 TB/s</td><td>4 TB/s</td></tr>
+                        <tr><td>互联带宽</td><td>2 TB/s</td><td>2 TB/s</td></tr>
+                        <tr><td>主要场景</td><td>Prefill、推荐系统</td><td>Decode、训练任务</td></tr>
+                        <tr><td>上市时间</td><td>2026 Q1</td><td>2026 Q4 (待发布)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>三、架构创新：SIMD + SIMT 双模式</h2>
+
+            <p>前代昇腾芯片主要采用 <strong>SIMD</strong>（单指令多数据）架构，适合处理规整的大块向量计算，但面对大模型中碎片化的数据访问时效率不足。</p>
+
+            <p>950 系列引入了 <strong>SIMT</strong>（单指令多线程）模式，两种模式可以共存在同一个芯片上：</p>
+
+            <div class="diagram">
+                <svg viewBox="0 0 650 200" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="10" y="20" width="290" height="80" rx="8" fill="#e8f4fd" stroke="#3498db" stroke-width="1.5"/>
+                    <text x="155" y="48" text-anchor="middle" fill="#2980b9" font-size="14" font-weight="bold">SIMD 模式</text>
+                    <text x="155" y="68" text-anchor="middle" fill="#555" font-size="11">单指令 · 多数据 · 流水线处理</text>
+                    <text x="155" y="88" text-anchor="middle" fill="#666" font-size="10">适合：推荐系统、计算机视觉、规整向量计算</text>
+
+                    <rect x="340" y="20" width="290" height="80" rx="8" fill="#fef9e7" stroke="#f39c12" stroke-width="1.5"/>
+                    <text x="485" y="48" text-anchor="middle" fill="#d35400" font-size="14" font-weight="bold">SIMT 模式</text>
+                    <text x="485" y="68" text-anchor="middle" fill="#555" font-size="11">单指令 · 多线程 · 碎片化灵活调度</text>
+                    <text x="485" y="88" text-anchor="middle" fill="#666" font-size="10">适合：NLP、大模型解码、不规则数据</text>
+
+                    <text x="320" y="145" text-anchor="middle" fill="#999" font-size="12">← 同一芯片上动态切换 →</text>
+
+                    <rect x="100" y="165" width="430" height="30" rx="4" fill="#f0f0f0" stroke="#ccc" stroke-width="1"/>
+                    <text x="315" y="185" text-anchor="middle" fill="#2c3e50" font-size="11">根据任务类型自动选择最优计算模式</text>
+                </svg>
+                <div class="diagram-caption">SIMD/SIMT 双编程模型，灵活适配不同 AI 任务</div>
+            </div>
+
+            <h3>内存访问优化：128 字节颗粒度</h3>
+
+            <p>前代芯片的内存访问颗粒度是 512 字节。在大模型推理中，很多小算子的数据量远小于 512 字节，导致严重带宽浪费。950 系列将这个粒度降至 <strong>128 字节</strong>，小算子访存效率提升 4 倍。</p>
+
+            <div class="callout green">
+                <strong>通俗理解</strong>：想像去超市买一瓶水。以前每次购物必须装满 512 个购物袋，哪怕只买一瓶水也得装 512 个袋子。现在允许只装 128 个袋子，浪费大大减少。这就是 512B → 128B 的优化。
+            </div>
+
+            <h2>四、FP4：精度降一半，速度翻一倍</h2>
+
+            <p>950 系列最大的亮点之一，是 <strong>原生支持 FP4</strong>（4 位浮点数）。这是目前业界首个支持 FP4 的 AI 芯片。</p>
+
+            <p>精度越低，计算越快、显存占用越少：</p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>精度格式</th><th>位宽</th><th>相对 FP16 显存</th><th>备注</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>FP32</td><td>32 bit</td><td>2x</td><td>训练精度基准</td></tr>
+                        <tr><td>FP16 / BF16</td><td>16 bit</td><td>1x</td><td>标准训练格式</td></tr>
+                        <tr><td>FP8</td><td>8 bit</td><td>0.5x</td><td>950 系列支持</td></tr>
+                        <tr><td><strong>FP4</strong></td><td><strong>4 bit</strong></td><td><strong>0.25x</strong></td><td><strong>950 系列率先支持</strong></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p>这意味着，一块 144GB 显存的 950DT，在 FP4 精度下等效于 576GB 的 FP16 容量，理论上可以单卡运行万亿参数模型。FP4 算力达到 2 PFLOPS，是 NVIDIA H100 FP4 算力 (0.543 PFLOPS) 的 2.87 倍。</p>
+
+            <div class="callout warn">
+                <strong>注意</strong>：FP4 会带来一定的精度损失，但华为自研的 HiF8/HiF4 格式在保持低精度的同时，通过优化数值分布，让精度接近 FP16/BF16。实际推理中精度损失可控，特别适合推荐系统等对精度容忍度较高的场景。
+            </div>
+
+            <h2>五、灵衢 2.0 互联：8192 卡全互联</h2>
+
+            <p>单个芯片再强，也不足以训练万亿参数模型。集群互联能力才是关键。</p>
+
+            <p>950 系列搭载了华为自研的 <strong>灵衢 (Lingqu) 2.0</strong> 互联协议：</p>
+
+            <ul>
+                <li>单芯片互联带宽：<strong>2 TB/s</strong>（是 910C 的 2.5 倍）</li>
+                <li>单跳延迟：从 2μs 降至 <strong>200ns</strong>（提升 10 倍）</li>
+                <li>支持 <strong>8192 卡全互联</strong>的无收敛 Mesh 拓扑</li>
+                <li>Atlas 950 超节点总互联带宽：<strong>16.3 PB/s</strong>（是 NVLink 的 62 倍）</li>
+            </ul>
+
+            <div class="diagram">
+                <svg viewBox="0 0 650 160" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="10" y="10" width="30" height="30" rx="3" fill="#3498db"/>
+                    <rect x="50" y="10" width="30" height="30" rx="3" fill="#3498db"/>
+                    <rect x="90" y="10" width="30" height="30" rx="3" fill="#3498db"/>
+                    <text x="130" y="30" fill="#666" font-size="10">... 8192 张卡</text>
+
+                    <line x1="25" y1="40" x2="25" y2="70" stroke="#3498db" stroke-width="1"/>
+                    <line x1="65" y1="40" x2="65" y2="70" stroke="#3498db" stroke-width="1"/>
+                    <line x1="105" y1="40" x2="105" y2="70" stroke="#3498db" stroke-width="1"/>
+
+                    <rect x="10" y="70" width="160" height="30" rx="4" fill="#e8f8e8" stroke="#27ae60" stroke-width="1"/>
+                    <text x="90" y="89" text-anchor="middle" fill="#1e8449" font-size="11" font-weight="bold">UB-Mesh 全互联网络</text>
+
+                    <path d="M170,85 L200,85" stroke="#999" stroke-width="1.5" marker-end="url(#arr3)"/>
+
+                    <rect x="205" y="70" width="160" height="30" rx="4" fill="#e8f8e8" stroke="#27ae60" stroke-width="1"/>
+                    <text x="285" y="89" text-anchor="middle" fill="#1e8449" font-size="11" font-weight="bold">灵衢 2.0 协议</text>
+
+                    <path d="M365,85 L395,85" stroke="#999" stroke-width="1.5" marker-end="url(#arr3)"/>
+
+                    <rect x="400" y="70" width="160" height="30" rx="4" fill="#e8f8e8" stroke="#27ae60" stroke-width="1"/>
+                    <text x="480" y="89" text-anchor="middle" fill="#1e8449" font-size="11" font-weight="bold">Atlas 950 超节点</text>
+
+                    <text x="310" y="135" text-anchor="middle" fill="#999" font-size="11">无收敛拓扑 → 算力随规模线性增长</text>
+
+                    <line x1="25" y1="55" x2="25" y2="70" stroke="#3498db" stroke-width="1.5"/>
+                    <line x1="65" y1="55" x2="65" y2="70" stroke="#3498db" stroke-width="1.5"/>
+                    <line x1="105" y1="55" x2="105" y2="70" stroke="#3498db" stroke-width="1.5"/>
+                    <text x="25" y="58" text-anchor="middle" fill="#333" font-size="8" font-weight="bold">卡1</text>
+                    <text x="65" y="58" text-anchor="middle" fill="#333" font-size="8" font-weight="bold">卡2</text>
+                    <text x="105" y="58" text-anchor="middle" fill="#333" font-size="8" font-weight="bold">卡3</text>
+                </svg>
+                <div class="diagram-caption">UB-Mesh 网络 + 灵衢 2.0 → 8192 卡全互联超节点</div>
+            </div>
+
+            <h2>六、Atlas 350：950PR 落地的第一块加速卡</h2>
+
+            <p>2026 年 3 月，搭载 950PR 的 Atlas 350 加速卡正式上市：</p>
+
+            <div class="spec-card">
+                <div class="row"><div class="label">芯片</div><div class="value">Ascend 950PR</div></div>
+                <div class="row"><div class="label">FP4 算力</div><div class="value">1.56 PFLOPS</div></div>
+                <div class="row"><div class="label">内存带宽</div><div class="value">1.4 TB/s</div></div>
+                <div class="row"><div class="label">内存容量</div><div class="value">112 GB HBM</div></div>
+                <div class="row"><div class="label">功耗</div><div class="value">600W</div></div>
+                <div class="row"><div class="label">算力对比</div><div class="value">NVIDIA H20 的 2.87 倍</div></div>
+                <div class="row"><div class="label">精度支持</div><div class="value">FP32/FP16/BF16/FP8/MXFP8/HiF8/FP4</div></div>
+                <div class="row"><div class="label">首发伙伴</div><div class="value">昆仑、华鲲振宇、神州鲲泰、长江计算、宝德等 7 家</div></div>
+            </div>
+
+            <p>Atlas 350 的主要优势在 <strong>推荐推理场景</strong>：短视频推荐、电商广告排序等高并发场景，Atlas 350 的时延更低、吞吐更高。华为宣称其多模态生成速度比 H20 提升 60%。</p>
+
+            <p>科大讯飞也宣布新一代星火大模型将与昇腾 950 系列算力底座进行适配。</p>
+
+            <h2>七、未来路线图</h2>
+
+            <p>华为的规划非常清晰：</p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>芯片</th><th>时间</th><th>预期指标</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>950DT</td><td>2026 Q4</td><td>144GB HiZQ 2.0, 4TB/s, 4 PFLOPS FP4</td></tr>
+                        <tr><td>960</td><td>2027</td><td>算力/内存/互联全面翻倍，支持 HiF4</td></tr>
+                        <tr><td>970</td><td>2028</td><td>8 PFLOPS FP4, 4TB/s 互联</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>八、总结</h2>
+
+            <p>昇腾 950 系列之所以意义重大，不只是因为它性能强，更在于它展示了一条清晰的自主技术路径：</p>
+
+            <ul>
+                <li><strong>架构自研</strong>：SIMD/SIMT 双模式、自研 HBM、灵衢互联，全栈自主可控</li>
+                <li><strong>场景定制</strong>：PR/DT 分型设计，而不是一块芯片打天下</li>
+                <li><strong>精度创新</strong>：FP4 原生支持，用精度换效率，开辟新赛道</li>
+                <li><strong>集群思维</strong>：不追求单芯片极致，而是通过大规模互联实现系统级领先</li>
+            </ul>
+
+            <p>对于正在选型 AI 算力的国内团队来说，950PR 已经是一个可用的、有竞争力的选择。等到 950DT 在 Q4 上市、960/970 持续迭代，国产 AI 芯片的竞争力只会越来越强。</p>
+
+            <div class="callout">
+                <strong>参考资源</strong>：华为昇腾 950 NPU 架构白皮书 · 华为全联接大会 2025 · arXiv 2504.17577
+            </div>
+
+        </article>
+
+        <footer>&copy; 2026 Ha2fde</footer>
+    </div>
+</body>
+</html>
