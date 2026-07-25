@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AGI 路线图：从语言模型到通用人工智能的六阶梯</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, 'Segoe UI', 'Noto Sans SC', system-ui, sans-serif;
+  background: #f5f6fa; color: #2d3436; line-height: 1.8;
+}
+.article-container { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem; }
+header.article-header { padding: 2rem 0 1.5rem; border-bottom: 2px solid #dfe6e9; margin-bottom: 2rem; }
+header.article-header h1 { font-size: 1.9rem; color: #2d3436; line-height: 1.3; }
+.meta { color: #636e72; font-size: 0.9rem; margin-top: 0.6rem; }
+.back { display:inline-block; margin-bottom:1rem; color:#0984e3; text-decoration:none; font-size:0.9rem; }
+.back:hover { text-decoration:underline; }
+
+h2 { font-size:1.5rem; margin:2.5rem 0 1rem; color:#2d3436; padding-bottom:0.3rem; border-bottom:2px solid #0984e3; display:inline-block; }
+h3 { font-size:1.2rem; margin:1.8rem 0 0.8rem; color:#2d3436; }
+h4 { font-size:1.05rem; margin:1.2rem 0 0.5rem; color:#636e72; }
+p { margin:0.8rem 0; color:#555; }
+.highlight-box {
+  background: #eef6ff; border-left: 4px solid #0984e3; padding: 1rem 1.2rem;
+  margin: 1.2rem 0; border-radius: 0 6px 6px 0;
+}
+.info-box {
+  background: #fef9e7; border-left: 4px solid #f39c12; padding: 1rem 1.2rem;
+  margin: 1.2rem 0; border-radius: 0 6px 6px 0;
+}
+.warn-box {
+  background: #fde8e8; border-left: 4px solid #e74c3c; padding: 1rem 1.2rem;
+  margin: 1.2rem 0; border-radius: 0 6px 6px 0;
+}
+pre {
+  background: #1e272e; color: #d2dae2; padding: 1rem 1.2rem;
+  border-radius: 6px; overflow-x: auto; font-size: 0.85rem; line-height: 1.5;
+  margin: 1rem 0;
+}
+code { font-family: 'Fira Code', 'Cascadia Code', monospace; }
+p code { background: #eee; padding: 0.15rem 0.4rem; border-radius: 3px; font-size: 0.9em; }
+
+table { width:100%; border-collapse:collapse; margin:1rem 0; font-size:0.92rem; }
+th { background:#0984e3; color:#fff; padding:10px 12px; text-align:left; font-weight:600; }
+td { padding:10px 12px; border-bottom:1px solid #dfe6e9; }
+tr:nth-child(even) td { background:#f8f9fa; }
+tr:hover td { background:#eef6ff; }
+
+ul, ol { margin:0.6rem 0; padding-left:1.5rem; color:#555; }
+li { margin:0.3rem 0; }
+
+.diagram-container {
+  text-align:center; margin: 1.5rem 0; padding: 1rem;
+  background: #fff; border: 1px solid #dfe6e9; border-radius: 8px;
+  overflow-x: auto;
+}
+.diagram-container svg { max-width:100%; height:auto; }
+.diagram-caption { font-size:0.85rem; color:#636e72; margin-top:0.6rem; }
+
+.tag {
+  display:inline-block; background:#dfe6e9; color:#636e72;
+  padding:0.1rem 0.6rem; border-radius:3px; font-size:0.8rem; margin-right:0.3rem;
+}
+
+footer { text-align:center; padding:2rem; color:#999; font-size:0.85rem; border-top:1px solid #dfe6e9; margin-top:2rem; }
+
+.summary-card {
+  background: #fff; border: 1px solid #dfe6e9; border-radius: 8px;
+  padding: 1.2rem; margin: 1rem 0;
+}
+.summary-card .sc-title { font-weight:600; color:#0984e3; margin-bottom:0.5rem; }
+.summary-card ul { margin:0; }
+
+.step-label {
+  display:inline-block; padding:0.1rem 0.5rem; border-radius:3px; font-size:0.8rem; font-weight:600; margin-right:0.3rem;
+}
+.step-done { background:#eef6ff; color:#0984e3; }
+.step-now { background:#e8f8e8; color:#27ae60; }
+.step-next { background:#fef9e7; color:#f39c12; }
+.step-far { background:#fde8e8; color:#e74c3c; }
+</style>
+</head>
+<body>
+<div class="article-container">
+<a href="../index.html" class="back">← 返回首页</a>
+<header class="article-header">
+<h1>AGI 路线图：从语言模型到通用人工智能的六阶梯</h1>
+<div class="meta">2026-07-25 · 约 18 分钟</div>
+</header>
+
+<div class="summary-card">
+<div class="sc-title">本文核心逻辑</div>
+<ul>
+<li>AGI 的实现路径可以分解为 <strong>6 个递进阶梯</strong>，后一步建立在前一步之上</li>
+<li>当前我们正处于 <strong>第③阶（LLM-based Agent）</strong>——这是语言模型能力向通用智能扩散的关键一步</li>
+<li>第③阶的核心是把语言模型从"对话工具"变成"自主行动体"：以语言为推理介质，挂载工具、记忆、感知模块</li>
+<li>第③阶之后面临的最大瓶颈是 <strong>持续学习</strong>——突破它之后，AI 可能进入自我加速的"奇点"阶段</li>
+<li>最终形态是具身智能：AI 走进物理世界</li>
+</ul>
+</div>
+
+<h2>一、AGI 的六阶梯：一个总览</h2>
+
+<p>人工智能正在经历一场从"对话"到"行动"、从"工具"到"智能体"的转变。但很少有人能清晰地回答：<strong>AI 到底会沿着怎样的路径走向通用人工智能（AGI）？</strong></p>
+
+<p>综合当前学术界的主流共识和产业界的前沿实践，我们可以提炼出一条清晰、递进的 AGI 路线图。这条路从语言模型出发，经过推理能力的增强、自主行动能力的获得、持续学习机制的建立，最终走向自我进化和物理世界的具身化。</p>
+
+<div class="diagram-container">
+<svg viewBox="0 0 750 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrowStep" viewBox="0 0 10 10" refX="5" refY="9" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,10 L5,0 L10,10 Z" fill="#636e72"/>
+    </marker>
+    <marker id="arrowStepBlue" viewBox="0 0 10 10" refX="5" refY="9" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,10 L5,0 L10,10 Z" fill="#0984e3"/>
+    </marker>
+  </defs>
+
+  <rect x="20" y="10" width="710" height="380" rx="10" fill="none" stroke="#dfe6e9" stroke-width="1"/>
+  <text x="375" y="35" text-anchor="middle" fill="#2d3436" font-size="14" font-weight="bold">AGI 的六阶梯</text>
+
+  <!-- Step 1 -->
+  <rect x="40" y="55" width="200" height="55" rx="8" fill="#eef6ff" stroke="#0984e3" stroke-width="1.5"/>
+  <text x="140" y="78" text-anchor="middle" fill="#0984e3" font-size="12" font-weight="bold">① 语言模型基础</text>
+  <text x="140" y="96" text-anchor="middle" fill="#636e72" font-size="10">大规模预训练 · 指令微调</text>
+  <text x="140" y="50" text-anchor="middle" fill="#0984e3" font-size="10">已完成</text>
+
+  <line x1="245" y1="82" x2="275" y2="82" stroke="#0984e3" stroke-width="2" marker-end="url(#arrowStepBlue)"/>
+
+  <!-- Step 2 -->
+  <rect x="280" y="55" width="200" height="55" rx="8" fill="#eef6ff" stroke="#0984e3" stroke-width="1.5"/>
+  <text x="380" y="78" text-anchor="middle" fill="#0984e3" font-size="12" font-weight="bold">② Chain-of-Thought 推理</text>
+  <text x="380" y="96" text-anchor="middle" fill="#636e72" font-size="10">思维链 · 数学推理 · 代码生成</text>
+
+  <line x1="485" y1="82" x2="515" y2="82" stroke="#0984e3" stroke-width="2" marker-end="url(#arrowStepBlue)"/>
+
+  <!-- Step 3 - highlighted -->
+  <rect x="255" y="135" width="250" height="65" rx="10" fill="#e8f8e8" stroke="#27ae60" stroke-width="2.5"/>
+  <text x="380" y="162" text-anchor="middle" fill="#27ae60" font-size="14" font-weight="bold">③ LLM-based Agent</text>
+  <text x="380" y="182" text-anchor="middle" fill="#636e72" font-size="11">语言推理 + 工具调用 + 记忆 + 感知</text>
+  <text x="380" y="130" text-anchor="middle" fill="#27ae60" font-size="11" font-weight="bold">← 当前阶段 · 本文重点</text>
+
+  <line x1="380" y1="202" x2="380" y2="225" stroke="#f39c12" stroke-width="2" marker-end="url(#arrowStep)"/>
+
+  <!-- Step 4 -->
+  <rect x="255" y="230" width="250" height="55" rx="8" fill="#fef9e7" stroke="#f39c12" stroke-width="1.5"/>
+  <text x="380" y="253" text-anchor="middle" fill="#f39c12" font-size="12" font-weight="bold">④ 持续学习</text>
+  <text x="380" y="271" text-anchor="middle" fill="#636e72" font-size="10">跨任务经验积累 · 自我改进</text>
+  <text x="380" y="225" text-anchor="middle" fill="#f39c12" font-size="10">下一个瓶颈</text>
+
+  <line x1="380" y1="287" x2="380" y2="310" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrowStep)"/>
+
+  <!-- Step 5 -->
+  <rect x="50" y="315" width="200" height="55" rx="8" fill="#fde8e8" stroke="#e74c3c" stroke-width="1.5"/>
+  <text x="150" y="338" text-anchor="middle" fill="#e74c3c" font-size="12" font-weight="bold">⑤ AI 自我迭代</text>
+  <text x="150" y="356" text-anchor="middle" fill="#636e72" font-size="10">自行开发下一代模型</text>
+  <text x="150" y="310" text-anchor="middle" fill="#e74c3c" font-size="10">奇点</text>
+
+  <line x1="255" y1="342" x2="300" y2="342" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrowStep)"/>
+
+  <!-- Step 6 -->
+  <rect x="305" y="315" width="200" height="55" rx="8" fill="#fde8e8" stroke="#e74c3c" stroke-width="1.5"/>
+  <text x="405" y="338" text-anchor="middle" fill="#e74c3c" font-size="12" font-weight="bold">⑥ 具身智能</text>
+  <text x="405" y="356" text-anchor="middle" fill="#636e72" font-size="10">走进物理世界</text>
+
+  <!-- Arrow from 5 to 6 -->
+  <line x1="510" y1="342" x2="540" y2="342" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrowStep)"/>
+
+  <!-- Timeline bar -->
+  <rect x="550" y="60" width="160" height="300" rx="6" fill="#f8f9fa" stroke="#dfe6e9" stroke-width="1"/>
+  <text x="630" y="82" text-anchor="middle" fill="#636e72" font-size="10" font-weight="bold">时间线</text>
+  <line x1="570" y1="95" x2="690" y2="95" stroke="#dfe6e9" stroke-width="0.5"/>
+
+  <rect x="570" y="105" width="120" height="22" rx="4" fill="#0984e3" opacity="0.2"/>
+  <text x="630" y="120" text-anchor="middle" fill="#0984e3" font-size="9">2022 — 2025</text>
+
+  <rect x="570" y="137" width="120" height="22" rx="4" fill="#27ae60" opacity="0.2"/>
+  <text x="630" y="152" text-anchor="middle" fill="#27ae60" font-size="9">2025 — 2026</text>
+
+  <rect x="570" y="240" width="120" height="22" rx="4" fill="#f39c12" opacity="0.2"/>
+  <text x="630" y="255" text-anchor="middle" fill="#f39c12" font-size="9">2026 — 2027</text>
+
+  <rect x="570" y="325" width="120" height="22" rx="4" fill="#e74c3c" opacity="0.2"/>
+  <text x="630" y="340" text-anchor="middle" fill="#e74c3c" font-size="9">2027+</text>
+</svg>
+<div class="diagram-caption">AGI 六阶梯总览：①②已基本完成，③是当前阶段，④是下一个瓶颈，⑤⑥是远期目标。每一阶都建立在前一阶的基础之上。</div>
+</div>
+
+<p>这六阶不是并行的技术方向，而是<strong>递进的依赖关系</strong>：Agent 要用到 CoT 推理，CoT 需要语言模型基础，持续学习需要 Agent 作为执行载体，自我迭代需要持续学习积累的经验数据，具身智能需要 AI 先具备完整的认知能力。没有一步是白走的。</p>
+
+<h2>二、第一阶：语言模型基础</h2>
+
+<p>一切的起点。大规模语言模型（LLM）通过在海量文本上的预训练，学会了语言的语法、知识、推理模式，再通过指令微调（Instruction Tuning）和人类反馈强化学习（RLHF）与人类对齐。</p>
+
+<p>这个阶段的产出是一个<strong>能理解语言、能生成语言、能执行简单指令的"对话模型"</strong>。它已经具备了知识储备和基本的推理能力，但有两个根本局限：</p>
+
+<ul>
+  <li><strong>缺乏行动能力</strong>——只会"说"，不会"做"</li>
+  <li><strong>缺乏自主性</strong>——每次都需要人类给出完整的指令，不能主动规划</li>
+</ul>
+
+<p>这两个局限，正是下一阶要解决的问题。</p>
+
+<h2>三、第二阶：Chain-of-Thought 推理</h2>
+
+<p>思维链（CoT）的发现是 AI 发展中的一个转折点。研究人员发现：让模型在输出最终答案之前，先输出中间推理步骤，可以显著提升复杂推理任务的准确率。</p>
+
+<p>这看似简单，但意义深远——它意味着模型学会了一种<strong>"内省"的能力</strong>：不是直接跳到一个结论，而是先"思考"（生成中间推理步骤），再给出答案。这种"先想后说"的模式，与人类解决问题的方式高度一致。</p>
+
+<div class="highlight-box">
+<strong>关键突破：</strong>CoT 让语言模型从"一步预测器"变成了"多步推理器"。这种能力上的飞跃，是后续 Agent 范式的必要前提——因为 Agent 本质上就是一个"持续推理直到完成任务"的循环。
+</div>
+
+<p>CoT 的变体包括 Self-Consistency（多次采样取多数）、Tree-of-Thoughts（树状搜索推理路径）、Graph-of-Thoughts（图结构推理）等。它们在推理深度和探索广度上不断提升，但核心思想不变：<strong>把推理过程外显化，让模型在每一步都能"看到"自己的思考</strong>。</p>
+
+<h2>四、第三阶：LLM-based Agent（当前阶段）</h2>
+
+<p>这是本文的核心，也是当前 AI 发展的主战场。LLM-based Agent 的本质可以概括为一句话：</p>
+
+<div class="highlight-box">
+<strong>核心定义：</strong>LLM-based Agent = 语言推理引擎（LLM）+ 自主控制循环（Scaffold）+ 外部能力扩展（工具 · 记忆 · 感知）
+</div>
+
+<p>语言模型不再只是回答问题，而是坐在一个循环中，反复进行<strong>观察 → 推理 → 行动 → 再观察</strong>的迭代，直到完成任务。这个循环使得语言模型从"对话工具"变成了"自主行动体"。</p>
+
+<h3>4.1 统一架构</h3>
+
+<p>所有 LLM-based Agent，不管它叫"AI Agent"还是"Agentic AI"，不管它的应用场景是编程、搜索还是自动化，底层架构高度一致：</p>
+
+<div class="diagram-container">
+<svg viewBox="0 0 750 240" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="archArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#b2bec3"/>
+    </marker>
+  </defs>
+
+  <rect x="290" y="15" width="180" height="45" rx="8" fill="#0984e3"/>
+  <text x="380" y="43" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">LLM 语言中枢</text>
+  <text x="380" y="78" text-anchor="middle" fill="#636e72" font-size="11">推理 · 规划 · 决策 · 语言理解与生成</text>
+
+  <line x1="380" y1="60" x2="380" y2="90" stroke="#b2bec3" stroke-width="1.5" marker-end="url(#archArrow)"/>
+
+  <rect x="50" y="105" width="150" height="50" rx="6" fill="#dfe6e9" stroke="#b2bec3" stroke-width="1"/>
+  <text x="125" y="128" text-anchor="middle" fill="#2d3436" font-size="11">Scaffold 控制循环</text>
+  <text x="125" y="145" text-anchor="middle" fill="#636e72" font-size="10">ReAct / Plan-Execute / MCTS</text>
+
+  <rect x="215" y="105" width="150" height="50" rx="6" fill="#dfe6e9" stroke="#b2bec3" stroke-width="1"/>
+  <text x="290" y="128" text-anchor="middle" fill="#2d3436" font-size="11">工具接口层</text>
+  <text x="290" y="145" text-anchor="middle" fill="#636e72" font-size="10">MCP / Function Calling / API</text>
+
+  <rect x="380" y="105" width="150" height="50" rx="6" fill="#dfe6e9" stroke="#b2bec3" stroke-width="1"/>
+  <text x="455" y="128" text-anchor="middle" fill="#2d3436" font-size="11">记忆层</text>
+  <text x="455" y="145" text-anchor="middle" fill="#636e72" font-size="10">RAG / 情景记忆 / 工作记忆</text>
+
+  <rect x="545" y="105" width="150" height="50" rx="6" fill="#dfe6e9" stroke="#b2bec3" stroke-width="1"/>
+  <text x="620" y="128" text-anchor="middle" fill="#2d3436" font-size="11">感知与行动层</text>
+  <text x="620" y="145" text-anchor="middle" fill="#636e72" font-size="10">视觉 / 代码 / 文件 / 网页</text>
+
+  <line x1="290" y1="37" x2="200" y2="105" stroke="#b2bec3" stroke-width="1" marker-end="url(#archArrow)"/>
+  <line x1="380" y1="60" x2="290" y2="105" stroke="#b2bec3" stroke-width="1" marker-end="url(#archArrow)"/>
+  <line x1="380" y1="60" x2="455" y2="105" stroke="#b2bec3" stroke-width="1" marker-end="url(#archArrow)"/>
+  <line x1="470" y1="37" x2="620" y2="105" stroke="#b2bec3" stroke-width="1" marker-end="url(#archArrow)"/>
+
+  <rect x="120" y="175" width="500" height="45" rx="6" fill="#fef9e7" stroke="#f39c12" stroke-width="1"/>
+  <text x="370" y="195" text-anchor="middle" fill="#2d3436" font-size="12">核心不变：LLM 语言中枢 — 多样性的来源：Scaffold 层的组合方式</text>
+  <text x="370" y="212" text-anchor="middle" fill="#636e72" font-size="10">控制循环 × 工具集 × 记忆策略 × 编排拓扑 = 架构多样性</text>
+</svg>
+<div class="diagram-caption">LLM-based Agent 的统一架构。所有现代 AI Agent 共享同一个 LLM 语言中枢，真正的差异化来自 Scaffold 层的设计选择。</div>
+</div>
+
+<h3>4.2 为什么所有主流"AI Agent"本质上都是 LLM-based Agent？</h3>
+
+<p>当我们审视今天被广泛称为"AI Agent"的产品和框架——无论是编程助手（Claude Code、Codex）、通用 Agent 框架（LangChain、LangGraph）、多 Agent 编排系统（AutoGen、CrewAI）——它们共享一个不可忽视的共同特征：<strong>核心推理回路是一个语言模型，所有异构信息在进入推理回路前被投影到语言空间。</strong></p>
+
+<p>视觉信息被编码为文本描述，工具调用被序列化为函数名和参数，数据库查询结果被格式化为文本段落。无论外围挂载了多少模块，<strong>最终的推理决策发生在语言空间中</strong>。这就是这些系统被称为"AI Agent"但本质是"LLM-based Agent"的根本原因。</p>
+
+<p>那为什么不直接叫"LLM-based Agent"？两个原因：</p>
+<ul>
+  <li><strong>术语惯性：</strong>"AI Agent"自 1980 年代就已存在，产业界只是将"传统 AI Agent"替换为"LLM-based AI Agent"，命名没有同步更新</li>
+  <li><strong>商业考量：</strong>"AI Agent"听起来更通用、更宏大，而"LLM-based Agent"似乎限制了想象空间</li>
+</ul>
+
+<p>但精确的术语有助于精确地理解问题。当我们清楚地说出"我们研究的是 LLM-based Agent"时，我们就知道：这个系统的能力天花板取决于 LLM 的推理质量，扩展能力需要通过工具接口和记忆系统来实现，下一步的关键突破是让模型能够持续学习而不是每个任务都从零开始。</p>
+
+<h3>4.3 多样性从哪来？Scaffold 层的设计空间</h3>
+
+<p>如果核心都是 LLM，那不同 Agent 之间的差异从何而来？答案在 Scaffold 层——LLM 之外的"骨架代码"。Scaffold 的设计选择决定了 Agent 的行为特征和适用场景。</p>
+
+<table>
+<tr><th>Scaffold 维度</th><th>设计选项</th><th>影响</th></tr>
+<tr>
+  <td>控制循环</td><td>ReAct / Plan-Execute / Tree Search / 组合</td><td>决定推理深度和灵活性</td>
+</tr>
+<tr>
+  <td>工具数量</td><td>0 — 37+ 个</td><td>决定能力边界</td>
+</tr>
+<tr>
+  <td>记忆策略</td><td>工作记忆 / RAG / 情景记忆 / 无记忆</td><td>决定信息持久性</td>
+</tr>
+<tr>
+  <td>上下文管理</td><td>滑动窗口 / 摘要压缩 / 结构化缩减</td><td>决定长任务能力</td>
+</tr>
+<tr>
+  <td>编排拓扑</td><td>单 Agent / 顺序管道 / 层级编排 / 网状</td><td>决定协作模式</td>
+</tr>
+<tr>
+  <td>模型路由</td><td>单模型 / 多模型切换 / 级联</td><td>决定成本与质量权衡</td>
+</tr>
+</table>
+
+<div class="info-box">
+<strong>重要洞察：</strong>对 Scaffold 层的研究还处在早期阶段。现有系统在控制循环、工具数量、记忆策略上的差异远大于在 LLM 选择上的差异。这意味着在模型能力接近天花板后，Scaffold 层的创新将是推动 Agent 能力进步的主要驱动力。
+</div>
+
+<h3>4.4 Agent 的四种核心能力</h3>
+
+<p>LLM-based Agent 之所以能完成语言模型无法独立完成的任务，是因为它在架构层面集成了四种核心能力：</p>
+
+<p><strong>工具调用（Tool Use）：</strong>Agent 可以调用外部工具（搜索引擎、代码执行器、文件系统、数据库）来获取信息或执行操作。MCP（Model Context Protocol）的出现标志着工具接口正在走向标准化。</p>
+
+<p><strong>规划（Planning）：</strong>在开始执行之前或执行过程中，Agent 可以将复杂任务分解为子步骤，形成执行计划。Plan-and-Execute 模式将规划与执行分离，使得每一步的执行都可以基于上一步的结果动态调整。</p>
+
+<p><strong>记忆（Memory）：</strong>Agent 可以维护短期工作记忆（当前对话上下文）和长期记忆（通过 RAG 检索的知识库）。记忆机制使 Agent 的行为有了"历史感"——它知道之前做过什么、学到了什么。</p>
+
+<p><strong>反思（Reflection）：</strong>Agent 可以评估自己的输出，发现错误并纠正。Reflexion 模式让 Agent 在每次行动后记录经验反馈，在后续决策中参考。这是 Agent 具备"学习能力"的雏形。</p>
+
+<div class="diagram-container">
+<svg viewBox="0 0 600 140" xmlns="http://www.w3.org/2000/svg">
+  <rect x="20" y="15" width="120" height="110" rx="8" fill="#eef6ff" stroke="#0984e3" stroke-width="1.5"/>
+  <text x="80" y="45" text-anchor="middle" fill="#0984e3" font-size="12" font-weight="bold">工具调用</text>
+  <text x="80" y="65" text-anchor="middle" fill="#636e72" font-size="10">搜索 · 代码</text>
+  <text x="80" y="80" text-anchor="middle" fill="#636e72" font-size="10">文件 · API</text>
+  <text x="80" y="100" text-anchor="middle" fill="#636e72" font-size="9">→ 扩展行动边界</text>
+
+  <rect x="165" y="15" width="120" height="110" rx="8" fill="#eef6ff" stroke="#0984e3" stroke-width="1.5"/>
+  <text x="225" y="45" text-anchor="middle" fill="#0984e3" font-size="12" font-weight="bold">规划</text>
+  <text x="225" y="65" text-anchor="middle" fill="#636e72" font-size="10">任务分解</text>
+  <text x="225" y="80" text-anchor="middle" fill="#636e72" font-size="10">步骤编排</text>
+  <text x="225" y="100" text-anchor="middle" fill="#636e72" font-size="9">→ 应对复杂任务</text>
+
+  <rect x="310" y="15" width="120" height="110" rx="8" fill="#eef6ff" stroke="#0984e3" stroke-width="1.5"/>
+  <text x="370" y="45" text-anchor="middle" fill="#0984e3" font-size="12" font-weight="bold">记忆</text>
+  <text x="370" y="65" text-anchor="middle" fill="#636e72" font-size="10">RAG · 上下文</text>
+  <text x="370" y="80" text-anchor="middle" fill="#636e72" font-size="10">情景回忆</text>
+  <text x="370" y="100" text-anchor="middle" fill="#636e72" font-size="9">→ 延续历史</text>
+
+  <rect x="455" y="15" width="120" height="110" rx="8" fill="#eef6ff" stroke="#0984e3" stroke-width="1.5"/>
+  <text x="515" y="45" text-anchor="middle" fill="#0984e3" font-size="12" font-weight="bold">反思</text>
+  <text x="515" y="65" text-anchor="middle" fill="#636e72" font-size="10">自我评估</text>
+  <text x="515" y="80" text-anchor="middle" fill="#636e72" font-size="10">错误纠正</text>
+  <text x="515" y="100" text-anchor="middle" fill="#636e72" font-size="9">→ 自我改进雏形</text>
+</svg>
+<div class="diagram-caption">LLM-based Agent 的四种核心能力。这四种能力共同构成了 Agent 的完整行为模式。</div>
+</div>
+
+<h2>五、第四阶：持续学习——下一个瓶颈</h2>
+
+<p>LLM-based Agent 已经能够完成令人惊叹的任务——编写代码、撰写报告、分析数据、自动化工作流。但它仍然<strong>无法替代人类员工</strong>。原因只有一个：它不能像人一样持续学习。</p>
+
+<div class="info-box">
+<strong>核心差距：</strong>你招一个员工，他花两个月熟悉公司环境、了解业务、认识同事之后就能独立工作。但 AI 没有这两个月的"学习期"——每次对话都是一次全新的开始。你必须把所有的上下文（"小王是谁、负责什么、邮件地址是什么"）都塞进提示词里。
+</div>
+
+<p>这个"无状态"问题是当前 LLM-based Agent 的根本局限。尽管 RAG 和记忆系统在一定程度上缓解了信息获取的问题，但<strong>真正的持续学习意味着：Agent 能够从每一次交互中提取经验，转化为可复用的知识，并在未来的任务中自发地应用这些知识</strong>。</p>
+
+<p>持续学习包含三个层次：</p>
+
+<table>
+<tr><th>层次</th><th>当前状态</th><th>AGI 所需</th></tr>
+<tr>
+  <td>事实积累</td><td>✅ RAG 可检索</td><td>✅ 基本满足</td>
+</tr>
+<tr>
+  <td>技能习得</td><td>❌ 不会从工具使用经验中改进</td><td>需要跨 session 的技能内化</td>
+</tr>
+<tr>
+  <td>策略进化</td><td>❌ 不会根据历史结果调整行为模式</td><td>需要反思 → 经验 → 策略的闭环</td>
+</tr>
+</table>
+
+<p>解决了持续学习，AI 就具备了人类最基本的成长能力。这正是它走向"奇点"的跳板。</p>
+
+<h2>六、第五阶：AI 自我迭代——奇点</h2>
+
+<p>当一个 AI 系统具备了持续学习能力之后，它能做什么？最关键的——<strong>它能参与 AI 研究本身。</strong></p>
+
+<p>这不是科幻。当 AI 能够阅读研究论文、理解实验方法、编写代码、测试假设、分析结果——并且能够从每一次实验中持续学习——它就能在两个层面上加速 AI 的发展：</p>
+
+<ul>
+  <li><strong>效率层面：</strong>自动化实验流程，24/7 不间断运行</li>
+  <li><strong>能力层面：</strong>发现人类研究者可能忽略的模式和联系</li>
+</ul>
+
+<p>这就是"奇点"的含义——当 AI 能够研究 AI，进步的速率就不再受限于人类研究者的速度和数量，而只受限于计算资源。这个阶段的 AI 已经能做人类能做的所有事情，并且能自己开发下一代更强的 AI 模型。</p>
+
+<p>需要强调的是：这个阶段不是自动到来的。它依赖于第④阶（持续学习）的真正突破，以及足够强大的第③阶（LLM-based Agent）作为执行载体。没有前两阶的基础，自我迭代就是空中楼阁。</p>
+
+<h2>七、第六阶：具身智能</h2>
+
+<p>路线图的最后一步：AI 走进物理世界。</p>
+
+<p>具身智能（Embodied Intelligence）指的是 AI 系统不再局限于数字世界，而是通过机器人等物理载体在现实世界中感知、行动和交互。它可以做家务、照顾老人、操作设备、建造物体。</p>
+
+<p>为什么把它放在最后？因为<strong>物理世界的交互要求认知能力先成熟</strong>——一个连数字世界都无法自主操作的 AI，不可能安全地操作物理设备。具身智能是 AGI 的"毕业项目"：在认知能力完备之后，把智能扩展到物理维度。</p>
+
+<div class="diagram-container">
+<svg viewBox="0 0 750 140" xmlns="http://www.w3.org/2000/svg">
+  <rect x="15" y="20" width="110" height="100" rx="8" fill="#0984e3" opacity="0.8"/>
+  <text x="70" y="55" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">数字世界</text>
+  <text x="70" y="75" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">认知能力</text>
+  <text x="70" y="95" text-anchor="middle" fill="#fff" opacity="0.7" font-size="10">①→⑤</text>
+
+  <text x="140" y="70" text-anchor="middle" fill="#636e72" font-size="18">→</text>
+
+  <rect x="160" y="20" width="110" height="100" rx="8" fill="#e74c3c" opacity="0.8"/>
+  <text x="215" y="55" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">物理世界</text>
+  <text x="215" y="75" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">具身能力</text>
+  <text x="215" y="95" text-anchor="middle" fill="#fff" opacity="0.7" font-size="10">⑥</text>
+
+  <text x="285" y="70" text-anchor="middle" fill="#636e72" font-size="18">→</text>
+
+  <rect x="320" y="20" width="400" height="100" rx="8" fill="#dfe6e9" stroke="#0984e3" stroke-width="1"/>
+  <text x="520" y="48" text-anchor="middle" fill="#0984e3" font-size="12" font-weight="bold">六阶梯的依赖关系</text>
+  <line x1="340" y1="55" x2="700" y2="55" stroke="#b2bec3" stroke-width="0.5"/>
+  <text x="520" y="75" text-anchor="middle" fill="#2d3436" font-size="11">语言模型 → CoT → Agent → 持续学习 → 自我迭代 → 具身</text>
+  <text x="520" y="98" text-anchor="middle" fill="#636e72" font-size="10">每一阶都"站在前一阶的肩膀上"</text>
+</svg>
+<div class="diagram-caption">六阶梯的依赖链：认知能力（①—⑤）走在前面，具身化（⑥）是认知成熟之后的自然延伸。</div>
+</div>
+
+<h2>八、路线图的启示</h2>
+
+<p>回顾整条路线图，我们可以提炼出几个核心启示：</p>
+
+<p><strong>第一，AGI 不是单一突破，而是递进阶梯。</strong> 它不会在某一天突然出现，而是沿着清晰的路径逐步实现。每一阶都有明确的科学问题和工程挑战。认识这条路径，有助于我们判断当前工作的优先级：我们是否在解决当前阶段最关键的问题？</p>
+
+<p><strong>第二，当前的重心在 LLM-based Agent。</strong> 大规模的模型预训练红利正在放缓，真正的增量创新正在向 Agent 层迁移——工具接口的标准化（MCP）、Scaffold 架构的创新、多 Agent 协作的编排、记忆系统的深度整合。这些才是接下来 1-2 年的主战场。</p>
+
+<p><strong>第三，持续学习是通往 AGI 的"最后一公里瓶颈"。</strong> 在 Agent 能力日趋成熟之后，下一个必须攻克的难关就是让 AI 具备持续学习的能力。这个问题的解决，将直接触发第五阶（自我迭代）的出现，从而启动自我加速的飞轮。</p>
+
+<p><strong>第四，这条路径的"必然性"源于语言的地位。</strong> 语言是人类认知的唯一已知载体，也是 AI 与人类交互、传承知识、表达推理过程的天然媒介。以 LLM 为核心的 Agent 架构不是偶然的工程选择——它是当前通往 AGI 的唯一已知路径，就像内燃机不是汽车的唯一可能动力，但在当时的工程技术条件下，它是最可行的选择。AI 的"内燃机"就是语言模型。</p>
+
+<div class="diagram-container">
+<svg viewBox="0 0 750 130" xmlns="http://www.w3.org/2000/svg">
+  <rect x="30" y="15" width="100" height="100" rx="50" fill="#0984e3" opacity="0.9"/>
+  <text x="80" y="72" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">路线图</text>
+  <text x="80" y="90" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">思维</text>
+
+  <text x="145" y="65" text-anchor="middle" fill="#636e72" font-size="16">→</text>
+
+  <rect x="170" y="15" width="140" height="100" rx="12" fill="#eef6ff" stroke="#0984e3" stroke-width="1.5"/>
+  <text x="240" y="50" text-anchor="middle" fill="#0984e3" font-size="12" font-weight="bold">第③阶：LLM-based Agent</text>
+  <text x="240" y="72" text-anchor="middle" fill="#2d3436" font-size="11">当前的主战场</text>
+  <text x="240" y="92" text-anchor="middle" fill="#636e72" font-size="10">Scaffold 创新 · 工具标准化</text>
+
+  <text x="325" y="65" text-anchor="middle" fill="#636e72" font-size="16">→</text>
+
+  <rect x="350" y="15" width="140" height="100" rx="12" fill="#fef9e7" stroke="#f39c12" stroke-width="1.5"/>
+  <text x="420" y="50" text-anchor="middle" fill="#f39c12" font-size="12" font-weight="bold">第④阶：持续学习</text>
+  <text x="420" y="72" text-anchor="middle" fill="#2d3436" font-size="11">下一个关键瓶颈</text>
+  <text x="420" y="92" text-anchor="middle" fill="#636e72" font-size="10">打通 AGI 的关键</text>
+
+  <text x="505" y="65" text-anchor="middle" fill="#636e72" font-size="16">→</text>
+
+  <rect x="530" y="15" width="190" height="100" rx="12" fill="#fde8e8" stroke="#e74c3c" stroke-width="1.5"/>
+  <text x="625" y="50" text-anchor="middle" fill="#e74c3c" font-size="12" font-weight="bold">⑤⑥ 奇点 · 具身</text>
+  <text x="625" y="72" text-anchor="middle" fill="#2d3436" font-size="11">自我加速 · 物理世界</text>
+  <text x="625" y="92" text-anchor="middle" fill="#636e72" font-size="10">远期目标</text>
+</svg>
+<div class="diagram-caption">当前的时间线焦点：第③阶 LLM-based Agent 正在快速成熟，第④阶持续学习是决定 AGI 能否加速推进的关键。</div>
+</div>
+
+<p><strong>总结：</strong>AGI 不是靠某一次"大统一理论"式的突破（如爱因斯坦的统一场论）来实现的，它更像是一条<strong>工程阶梯</strong>——每一级都需要扎实的科学突破和工程技术，上一级为下一级铺路。我们现在站在第③级（LLM-based Agent）上，已经能看到第④级（持续学习）的轮廓。路还很长，但方向已经清晰。</p>
+
+</div>
+<footer>&copy; 2026 Ha2fde</footer>
+</div>
+</body>
+</html>
