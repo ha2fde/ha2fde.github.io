@@ -3,35 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ha2fde's Site</title>
+    <title>Ha2fde's Blog</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #f5f5f5; color: #333; min-height: 100vh;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif;
+            background: #f8f9fa; color: #333; line-height: 1.7;
         }
-        .container { text-align: center; padding: 2rem; }
-        h1 { font-size: 3rem; margin-bottom: 1rem; color: #2c3e50; }
-        p { font-size: 1.2rem; color: #666; line-height: 1.8; }
-        .links { margin-top: 2rem; }
-        .links a {
-            display: inline-block; margin: 0 0.5rem; padding: 0.6rem 1.5rem;
-            background: #3498db; color: #fff; text-decoration: none;
-            border-radius: 6px; font-size: 1rem; transition: background 0.2s;
+        .container { max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem; }
+        header { padding: 3rem 0 2rem; border-bottom: 1px solid #eee; margin-bottom: 2rem; }
+        header h1 { font-size: 2rem; color: #1a1a2e; }
+        header p { color: #666; margin-top: 0.3rem; }
+        header .nav { margin-top: 0.8rem; }
+        header .nav a { color: #3498db; text-decoration: none; font-size: 0.95rem; }
+        header .nav a:hover { text-decoration: underline; }
+        .post {
+            padding: 1.5rem 0; border-bottom: 1px solid #eee;
+            display: flex; gap: 1.5rem; align-items: flex-start;
         }
-        .links a:hover { background: #2980b9; }
-        footer { margin-top: 3rem; color: #999; font-size: 0.9rem; }
+        .post:last-child { border-bottom: none; }
+        .post-thumb {
+            width: 100px; height: 100px; border-radius: 8px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem;
+        }
+        .post-content { flex: 1; }
+        .post-title { font-size: 1.3rem; font-weight: 600; }
+        .post-title a { color: #1a1a2e; text-decoration: none; }
+        .post-title a:hover { color: #3498db; }
+        .post-meta { font-size: 0.85rem; color: #999; margin-top: 0.3rem; }
+        .post-desc { font-size: 0.95rem; color: #555; margin-top: 0.5rem; }
+        footer { text-align: center; padding: 2rem; color: #999; font-size: 0.85rem; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Welcome</h1>
-        <p>Hi, this is Ha2fde's personal site, hosted on GitHub Pages.</p>
-        <div class="links">
-            <a href="https://github.com/ha2fde">GitHub</a>
+        <header>
+            <h1>Ha2fde's Blog</h1>
+            <p>记录技术学习笔记</p>
+            <div class="nav"><a href="https://github.com/ha2fde">GitHub</a></div>
+        </header>
+
+        <div class="post">
+            <div class="post-thumb" style="background:#e8f4fd;">⚡</div>
+            <div class="post-content">
+                <div class="post-title"><a href="posts/tilelang-intro.html">TileLang：高性能 AI 内核的 Python 式 DSL</a></div>
+                <div class="post-meta">2026-07-25 · 约 12 分钟</div>
+                <div class="post-desc">TileLang 是一个基于 TVM 的领域专用语言，以 tile 为单位编写 GPU/CPU 高性能计算内核。</div>
+            </div>
         </div>
-        <footer>&copy; 2026 Ha2fde</footer>
     </div>
+
+    <footer>&copy; 2026 Ha2fde</footer>
 </body>
 </html>
