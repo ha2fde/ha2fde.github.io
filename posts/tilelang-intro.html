@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TileLang：高性能 AI 内核的 Python 式 DSL - Ha2fde's Blog</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', monospace;
+            background: #f8f9fa; color: #333; line-height: 1.8;
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem; }
+        .nav-bar { padding: 1rem 0; margin-bottom: 1rem; }
+        .nav-bar a { color: #3498db; text-decoration: none; font-size: 0.95rem; }
+        .nav-bar a:hover { text-decoration: underline; }
+        .nav-bar .sep { color: #ccc; margin: 0 0.4rem; }
+        article h1 { font-size: 1.8rem; color: #1a1a2e; margin-bottom: 0.5rem; }
+        .meta { color: #999; font-size: 0.9rem; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #eee; }
+        article h2 { font-size: 1.3rem; color: #1a1a2e; margin: 2rem 0 0.8rem; padding-bottom: 0.3rem; border-bottom: 1px solid #eee; }
+        article h3 { font-size: 1.1rem; color: #2c3e50; margin: 1.5rem 0 0.5rem; }
+        article p { margin-bottom: 1rem; }
+        article ul, article ol { margin: 0.5rem 0 1rem 1.5rem; }
+        article li { margin-bottom: 0.3rem; }
+        .code-block {
+            background: #1e1e2e; color: #cdd6f4; border-radius: 8px;
+            margin: 1rem 0; overflow-x: auto;
+        }
+        .code-block .header {
+            background: #181825; padding: 0.4rem 1rem; font-size: 0.8rem;
+            color: #6c7086; border-radius: 8px 8px 0 0;
+            display: flex; justify-content: space-between;
+        }
+        .code-block pre { padding: 1rem; margin: 0; font-size: 0.85rem; line-height: 1.6; }
+        .code-block code { font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace; }
+        .kw { color: #cba6f7; } .fn { color: #89b4fa; } .ty { color: #f9e2af; }
+        .cm { color: #6c7086; } .str { color: #a6e3a1; } .num { color: #fab387; }
+        .op { color: #89dceb; } .pr { color: #f38ba8; }
+        .diagram {
+            background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
+            margin: 1.5rem 0; padding: 1rem; text-align: center;
+        }
+        .diagram svg { max-width: 100%; height: auto; }
+        .diagram-caption { font-size: 0.85rem; color: #666; margin-top: 0.5rem; }
+        .callout {
+            background: #eef6ff; border-left: 4px solid #3498db;
+            padding: 0.8rem 1rem; margin: 1rem 0; border-radius: 4px;
+            font-size: 0.95rem;
+        }
+        .callout.warn { background: #fff8e6; border-left-color: #f39c12; }
+        .table-wrap { overflow-x: auto; margin: 1rem 0; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th, td { padding: 0.5rem 0.8rem; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #f0f0f0; font-weight: 600; }
+        tr:hover { background: #f8f8f8; }
+        footer { text-align: center; padding: 2rem; color: #999; font-size: 0.85rem; margin-top: 2rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-bar">
+            <a href="../">Home</a><span class="sep">/</span><span>TileLang</span>
+        </div>
+
+        <article>
+            <h1>TileLang：高性能 AI 内核的 Python 式 DSL</h1>
+            <div class="meta">2026-07-25 · 约 12 分钟</div>
+
+            <p>在现代 AI 系统中，GPU 计算内核的性能至关重要。然而，编写高效的 GPU 内核（如 GEMM、FlashAttention）一直是一项极具挑战的工作 —— 开发者要么使用底层 CUDA/HIP 手动优化，事无巨细地管理每一级内存和线程调度；要么使用 Triton 等高级 DSL，但失去对硬件细节的精细控制。</p>
+
+            <p><strong>TileLang</strong>（<a href="https://github.com/tile-ai/tilelang">tile-lang</a>）正是为了解决这个痛点而生的。它是一个基于 TVM 的领域专用语言，让开发者用 Python 语法编写 tile 级别的计算内核，同时保留对内存层次和线程映射的精细控制。由北京大学和微软研究院联合推出，论文已被 <a href="https://arxiv.org/abs/2504.17577">arXiv 2504.17577</a> 收录。</p>
+
+            <h2>为什么需要 TileLang？</h2>
+
+            <p>在 TileLang 之前，编写 GPU 内核主要有三种方式：</p>
+
+            <ul>
+                <li><strong>CUDA/HIP</strong>：最灵活，但需要手动管理所有细节 —— 从全局内存加载、共享内存同步、寄存器分配、到 warp 级别的指令调度。开发效率极低。</li>
+                <li><strong>Triton</strong>：以 tile 为单位编程，大大简化了开发流程。但其数据流表示不够直观，不支持显式的内存层次声明，一些优化（如 TMA、软件流水线）需要 workaround。</li>
+                <li><strong>TVM/Ansor</strong>：自动调度搜索，但计算和调度分离，调试困难，且在复杂融合算子上的表现不如手动优化的内核。</li>
+            </ul>
+
+            <p>TileLang 的目标是 <strong>兼顾 Triton 的开发效率和 CUDA 的性能控制</strong>：</p>
+
+            <div class="diagram">
+                <svg viewBox="0 0 700 240" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                            <path d="M0,0 L10,5 L0,10 Z" fill="#666"/>
+                        </marker>
+                    </defs>
+                    <rect x="10" y="20" width="200" height="60" rx="8" fill="#e8f4fd" stroke="#3498db" stroke-width="2"/>
+                    <text x="110" y="55" text-anchor="middle" fill="#2c3e50" font-size="14" font-weight="bold">CUDA / HIP</text>
+                    <text x="110" y="72" text-anchor="middle" fill="#666" font-size="11">最高性能 · 最低开发效率</text>
+
+                    <rect x="250" y="20" width="200" height="60" rx="8" fill="#f0e6ff" stroke="#9b59b6" stroke-width="2"/>
+                    <text x="350" y="55" text-anchor="middle" fill="#2c3e50" font-size="14" font-weight="bold">Triton</text>
+                    <text x="350" y="72" text-anchor="middle" fill="#666" font-size="11">高开发效率 · 控制力有限</text>
+
+                    <rect x="490" y="20" width="200" height="60" rx="8" fill="#e8f8e8" stroke="#27ae60" stroke-width="3"/>
+                    <text x="590" y="55" text-anchor="middle" fill="#2c3e50" font-size="14" font-weight="bold">TileLang</text>
+                    <text x="590" y="72" text-anchor="middle" fill="#666" font-size="11">开发效率 × 精细控制</text>
+
+                    <line x1="210" y1="50" x2="240" y2="50" stroke="#999" stroke-width="1.5" marker-end="url(#arrow)"/>
+                    <line x1="450" y1="50" x2="480" y2="50" stroke="#999" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+                    <rect x="10" y="100" width="200" height="40" rx="6" fill="#fce4ec" stroke="#e74c3c" stroke-width="1"/>
+                    <text x="110" y="125" text-anchor="middle" fill="#2c3e50" font-size="12">手动管理一切</text>
+
+                    <rect x="250" y="100" width="200" height="40" rx="6" fill="#fce4ec" stroke="#e74c3c" stroke-width="1"/>
+                    <text x="350" y="125" text-anchor="middle" fill="#2c3e50" font-size="12">自动推理 · 有限暴露</text>
+
+                    <rect x="490" y="100" width="200" height="40" rx="6" fill="#e8f8e8" stroke="#27ae60" stroke-width="1"/>
+                    <text x="590" y="125" text-anchor="middle" fill="#2c3e50" font-size="12">可显式声明 · 可自动推理</text>
+
+                    <text x="350" y="185" text-anchor="middle" fill="#999" font-size="12">← 开发效率 →</text>
+                    <text x="350" y="200" text-anchor="middle" fill="#999" font-size="12">→ 性能控制力 →</text>
+                </svg>
+                <div class="diagram-caption">TileLang 在设计空间中的定位：兼顾开发效率和性能控制力</div>
+            </div>
+
+            <h2>核心设计：Tile 编程模型</h2>
+
+            <p>TileLang 的核心抽象是 <strong>tile（数据块）</strong>。与传统逐元素编程不同，TileLang 的开发者以 tile 为单位思考计算：一个 tile 是一个在 GPU 内存层次中明确放置的数据块。</p>
+
+            <h3>三级内存层次</h3>
+
+            <p>TileLang 显式暴露了 GPU 的三级内存层次，开发者可以声明数据在哪一级放置：</p>
+
+            <div class="diagram">
+                <svg viewBox="0 0 600 280" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="20" y="30" width="560" height="50" rx="6" fill="#fce4ec" stroke="#e74c3c" stroke-width="1.5"/>
+                    <text x="40" y="60" fill="#c0392b" font-size="13" font-weight="bold">Global Memory</text>
+                    <text x="290" y="60" fill="#666" font-size="11">GPU 显存 (HBM) · 大容量 (~80GB) · 高延迟 (~400 cycles)</text>
+
+                    <path d="M40,80 L40,100" stroke="#999" stroke-width="1.5"/>
+                    <line x1="40" y1="100" x2="300" y2="100" stroke="#999" stroke-width="1.5" marker-end="url(#arrow)" transform="translate(-8,0)"/>
+
+                    <rect x="40" y="110" width="520" height="50" rx="6" fill="#fef9e7" stroke="#f39c12" stroke-width="1.5"/>
+                    <text x="60" y="140" fill="#d35400" font-size="13" font-weight="bold">Shared Memory</text>
+                    <text x="290" y="140" fill="#666" font-size="11">每个 Block 共享 · 小容量 (~228KB) · 低延迟 (~30 cycles)</text>
+
+                    <path d="M60,160 L60,180" stroke="#999" stroke-width="1.5"/>
+                    <line x1="60" y1="180" x2="200" y2="180" stroke="#999" stroke-width="1.5" marker-end="url(#arrow)" transform="translate(-8,0)"/>
+
+                    <rect x="60" y="190" width="480" height="50" rx="6" fill="#e8f8e8" stroke="#27ae60" stroke-width="1.5"/>
+                    <text x="80" y="220" fill="#1e8449" font-size="13" font-weight="bold">Fragment (Registers)</text>
+                    <text x="310" y="220" fill="#666" font-size="11">每个 Thread 私有 · 极小 (~256寄存器) · 极低延迟 (~1 cycle)</text>
+
+                    <text x="300" y="270" text-anchor="middle" fill="#999" font-size="11">容量递减 · 速度递增</text>
+                </svg>
+                <div class="diagram-caption">TileLang 暴露的 GPU 三级内存层次 — Global / Shared / Fragment</div>
+            </div>
+
+            <p>在 TileLang 中，分配显式内存的 API 非常直观：</p>
+
+            <div class="code-block">
+                <div class="header"><span>TileLang</span></div>
+                <pre><code><span class="cm"># 在 shared memory 中分配 tile</span>
+<span class="pr">A_shared</span> = <span class="fn">T.alloc_shared</span>((<span class="num">128</span>, <span class="num">32</span>), <span class="str">"float16"</span>)
+
+<span class="cm"># 在寄存器中分配 tile（累加器）</span>
+<span class="pr">C_local</span> = <span class="fn">T.alloc_fragment</span>((<span class="num">128</span>, <span class="num">128</span>), <span class="str">"float32"</span>)
+
+<span class="cm"># 在 global memory 中的 tile（输入张量的一个切片）</span>
+<span class="pr">A_global</span> = <span class="pr">A</span>[<span class="pr">by</span> * <span class="num">128</span>, <span class="pr">ko</span> * <span class="num">32</span>]</code></pre>
+            </div>
+
+            <h2>代码实战：GEMM 内核</h2>
+
+            <p>下面是一个完整的 GEMM（矩阵乘法）内核，展示了 TileLang 的核心编程模式：</p>
+
+            <div class="code-block">
+                <div class="header"><span>tilelang_gemm.py</span></div>
+                <pre><code><span class="kw">import</span> tilelang
+<span class="kw">import</span> tilelang.language <span class="kw">as</span> <span class="ty">T</span>
+
+<span class="pr">M</span>, <span class="pr">N</span>, <span class="pr">K</span> = <span class="num">1024</span>, <span class="num">1024</span>, <span class="num">1024</span>
+<span class="pr">block_M</span>, <span class="pr">block_N</span>, <span class="pr">block_K</span> = <span class="num">128</span>, <span class="num">128</span>, <span class="num">32</span>
+<span class="pr">num_stages</span> = <span class="num">3</span>
+<span class="pr">threads</span> = <span class="num">128</span>
+
+<span class="fn">@tilelang.jit</span>
+<span class="kw">def</span> <span class="fn">matmul</span>(
+    <span class="pr">A</span>: <span class="ty">T.Tensor</span>, <span class="pr">B</span>: <span class="ty">T.Tensor</span>, <span class="pr">C</span>: <span class="ty">T.Tensor</span>
+):
+    <span class="fn">@T.prim_func</span>
+    <span class="kw">def</span> <span class="fn">kernel</span>(
+        <span class="pr">A</span>: <span class="ty">T.Buffer</span>[(<span class="pr">M</span>, <span class="pr">K</span>), <span class="str">"float16"</span>],
+        <span class="pr">B</span>: <span class="ty">T.Buffer</span>[(<span class="pr">K</span>, <span class="pr">N</span>), <span class="str">"float16"</span>],
+        <span class="pr">C</span>: <span class="ty">T.Buffer</span>[(<span class="pr">M</span>, <span class="pr">N</span>), <span class="str">"float32"</span>],
+    ):
+        <span class="kw">with</span> <span class="fn">T.Kernel</span>(
+            <span class="fn">T.ceildiv</span>(<span class="pr">N</span>, <span class="pr">block_N</span>),
+            <span class="fn">T.ceildiv</span>(<span class="pr">M</span>, <span class="pr">block_M</span>),
+            threads=<span class="pr">threads</span>
+        ) <span class="kw">as</span> (<span class="pr">bx</span>, <span class="pr">by</span>):
+
+            <span class="cm"># 分配各级内存的 tile</span>
+            <span class="pr">A_shared</span> = <span class="fn">T.alloc_shared</span>(
+                (<span class="pr">block_M</span>, <span class="pr">block_K</span>), <span class="str">"float16"</span>)
+            <span class="pr">B_shared</span> = <span class="fn">T.alloc_shared</span>(
+                (<span class="pr">block_K</span>, <span class="pr">block_N</span>), <span class="str">"float16"</span>)
+            <span class="pr">C_local</span> = <span class="fn">T.alloc_fragment</span>(
+                (<span class="pr">block_M</span>, <span class="pr">block_N</span>), <span class="str">"float32"</span>)
+
+            <span class="cm"># 清零局部累加器</span>
+            <span class="fn">T.clear</span>(<span class="pr">C_local</span>)
+
+            <span class="cm"># 分块迭代（带软件流水线）</span>
+            <span class="kw">for</span> <span class="pr">ko</span> <span class="kw">in</span> <span class="fn">T.Pipelined</span>(
+                <span class="fn">T.ceildiv</span>(<span class="pr">K</span>, <span class="pr">block_K</span>),
+                num_stages=<span class="pr">num_stages</span>
+            ):
+                <span class="cm"># Global → Shared（异步拷贝）</span>
+                <span class="fn">T.copy</span>(<span class="pr">A</span>[<span class="pr">by</span> * <span class="pr">block_M</span>, <span class="pr">ko</span> * <span class="pr">block_K</span>],
+                        <span class="pr">A_shared</span>)
+                <span class="fn">T.copy</span>(<span class="pr">B</span>[<span class="pr">ko</span> * <span class="pr">block_K</span>, <span class="pr">bx</span> * <span class="pr">block_N</span>],
+                        <span class="pr">B_shared</span>)
+
+                <span class="cm"># Shared → Fragment + 计算</span>
+                <span class="fn">T.gemm</span>(<span class="pr">A_shared</span>, <span class="pr">B_shared</span>, <span class="pr">C_local</span>)
+
+            <span class="cm"># Fragment → Global（写回）</span>
+            <span class="fn">T.copy</span>(<span class="pr">C_local</span>,
+                    <span class="pr">C</span>[<span class="pr">by</span> * <span class="pr">block_M</span>, <span class="pr">bx</span> * <span class="pr">block_N</span>])
+
+    <span class="kw">return</span> <span class="fn">kernel</span></code></pre>
+            </div>
+
+            <div class="callout">
+                <strong>关键洞察</strong>：与 Triton 不同，TileLang 允许开发者<strong>显式声明</strong>每个 tile 在内存层次中的位置（global/shared/fragment），并通过 <code>T.gemm</code> 等算子表达计算语义。编译器通过 <strong>Layout Inference</strong> 机制自动推导出高效的并行化方案和内存访问模式。
+            </div>
+
+            <h2>编译流程</h2>
+
+            <p>TileLang 的编译器将 Python DSL 逐步下译为可执行的 GPU 代码，整个过程分为四个阶段：</p>
+
+            <div class="diagram">
+                <svg viewBox="0 0 720 300" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                            <path d="M0,0 L10,5 L0,10 Z" fill="#3498db"/>
+                        </marker>
+                    </defs>
+
+                    <rect x="10" y="20" width="150" height="60" rx="6" fill="#e8f4fd" stroke="#3498db" stroke-width="1.5"/>
+                    <text x="85" y="47" text-anchor="middle" fill="#2c3e50" font-size="12" font-weight="bold">Python DSL</text>
+                    <text x="85" y="63" text-anchor="middle" fill="#666" font-size="10">@T.prim_func</text>
+
+                    <line x1="160" y1="50" x2="185" y2="50" stroke="#3498db" stroke-width="2" marker-end="url(#arr2)"/>
+
+                    <rect x="190" y="20" width="150" height="60" rx="6" fill="#fef9e7" stroke="#f39c12" stroke-width="1.5"/>
+                    <text x="265" y="47" text-anchor="middle" fill="#2c3e50" font-size="12" font-weight="bold">Tile Operator IR</text>
+                    <text x="265" y="63" text-anchor="middle" fill="#666" font-size="10">TileOperator 图</text>
+
+                    <line x1="340" y1="50" x2="365" y2="50" stroke="#3498db" stroke-width="2" marker-end="url(#arr2)"/>
+
+                    <rect x="370" y="20" width="150" height="60" rx="6" fill="#f0e6ff" stroke="#9b59b6" stroke-width="1.5"/>
+                    <text x="445" y="47" text-anchor="middle" fill="#2c3e50" font-size="12" font-weight="bold">Lowered TIR</text>
+                    <text x="445" y="63" text-anchor="middle" fill="#666" font-size="10">TVM 中间表示</text>
+
+                    <line x1="520" y1="50" x2="545" y2="50" stroke="#3498db" stroke-width="2" marker-end="url(#arr2)"/>
+
+                    <rect x="550" y="20" width="150" height="60" rx="6" fill="#e8f8e8" stroke="#27ae60" stroke-width="1.5"/>
+                    <text x="625" y="47" text-anchor="middle" fill="#2c3e50" font-size="12" font-weight="bold">CUDA / HIP</text>
+                    <text x="625" y="63" text-anchor="middle" fill="#666" font-size="10">目标设备代码</text>
+
+                    <rect x="190" y="110" width="150" height="35" rx="4" fill="#fff8e6" stroke="#f39c12" stroke-width="1" stroke-dasharray="4"/>
+                    <text x="265" y="132" text-anchor="middle" fill="#d35400" font-size="10">Layout Inference</text>
+
+                    <rect x="370" y="110" width="170" height="50" rx="4" fill="#f5e6ff" stroke="#9b59b6" stroke-width="1" stroke-dasharray="4"/>
+                    <text x="455" y="127" text-anchor="middle" fill="#8e44ad" font-size="10">LowerAndLegalize (14 passes)</text>
+                    <text x="455" y="145" text-anchor="middle" fill="#8e44ad" font-size="10">→ OptimizeForTarget</text>
+
+                    <rect x="10" y="180" width="690" height="90" rx="6" fill="#f0f0f0" stroke="#ccc" stroke-width="1"/>
+                    <text x="355" y="205" text-anchor="middle" fill="#2c3e50" font-size="11" font-weight="bold">优化 Passes</text>
+                    <text x="60" y="225" fill="#666" font-size="10">• 动态参数简化</text>
+                    <text x="60" y="242" fill="#666" font-size="10">• 自动流水线推导</text>
+                    <text x="320" y="225" fill="#666" font-size="10">• 循环尾部分割</text>
+                    <text x="320" y="242" fill="#666" font-size="10">• Z3 符号推理</text>
+                    <text x="560" y="225" fill="#666" font-size="10">• 自动并行化</text>
+                    <text x="560" y="242" fill="#666" font-size="10">• 张量核心指令匹配</text>
+                </svg>
+                <div class="diagram-caption">TileLang 的四阶段编译流程</div>
+            </div>
+
+            <ol>
+                <li><strong>Python DSL 解析</strong>：@T.prim_func 装饰器解析函数体，构造 TileOperator 节点图</li>
+                <li><strong>Layout Inference</strong>：自动推导每个 tile 的线程映射模式和内存布局，确定最优的并行化方案</li>
+                <li><strong>LowerAndLegalize</strong>：通过 14 个子 pass 将高级算子下译为 TVM TIR（含边界检查、负索引归一化等）</li>
+                <li><strong>OptimizeForTarget</strong>：针对目标硬件进行优化（Tensor Core 指令匹配、流水线编排、寄存器分配），最终生成 CUDA/HIP 代码</li>
+            </ol>
+
+            <h2>性能对比</h2>
+
+            <p>根据论文中的数据，TileLang 在多种 AI 内核上的性能表现与手动优化的实现相当，部分场景甚至超越：</p>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>内核</th><th>TileLang</th><th>Triton</th><th>cuBLAS</th><th>硬件</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>FP16 GEMM (8192x8192)</td><td><strong>1.00x</strong></td><td>0.92x</td><td>0.98x</td><td>H100</td></tr>
+                        <tr><td>INT8 GEMM</td><td><strong>1.00x</strong></td><td>0.88x</td><td>0.95x</td><td>H100</td></tr>
+                        <tr><td>FlashAttention (seq=4096)</td><td><strong>1.00x</strong></td><td>0.89x</td><td>—</td><td>A100</td></tr>
+                        <tr><td>Dequant GEMM (W4A16)</td><td><strong>1.00x</strong></td><td>0.85x</td><td>—</td><td>A100</td></tr>
+                        <tr><td>Grouped GEMM</td><td><strong>1.00x</strong></td><td>0.78x</td><td>0.93x</td><td>A100</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="callout warn">
+                <strong>注意</strong>：以上数据来自 TileLang 论文（arXiv 2504.17577），均为 TileLang 归一化后的相对吞吐。实际性能因硬件配置、CUDA 版本等因素而异。
+            </div>
+
+            <p>TileLang 之所以能达到这样的性能，主要得益于其 <strong>Layout Inference</strong> 机制。传统的 tile DSL 需要开发者手动指定线程映射和内存合并模式，而 TileLang 可以根据 tile 的声明自动推导出最优的并行策略，同时将底层细节（如 shared memory bank conflict 避免、向量化加载）交给编译器处理。</p>
+
+            <h2>支持的后端</h2>
+
+            <p>TileLang 目前支持以下硬件后端：</p>
+
+            <ul>
+                <li><strong>NVIDIA CUDA</strong>：sm_70 到 sm_100，含 Tensor Core (WGMMA) 支持</li>
+                <li><strong>AMD ROCm</strong>：gfx90a, gfx942, gfx950</li>
+                <li><strong>Apple Metal</strong>：M 系列芯片</li>
+                <li><strong>CPU</strong>：x86 和 ARM</li>
+                <li><strong>Huawei Ascend</strong>（实验性）：AscendC / AscendNPU IR</li>
+                <li><strong>CuTe DSL</strong>（实验性）：编译为 CUTLASS CuTe</li>
+            </ul>
+
+            <h2>安装和使用</h2>
+
+            <p>安装 TileLang 非常简单：</p>
+
+            <div class="code-block">
+                <div class="header"><span>bash</span></div>
+                <pre><code><span class="cm"># 从 PyPI 安装</span>
+pip install tilelang
+
+<span class="cm"># 安装 nightly 版本（最新特性）</span>
+pip install tilelang -f https://tile-ai.github.io/whl/nightly</code></pre>
+            </div>
+
+            <p>然后就可以用 <code>@tilelang.jit</code> 装饰器编写和 JIT 编译内核了：</p>
+
+            <div class="code-block">
+                <div class="header"><span>Python</span></div>
+                <pre><code><span class="kw">import</span> torch
+<span class="kw">import</span> tilelang
+<span class="kw">import</span> tilelang.language <span class="kw">as</span> <span class="ty">T</span>
+
+<span class="fn">@tilelang.jit</span>
+<span class="kw">def</span> <span class="fn">add</span>(<span class="pr">N</span>: <span class="kw">int</span>, block: <span class="kw">int</span> = <span class="num">256</span>):
+    <span class="fn">@T.prim_func</span>
+    <span class="kw">def</span> <span class="fn">add_kernel</span>(
+        <span class="pr">A</span>: <span class="ty">T.Buffer</span>[(<span class="pr">N</span>,), <span class="str">"float32"</span>],
+        <span class="pr">B</span>: <span class="ty">T.Buffer</span>[(<span class="pr">N</span>,), <span class="str">"float32"</span>],
+        <span class="pr">C</span>: <span class="ty">T.Buffer</span>[(<span class="pr">N</span>,), <span class="str">"float32"</span>],
+    ):
+        <span class="kw">with</span> <span class="fn">T.Kernel</span>(
+            <span class="fn">T.ceildiv</span>(<span class="pr">N</span>, block), threads=<span class="num">256</span>
+        ) <span class="kw">as</span> <span class="pr">bx</span>:
+            <span class="pr">offset</span> = <span class="pr">bx</span> * block
+            <span class="kw">for</span> <span class="pr">i</span> <span class="kw">in</span> <span class="fn">T.Parallel</span>(block):
+                <span class="pr">C</span>[<span class="pr">offset</span> + <span class="pr">i</span>] = (
+                    <span class="pr">A</span>[<span class="pr">offset</span> + <span class="pr">i</span>] +
+                    <span class="pr">B</span>[<span class="pr">offset</span> + <span class="pr">i</span>]
+                )
+    <span class="kw">return</span> <span class="fn">add_kernel</span>
+
+<span class="cm"># 与 PyTorch 无缝集成</span>
+<span class="pr">a</span> = torch.randn(<span class="num">1024</span>, device=<span class="str">"cuda"</span>)
+<span class="pr">b</span> = torch.randn(<span class="num">1024</span>, device=<span class="str">"cuda"</span>)
+<span class="pr">c</span> = <span class="fn">add</span>(<span class="pr">a</span>, <span class="pr">b</span>)
+<span class="fn">print</span>(<span class="pr">c</span>)</code></pre>
+            </div>
+
+            <h2>生态与社区</h2>
+
+            <p>TileLang 已经被多个知名项目采用：</p>
+
+            <ul>
+                <li><strong>BitBLAS</strong>（微软）：使用 TileLang 加速量化矩阵乘法</li>
+                <li><strong>AttentionEngine</strong>（微软）：使用 TileLang 实现高性能 Attention 算子</li>
+                <li><strong>TileLang Puzzles</strong>：10 道渐进式编程练习，通过写 TileLang 内核学习 GPU 编程</li>
+            </ul>
+
+            <p>社区资源：</p>
+            <ul>
+                <li>GitHub：<a href="https://github.com/tile-ai/tilelang">github.com/tile-ai/tilelang</a></li>
+                <li>文档：<a href="https://tilelang.com">tilelang.com</a></li>
+                <li>Discord：<a href="https://discord.gg/TUrHyJnKPG">discord.gg/TUrHyJnKPG</a></li>
+                <li>论文：<a href="https://arxiv.org/abs/2504.17577">arXiv 2504.17577</a></li>
+            </ul>
+
+            <h2>总结</h2>
+
+            <p>TileLang 最大的价值在于它在<strong>易用性</strong>和<strong>性能控制</strong>之间找到了一个优雅的平衡点。如果你正在为 AI 模型编写自定义 GPU 内核，希望在提高开发效率的同时不牺牲性能表现，TileLang 是一个值得关注的选择。它不仅降低了 GPU 内核开发的门槛，还通过 Layout Inference 等机制提供了超越手动编写的可能性。</p>
+
+        </article>
+
+        <footer>&copy; 2026 Ha2fde</footer>
+    </div>
+</body>
+</html>
