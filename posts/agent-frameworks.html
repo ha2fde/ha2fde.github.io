@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent 框架：LLM 进化的终点与 AGI 的工程化路径</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif;
+            background: #f8f9fa; color: #333; line-height: 1.8;
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem; }
+        header { padding: 2rem 0; border-bottom: 1px solid #eee; margin-bottom: 2rem; }
+        header a { color: #3498db; text-decoration: none; }
+        h1 { font-size: 1.8rem; line-height: 1.4; margin-bottom: 0.8rem; }
+        .meta { color: #999; font-size: 0.9rem; margin-bottom: 2rem; }
+        h2 { font-size: 1.3rem; margin: 2rem 0 0.8rem; color: #1a1a2e; border-left: 4px solid #e84393; padding-left: 0.8rem; }
+        h3 { font-size: 1.1rem; margin: 1.5rem 0 0.6rem; color: #2d3436; }
+        p { margin: 0.8rem 0; }
+        blockquote { border-left: 3px solid #e84393; margin: 1rem 0; padding: 0.5rem 1rem; background: #fce4ec; }
+        ul, ol { margin: 0.8rem 0; padding-left: 1.5rem; }
+        li { margin: 0.4rem 0; }
+        pre { background: #2d3436; color: #dfe6e9; padding: 1rem; border-radius: 6px; overflow-x: auto; font-size: 0.85rem; margin: 1rem 0; }
+        code { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+        p code { background: #eee; padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.9rem; }
+        .callout { padding: 1rem; border-radius: 6px; margin: 1rem 0; border-left: 4px solid; }
+        .callout.kr { background: #fce4ec; border-color: #e84393; }
+        .callout.info { background: #eef6ff; border-color: #0984e3; }
+        .callout.success { background: #e6ffe6; border-color: #27ae60; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        th, td { padding: 0.5rem 0.8rem; border: 1px solid #dfe6e9; text-align: left; }
+        th { background: #fce4ec; font-weight: 600; }
+        .ref { font-size: 0.85rem; color: #666; }
+        footer { text-align: center; padding: 3rem 0 1rem; color: #999; font-size: 0.85rem; }
+        .diagram { background: #fff; border: 1px solid #dfe6e9; border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; text-align: center; }
+        .diagram svg { max-width: 100%; height: auto; }
+        .diagram-caption { font-size: 0.85rem; color: #666; margin-top: 0.5rem; }
+        @media (max-width: 600px) { .container { padding: 1rem; } h1 { font-size: 1.4rem; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header><a href="../index.html">← 返回首页</a></header>
+    <h1>Agent 框架：LLM 进化的终点与 AGI 的工程化路径</h1>
+    <div class="meta">2026-07-27 · 约 15 分钟 · LLM 进化史 ⑨</div>
+
+    <p>如果回顾整条 LLM 进化链，所有节点最终汇聚到一个方向：<b>AI Agent</b>。</p>
+
+    <div class="diagram">
+        <svg viewBox="0 0 660 200" xmlns="http://www.w3.org/2000/svg" style="font-family: -apple-system, sans-serif;">
+            <defs>
+                <linearGradient id="ag1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#74b9ff"/><stop offset="1" stop-color="#0984e3"/></linearGradient>
+                <linearGradient id="ag2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a29bfe"/><stop offset="1" stop-color="#6c5ce7"/></linearGradient>
+                <linearGradient id="ag3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#55efc4"/><stop offset="1" stop-color="#00b894"/></linearGradient>
+                <linearGradient id="ag4" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fdcb6e"/><stop offset="1" stop-color="#e67e22"/></linearGradient>
+            </defs>
+            <text x="330" y="25" text-anchor="middle" font-size="15" font-weight="bold" fill="#2d3436">Agent = 之前所有技术的集成</text>
+
+            <rect x="20" y="45" width="150" height="60" rx="8" fill="url(#ag1)"/>
+            <text x="95" y="68" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">强大的 LLM</text>
+            <text x="95" y="88" text-anchor="middle" font-size="9" fill="#dfe6e9">Scaling Laws → GPT-3/4</text>
+
+            <rect x="175" y="45" width="150" height="60" rx="8" fill="url(#ag2)"/>
+            <text x="250" y="68" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">推理能力</text>
+            <text x="250" y="88" text-anchor="middle" font-size="9" fill="#dfe6e9">CoT → 思维链推理</text>
+
+            <rect x="330" y="45" width="150" height="60" rx="8" fill="url(#ag3)"/>
+            <text x="405" y="68" text-anchor="middle" font-size="11" font-weight="bold" fill="#2d3436">工具调用</text>
+            <text x="405" y="88" text-anchor="middle" font-size="9" fill="#636e72">Toolformer → Function Call</text>
+
+            <rect x="485" y="45" width="150" height="60" rx="8" fill="url(#ag4)"/>
+            <text x="560" y="68" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">人机对齐</text>
+            <text x="560" y="88" text-anchor="middle" font-size="9" fill="#dfe6e9">RLHF → InstructGPT</text>
+
+            <line x1="95" y1="105" x2="95" y2="130" stroke="#0984e3" stroke-width="2"/>
+            <line x1="250" y1="105" x2="250" y2="130" stroke="#6c5ce7" stroke-width="2"/>
+            <line x1="405" y1="105" x2="405" y2="130" stroke="#00b894" stroke-width="2"/>
+            <line x1="560" y1="105" x2="560" y2="130" stroke="#e67e22" stroke-width="2"/>
+
+            <rect x="215" y="130" width="230" height="55" rx="12" fill="#e84393"/>
+            <text x="330" y="155" text-anchor="middle" font-size="15" font-weight="bold" fill="#fff">Agent 框架</text>
+            <text x="330" y="175" text-anchor="middle" font-size="10" fill="#dfe6e9">LLM + 推理 + 工具 + 对齐 + 记忆 + 循环</text>
+        </svg>
+        <div class="diagram-caption">图1：Agent 框架是之前所有技术的集成。</div>
+    </div>
+
+    <h2>一、什么是 Agent 框架？</h2>
+
+    <p>Agent 框架没有严格的定义，但大多数框架共享以下核心组成：</p>
+
+    <table>
+        <tr><th>组件</th><th>功能</th><th>来自</th></tr>
+        <tr><td>LLM 引擎</td><td>理解、推理、生成</td><td>GPT-3 / 4 / Claude / LLaMA</td></tr>
+        <tr><td>推理层</td><td>规划、分解、反思</td><td>CoT / ReAct / Tree-of-Thought</td></tr>
+        <tr><td>工具集</td><td>搜索、代码执行、文件操作</td><td>Toolformer / Function Calling</td></tr>
+        <tr><td>记忆系统</td><td>短期工作记忆 + 长期存储</td><td>多轮对话 + 向量数据库</td></tr>
+        <tr><td>行动循环</td><td>Thought → Action → Observation</td><td>ReAct</td></tr>
+    </table>
+
+    <h2>二、代表性框架</h2>
+
+    <h3>AutoGPT（2023 春）</h3>
+    <p>最早引起关注的开源 Agent 实验。给 ChatGPT 加上「设定目标 → 自主规划 → 循环执行」的能力。虽然在实际任务中成功率不高，但它第一次让公众直观感受到「AI 自主完成任务」的样子。</p>
+
+    <h3>LangChain Agent（2023 夏）</h3>
+    <p>将 ReAct 框架工程化的第一个主流框架。提供了「工具」的抽象层，让开发者可以轻松地为 Agent 注册各种外部工具。Agent Executor 模式成为行业标准。</p>
+
+    <h3>Claude Code / OpenCode（2024-2025）</h3>
+    <p>新一代「编码 Agent」的代表。不只是一个普通的对话界面——它们可以在终端中自主执行命令、读写文件、运行测试、git 操作。ReAct 循环在这里被推向极致：Agent 在一个沙箱环境中自主完成复杂的软件开发任务。</p>
+
+    <h3>Codex（2024）</h3>
+    <p>GitHub 的 AI 编码 Agent，深度集成 VS Code 和 GitHub 工作流。能够理解整个代码仓库的结构，自主创建 Pull Request、修复 Bug、编写测试。</p>
+
+    <h3>Deep Research（2024-2025）</h3>
+    <p>深度研究 Agent。ReAct 循环 + 搜索引擎 + 网页阅读器 + 综合推理：给定一个研究问题，Agent 自主搜索、阅读、交叉验证、综合信息，最终生成研究报告。</p>
+
+    <h2>三、通用 Agent 架构</h2>
+
+    <div class="diagram">
+        <svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg" style="font-family: -apple-system, sans-serif;">
+            <rect x="180" y="20" width="240" height="50" rx="10" fill="#e84393"/>
+            <text x="300" y="50" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">LLM 核心引擎</text>
+
+            <line x1="300" y1="70" x2="300" y2="95" stroke="#636e72" stroke-width="2"/>
+
+            <rect x="180" y="95" width="240" height="40" rx="8" fill="#0984e3" opacity="0.9"/>
+            <text x="300" y="120" text-anchor="middle" font-size="12" font-weight="bold" fill="#fff">推理 / 规划 / 决策</text>
+
+            <line x1="180" y1="135" x2="80" y2="165" stroke="#636e72" stroke-width="1.5"/>
+            <line x1="300" y1="135" x2="300" y2="165" stroke="#636e72" stroke-width="1.5"/>
+            <line x1="420" y1="135" x2="520" y2="165" stroke="#636e72" stroke-width="1.5"/>
+
+            <rect x="10" y="165" width="140" height="50" rx="8" fill="#00b894"/>
+            <text x="80" y="190" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">工具层</text>
+            <text x="80" y="207" text-anchor="middle" font-size="9" fill="#dfe6e9">搜索 / 计算 / 代码 / API</text>
+
+            <rect x="230" y="165" width="140" height="50" rx="8" fill="#e67e22"/>
+            <text x="300" y="190" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">记忆层</text>
+            <text x="300" y="207" text-anchor="middle" font-size="9" fill="#dfe6e9">上下文 / 向量库 / 文件</text>
+
+            <rect x="450" y="165" width="140" height="50" rx="8" fill="#6c5ce7"/>
+            <text x="520" y="190" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">安全层</text>
+            <text x="520" y="207" text-anchor="middle" font-size="9" fill="#dfe6e9">权限 / 审核 / 沙箱</text>
+
+            <line x1="80" y1="215" x2="300" y2="245" stroke="#636e72" stroke-width="1.5"/>
+            <line x1="300" y1="215" x2="300" y2="245" stroke="#636e72" stroke-width="1.5"/>
+            <line x1="520" y1="215" x2="300" y2="245" stroke="#636e72" stroke-width="1.5"/>
+
+            <rect x="180" y="245" width="240" height="40" rx="10" fill="#e84393" opacity="0.7"/>
+            <text x="300" y="270" text-anchor="middle" font-size="12" font-weight="bold" fill="#fff">循环：Thought → Action → Observation</text>
+        </svg>
+        <div class="diagram-caption">图2：通用 Agent 架构。LLM 核心 + 推理/规划层 + 外部工具 + 记忆系统 + 安全保护，围绕 ReAct 循环迭代。</div>
+    </div>
+
+    <h2>四、趋势与展望</h2>
+
+    <p>Agent 框架的发展有几个明显的趋势：</p>
+
+    <ul>
+        <li><b>从通用到专用</b>：编码 Agent（Claude Code）、研究 Agent（Deep Research）、数据分析 Agent——每个垂直领域都在诞生专用的 Agent</li>
+        <li><b>从单一模型到多模型协调</b>：一个复杂任务可能需要多个 Agent 协作（Multi-Agent 系统）</li>
+        <li><b>从文本输入到多模态输入</b>：图像、音频、视频都能作为 Agent 的输入</li>
+        <li><b>从对话式到自主式</b>：从「你问我答」到「设定目标后自主执行」</li>
+    </ul>
+
+    <div class="callout kr">
+        <p><b>Agent 不只是 LLM 的一个应用场景——它是 LLM 技术的最终形态。</b>规模、推理、对齐、工具——所有之前的进化节点，都在为 Agent 做铺垫。</p>
+    </div>
+
+    <h2>五、整条进化链的回顾</h2>
+
+    <p>至此，我们走完了从 2018 年到 2024+ 的 LLM 进化之路：</p>
+
+    <table>
+        <tr><th>#</th><th>节点</th><th>核心贡献</th><th>解决的问题</th></tr>
+        <tr><td>①</td><td>GPT-1</td><td>预训练+微调框架</td><td>NLP 任务各自为政</td></tr>
+        <tr><td>②</td><td>GPT-2</td><td>零样本能力</td><td>标注数据依赖</td></tr>
+        <tr><td>③</td><td>GPT-3</td><td>上下文学习 + 涌现</td><td>微调效率瓶颈</td></tr>
+        <tr><td>④</td><td>CoT</td><td>显式推理过程</td><td>模型不会多步推理</td></tr>
+        <tr><td>⑤</td><td>InstructGPT</td><td>RLHF 对齐</td><td>模型不听话、有偏见</td></tr>
+        <tr><td>⑥</td><td>ReAct</td><td>推理行动交替</td><td>模型只会想不会做</td></tr>
+        <tr><td>⑦</td><td>ChatGPT</td><td>产品化引爆</td><td>技术到产品的鸿沟</td></tr>
+        <tr><td>⑧</td><td>Toolformer</td><td>自学工具调用</td><td>模型不会用工具</td></tr>
+        <tr><td>⑨</td><td>Agent 框架</td><td>自主行动系统</td><td>以上所有问题的工程化集成</td></tr>
+    </table>
+
+    <div class="callout success">
+        <p><b>核心模式</b>：每一步都暴露出当前阶段的瓶颈，下一步就为了解决这个瓶颈而生。从「模型不够大」到「模型只会想不会做」，九个节点拼出了一张完整的 AGI 工程路线图。</p>
+    </div>
+
+    <hr style="margin: 2rem 0;">
+
+    <h2>参考文献</h2>
+    <ol class="ref">
+        <li>系列各篇的参考文献，涵盖 GPT-1 到 Toolformer。</li>
+    </ol>
+
+    <footer>&copy; 2026 Ha2fde · LLM 进化史系列</footer>
+</div>
+</body>
+</html>

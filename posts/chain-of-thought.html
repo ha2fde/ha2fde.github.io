@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chain-of-Thought：让大模型学会「先想再答」</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif;
+            background: #f8f9fa; color: #333; line-height: 1.8;
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem; }
+        header { padding: 2rem 0; border-bottom: 1px solid #eee; margin-bottom: 2rem; }
+        header a { color: #3498db; text-decoration: none; }
+        header a:hover { text-decoration: underline; }
+        h1 { font-size: 1.8rem; line-height: 1.4; margin-bottom: 0.8rem; }
+        .meta { color: #999; font-size: 0.9rem; margin-bottom: 2rem; }
+        h2 { font-size: 1.3rem; margin: 2rem 0 0.8rem; color: #1a1a2e; border-left: 4px solid #6c5ce7; padding-left: 0.8rem; }
+        h3 { font-size: 1.1rem; margin: 1.5rem 0 0.6rem; color: #2d3436; }
+        p { margin: 0.8rem 0; }
+        blockquote { border-left: 3px solid #6c5ce7; margin: 1rem 0; padding: 0.5rem 1rem; background: #f1f8ff; color: #2d3436; }
+        ul, ol { margin: 0.8rem 0; padding-left: 1.5rem; }
+        li { margin: 0.4rem 0; }
+        pre { background: #2d3436; color: #dfe6e9; padding: 1rem; border-radius: 6px; overflow-x: auto; font-size: 0.85rem; margin: 1rem 0; }
+        code { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+        p code { background: #eee; padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.9rem; }
+        .callout { padding: 1rem; border-radius: 6px; margin: 1rem 0; border-left: 4px solid; }
+        .callout.info { background: #eef6ff; border-color: #0984e3; }
+        .callout.warn { background: #fff3e0; border-color: #e67e22; }
+        .callout.success { background: #e6ffe6; border-color: #27ae60; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        th, td { padding: 0.5rem 0.8rem; border: 1px solid #dfe6e9; text-align: left; }
+        th { background: #f1f8ff; font-weight: 600; }
+        .ref { font-size: 0.85rem; color: #666; }
+        footer { text-align: center; padding: 3rem 0 1rem; color: #999; font-size: 0.85rem; }
+        .diagram { background: #fff; border: 1px solid #dfe6e9; border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; text-align: center; }
+        .diagram svg { max-width: 100%; height: auto; }
+        .diagram-caption { font-size: 0.85rem; color: #666; margin-top: 0.5rem; }
+        @media (max-width: 600px) { .container { padding: 1rem; } h1 { font-size: 1.4rem; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header><a href="../index.html">← 返回首页</a></header>
+    <h1>Chain-of-Thought：让大模型学会「先想再答」</h1>
+    <div class="meta">2026-07-27 · 约 15 分钟 · LLM 进化史 ④</div>
+
+    <p>2022 年 1 月，Google 的 Wei 等人发表了可能是 Prompt Engineering 领域最有影响力的论文：<b>《Chain-of-Thought Prompting Elicits Reasoning in Large Language Models》</b>。</p>
+
+    <p>核心思想极其简单：<b>让模型在给出最终答案前，先输出一步一步的推理过程。</b></p>
+
+    <div class="callout info">
+        <p><b>一句话定位</b>：CoT 让 LLM 的推理从「直接猜答案」变成「先想再答」——这个改变看似微小，却解锁了模型在数学、逻辑、常识推理上的巨大潜力。</p>
+    </div>
+
+    <h2>一、背景：大模型的推理瓶颈</h2>
+
+    <p>GPT-3 虽然强大，但在需要<b>多步推理</b>的任务上表现不佳。比如：</p>
+
+    <pre>Q: 商店有 10 个苹果，卖出 3 个后又进货 5 个，现在有多少个？
+
+GPT-3 直接回答：
+12 个 ← 答案正确，但过程不透明
+
+GPT-3 在更复杂的推理问题上会频繁出错，而且无法判断</pre>
+
+    <p>问题的本质：<b>标准语言模型的训练目标是「预测下一个词」</b>，而不是「进行正确推理」。模型擅长从训练数据中记忆答案模式，但不擅长需要多步组合的推理。</p>
+
+    <h2>二、核心思想：在 Prompt 中给出推理范例</h2>
+
+    <p>CoT 的核心方法简单到令人惊讶：<b>在少样本示例中，不只给出「问题 → 答案」，而是给出「问题 → 推理过程 → 答案」。</b></p>
+
+    <div class="diagram">
+        <svg viewBox="0 0 680 360" xmlns="http://www.w3.org/2000/svg" style="font-family: -apple-system, sans-serif;">
+            <rect x="20" y="30" width="310" height="310" rx="8" fill="#fff3e0" stroke="#e67e22" stroke-width="1.5"/>
+            <text x="175" y="55" text-anchor="middle" font-size="13" font-weight="bold" fill="#e67e22">标准 Prompt</text>
+            <text x="35" y="80" font-size="10" fill="#636e72">Q: Roger 有 5 个网球，买了 2 罐，</text>
+            <text x="35" y="97" font-size="10" fill="#636e72">每罐有 3 个。他有多少个？</text>
+            <text x="35" y="117" font-size="10" fill="#0984e3" font-weight="bold">A: 11</text>
+
+            <text x="35" y="145" font-size="10" fill="#636e72">Q: 餐厅有 23 个苹果，用了 20 个</text>
+            <text x="35" y="162" font-size="10" fill="#636e72">做派，又买了 6 个。还有多少个？</text>
+            <text x="35" y="182" font-size="10" fill="#e74c3c" font-weight="bold">A: 27 ← 错误！</text>
+
+            <text x="35" y="215" font-size="10" fill="#636e72">Q: 商店有 10 个苹果，卖出 3 个后</text>
+            <text x="35" y="232" font-size="10" fill="#636e72">又进货 5 个，现在有多少个？</text>
+
+            <text x="35" y="262" font-size="10" fill="#e74c3c" font-weight="bold">A: 12</text>
+            <text x="35" y="282" font-size="10" fill="#636e72">（答案似乎正确但模型只是</text>
+            <text x="35" y="299" font-size="10" fill="#636e72">  猜了个常见数字）</text>
+
+            <line x1="330" y1="185" x2="350" y2="185" stroke="#636e72" stroke-width="2"/>
+
+            <rect x="350" y="30" width="310" height="310" rx="8" fill="#e6ffe6" stroke="#27ae60" stroke-width="1.5"/>
+            <text x="505" y="55" text-anchor="middle" font-size="13" font-weight="bold" fill="#27ae60">CoT Prompt</text>
+            <text x="365" y="80" font-size="10" fill="#636e72">Q: Roger 有 5 个网球，买了 2 罐，</text>
+            <text x="365" y="97" font-size="10" fill="#636e72">每罐有 3 个。他有多少个？</text>
+            <text x="365" y="117" font-size="10" fill="#00b894" font-weight="bold">A: Roger 有 5 个。买了 2 罐，</text>
+            <text x="365" y="135" font-size="10" fill="#00b894" font-weight="bold">每罐 3 个，共 2×3=6 个。</text>
+            <text x="365" y="153" font-size="10" fill="#00b894" font-weight="bold">5+6=11。答案是 11。</text>
+
+            <text x="365" y="182" font-size="10" fill="#636e72">Q: 餐厅有 23 个苹果，用了 20 个</text>
+            <text x="365" y="199" font-size="10" fill="#636e72">做派，又买了 6 个。还有多少个？</text>
+            <text x="365" y="219" font-size="10" fill="#00b894" font-weight="bold">A: 原来有 23 个。用了 20 个，</text>
+            <text x="365" y="237" font-size="10" fill="#00b894" font-weight="bold">剩下 23-20=3 个。又买了 6 个，</text>
+            <text x="365" y="255" font-size="10" fill="#00b894" font-weight="bold">3+6=9。答案是 9。</text>
+
+            <text x="365" y="285" font-size="10" fill="#636e72">Q: 商店有 10 个苹果，卖出 3 个后</text>
+            <text x="365" y="302" font-size="10" fill="#636e72">又进货 5 个，现在有多少个？</text>
+
+            <text x="365" y="325" font-size="10" fill="#00b894" font-weight="bold">A: 原来有 10 个。卖出 3 个，</text>
+            <text x="365" y="340" font-size="10" fill="#00b894" font-weight="bold">剩下 10-3=7 个。进货 5 个，</text>
+            <text x="365" y="355" font-size="10" fill="#00b894" font-weight="bold">7+5=12。答案是 12。✓</text>
+        </svg>
+        <div class="diagram-caption">图1：标准 Prompt vs CoT Prompt。CoT 在示例中加入了中间推理步骤，模型学会模仿这个推理过程。</div>
+    </div>
+
+    <h2>三、关键发现</h2>
+
+    <h3>推理提升巨大</h3>
+    <p>CoT 在需要多步推理的任务上带来了惊人的提升：</p>
+
+    <table>
+        <tr><th>测试集</th><th>标准 Prompt</th><th>CoT Prompt</th><th>提升</th></tr>
+        <tr><td>GSM8K（小学数学）</td><td>~18%</td><td>~58%</td><td>+40%</td></tr>
+        <tr><td>SVAMP（数学应用题）</td><td>~37%</td><td>~79%</td><td>+42%</td></tr>
+        <tr><td>MAWPS（简单数学）</td><td>~67%</td><td>~87%</td><td>+20%</td></tr>
+        <tr><td>CommonsenseQA（常识）</td><td>~71%</td><td>~76%</td><td>+5%</td></tr>
+    </table>
+
+    <h3>模型越大，CoT 效果越好</h3>
+    <p>论文发现了一个关键趋势：CoT 的效果与模型规模正相关。对于小模型（~10B 以下），CoT 几乎没有提升甚至有害。但当模型超过某个规模阈值（约 100B），CoT 的效果显著出现。</p>
+
+    <div class="callout warn">
+        <p><b>涌现能力</b>：CoT 的效果是涌现的——小模型做不到，大模型突然就能做。这再次验证了 Scaling Laws：规模不仅带来更好的性能，还带来质的能力涌现。</p>
+    </div>
+
+    <h3>不需要少样本示例：零样本 CoT</h3>
+    <p>后续研究（Kojima et al., 2022）发现，甚至不需要给示例：只需在 Prompt 末尾加上 <b>"Let's think step by step"</b>，模型就会自动开始推理——这就是零样本 CoT。</p>
+
+    <pre>Q: 商店有 10 个苹果，卖出 3 个后又进货 5 个，现在有多少个？
+A: 让我们一步步思考。</pre>
+
+    <h2>四、更大意义：从黑盒到透明推理</h2>
+
+    <p>CoT 的意义远远超出了性能提升：</p>
+
+    <ul>
+        <li><b>可解释性</b>：模型的推理过程被显式写出，人类可以检查中间步骤是否正确</li>
+        <li><b>可调试性</b>：如果答案错误，可以从推理过程中定位哪一步出错</li>
+        <li><b>推理链路</b>：为后续的 Self-Consistency、Tree-of-Thought、Graph-of-Thought 等技术打开了大门</li>
+        <li><b>Agent 的基础</b>：CoT 的「思考 → 行动」模式直接启发了 ReAct</li>
+    </ul>
+
+    <h2>五、局限</h2>
+    <ul>
+        <li><b>不是真正的推理</b>：模型生成的「推理过程」可能听起来合理但实际上是编造的（虚假推理）</li>
+        <li><b>计算成本更高</b>：生成推理过程需要更多的 token，延迟和成本增加</li>
+        <li><b>对小模型无效</b>：这是涌现能力，小模型无法受益</li>
+    </ul>
+
+    <div class="callout success">
+        <p><b>一句话总结</b>：CoT 用最简单的方法——让模型在回答前先写出推理过程——解锁了大模型的多步推理能力。它让 LLM 从「直接猜答案的统计鹦鹉」变成了「会展示思考过程的推理者」。</p>
+    </div>
+
+    <hr style="margin: 2rem 0;">
+
+    <h2>参考文献</h2>
+    <ol class="ref">
+        <li>Wei, J. et al. (2022). <i>Chain-of-Thought Prompting Elicits Reasoning in Large Language Models</i>. NeurIPS 2022. arXiv:2201.11903. <a href="https://arxiv.org/abs/2201.11903">https://arxiv.org/abs/2201.11903</a></li>
+        <li>Kojima, T. et al. (2022). <i>Large Language Models are Zero-Shot Reasoners</i>. arXiv:2205.11916.</li>
+    </ol>
+
+    <footer>&copy; 2026 Ha2fde · LLM 进化史系列</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPT-1：生成式预训练如何统一 NLP 框架</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif;
+            background: #f8f9fa; color: #333; line-height: 1.8;
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem; }
+        header { padding: 2rem 0; border-bottom: 1px solid #eee; margin-bottom: 2rem; }
+        header a { color: #3498db; text-decoration: none; }
+        header a:hover { text-decoration: underline; }
+        h1 { font-size: 1.8rem; line-height: 1.4; margin-bottom: 0.8rem; }
+        .meta { color: #999; font-size: 0.9rem; margin-bottom: 2rem; }
+        h2 { font-size: 1.3rem; margin: 2rem 0 0.8rem; color: #1a1a2e; border-left: 4px solid #0984e3; padding-left: 0.8rem; }
+        h3 { font-size: 1.1rem; margin: 1.5rem 0 0.6rem; color: #2d3436; }
+        p { margin: 0.8rem 0; }
+        blockquote {
+            border-left: 3px solid #0984e3; margin: 1rem 0; padding: 0.5rem 1rem;
+            background: #f1f8ff; color: #2d3436;
+        }
+        ul, ol { margin: 0.8rem 0; padding-left: 1.5rem; }
+        li { margin: 0.4rem 0; }
+        pre {
+            background: #2d3436; color: #dfe6e9; padding: 1rem; border-radius: 6px;
+            overflow-x: auto; font-size: 0.85rem; margin: 1rem 0;
+        }
+        code { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+        p code { background: #eee; padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.9rem; }
+        .callout {
+            padding: 1rem; border-radius: 6px; margin: 1rem 0;
+            border-left: 4px solid;
+        }
+        .callout.info { background: #eef6ff; border-color: #0984e3; }
+        .callout.warn { background: #fff3e0; border-color: #e67e22; }
+        .callout.success { background: #e6ffe6; border-color: #27ae60; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        th, td { padding: 0.5rem 0.8rem; border: 1px solid #dfe6e9; text-align: left; }
+        th { background: #f1f8ff; font-weight: 600; }
+        .ref { font-size: 0.85rem; color: #666; }
+        footer { text-align: center; padding: 3rem 0 1rem; color: #999; font-size: 0.85rem; }
+        .diagram {
+            background: #fff; border: 1px solid #dfe6e9; border-radius: 8px;
+            padding: 1.5rem; margin: 1.5rem 0; text-align: center;
+        }
+        .diagram svg { max-width: 100%; height: auto; }
+        .diagram-caption { font-size: 0.85rem; color: #666; margin-top: 0.5rem; }
+        @media (max-width: 600px) {
+            .container { padding: 1rem; }
+            h1 { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header><a href="../index.html">← 返回首页</a></header>
+    <h1>GPT-1：生成式预训练如何统一 NLP 框架</h1>
+    <div class="meta">2026-07-27 · 约 15 分钟 · LLM 进化史 ①</div>
+
+    <p>2018 年 6 月，OpenAI 发表了一篇在当时不算轰动、却被历史证明为里程碑的论文：<b>《Improving Language Understanding by Generative Pre-Training》</b>——也就是 GPT-1。</p>
+
+    <p>这篇论文只有一个核心观点，但它改变了一切：<b>先用无监督方式预训练一个语言模型，然后在每个具体任务上做少量有监督微调。</b></p>
+
+    <div class="callout info">
+        <p><b>一句话定位</b>：GPT-1 不是最强的模型（它只有 1.17 亿参数），但它定义了此后所有大语言模型的基本范式。</p>
+    </div>
+
+    <h2>一、背景：2018 年 NLP 是什么样？</h2>
+
+    <p>在 GPT-1 之前，NLP 领域的主流做法是：<b>每个任务独立设计模型架构</b>。</p>
+
+    <ul>
+        <li>做情感分类，用 LSTM + 词向量</li>
+        <li>做文本蕴含，用注意力 + 比较网络</li>
+        <li>做问答，用记忆网络</li>
+        <li>做序列标注，用 BiLSTM + CRF</li>
+    </ul>
+
+    <p>每个任务各自设计专门的架构、专门的损失函数、专门的训练流程。你在一个任务上学到的知识，几乎无法迁移到另一个任务。</p>
+
+    <p>简单说：<b>2018 年的 NLP 有点像「每个问题都盖一栋新房子」——没有地基复用</b>。</p>
+
+    <h2>二、核心思想：两阶段框架</h2>
+
+    <p>GPT-1 的核心贡献在于提出了一个极其简洁的两阶段框架：</p>
+
+    <div class="diagram">
+        <svg viewBox="0 0 680 280" xmlns="http://www.w3.org/2000/svg" style="font-family: -apple-system, sans-serif;">
+            <defs>
+                <linearGradient id="pre" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#74b9ff"/><stop offset="1" stop-color="#0984e3"/></linearGradient>
+                <linearGradient id="fin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#55efc4"/><stop offset="1" stop-color="#00b894"/></linearGradient>
+                <marker id="ar3" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#636e72"/>
+                </marker>
+            </defs>
+            <text x="340" y="28" text-anchor="middle" font-size="16" font-weight="bold" fill="#2d3436">GPT-1 两阶段框架</text>
+
+            <rect x="30" y="50" width="280" height="200" rx="12" fill="url(#pre)"/>
+            <text x="170" y="78" text-anchor="middle" font-size="15" font-weight="bold" fill="#fff">阶段一：无监督预训练</text>
+            <line x1="60" y1="95" x2="280" y2="95" stroke="#fff" stroke-opacity="0.3" stroke-width="1"/>
+            <text x="170" y="118" text-anchor="middle" font-size="11" fill="#dfe6e9">目标：预测下一个词</text>
+            <text x="170" y="140" text-anchor="middle" font-size="11" fill="#dfe6e9">数据：BookCorpus（7000 本书）</text>
+            <text x="170" y="162" text-anchor="middle" font-size="11" fill="#dfe6e9">规模：1.17 亿参数</text>
+            <text x="170" y="184" text-anchor="middle" font-size="11" fill="#dfe6e9">架构：12 层 Transformer 解码器</text>
+            <text x="170" y="215" text-anchor="middle" font-size="10" fill="#dfe6e9" font-style="italic">学到：语法、语义、世界知识</text>
+
+            <line x1="310" y1="150" x2="350" y2="150" stroke="#636e72" stroke-width="2.5" marker-end="url(#ar3)"/>
+
+            <rect x="355" y="50" width="295" height="200" rx="12" fill="url(#fin)"/>
+            <text x="500" y="78" text-anchor="middle" font-size="15" font-weight="bold" fill="#2d3436">阶段二：有监督微调</text>
+            <line x1="385" y1="95" x2="620" y2="95" stroke="#2d3436" stroke-opacity="0.15" stroke-width="1"/>
+            <text x="500" y="118" text-anchor="middle" font-size="11" fill="#636e72">对每个任务：</text>
+            <text x="500" y="140" text-anchor="middle" font-size="11" fill="#636e72">1. 在预训练模型上加分类头</text>
+            <text x="500" y="162" text-anchor="middle" font-size="11" fill="#636e72">2. 用小规模标注数据训练</text>
+            <text x="500" y="184" text-anchor="middle" font-size="11" fill="#636e72">3. 同时微调分类头 + 预训练参数</text>
+            <text x="500" y="215" text-anchor="middle" font-size="10" fill="#636e72" font-style="italic">结果：12 / 12 任务超越 SOTA</text>
+
+            <text x="170" y="275" text-anchor="middle" font-size="10" fill="#0984e3">大规模无标签数据（免费）</text>
+            <text x="500" y="275" text-anchor="middle" font-size="10" fill="#00b894">小规模有标签数据（昂贵）</text>
+        </svg>
+        <div class="diagram-caption">图1：GPT-1 的两阶段框架。先用免费的无标签数据做预训练，再用少量的有标签数据做微调。</div>
+    </div>
+
+    <h3>无监督预训练</h3>
+    <p>GPT-1 使用标准的语言模型目标函数：给定前 k 个词，预测第 k+1 个词。这是自回归（Autoregressive）方式。训练数据是 BookCorpus——约 7000 本未出版书籍，涵盖多种文体。</p>
+
+    <p>关键洞察：<b>「预测下一个词」这个看似简单的任务，迫使模型学习到大量的语言学知识</b>——语法结构、语义关系、甚至推理能力。</p>
+
+    <h3>有监督微调</h3>
+    <p>在预训练完成后，对每个具体 NLP 任务：</p>
+    <ol>
+        <li>在 Transformer 的输出上加一个线性分类层</li>
+        <li>在任务标注数据上训练</li>
+        <li>训练时同时更新分类层参数和预训练 Transformer 参数</li>
+    </ol>
+
+    <p>论文的一个重要贡献是设计了<b>统一的输入变换方法（Traversal-Style）</b>：将各种不同结构的任务（文本分类、文本蕴含、问答、序列标注）都转化为统一的「连续文本序列」格式，使得同一个预训练模型可以直接处理所有任务。</p>
+
+    <h2>三、关键结果：12/12 任务超越 SOTA</h2>
+
+    <p>GPT-1 在 12 个 NLP 任务上进行了评估，覆盖了 4 大类：</p>
+
+    <table>
+        <tr><th>任务类型</th><th>数据示例</th><th>GPT-1 结果</th></tr>
+        <tr><td>自然语言推理</td><td>SNLI, MultiNLI, RTE, QNLI</td><td>所有 4 个数据集上优于最先进方法</td></tr>
+        <tr><td>问答与常识推理</td><td>RACE, Story Cloze</td><td>在 RACE 上比此前最佳提升 5.7%</td></tr>
+        <tr><td>文本分类</td><td>SST-2, CoLA</td><td>均达到或超过此前最佳</td></tr>
+        <tr><td>序列标注</td><td>STS-B, MRPC, QQP</td><td>一致超越之前的方法</td></tr>
+    </table>
+
+    <p>更重要的是，<b>GPT-1 在绝大多数任务上仅用很少的微调就超越了那些为每个任务精心设计的专门模型</b>。这直观地证明了：「预测下一个词」学到的东西比人工设计的监督信号更好。</p>
+
+    <h2>四、为什么「预测下一个词」这么有效？</h2>
+
+    <p>表面上看起来，预测下一个词是一个非常弱的监督信号——毕竟下一个词的可能性太多了。但正是这种<b>无偏性</b>让语言模型学到了通用的语言能力：</p>
+
+    <ul>
+        <li><b>语法</b>：要预测下一个词，模型必须学会句法结构——形容词后面通常是名词，动词有主谓一致</li>
+        <li><b>语义</b>：模型必须理解「苹果是一种水果」之类的事实知识</li>
+        <li><b>长篇依赖</b>：Transformer 的注意力机制让模型学会跨长距离的语义关联</li>
+        <li><b>多任务</b>：不同于任何特定任务的目标函数，「预测下一个词」要求模型学会所有任务共通的语 言理解</li>
+    </ul>
+
+    <div class="callout success">
+        <p><b>关键洞察</b>：GPT-1 的核心贡献不是架构创新（Transformer 是 Google 提出的），而是<b>第一次证明了「生成式预训练 + 判别式微调」这个框架的有效性。</b>这个框架后来被 BERT、T5、GPT 后续系列等所有主流模型继承。</p>
+    </div>
+
+    <h2>五、历史局限与意义</h2>
+
+    <h3>局限</h3>
+    <ul>
+        <li><b>规模小</b>：1.17 亿参数，放在今天属于「小模型」</li>
+        <li><b>训练数据有限</b>：BookCorpus 仅约 1GB 文本</li>
+        <li><b>单向注意力</b>：GPT-1 使用标准的从左到右自回归 Transformer，看不到下文（这后来被 BERT 的双向注意力超越）</li>
+        <li><b>仍需要微调</b>：每个任务还需要有标签数据，不像后来的模型可以零样本或少样本完成任务</li>
+    </ul>
+
+    <h3>历史意义</h3>
+    <p>如果没有 GPT-1，就不会有 GPT-2、GPT-3，更不会有 ChatGPT。GPT-1 是整条进化链的起点。它证明了两个关键命题：</p>
+
+    <p><b>命题一</b>：无监督语言建模可以学到丰富的语言学知识。</p>
+    <p><b>命题二</b>：这些知识可以通过微调迁移到具体任务，并且效果超过专门设计的监督方法。</p>
+
+    <div class="callout info">
+        <p><b>下一站</b>：如果 GPT-1 证明了「预训练 + 微调」的框架有效，那么 GPT-2 将证明——<b>把模型做大，微调可能都不需要了</b>。→ <a href="gpt2-zero-shot.html">阅读 GPT-2 解读</a></p>
+    </div>
+
+    <hr style="margin: 2rem 0;">
+
+    <h2>参考文献</h2>
+    <ol class="ref">
+        <li>Radford, A., Narasimhan, K., Salimans, T., & Sutskever, I. (2018). <i>Improving Language Understanding by Generative Pre-Training</i>. OpenAI. <a href="https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf">PDF</a></li>
+    </ol>
+
+    <footer>&copy; 2026 Ha2fde · LLM 进化史系列</footer>
+</div>
+</body>
+</html>

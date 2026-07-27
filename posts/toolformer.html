@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toolformer：让语言模型学会自己用工具</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif;
+            background: #f8f9fa; color: #333; line-height: 1.8;
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem; }
+        header { padding: 2rem 0; border-bottom: 1px solid #eee; margin-bottom: 2rem; }
+        header a { color: #3498db; text-decoration: none; }
+        h1 { font-size: 1.8rem; line-height: 1.4; margin-bottom: 0.8rem; }
+        .meta { color: #999; font-size: 0.9rem; margin-bottom: 2rem; }
+        h2 { font-size: 1.3rem; margin: 2rem 0 0.8rem; color: #1a1a2e; border-left: 4px solid #0984e3; padding-left: 0.8rem; }
+        h3 { font-size: 1.1rem; margin: 1.5rem 0 0.6rem; color: #2d3436; }
+        p { margin: 0.8rem 0; }
+        blockquote { border-left: 3px solid #0984e3; margin: 1rem 0; padding: 0.5rem 1rem; background: #eef6ff; }
+        ul, ol { margin: 0.8rem 0; padding-left: 1.5rem; }
+        li { margin: 0.4rem 0; }
+        pre { background: #2d3436; color: #dfe6e9; padding: 1rem; border-radius: 6px; overflow-x: auto; font-size: 0.85rem; margin: 1rem 0; }
+        code { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+        p code { background: #eee; padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.9rem; }
+        .callout { padding: 1rem; border-radius: 6px; margin: 1rem 0; border-left: 4px solid; }
+        .callout.info { background: #eef6ff; border-color: #0984e3; }
+        .callout.warn { background: #fff3e0; border-color: #e67e22; }
+        .callout.success { background: #e6ffe6; border-color: #27ae60; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        th, td { padding: 0.5rem 0.8rem; border: 1px solid #dfe6e9; text-align: left; }
+        th { background: #eef6ff; font-weight: 600; }
+        .ref { font-size: 0.85rem; color: #666; }
+        footer { text-align: center; padding: 3rem 0 1rem; color: #999; font-size: 0.85rem; }
+        .diagram { background: #fff; border: 1px solid #dfe6e9; border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; text-align: center; }
+        .diagram svg { max-width: 100%; height: auto; }
+        .diagram-caption { font-size: 0.85rem; color: #666; margin-top: 0.5rem; }
+        @media (max-width: 600px) { .container { padding: 1rem; } h1 { font-size: 1.4rem; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header><a href="../index.html">← 返回首页</a></header>
+    <h1>Toolformer：让语言模型学会自己用工具</h1>
+    <div class="meta">2026-07-27 · 约 15 分钟 · LLM 进化史 ⑧</div>
+
+    <p>2023 年 2 月，Meta AI 的 Schick 等人发表了 <b>Toolformer</b>——一篇简洁而优雅的论文：<b>《Toolformer: Language Models Can Teach Themselves to Use Tools》</b>。</p>
+
+    <p>核心思想：<b>让语言模型自己学会在什么时候调用什么工具，而不是由开发者硬编码工具调用规则。</b></p>
+
+    <div class="callout info">
+        <p><b>一句话定位</b>：Toolformer 解决了 LLM 的「纯文本局限」——模型只能生成文本，无法查询外部信息、无法精确计算、无法更新知识。Toolformer 让模型自己决定何时调用外部工具来弥补这些局限。</p>
+    </div>
+
+    <h2>一、为什么需要工具？</h2>
+
+    <p>标准语言模型有三大固有缺陷：</p>
+    <table>
+        <tr><th>缺陷</th><th>示例</th><th>工具解决方案</th></tr>
+        <tr><td><b>知识截止</b></td><td>"2023 年世界杯冠军是谁？"</td><td>调用搜索引擎</td></tr>
+        <tr><td><b>数学不好</b></td><td>"234 × 567 = ?"</td><td>调用计算器</td></tr>
+        <tr><td><b>事实幻觉</b></td><td>编造不存在的信息</td><td>调用知识库/维基百科</td></tr>
+    </table>
+
+    <p>人工设计规则让模型调用工具的问题是：你无法预见到模型所有可能需要调用工具的场景。<b>Toolformer 的想法是让模型自我学习。</b></p>
+
+    <h2>二、核心方法：自学工具调用</h2>
+
+    <div class="diagram">
+        <svg viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg" style="font-family: -apple-system, sans-serif;">
+            <defs>
+                <linearGradient id="t1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#74b9ff"/><stop offset="1" stop-color="#0984e3"/></linearGradient>
+                <linearGradient id="t2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#55efc4"/><stop offset="1" stop-color="#00b894"/></linearGradient>
+                <linearGradient id="t3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fdcb6e"/><stop offset="1" stop-color="#e67e22"/></linearGradient>
+                <marker id="arr2" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#636e72"/>
+                </marker>
+            </defs>
+            <text x="340" y="25" text-anchor="middle" font-size="15" font-weight="bold" fill="#2d3436">Toolformer 三步自学流程</text>
+
+            <rect x="30" y="45" width="200" height="80" rx="8" fill="url(#t1)"/>
+            <text x="130" y="70" text-anchor="middle" font-size="13" font-weight="bold" fill="#fff">① 采样</text>
+            <text x="130" y="92" text-anchor="middle" font-size="10" fill="#dfe6e9">对每个文本位置，让模型</text>
+            <text x="130" y="110" text-anchor="middle" font-size="10" fill="#dfe6e9">预测是否应该调用工具</text>
+
+            <line x1="230" y1="85" x2="260" y2="85" stroke="#636e72" stroke-width="2" marker-end="url(#arr2)"/>
+
+            <rect x="265" y="45" width="200" height="80" rx="8" fill="url(#t2)"/>
+            <text x="365" y="70" text-anchor="middle" font-size="13" font-weight="bold" fill="#2d3436">② 执行</text>
+            <text x="365" y="92" text-anchor="middle" font-size="10" fill="#636e72">实际调用工具</text>
+            <text x="365" y="110" text-anchor="middle" font-size="10" fill="#636e72">获取返回结果</text>
+
+            <line x1="465" y1="85" x2="495" y2="85" stroke="#636e72" stroke-width="2" marker-end="url(#arr2)"/>
+
+            <rect x="500" y="45" width="160" height="80" rx="8" fill="url(#t3)"/>
+            <text x="580" y="70" text-anchor="middle" font-size="13" font-weight="bold" fill="#fff">③ 过滤</text>
+            <text x="580" y="92" text-anchor="middle" font-size="10" fill="#dfe6e9">保留使损失降低</text>
+            <text x="580" y="110" text-anchor="middle" font-size="10" fill="#dfe6e9">的调用，丢弃其他</text>
+
+            <text x="340" y="165" text-anchor="middle" font-size="12" fill="#636e72">循环：用过滤后的数据继续训练模型</text>
+
+            <path d="M 580 165 L 580 185 L 130 185 L 130 132" stroke="#636e72" stroke-width="1.5" stroke-dasharray="4" fill="none" marker-end="url(#arr2)"/>
+
+            <rect x="150" y="210" width="380" height="60" rx="8" fill="#dfe6e9"/>
+            <text x="340" y="235" text-anchor="middle" font-size="12" font-weight="bold" fill="#2d3436">最终效果</text>
+            <text x="340" y="255" text-anchor="middle" font-size="10" fill="#636e72">模型学会了在合适位置插入 [Tool_call(参数)] 这样的标记</text>
+        </svg>
+        <div class="diagram-caption">图1：Toolformer 的三步自学流程。模型自己学会什么时候调用工具、调用什么工具。</div>
+    </div>
+
+    <p>具体来说，<b>采样阶段</b>模型在每个位置判断是否调用工具，生成类似这样的调用：</p>
+
+    <pre>用户问：2020 年东京奥运会主办国是哪个国家？
+模型生成：2020 年东京奥运会主办国是 [QA(东京奥运会主办国)] → 返回 [日本]
+
+最终输出：2020 年东京奥运会主办国是日本。</pre>
+
+    <h2>三、支持的工具</h2>
+
+    <p>Toolformer 支持 5 种工具，全部通过模型自学调用：</p>
+
+    <table>
+        <tr><th>工具</th><th>用途</th><th>调用示例</th></tr>
+        <tr><td>问答模型</td><td>回答事实性问题</td><td>[QA(问题)]</td></tr>
+        <tr><td>维基百科搜索</td><td>查找最新信息</td><td>[WikiSearch(关键词)]</td></tr>
+        <tr><td>计算器</td><td>精确数学计算</td><td>[Calculator(表达式)]</td></tr>
+        <tr><td>日历</td><td>查询日期信息</td><td>[Calendar()]</td></tr>
+        <tr><td>机器翻译</td><td>跨语言翻译</td><td>[MT(文本, 目标语言)]</td></tr>
+    </table>
+
+    <h2>四、关键结果</h2>
+
+    <p>Toolformer 的核心实验设计巧妙：对比使用工具前后的损失变化。如果调用工具后模型的预测损失显著降低，说明工具调用是有效的。</p>
+
+    <ul>
+        <li><b>工具调用使模型在需要外部知识的任务上表现显著提升</b></li>
+        <li><b>模型学会了在适当场景自主决定调用工具</b>——不是在所有位置都调用</li>
+        <li><b>模型能够组合多个工具</b>解决复杂问题</li>
+        <li><b>不降低原始语言建模能力</b>——工具调用是附加能力，不是替代</li>
+    </ul>
+
+    <h2>五、深远影响</h2>
+
+    <p>Toolformer 的思想被后续几乎所有 Agent 框架继承：</p>
+    <ul>
+        <li><b>Function Calling API</b>：OpenAI 在 2023 年 6 月推出的函数调用功能，本质是 Toolformer 的工程化版本</li>
+        <li><b>MCP（Model Context Protocol）</b>：Anthropic 的统一工具调用协议</li>
+        <li><b>Gorilla / APIBench</b>：专门针对 API 调用的训练方法</li>
+        <li><b>每个 Agent 框架</b>：核心都是「模型自主决定调用什么工具」</li>
+    </ul>
+
+    <div class="callout success">
+        <p><b>一句话总结</b>：Toolformer 教会了模型「什么时候该用工具」。它把 LLM 从一个只能生成文本的系统变成了可以操作外部世界的信息枢纽——这是通往 Agent 的关键一步。</p>
+    </div>
+
+    <hr style="margin: 2rem 0;">
+
+    <h2>参考文献</h2>
+    <ol class="ref">
+        <li>Schick, T. et al. (2023). <i>Toolformer: Language Models Can Teach Themselves to Use Tools</i>. arXiv:2302.04761. <a href="https://arxiv.org/abs/2302.04761">https://arxiv.org/abs/2302.04761</a></li>
+    </ol>
+
+    <footer>&copy; 2026 Ha2fde · LLM 进化史系列</footer>
+</div>
+</body>
+</html>

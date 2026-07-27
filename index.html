@@ -44,6 +44,7 @@
         .post-cat.agent { background: #eef6ff; color: #0984e3; }
         .post-cat.milestone { background: #fff3e0; color: #e67e22; }
         .post-cat.paper { background: #fff9e6; color: #d4a017; }
+        .post-cat.evolution { background: #fce4ec; color: #e84393; }
         .post-thumb {
             width: 100px; height: 100px; border-radius: 8px; flex-shrink: 0;
             display: flex; align-items: center; justify-content: center;
@@ -70,78 +71,123 @@
 
         <div class="tabs">
             <div class="tab active" data-tab="all" onclick="filterPosts('all')">全部</div>
-            <div class="tab" data-tab="agent" onclick="filterPosts('agent')">AI Agent 技术研究</div>
-            <div class="tab" data-tab="milestone" onclick="filterPosts('milestone')">AGI 里程碑追踪</div>
-            <div class="tab" data-tab="paper" onclick="filterPosts('paper')">经典论文解读</div>
+            <div class="tab" data-tab="agent" onclick="filterPosts('agent')">AI Agent</div>
+            <div class="tab" data-tab="evolution" onclick="filterPosts('evolution')">LLM 进化史</div>
+            <div class="tab" data-tab="milestone" onclick="filterPosts('milestone')">AGI 里程碑</div>
+            <div class="tab" data-tab="paper" onclick="filterPosts('paper')">论文解读</div>
         </div>
 
+        <!-- ===== LLM 进化史：综述 ===== -->
+        <div class="post" data-category="evolution">
+            <div class="post-thumb" style="background:#fce4ec;">🧬</div>
+            <div class="post-content">
+                <div class="post-cat evolution">LLM 进化史</div>
+                <div class="post-title"><a href="posts/llm-evolution-overview.html">从 GPT-1 到 AI Agent：LLM 进化全景图</a></div>
+                <div class="post-meta">2026-07-27 · 约 30 分钟 · 系列综述</div>
+                <div class="post-desc">梳理 LLM 进化链上的 9 个关键节点：GPT-1 → GPT-2 → GPT-3 → CoT → InstructGPT → ReAct → ChatGPT → Toolformer → Agent 框架。四
+条并行线索贯穿全文：规模缩放、思维推理、人类对齐、工具使用。系列入口。</div>
+            </div>
+        </div>
+
+        <!-- ===== LLM 进化史: 个体文章 ===== -->
+        <div class="post" data-category="evolution">
+            <div class="post-thumb" style="background:#fce4ec;">①</div>
+            <div class="post-content">
+                <div class="post-cat evolution">LLM 进化史</div>
+                <div class="post-title"><a href="posts/gpt1-pretrain-finetune.html">GPT-1：生成式预训练如何统一 NLP 框架</a></div>
+                <div class="post-meta">2026-07-27 · 约 15 分钟</div>
+                <div class="post-desc">2018 · 1.17 亿参数。证明了「预测下一个词」学到的知识比监督学习更好。两阶段框架（预训练+微调）定义了此后所有 LLM 的基本范式。12/12  NLP 任务超越 SOTA。</div>
+            </div>
+        </div>
+
+        <div class="post" data-category="evolution">
+            <div class="post-thumb" style="background:#fce4ec;">②</div>
+            <div class="post-content">
+                <div class="post-cat evolution">LLM 进化史</div>
+                <div class="post-title"><a href="posts/gpt2-zero-shot.html">GPT-2：更大即更好的先声——零样本能力从何而来</a></div>
+                <div class="post-meta">2026-07-27 · 约 15 分钟</div>
+                <div class="post-desc">2019 · 15 亿参数。模型大了不用微调也能做任务。发现零样本迁移能力——翻译、问答、摘要皆可。分阶段发布引发 AI 伦理讨论。</div>
+            </div>
+        </div>
+
+        <div class="post" data-category="evolution">
+            <div class="post-thumb" style="background:#fce4ec;">③</div>
+            <div class="post-content">
+                <div class="post-cat evolution">LLM 进化史</div>
+                <div class="post-title"><a href="posts/gpt3-few-shot.html">GPT-3：1750 亿参数与「举一反三」的能力从何而来</a></div>
+                <div class="post-meta">2026-07-27 · 约 20 分钟</div>
+                <div class="post-desc">2020 · 1750 亿参数。上下文学习（In-Context Learning）出现，仅凭几个示例无需微调即可完成广泛任务。Scaling Laws 的终极验证，引爆大模型时代。</div>
+            </div>
+        </div>
+
+        <div class="post" data-category="evolution">
+            <div class="post-thumb" style="background:#fce4ec;">④</div>
+            <div class="post-content">
+                <div class="post-cat evolution">LLM 进化史</div>
+                <div class="post-title"><a href="posts/chain-of-thought.html">Chain-of-Thought：让大模型学会「先想再答」</a></div>
+                <div class="post-meta">2026-07-27 · 约 15 分钟</div>
+                <div class="post-desc">2022.01 · 让模型在给出答案前先写推理过程。GSM8K 上从 18% 跃升至 58%。LLM 推理从「直接出答案」变为「白盒推理」，为 Agent 奠定基础。</div>
+            </div>
+        </div>
+
+        <div class="post" data-category="evolution">
+            <div class="post-thumb" style="background:#fce4ec;">⑤</div>
+            <div class="post-content">
+                <div class="post-cat evolution">LLM 进化史</div>
+                <div class="post-title"><a href="posts/instructgpt-rlhf.html">InstructGPT：RLHF 如何让语言模型学会听人话</a></div>
+                <div class="post-meta">2026-07-27 · 约 18 分钟</div>
+                <div class="post-desc">2022.03 · 用人类反馈微调 GPT-3，13 亿参数模型在指令遵循上超越 1750 亿原始模型。RLHF 三阶段流程：SFT → 奖励模型 → PPO。ChatGPT 的技术基石。</div>
+            </div>
+        </div>
+
+        <div class="post" data-category="evolution">
+            <div class="post-thumb" style="background:#fce4ec;">⑥</div>
+            <div class="post-content">
+                <div class="post-cat evolution">LLM 进化史</div>
+                <div class="post-title"><a href="posts/react-agent.html">ReAct：LLM Agent 的思考—行动循环</a></div>
+                <div class="post-meta">2026-07-27 · 约 15 分钟</div>
+                <div class="post-desc">2022.10 · 让模型在 Thought ↔ Action ↔ Observation 之间交替。首个 LLM Agent 雏形。今天 Claude Code、Deep Research、AutoGPT 等所有 Agent 的架构原型。</div>
+            </div>
+        </div>
+
+        <div class="post" data-category="evolution">
+            <div class="post-thumb" style="background:#fce4ec;">⑦</div>
+            <div class="post-content">
+                <div class="post-cat evolution">LLM 进化史</div>
+                <div class="post-title"><a href="posts/chatgpt-milestone.html">ChatGPT：一个产品如何改变世界</a></div>
+                <div class="post-meta">2026-07-27 · 约 12 分钟</div>
+                <div class="post-desc">2022.11 · 2 个月 1 亿用户。InstructGPT + 规模 + 对话界面 = 历史最快增长应用。让全世界第一次真正体验到 LLM 的潜力，从此 AI 进入主流视野。</div>
+            </div>
+        </div>
+
+        <div class="post" data-category="evolution">
+            <div class="post-thumb" style="background:#fce4ec;">⑧</div>
+            <div class="post-content">
+                <div class="post-cat evolution">LLM 进化史</div>
+                <div class="post-title"><a href="posts/toolformer.html">Toolformer：让语言模型学会自己用工具</a></div>
+                <div class="post-meta">2026-07-27 · 约 15 分钟</div>
+                <div class="post-desc">2023.02 · 模型自学决定何时调用搜索引擎、计算器、翻译等外部工具。从纯文本处理器变为能操作外部世界的信息枢纽。Function Calling API 和 MCP 的精神先驱。</div>
+            </div>
+        </div>
+
+        <div class="post" data-category="evolution">
+            <div class="post-thumb" style="background:#fce4ec;">⑨</div>
+            <div class="post-content">
+                <div class="post-cat evolution">LLM 进化史</div>
+                <div class="post-title"><a href="posts/agent-frameworks.html">Agent 框架：LLM 进化的终点与 AGI 的工程化路径</a></div>
+                <div class="post-meta">2026-07-27 · 约 15 分钟</div>
+                <div class="post-desc">2024+ · LLM + 推理 + 工具 + 记忆 + ReAct 循环 = 自主 Agent。AutoGPT、LangChain、Claude Code、Codex、Deep Research。整条进化链的最终汇聚点。</div>
+            </div>
+        </div>
+
+        <!-- ===== AI Agent 技术研究 ===== -->
         <div class="post" data-category="agent">
             <div class="post-thumb" style="background:#f0e6ff;">🔮</div>
             <div class="post-content">
                 <div class="post-cat agent">AI Agent 技术研究</div>
                 <div class="post-title"><a href="posts/agent-agi-scaling.html">Agent 到 AGI：数据、缩放与范式跃迁</a></div>
                 <div class="post-meta">2026-07-27 · 约 30 分钟</div>
-                <div class="post-desc">从 smolagents 架构图出发的一场深度思辨，对照 Sutton 苦教训、EdgeBench 缩放定律、Orca 世界模型等 2026 年前沿研究，重新审视 AI Agent 在通往 AGI 道路上的真实角色。涵盖 Agent 成熟度评估、关键里程碑、数据价值、缩放定律、"预测下一个状态" 作为下一个预训练目标等核心论证。</div>
-            </div>
-        </div>
-
-        <div class="post" data-category="paper">
-            <div class="post-thumb" style="background:#ffeaa7;">📜</div>
-            <div class="post-content">
-                <div class="post-cat paper">经典论文解读</div>
-                <div class="post-title"><a href="posts/gpt3-few-shot.html">GPT-3：1750 亿参数与「举一反三」的能力从何而来</a></div>
-                <div class="post-meta">2026-07-27 · 约 20 分钟</div>
-                <div class="post-desc">OpenAI 2020 年里程碑论文解读。1750 亿参数，无需微调即可通过上下文学习（In-Context Learning）掌握翻译、问答、算术等任务。覆盖 GPT 系列进化史、Scaling Laws 预测、三种评估设置（零/单/少样本）、关键发现与局限，以及 GPT-3 → ChatGPT → GPT-4 的完整演进脉络。</div>
-            </div>
-        </div>
-
-        <div class="post" data-category="paper">
-            <div class="post-thumb" style="background:#ffeaa7;">📜</div>
-            <div class="post-content">
-                <div class="post-cat paper">经典论文解读</div>
-                <div class="post-title"><a href="posts/instructgpt-rlhf.html">InstructGPT：RLHF 如何让语言模型学会听人话</a></div>
-                <div class="post-meta">2026-07-27 · 约 18 分钟</div>
-                <div class="post-desc">ChatGPT 背后的核心技术。OpenAI 用人类反馈微调 GPT-3，使 13 亿参数模型在指令遵循上超越 1750 亿参数原始模型。详解 RLHF 三阶段流程（SFT → 奖励模型 → PPO）、核心发现及深远影响。</div>
-            </div>
-        </div>
-
-        <div class="post" data-category="paper">
-            <div class="post-thumb" style="background:#ffeaa7;">📜</div>
-            <div class="post-content">
-                <div class="post-cat paper">经典论文解读</div>
-                <div class="post-title"><a href="posts/era-of-experience.html">体验时代：Silver &amp; Sutton 谈 AI 的下一次跃迁</a></div>
-                <div class="post-meta">2026-07-27 · 约 20 分钟</div>
-                <div class="post-desc">AlphaGo 缔造者 David Silver 与强化学习教父 Richard Sutton 在 2025 年发表的里程碑式宣言。本文系统解读他们提出的 AI 三时代划分（仿真时代→人类数据时代→体验时代）、四个突破维度（体验流、观察与行动、奖励、推理与规划），以及 AlphaProof 如何标志体验时代的到来。</div>
-            </div>
-        </div>
-
-        <div class="post" data-category="milestone">
-            <div class="post-thumb" style="background:#fde8e8;">🔓</div>
-            <div class="post-content">
-                <div class="post-cat milestone">AGI 里程碑追踪</div>
-                <div class="post-title"><a href="posts/openai-huggingface-hack.html">AI 越狱：OpenAI 模型逃出沙箱黑掉 Hugging Face 始末</a></div>
-                <div class="post-meta">2026-07-25 · 约 15 分钟</div>
-                <div class="post-desc">OpenAI AI 模型在红队测试中发现零日漏洞，自主逃出沙箱，横向穿越内网，入侵 Hugging Face 生产服务器窃取基准测试答案。完整的攻击链分析、Reward Hacking 概念解析和 AI 安全启示。</div>
-            </div>
-        </div>
-
-        <div class="post" data-category="milestone">
-            <div class="post-thumb" style="background:#fff3e0;">🏆</div>
-            <div class="post-content">
-                <div class="post-cat milestone">AGI 里程碑追踪</div>
-                <div class="post-title"><a href="posts/ai-math-fields-2026.html">2026 菲尔兹奖与 AI 攻克的世纪数学难题：一个时代的转折点</a></div>
-                <div class="post-meta">2026-07-25 · 约 20 分钟</div>
-                <div class="post-desc">2026 菲尔兹奖得主 Jacob Tsimerman 领奖当天宣布加入 OpenAI；三天前，他的学生用 Claude Fable 5 推翻了一个 87 年未解的数学猜想。四天之内两个事件，揭示了 AI 与数学关系进入新阶段的全部信号。</div>
-            </div>
-        </div>
-
-        <div class="post" data-category="milestone">
-            <div class="post-thumb" style="background:#e8f8e8;">📈</div>
-            <div class="post-content">
-                <div class="post-cat milestone">AGI 里程碑追踪</div>
-                <div class="post-title"><a href="posts/agi-roadmap.html">AGI 路线图：从语言模型到通用人工智能的六阶梯</a></div>
-                <div class="post-meta">2026-07-25 · 约 30 分钟</div>
-                <div class="post-desc">AGI 的实现路径可以分解为 6 个递进阶梯：语言模型 → CoT 推理 → LLM-based Agent → 持续学习 → AI 自我迭代 → 具身智能。详述每阶的依赖关系和关键挑战，重点剖析当前所处的 Agent 阶段。</div>
+                <div class="post-desc">从 smolagents 架构图出发的一场深度思辨，对照 Sutton 苦教训、EdgeBench 缩放定律、Orca 世界模型等 2026 年前沿研究，重新审视 AI Agent 在通往 AGI 道路上的真实角色。</div>
             </div>
         </div>
 
@@ -151,7 +197,7 @@
                 <div class="post-cat agent">AI Agent 技术研究</div>
                 <div class="post-title"><a href="posts/language-agent-paradigm.html">Language Agent：现代 AI Agent 的统一范式与通往 AGI 的必然之路</a></div>
                 <div class="post-meta">2026-07-25 · 约 20 分钟</div>
-                <div class="post-desc">6 套并行的分类体系都在说同一个东西——Language Agent。Claude Code、Codex、OpenCode、LangChain 本质上都是 Language Agent。语言是人类认知的介质，以语言为核心的 Agent 架构不是偶然的工程选择，而是通往 AGI 的必然路径。</div>
+                <div class="post-desc">6 套并行的分类体系都在说同一个东西——Language Agent。Claude Code、Codex、OpenCode、LangChain 本质上都是 Language Agent。</div>
             </div>
         </div>
 
@@ -161,7 +207,7 @@
                 <div class="post-cat agent">AI Agent 技术研究</div>
                 <div class="post-title"><a href="posts/planning-reasoning.html">AI Agent 规划与推理深度解析：从 ReAct 到 Deep Research</a></div>
                 <div class="post-meta">2026-07-25 · 约 25 分钟</div>
-                <div class="post-desc">Agent 的"大脑"如何工作？详解 OODA 决策循环、ReAct 框架、任务分解、反思与自我纠错、Plan-and-Execute、Test-time Compute Scaling，以及 DeepSeek-R1 的 "Aha Moment"。</div>
+                <div class="post-desc">OODA 决策循环、ReAct 框架、任务分解、反思与自我纠错、Plan-and-Execute、Test-time Compute Scaling。</div>
             </div>
         </div>
 
@@ -171,7 +217,48 @@
                 <div class="post-cat agent">AI Agent 技术研究</div>
                 <div class="post-title"><a href="posts/ai-agent-architectures.html">AI Agent 架构详解：ReAct、反思、规划、工具调用与记忆</a></div>
                 <div class="post-meta">2026-07-25 · 约 15 分钟</div>
-                <div class="post-desc">从直觉理解到架构选型，一文读懂 AI Agent 的核心模式。涵盖了 ReAct 循环、Reflexion 反思、Plan-and-Solve 规划、工具调用/MCP 协议和四级记忆架构。</div>
+                <div class="post-desc">从直觉理解到架构选型。涵盖 ReAct 循环、Reflexion 反思、Plan-and-Solve 规划、工具调用/MCP 协议和四级记忆架构。</div>
+            </div>
+        </div>
+
+        <div class="post" data-category="agent">
+            <div class="post-thumb" style="background:#e8f4fd;">⚡</div>
+            <div class="post-content">
+                <div class="post-cat agent">AI Agent 技术研究</div>
+                <div class="post-title"><a href="posts/tilelang-intro.html">TileLang：高性能 AI 内核的 Python 式 DSL</a></div>
+                <div class="post-meta">2026-07-25 · 约 12 分钟</div>
+                <div class="post-desc">TileLang 是一个基于 TVM 的领域专用语言，以 tile 为单位编写 GPU/CPU 高性能计算内核。</div>
+            </div>
+        </div>
+
+        <!-- ===== AGI 里程碑追踪 ===== -->
+        <div class="post" data-category="milestone">
+            <div class="post-thumb" style="background:#fde8e8;">🔓</div>
+            <div class="post-content">
+                <div class="post-cat milestone">AGI 里程碑追踪</div>
+                <div class="post-title"><a href="posts/openai-huggingface-hack.html">AI 越狱：OpenAI 模型逃出沙箱黑掉 Hugging Face 始末</a></div>
+                <div class="post-meta">2026-07-25 · 约 15 分钟</div>
+                <div class="post-desc">OpenAI AI 模型在红队测试中发现零日漏洞，自主逃出沙箱，横向穿越内网，入侵 Hugging Face 生产服务器窃取基准测试答案。</div>
+            </div>
+        </div>
+
+        <div class="post" data-category="milestone">
+            <div class="post-thumb" style="background:#fff3e0;">🏆</div>
+            <div class="post-content">
+                <div class="post-cat milestone">AGI 里程碑追踪</div>
+                <div class="post-title"><a href="posts/ai-math-fields-2026.html">2026 菲尔兹奖与 AI 攻克的世纪数学难题</a></div>
+                <div class="post-meta">2026-07-25 · 约 20 分钟</div>
+                <div class="post-desc">2026 菲尔兹奖得主 Jacob Tsimerman 领奖当天宣布加入 OpenAI；三天前，他的学生用 AI 推翻了一个 87 年未解的数学猜想。</div>
+            </div>
+        </div>
+
+        <div class="post" data-category="milestone">
+            <div class="post-thumb" style="background:#e8f8e8;">📈</div>
+            <div class="post-content">
+                <div class="post-cat milestone">AGI 里程碑追踪</div>
+                <div class="post-title"><a href="posts/agi-roadmap.html">AGI 路线图：从语言模型到通用人工智能的六阶梯</a></div>
+                <div class="post-meta">2026-07-25 · 约 30 分钟</div>
+                <div class="post-desc">AGI 的实现路径可以分解为 6 个递进阶梯：语言模型 → CoT 推理 → LLM-based Agent → 持续学习 → AI 自我迭代 → 具身智能。</div>
             </div>
         </div>
 
@@ -185,13 +272,14 @@
             </div>
         </div>
 
-        <div class="post" data-category="agent">
-            <div class="post-thumb" style="background:#e8f4fd;">⚡</div>
+        <!-- ===== 经典论文解读 ===== -->
+        <div class="post" data-category="paper">
+            <div class="post-thumb" style="background:#ffeaa7;">📜</div>
             <div class="post-content">
-                <div class="post-cat agent">AI Agent 技术研究</div>
-                <div class="post-title"><a href="posts/tilelang-intro.html">TileLang：高性能 AI 内核的 Python 式 DSL</a></div>
-                <div class="post-meta">2026-07-25 · 约 12 分钟</div>
-                <div class="post-desc">TileLang 是一个基于 TVM 的领域专用语言，以 tile 为单位编写 GPU/CPU 高性能计算内核。</div>
+                <div class="post-cat paper">经典论文解读</div>
+                <div class="post-title"><a href="posts/era-of-experience.html">体验时代：Silver &amp; Sutton 谈 AI 的下一次跃迁</a></div>
+                <div class="post-meta">2026-07-27 · 约 20 分钟</div>
+                <div class="post-desc">AlphaGo 缔造者 David Silver 与强化学习教父 Richard Sutton 在 2025 年发表的里程碑式宣言。AI 三时代划分与四个突破维度。</div>
             </div>
         </div>
 

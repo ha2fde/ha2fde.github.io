@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPT-2：更大即更好的先声——零样本能力从何而来</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif;
+            background: #f8f9fa; color: #333; line-height: 1.8;
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem; }
+        header { padding: 2rem 0; border-bottom: 1px solid #eee; margin-bottom: 2rem; }
+        header a { color: #3498db; text-decoration: none; }
+        header a:hover { text-decoration: underline; }
+        h1 { font-size: 1.8rem; line-height: 1.4; margin-bottom: 0.8rem; }
+        .meta { color: #999; font-size: 0.9rem; margin-bottom: 2rem; }
+        h2 { font-size: 1.3rem; margin: 2rem 0 0.8rem; color: #1a1a2e; border-left: 4px solid #6c5ce7; padding-left: 0.8rem; }
+        h3 { font-size: 1.1rem; margin: 1.5rem 0 0.6rem; color: #2d3436; }
+        p { margin: 0.8rem 0; }
+        blockquote {
+            border-left: 3px solid #6c5ce7; margin: 1rem 0; padding: 0.5rem 1rem;
+            background: #f1f8ff; color: #2d3436;
+        }
+        ul, ol { margin: 0.8rem 0; padding-left: 1.5rem; }
+        li { margin: 0.4rem 0; }
+        pre { background: #2d3436; color: #dfe6e9; padding: 1rem; border-radius: 6px; overflow-x: auto; font-size: 0.85rem; margin: 1rem 0; }
+        code { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+        p code { background: #eee; padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.9rem; }
+        .callout { padding: 1rem; border-radius: 6px; margin: 1rem 0; border-left: 4px solid; }
+        .callout.info { background: #f0e6ff; border-color: #6c5ce7; }
+        .callout.warn { background: #fff3e0; border-color: #e67e22; }
+        .callout.success { background: #e6ffe6; border-color: #27ae60; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        th, td { padding: 0.5rem 0.8rem; border: 1px solid #dfe6e9; text-align: left; }
+        th { background: #f0e6ff; font-weight: 600; }
+        .ref { font-size: 0.85rem; color: #666; }
+        footer { text-align: center; padding: 3rem 0 1rem; color: #999; font-size: 0.85rem; }
+        .diagram { background: #fff; border: 1px solid #dfe6e9; border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; text-align: center; }
+        .diagram svg { max-width: 100%; height: auto; }
+        .diagram-caption { font-size: 0.85rem; color: #666; margin-top: 0.5rem; }
+        @media (max-width: 600px) { .container { padding: 1rem; } h1 { font-size: 1.4rem; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header><a href="../index.html">← 返回首页</a></header>
+    <h1>GPT-2：更大即更好的先声——零样本能力从何而来</h1>
+    <div class="meta">2026-07-27 · 约 15 分钟 · LLM 进化史 ②</div>
+
+    <p>2019 年 2 月，OpenAI 发表了 <b>GPT-2</b>——论文标题直白地道出了核心发现：<b>《Language Models are Unsupervised Multitask Learners》</b>。</p>
+
+    <p>GPT-1 证明了「预训练 + 微调」是有效的框架。GPT-2 则向前迈出了更大胆的一步：<b>如果模型足够大，也许微调根本不需要——模型已经在无监督预训练中学会了多任务能力。</b></p>
+
+    <div class="callout info">
+        <p><b>一句话定位</b>：GPT-2 是「更大即更好」的第一个有力证据，也是零样本（zero-shot）迁移能力的发现者。</p>
+    </div>
+
+    <h2>一、GPT-1 的瓶颈与 GPT-2 的回答</h2>
+
+    <p>GPT-1 虽好，但有个实际问题：<b>每个任务都需要有标签数据做微调</b>。标注数据昂贵且不可扩展。</p>
+    <p>GPT-2 提出的问题：<b>能不能干脆不要微调？</b></p>
+
+    <div class="callout warn">
+        <p><b>核心假设</b>：如果语言模型在足够多样化的数据上训练，它应该能在「预测下一个词」的过程中，内化各种任务的结构——翻译、问答、摘要都只是文本生成的某种模式。</p>
+    </div>
+
+    <h2>二、规模变化</h2>
+
+    <table>
+        <tr><th></th><th>GPT-1</th><th>GPT-2</th><th>增长倍数</th></tr>
+        <tr><td>参数量</td><td>1.17 亿</td><td>15 亿</td><td>~12.8×</td></tr>
+        <tr><td>Transformer 层数</td><td>12</td><td>48</td><td>4×</td></tr>
+        <tr><td>训练数据</td><td>BookCorpus (~1GB)</td><td>WebText (~40GB)</td><td>~40×</td></tr>
+        <tr><td>零样本能力</td><td>无</td><td>有</td><td>涌现</td></tr>
+    </table>
+
+    <h2>三、关键发现：零样本任务迁移</h2>
+
+    <p>GPT-2 的核心贡献是证明了：<b>语言模型在零样本（zero-shot）设置下即可完成多种 NLP 任务。</b></p>
+
+    <div class="diagram">
+        <svg viewBox="0 0 680 260" xmlns="http://www.w3.org/2000/svg" style="font-family: -apple-system, sans-serif;">
+            <defs>
+                <linearGradient id="z1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#74b9ff"/><stop offset="1" stop-color="#0984e3"/></linearGradient>
+                <linearGradient id="z2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a29bfe"/><stop offset="1" stop-color="#6c5ce7"/></linearGradient>
+                <linearGradient id="z3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#55efc4"/><stop offset="1" stop-color="#00b894"/></linearGradient>
+                <linearGradient id="z4" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fdcb6e"/><stop offset="1" stop-color="#e67e22"/></linearGradient>
+            </defs>
+            <text x="340" y="25" text-anchor="middle" font-size="15" font-weight="bold" fill="#2d3436">GPT-2 零样本能力的关键：数据多样性</text>
+
+            <rect x="30" y="45" width="620" height="40" rx="8" fill="#dfe6e9"/>
+            <text x="340" y="65" text-anchor="middle" font-size="11" fill="#636e72">GPT-2 的训练数据：从 45 万个网页中提取的文本链接（Reddit 3 赞以上）</text>
+
+            <rect x="30" y="100" width="145" height="55" rx="6" fill="url(#z1)"/>
+            <text x="102" y="122" text-anchor="middle" font-size="10" font-weight="bold" fill="#fff">翻译模式</text>
+            <text x="102" y="142" text-anchor="middle" font-size="9" fill="#dfe6e9">"English: Hello, French: Bonjour"</text>
+
+            <rect x="185" y="100" width="145" height="55" rx="6" fill="url(#z2)"/>
+            <text x="257" y="122" text-anchor="middle" font-size="10" font-weight="bold" fill="#fff">问答模式</text>
+            <text x="257" y="142" text-anchor="middle" font-size="9" fill="#dfe6e9">"Q: What is ...? A: ..."</text>
+
+            <rect x="340" y="100" width="145" height="55" rx="6" fill="url(#z3)"/>
+            <text x="412" y="122" text-anchor="middle" font-size="10" font-weight="bold" fill="#fff">摘要模式</text>
+            <text x="412" y="142" text-anchor="middle" font-size="9" fill="#dfe6e9">"长文本 = TL;DR: 短摘要"</text>
+
+            <rect x="495" y="100" width="145" height="55" rx="6" fill="url(#z4)"/>
+            <text x="567" y="122" text-anchor="middle" font-size="10" font-weight="bold" fill="#fff">阅读理解</text>
+            <text x="567" y="142" text-anchor="middle" font-size="9" fill="#dfe6e9">"Passage: ... Question: ..."</text>
+
+            <text x="340" y="195" text-anchor="middle" font-size="11" fill="#2d3436">模型在训练时看到过所有这些模式的文本</text>
+            <text x="340" y="218" text-anchor="middle" font-size="11" fill="#2d3436">因此在新输入中给出这种格式，模型就知道该生成什么</text>
+
+            <text x="340" y="250" text-anchor="middle" font-size="10" fill="#636e72" font-style="italic">这就是「零样本」的底层机制：任务格式已在预训练数据中出现过</text>
+        </svg>
+        <div class="diagram-caption">图1：GPT-2 的零样本能力来源于训练数据的多样性。模型学会了识别任务格式并自动适配。</div>
+    </div>
+
+    <p>具体结果：</p>
+    <ul>
+        <li><b>翻译</b>：在 WMT-14 英法翻译上达到 11.5 BLEU——虽弱于监督系统，但完全是零样本</li>
+        <li><b>问答</b>：在 CoQA 数据集上达到 55 F1，无需任何微调</li>
+        <li><b>摘要</b>：在 CNN/Daily Mail 上达到约 6.4 的 ROUGE-L</li>
+        <li><b>文本生成</b>：人类评估者在真假难辨测试中只有约 50% 的正确率</li>
+    </ul>
+
+    <h2>四、分阶段发布事件</h2>
+
+    <p>GPT-2 还因另一个原因而闻名：<b>OpenAI 最初拒绝发布完整模型</b>。</p>
+
+    <p>理由是「担心恶意使用」——生成流畅的假新闻、冒充他人等。这在 AI 社区引发了激烈讨论：是应该公开发布研究成果，还是应该因潜在的滥用风险而限制发布？</p>
+
+    <p>最终 OpenAI 采取了分阶段发布策略：先发布小模型（1.24 亿参数），逐步扩大到完整版（15 亿参数），间隔数月。这个过程成为 AI 负责任发布的标志性案例。</p>
+
+    <h2>五、局限与历史意义</h2>
+
+    <h3>局限</h3>
+    <ul>
+        <li><b>零样本能力有限</b>：在需要深入推理的任务上表现不佳</li>
+        <li><b>生成质量虽高但不稳</b>：模型会编造事实，长文本容易偏离主题</li>
+        <li><b>单向注意力</b>：仍然是从左到右的生成，不能利用下文信息</li>
+    </ul>
+
+    <h3>历史意义</h3>
+    <p>GPT-2 最重要的贡献不是某项具体指标，而是它传递的信息：<b>更大的模型 = 更多的涌现能力</b>。Scale 的潜力在这里第一次被真实感受到。</p>
+
+    <div class="callout success">
+        <p><b>一句话总结</b>：GPT-2 证明了「无监督预训练」不只是学语言基础，而是直接内化了多任务能力。规模越大，无需微调就能做的事越多。当参数从 1.17 亿增长到 15 亿，零样本能力涌现了——那如果增长到 1750 亿呢？</p>
+    </div>
+
+    <hr style="margin: 2rem 0;">
+
+    <h2>参考文献</h2>
+    <ol class="ref">
+        <li>Radford, A., Wu, J., Child, R., Luan, D., Amodei, D., & Sutskever, I. (2019). <i>Language Models are Unsupervised Multitask Learners</i>. OpenAI. <a href="https://d4mucfpksywv.cloudfront.net/better-language-models/language_models_are_unsupervised_multitask_learners.pdf">PDF</a></li>
+    </ol>
+
+    <footer>&copy; 2026 Ha2fde · LLM 进化史系列</footer>
+</div>
+</body>
+</html>

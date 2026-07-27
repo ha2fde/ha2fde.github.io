@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>从 GPT-1 到 AI Agent：LLM 进化全景图</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif;
+            background: #f8f9fa; color: #333; line-height: 1.8;
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem; }
+        header { padding: 2rem 0; border-bottom: 1px solid #eee; margin-bottom: 2rem; }
+        header a { color: #3498db; text-decoration: none; }
+        header a:hover { text-decoration: underline; }
+        h1 { font-size: 1.8rem; line-height: 1.4; margin-bottom: 0.8rem; }
+        .meta { color: #999; font-size: 0.9rem; margin-bottom: 2rem; }
+        h2 { font-size: 1.3rem; margin: 2rem 0 0.8rem; color: #1a1a2e; border-left: 4px solid #0984e3; padding-left: 0.8rem; }
+        h3 { font-size: 1.1rem; margin: 1.5rem 0 0.6rem; color: #2d3436; }
+        p { margin: 0.8rem 0; }
+        blockquote {
+            border-left: 3px solid #0984e3; margin: 1rem 0; padding: 0.5rem 1rem;
+            background: #f1f8ff; color: #2d3436;
+        }
+        blockquote cite { display: block; margin-top: 0.3rem; font-size: 0.85rem; color: #666; }
+        ul, ol { margin: 0.8rem 0; padding-left: 1.5rem; }
+        li { margin: 0.4rem 0; }
+        pre {
+            background: #2d3436; color: #dfe6e9; padding: 1rem; border-radius: 6px;
+            overflow-x: auto; font-size: 0.85rem; margin: 1rem 0;
+        }
+        code { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+        p code { background: #eee; padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.9rem; }
+        .callout {
+            padding: 1rem; border-radius: 6px; margin: 1rem 0;
+            border-left: 4px solid;
+        }
+        .callout.info { background: #eef6ff; border-color: #0984e3; }
+        .callout.warn { background: #fff3e0; border-color: #e67e22; }
+        .callout.success { background: #e6ffe6; border-color: #27ae60; }
+        .callout.kr { background: #f0e6ff; border-color: #6c5ce7; }
+        table {
+            width: 100%; border-collapse: collapse; margin: 1rem 0;
+        }
+        th, td {
+            padding: 0.5rem 0.8rem; border: 1px solid #dfe6e9; text-align: left;
+        }
+        th { background: #f1f8ff; font-weight: 600; }
+        .ref { font-size: 0.85rem; color: #666; }
+        footer { text-align: center; padding: 3rem 0 1rem; color: #999; font-size: 0.85rem; }
+        .diagram {
+            background: #fff; border: 1px solid #dfe6e9; border-radius: 8px;
+            padding: 1.5rem; margin: 1.5rem 0; text-align: center;
+        }
+        .diagram svg { max-width: 100%; height: auto; }
+        .diagram-caption { font-size: 0.85rem; color: #666; margin-top: 0.5rem; }
+        .series-nav {
+            background: #2d3436; border-radius: 8px; padding: 1.2rem; margin: 1.5rem 0;
+        }
+        .series-nav h3 { color: #fff; border: none; margin-top: 0; padding: 0; }
+        .series-nav ul { list-style: none; padding: 0; margin: 0.5rem 0 0; display: flex; flex-wrap: wrap; gap: 0.4rem; }
+        .series-nav ul li a {
+            display: inline-block; padding: 0.3rem 0.7rem; border-radius: 4px;
+            background: #636e72; color: #dfe6e9; text-decoration: none; font-size: 0.85rem;
+            transition: background 0.2s;
+        }
+        .series-nav ul li a:hover { background: #0984e3; color: #fff; }
+        .series-nav ul li a.active { background: #0984e3; color: #fff; font-weight: 600; }
+        @media (max-width: 600px) {
+            .container { padding: 1rem; }
+            h1 { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header><a href="../index.html">← 返回首页</a></header>
+    <h1>从 GPT-1 到 AI Agent：LLM 进化全景图</h1>
+    <div class="meta">2026-07-27 · 约 30 分钟 · 系列综述</div>
+
+    <div class="series-nav">
+        <h3>📖 本系列文章（LLM 进化史）</h3>
+        <ul>
+            <li><a href="#" class="active">综述：全景图</a></li>
+            <li><a href="gpt1-pretrain-finetune.html">① GPT-1</a></li>
+            <li><a href="gpt2-zero-shot.html">② GPT-2</a></li>
+            <li><a href="gpt3-few-shot.html">③ GPT-3</a></li>
+            <li><a href="chain-of-thought.html">④ CoT</a></li>
+            <li><a href="instructgpt-rlhf.html">⑤ InstructGPT</a></li>
+            <li><a href="react-agent.html">⑥ ReAct</a></li>
+            <li><a href="chatgpt-milestone.html">⑦ ChatGPT</a></li>
+            <li><a href="toolformer.html">⑧ Toolformer</a></li>
+            <li><a href="agent-frameworks.html">⑨ Agent 框架</a></li>
+        </ul>
+    </div>
+
+    <blockquote>
+        <b>摘要</b>：从 2018 年 GPT-1「预测下一个词」的简单想法，到 2024 年自主编码 Agent 的复杂系统，LLM 的进化遵循一条清晰的轨迹——模型越来越大的同时，越来越少的「人类介入」被需要。本文梳理这条进化链上的 9 个关键节点，勾勒一幅完整的 LLM 进化全景图。
+    </blockquote>
+
+    <h2>一、为什么需要一篇全景图？</h2>
+
+    <p>如果你在 2023 年才开始关注 AI，你可能只见过 ChatGPT 和它的后继者。但 GPT 系列到 Agent 的进化不是一蹴而就的。每一步都解决了一个关键问题，也都为下一步铺平了道路。</p>
+
+    <p>这条进化链的核心逻辑可以概括为：</p>
+
+    <div class="callout kr">
+        <p><b>预训练 → 缩放 → 指令对齐 → 推理 → 工具使用 → 自主 Agent</b></p>
+        <p style="font-size: 0.9rem; margin-top: 0.3rem;">每一阶段解决前一个阶段暴露的瓶颈</p>
+    </div>
+
+    <p>让我们先看全景：</p>
+
+    <div class="diagram">
+        <svg viewBox="0 0 720 340" xmlns="http://www.w3.org/2000/svg" style="font-family: -apple-system, sans-serif;">
+            <defs>
+                <linearGradient id="lg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#74b9ff"/><stop offset="1" stop-color="#0984e3"/></linearGradient>
+                <linearGradient id="lg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a29bfe"/><stop offset="1" stop-color="#6c5ce7"/></linearGradient>
+                <linearGradient id="lg3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#55efc4"/><stop offset="1" stop-color="#00b894"/></linearGradient>
+                <linearGradient id="lg4" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fd79a8"/><stop offset="1" stop-color="#e84393"/></linearGradient>
+                <linearGradient id="lg5" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fdcb6e"/><stop offset="1" stop-color="#e67e22"/></linearGradient>
+                <marker id="arrw" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                    <polygon points="0 0, 8 3, 0 6" fill="#636e72"/>
+                </marker>
+            </defs>
+            <text x="360" y="28" text-anchor="middle" font-size="15" font-weight="bold" fill="#2d3436">LLM 进化链：9 个关键节点</text>
+
+            <rect x="10" y="45" width="130" height="68" rx="6" fill="url(#lg1)"/>
+            <text x="75" y="67" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">① GPT-1</text>
+            <text x="75" y="84" text-anchor="middle" font-size="10" fill="#dfe6e9">2018.06</text>
+            <text x="75" y="102" text-anchor="middle" font-size="9" fill="#dfe6e9">预训练+微调</text>
+
+            <line x1="140" y1="79" x2="155" y2="79" stroke="#636e72" stroke-width="1.5" marker-end="url(#arrw)"/>
+
+            <rect x="158" y="45" width="130" height="68" rx="6" fill="url(#lg2)"/>
+            <text x="223" y="67" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">② GPT-2</text>
+            <text x="223" y="84" text-anchor="middle" font-size="10" fill="#dfe6e9">2019.02</text>
+            <text x="223" y="102" text-anchor="middle" font-size="9" fill="#dfe6e9">零样本能力</text>
+
+            <line x1="288" y1="79" x2="303" y2="79" stroke="#636e72" stroke-width="1.5" marker-end="url(#arrw)"/>
+
+            <rect x="306" y="45" width="130" height="68" rx="6" fill="url(#lg3)"/>
+            <text x="371" y="67" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">③ GPT-3</text>
+            <text x="371" y="84" text-anchor="middle" font-size="10" fill="#dfe6e9">2020.05</text>
+            <text x="371" y="102" text-anchor="middle" font-size="9" fill="#dfe6e9">少样本+涌现</text>
+
+            <line x1="436" y1="79" x2="451" y2="79" stroke="#636e72" stroke-width="1.5" marker-end="url(#arrw)"/>
+
+            <rect x="454" y="45" width="130" height="68" rx="6" fill="url(#lg4)"/>
+            <text x="519" y="67" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">④ CoT</text>
+            <text x="519" y="84" text-anchor="middle" font-size="10" fill="#dfe6e9">2022.01</text>
+            <text x="519" y="102" text-anchor="middle" font-size="9" fill="#dfe6e9">思维链推理</text>
+
+            <line x1="584" y1="79" x2="599" y2="79" stroke="#636e72" stroke-width="1.5" marker-end="url(#arrw)"/>
+
+            <rect x="602" y="45" width="110" height="68" rx="6" fill="url(#lg5)"/>
+            <text x="657" y="67" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">⑤ InstructGPT</text>
+            <text x="657" y="84" text-anchor="middle" font-size="10" fill="#dfe6e9">2022.03</text>
+            <text x="657" y="102" text-anchor="middle" font-size="9" fill="#dfe6e9">人类对齐</text>
+
+            <rect x="10" y="140" width="130" height="68" rx="6" fill="url(#lg1)" opacity="0.8"/>
+            <text x="75" y="162" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">⑥ ReAct</text>
+            <text x="75" y="179" text-anchor="middle" font-size="10" fill="#dfe6e9">2022.10</text>
+            <text x="75" y="197" text-anchor="middle" font-size="9" fill="#dfe6e9">思考↔行动</text>
+
+            <line x1="140" y1="174" x2="155" y2="174" stroke="#636e72" stroke-width="1.5" marker-end="url(#arrw)"/>
+
+            <rect x="158" y="140" width="130" height="68" rx="6" fill="url(#lg2)" opacity="0.8"/>
+            <text x="223" y="162" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">⑦ ChatGPT</text>
+            <text x="223" y="179" text-anchor="middle" font-size="10" fill="#dfe6e9">2022.11</text>
+            <text x="223" y="197" text-anchor="middle" font-size="9" fill="#dfe6e9">产品化引爆</text>
+
+            <line x1="288" y1="174" x2="303" y2="174" stroke="#636e72" stroke-width="1.5" marker-end="url(#arrw)"/>
+
+            <rect x="306" y="140" width="130" height="68" rx="6" fill="url(#lg3)" opacity="0.8"/>
+            <text x="371" y="162" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">⑧ Toolformer</text>
+            <text x="371" y="179" text-anchor="middle" font-size="10" fill="#dfe6e9">2023.02</text>
+            <text x="371" y="197" text-anchor="middle" font-size="9" fill="#dfe6e9">学会用工具</text>
+
+            <line x1="436" y1="174" x2="451" y2="174" stroke="#636e72" stroke-width="1.5" marker-end="url(#arrw)"/>
+
+            <rect x="454" y="140" width="200" height="68" rx="6" fill="url(#lg4)" opacity="0.8"/>
+            <text x="554" y="162" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">⑨ Agent 框架</text>
+            <text x="554" y="179" text-anchor="middle" font-size="10" fill="#dfe6e9">2023-2024+</text>
+            <text x="554" y="197" text-anchor="middle" font-size="9" fill="#dfe6e9">LLM+工具+记忆=Agent</text>
+
+            <text x="360" y="260" text-anchor="middle" font-size="12" fill="#636e72">核心趋势：每一次进化都减少了「人类介入」的程度</text>
+
+            <path d="M 50 275 L 670 275" stroke="#dfe6e9" stroke-width="1" stroke-dasharray="4"/>
+            <text x="80" y="295" font-size="10" fill="#636e72">人类标注程度</text>
+            <rect x="80" y="305" width="60" height="12" rx="3" fill="#e74c3c"/>
+            <rect x="150" y="305" width="60" height="12" rx="3" fill="#e67e22"/>
+            <rect x="220" y="305" width="40" height="12" rx="3" fill="#fdcb6e"/>
+            <rect x="270" y="305" width="80" height="12" rx="3" fill="#55efc4"/>
+            <rect x="360" y="305" width="100" height="12" rx="3" fill="#00b894"/>
+            <text x="470" y="315" font-size="10" color="#636e72" fill="#636e72">→ 越来越少</text>
+        </svg>
+        <div class="diagram-caption">图1：LLM 进化的 9 个关键节点。从上到下，从左到右，每个节点解决前一个节点的瓶颈。</div>
+    </div>
+
+    <h2>二、进化主线：四条关键线索</h2>
+
+    <p>所有这 9 个节点并不是随机出现的。它们围绕 <b>四条并行线索</b> 展开：</p>
+
+    <table>
+        <tr><th>线索</th><th>起点 → 终点</th><th>核心问题</th></tr>
+        <tr><td><b>规模 Scaling</b></td><td>GPT-1 → GPT-2 → GPT-3</td><td>模型越大越好吗？</td></tr>
+        <tr><td><b>推理 Reasoning</b></td><td>GPT-3 → CoT → Agent</td><td>模型如何"思考"？</td></tr>
+        <tr><td><b>对齐 Alignment</b></td><td>GPT-3 → InstructGPT → ChatGPT</td><td>如何让模型听话？</td></tr>
+        <tr><td><b>工具 Tool Use</b></td><td>ReAct → Toolformer → Agent</td><td>模型如何与现实交互？</td></tr>
+    </table>
+
+    <div class="diagram">
+        <svg viewBox="0 0 680 220" xmlns="http://www.w3.org/2000/svg" style="font-family: -apple-system, sans-serif;">
+            <text x="340" y="25" text-anchor="middle" font-size="15" font-weight="bold" fill="#2d3436">四条进化主线</text>
+
+            <rect x="20" y="45" width="150" height="68" rx="6" fill="#74b9ff"/>
+            <text x="95" y="68" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">规模 Scaling</text>
+            <text x="95" y="88" text-anchor="middle" font-size="10" fill="#dfe6e9">GPT-1 → GPT-2 → GPT-3</text>
+            <text x="95" y="105" text-anchor="middle" font-size="9" fill="#dfe6e9">越大 = 越好（可预测）</text>
+
+            <rect x="185" y="45" width="150" height="68" rx="6" fill="#55efc4"/>
+            <text x="260" y="68" text-anchor="middle" font-size="11" font-weight="bold" fill="#2d3436">推理 Reasoning</text>
+            <text x="260" y="88" text-anchor="middle" font-size="10" fill="#636e72">GPT-3 → CoT → Agent</text>
+            <text x="260" y="105" text-anchor="middle" font-size="9" fill="#636e72">从直接答 → 先想再答</text>
+
+            <rect x="350" y="45" width="150" height="68" rx="6" fill="#e17055"/>
+            <text x="425" y="68" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">对齐 Alignment</text>
+            <text x="425" y="88" text-anchor="middle" font-size="10" fill="#dfe6e9">GPT-3 → RLHF → ChatGPT</text>
+            <text x="425" y="105" text-anchor="middle" font-size="9" fill="#dfe6e9">从续写器 → 指令跟随</text>
+
+            <rect x="515" y="45" width="150" height="68" rx="6" fill="#a29bfe"/>
+            <text x="590" y="68" text-anchor="middle" font-size="11" font-weight="bold" fill="#fff">工具 Tool Use</text>
+            <text x="590" y="88" text-anchor="middle" font-size="10" fill="#dfe6e9">ReAct → Toolformer → Agent</text>
+            <text x="590" y="105" text-anchor="middle" font-size="9" fill="#dfe6e9">LLM + 工具 = 自主系统</text>
+
+            <text x="340" y="165" text-anchor="middle" font-size="12" fill="#636e72">四条线在 Agent 处交汇</text>
+
+            <line x1="95" y1="113" x2="95" y2="145" stroke="#74b9ff" stroke-width="1.5" stroke-dasharray="4"/>
+            <line x1="260" y1="113" x2="260" y2="145" stroke="#55efc4" stroke-width="1.5" stroke-dasharray="4"/>
+            <line x1="425" y1="113" x2="425" y2="145" stroke="#e17055" stroke-width="1.5" stroke-dasharray="4"/>
+            <line x1="590" y1="113" x2="590" y2="145" stroke="#a29bfe" stroke-width="1.5" stroke-dasharray="4"/>
+
+            <rect x="260" y="150" width="170" height="45" rx="10" fill="#e84393" opacity="0.9"/>
+            <text x="345" y="172" text-anchor="middle" font-size="13" font-weight="bold" fill="#fff">Agent = 四线交汇</text>
+            <text x="345" y="188" text-anchor="middle" font-size="9" fill="#dfe6e9">规模 + 推理 + 对齐 + 工具</text>
+        </svg>
+        <div class="diagram-caption">图2：四条进化主线最终在 Agent 处交汇。</div>
+    </div>
+
+    <h2>三、逐站回顾</h2>
+
+    <h3>第一站：GPT-1（2018）—— 造好"底座"</h3>
+    <p><b>核心思想</b>：先在大规模无标签文本上预训练（预测下一个词），再在每个任务上微调。</p>
+    <p><b>关键发现</b>：「预测下一个词」学到的语言理解比专门设计的监督方法更好。</p>
+    <p><b>历史意义</b>：奠定了此后所有 LLM 的基础范式。</p>
+    <p>→ <a href="gpt1-pretrain-finetune.html">详细解读：GPT-1：预训练 + 微调统一 NLP 框架</a></p>
+
+    <h3>第二站：GPT-2（2019）—— 发现零样本能力</h3>
+    <p><b>核心思想</b>：把模型做大（15 亿参数），零样本就能做很多任务。</p>
+    <p><b>关键发现</b>：模型在训练时没见过的任务上也能表现良好——零样本迁移能力。</p>
+    <p><b>历史意义</b>：第一次暗示「更大的模型 = 更多涌现能力」。</p>
+    <p>→ <a href="gpt2-zero-shot.html">详细解读：GPT-2：更大即更好的先声</a></p>
+
+    <h3>第三站：GPT-3（2020）—— 涌现与上下文学</h3>
+    <p><b>核心思想</b>：再大 100 倍（1750 亿），给几个例子就能照做。</p>
+    <p><b>关键发现</b>：上下文学习（In-Context Learning）、规模与能力之间的涌现曲线。</p>
+    <p><b>历史意义</b>：证明了 Scaling Laws，引爆大模型时代。</p>
+    <p>→ <a href="gpt3-few-shot.html">详细解读：GPT-3：1750 亿参数与「举一反三」的能力从何而来</a></p>
+
+    <h3>第四站：Chain-of-Thought（2022.01）—— 让模型"先想再答"</h3>
+    <p><b>核 心思想</b>：让模型在给出最终答案前，先输出一步一步的推理过程。</p>
+    <p><b>关键发现</b>：把推理过程写在 Prompt 里，模型就会模仿这个推理模式。</p>
+    <p><b>历史意义</b>：LLM 的推理从「黑盒出答案」变成「白盒推理」。</p>
+    <p>→ <a href="chain-of-thought.html">详细解读：Chain-of-Thought：让大模型学会「先想再答」</a></p>
+
+    <h3>第五站：InstructGPT / RLHF（2022.03）—— 把续写器变成指令跟随器</h3>
+    <p><b>核心思想</b>：用人类反馈 + 强化学习对模型进行对齐训练。</p>
+    <p><b>关键发现</b>：13 亿参数的 InstructGPT 在指令遵循上  超越 1750 亿参数的原始 GPT-3。</p>
+    <p><b>历史意义</b>：从 GPT 到 ChatGPT 的关 键一步。</p>
+    <p>→ <a href="instructgpt-rlhf.html">详细解读：InstructGPT：RLHF 如何让语言模型学会听人话</a></p>
+
+    <h3>第六站：ReAct（2022.10）—— 思考与行动交替</h3>
+    <p><b>核心思想</b>：让模型在「推理」和「采取行动（调用工具）」之间交替循环。</p>
+    <p><b>关键发现</b>：推理 + 行动的组合比单独推理或单独行动都更有效。</p>
+    <p><b>历史意义</b>：LLM Agent 的雏形。</p>
+    <p>→ <a href="react-agent.html">详细解读：ReAct：LLM Agent 的思考-行动循环</a></p>
+
+    <h3>第七站：ChatGPT（2022.11）—— 产品化引爆全球</h3>
+    <p><b>核心思想</b>：InstructGPT + 规模 + 对话界面 = 产品级 AI 助手。</p>
+    <p><b>关键发现</b>：对话交互是 LLM 能力的最佳释放方式。</p>
+    <p><b>历史意义</b>：2 个月 1 亿用户，引爆 AGI 浪潮。</p>
+    <p>→ <a href="chatgpt-milestone.html">详细解读：ChatGPT：一个产品如何改变世界</a></p>
+
+    <h3>第八站：Toolformer（2023.02）—— 教模型用工具</h3>
+    <p><b>核心思想</b>：模型应该学会自己决定何时调用外部工具（搜索、计算器、翻译）。</p>
+    <p><b>关键发现</b>：工具调用能力本身也可以自学。</p>
+    <p><b>历史意义</b>：LLM 从「纯文本处理器」变成「能操作外部世界的系统」。</p>
+    <p>→ <a href="toolformer.html">详细解读：Toolformer：让语言模型学会自己用工具</a></p>
+
+    <h3>第九站：Agent 框架（2024+）—— 从模型到系统</h3>
+    <p><b>核心思想</b>：LLM 循环 + 工具 + 记忆 + 规划 = 自主 Agent。</p>
+    <p><b>关键工程</b>：AutoGPT、LangChain、Claude Code、OpenCode、Codex 等。</p>
+    <p><b>历史意义</b>：Agent 从学术概念变成工程框架，AGI 的工程化实现路径。</p>
+    <p>→ <a href="agent-frameworks.html">详细解读：Agent 框架：LLM 进化的终点</a></p>
+
+    <h2>四、关键洞察：纵览全图</h2>
+
+    <div class="diagram">
+        <svg viewBox="0 0 680 280" xmlns="http://www.w3.org/2000/svg" style="font-family: -apple-system, sans-serif;">
+            <defs>
+                <linearGradient id="timeline" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0" stop-color="#74b9ff"/>
+                    <stop offset="0.22" stop-color="#a29bfe"/>
+                    <stop offset="0.45" stop-color="#55efc4"/>
+                    <stop offset="0.68" stop-color="#fdcb6e"/>
+                    <stop offset="1" stop-color="#e84393"/>
+                </linearGradient>
+            </defs>
+            <text x="340" y="25" text-anchor="middle" font-size="15" font-weight="bold" fill="#2d3436">时间线：2018 → 2024</text>
+
+            <rect x="40" y="50" width="610" height="12" rx="6" fill="url(#timeline)"/>
+
+            <circle cx="80" cy="75" r="5" fill="#0984e3"/>
+            <text x="80" y="95" text-anchor="middle" font-size="9" font-weight="bold" fill="#0984e3">GPT-1</text>
+            <text x="80" y="108" text-anchor="middle" font-size="8" fill="#636e72">1.17亿</text>
+
+            <circle cx="175" cy="75" r="5" fill="#6c5ce7"/>
+            <text x="175" y="95" text-anchor="middle" font-size="9" font-weight="bold" fill="#6c5ce7">GPT-2</text>
+            <text x="175" y="108" text-anchor="middle" font-size="8" fill="#636e72">15亿</text>
+
+            <circle cx="295" cy="75" r="5" fill="#00b894"/>
+            <text x="295" y="95" text-anchor="middle" font-size="9" font-weight="bold" fill="#00b894">GPT-3</text>
+            <text x="295" y="108" text-anchor="middle" font-size="8" fill="#636e72">1750亿</text>
+
+            <circle cx="380" cy="75" r="5" fill="#6c5ce7"/>
+            <text x="380" y="95" text-anchor="middle" font-size="9" font-weight="bold" fill="#6c5ce7">CoT</text>
+
+            <circle cx="410" cy="75" r="5" fill="#e17055"/>
+            <text x="410" y="95" text-anchor="middle" font-size="9" font-weight="bold" fill="#e17055">Instruct</text>
+            <text x="410" y="108" text-anchor="middle" font-size="8" fill="#636e72">GPT</text>
+
+            <circle cx="480" cy="75" r="5" fill="#a29bfe"/>
+            <text x="480" y="95" text-anchor="middle" font-size="9" font-weight="bold" fill="#a29bfe">ReAct</text>
+
+            <circle cx="510" cy="75" r="5" fill="#e67e22"/>
+            <text x="510" y="95" text-anchor="middle" font-size="9" font-weight="bold" fill="#e67e22">Chat</text>
+            <text x="510" y="108" text-anchor="middle" font-size="8" fill="#636e72">GPT</text>
+
+            <circle cx="555" cy="75" r="5" fill="#0984e3"/>
+            <text x="555" y="95" text-anchor="middle" font-size="9" font-weight="bold" fill="#0984e3">Tool</text>
+            <text x="555" y="108" text-anchor="middle" font-size="8" fill="#636e72">former</text>
+
+            <circle cx="625" cy="75" r="5" fill="#e84393"/>
+            <text x="625" y="95" text-anchor="middle" font-size="9" font-weight="bold" fill="#e84393">Agent</text>
+            <text x="625" y="108" text-anchor="middle" font-size="8" fill="#636e72">框架</text>
+
+            <text x="340" y="145" text-anchor="middle" font-size="13" font-weight="bold" fill="#2d3436">三个跃迁阶段</text>
+
+            <rect x="40" y="165" width="190" height="85" rx="6" fill="#dfe6e9" opacity="0.5"/>
+            <text x="135" y="188" text-anchor="middle" font-size="12" font-weight="bold" fill="#0984e3">阶段 I：基础</text>
+            <text x="135" y="208" text-anchor="middle" font-size="10" fill="#636e72">GPT-1 → GPT-2 → GPT-3</text>
+            <text x="135" y="225" text-anchor="middle" font-size="9" fill="#636e72">验证规模 = 能力</text>
+
+            <rect x="245" y="165" width="200" height="85" rx="6" fill="#dfe6e9" opacity="0.5"/>
+            <text x="345" y="188" text-anchor="middle" font-size="12" font-weight="bold" fill="#e17055">阶段 II：能力提升</text>
+            <text x="345" y="208" text-anchor="middle" font-size="10" fill="#636e72">CoT → Instruct → ReAct</text>
+            <text x="345" y="225" text-anchor="middle" font-size="9" fill="#636e72">推理 · 对齐 · 行动</text>
+
+            <rect x="460" y="165" width="190" height="85" rx="6" fill="#dfe6e9" opacity="0.5"/>
+            <text x="555" y="188" text-anchor="middle" font-size="12" font-weight="bold" fill="#e84393">阶段 III：系统化</text>
+            <text x="555" y="208" text-anchor="middle" font-size="10" fill="#636e72">ChatGPT → Toolformer → Agent</text>
+            <text x="555" y="225" text-anchor="middle" font-size="9" fill="#636e72">产品 · 工具 · 自主</text>
+        </svg>
+        <div class="diagram-caption">图3：完整时间线与三个跃迁阶段。</div>
+    </div>
+
+    <h3>贯穿始终的核心趋势</h3>
+
+    <ol>
+        <li><b>人类介入越来越少</b>：从需要大量标注微调（GPT-1），到只给几个例子（GPT-3），到完全自理（Agent）。</li>
+        <li><b>系统越来越复杂</b>：从单一模型（GPT），到模型 + 推理（CoT），到模型 + 推理 + 工具 + 记忆（Agent）。</li>
+        <li><b>能力边界不断外推</b>：每个阶段都发现了前一个阶段不具备的「新涌现能力」。</li>
+        <li><b>从学术到工程再到产品</b>：2020 年之前基本是学术探索，2022-2023 年转向工程化，2024 年进入产品化。</li>
+    </ol>
+
+    <div class="callout success">
+        <p><b>一句话总结整条进化链</b>：我们先把模型做大（Scaling），再让它学会推理（CoT）、学会听话（RLHF）、学会做事（Toolformer）、学会自己行动（Agent）——每一步都建立在之前的基础上，而它们共同指向同一个方向：AGI。</p>
+    </div>
+
+    <hr style="margin: 2rem 0;">
+
+    <div class="series-nav">
+        <h3>📖 继续阅读系列文章</h3>
+        <ul>
+            <li><a href="gpt1-pretrain-finetune.html">① GPT-1：预训练 + 微调统一 NLP 框架</a></li>
+            <li><a href="gpt2-zero-shot.html">② GPT-2：更大即更好的先声</a></li>
+            <li><a href="gpt3-few-shot.html">③ GPT-3：1750 亿参数与上下文学习</a></li>
+            <li><a href="chain-of-thought.html">④ CoT：让大模型学会「先想再答」</a></li>
+            <li><a href="instructgpt-rlhf.html">⑤ InstructGPT：RLHF 让模型学会听人话</a></li>
+            <li><a href="react-agent.html">⑥ ReAct：Agent 的思考—行动循环</a></li>
+            <li><a href="chatgpt-milestone.html">⑦ ChatGPT：一个产品如何改变世界</a></li>
+            <li><a href="toolformer.html">⑧ Toolformer：让语言模型学会用工具</a></li>
+            <li><a href="agent-frameworks.html">⑨ Agent 框架：LLM 进化的终点</a></li>
+        </ul>
+    </div>
+
+    <hr style="margin: 2rem 0;">
+
+    <h2>参考文献</h2>
+    <ol class="ref">
+        <li>Radford, A. et al. (2018). <i>Improving Language Understanding by Generative Pre-Training</i>. 链接</li>
+        <li>Radford, A. et al. (2019). <i>Language Models are Unsupervised Multitask Learners</i>. 链接</li>
+        <li>Brown, T.B. et al. (2020). <i>Language Models are Few-Shot Learners</i>. arXiv:2005.14165.</li>
+        <li>Wei, J. et al. (2022). <i>Chain-of-Thought Prompting Elicits Reasoning in Large Language Models</i>. arXiv:2201.11903.</li>
+        <li>Ouyang, L. et al. (2022). <i>Training language models to follow instructions with human feedback</i>. arXiv:2203.02155.</li>
+        <li>Yao, S. et al. (2022). <i>ReAct: Synergizing Reasoning and Acting in Language Models</i>. arXiv:2210.03629.</li>
+        <li>Schick, T. et al. (2023). <i>Toolformer: Language Models Can Teach Themselves to Use Tools</i>. arXiv:2302.04761.</li>
+    </ol>
+
+    <footer>&copy; 2026 Ha2fde · LLM 进化史系列</footer>
+</div>
+</body>
+</html>
