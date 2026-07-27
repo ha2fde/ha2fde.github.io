@@ -96,7 +96,7 @@
             <line x1="175" y1="220" x2="175" y2="240" stroke="#dfe6e9" stroke-width="1.5" marker-end="url(#arrt)"/>
 
             <text x="175" y="260" text-anchor="middle" font-size="11" fill="#dfe6e9">（残差连接 + 层归一化）</text>
-            <text x="175" y="282" text-anchor="middle" font-size="11" fill="#dfe6e9">Add & Layer Norm</text>
+            <text x="175" y="282" text-anchor="middle" font-size="11" fill="#dfe6e9">Add and Layer Norm</text>
 
             <line x1="175" y1="292" x2="175" y2="315" stroke="#dfe6e9" stroke-width="1.5" marker-end="url(#arrt)"/>
 
@@ -172,29 +172,29 @@ PE(pos, 2i+1) = cos(pos / 10000^(2i/d_model))</pre>
     <p>Transformer 架构的妙处在于它的通用性。此后整个 LLM 领域沿着三条分支发展：</p>
 
     <div class="diagram">
-        <svg viewBox="0 0 620 200" xmlns="http://www.w3.org/2000/svg" style="font-family: -apple-system, sans-serif;">
-            <rect x="210" y="15" width="200" height="45" rx="10" fill="#0984e3"/>
-            <text x="310" y="43" text-anchor="middle" font-size="15" font-weight="bold" fill="#fff">Transformer (2017)</text>
+        <svg viewBox="0 0 600 180" xmlns="http://www.w3.org/2000/svg">
+            <rect x="200" y="10" width="200" height="40" rx="8" fill="#0984e3"/>
+            <text x="300" y="36" text-anchor="middle" font-size="15" font-weight="bold" fill="white">Transformer (2017)</text>
 
-            <line x1="250" y1="60" x2="100" y2="85" stroke="#636e72" stroke-width="2"/>
-            <line x1="310" y1="60" x2="310" y2="85" stroke="#636e72" stroke-width="2"/>
-            <line x1="370" y1="60" x2="520" y2="85" stroke="#636e72" stroke-width="2"/>
+            <line x1="240" y1="50" x2="100" y2="72" stroke="#636e72" stroke-width="2"/>
+            <line x1="300" y1="50" x2="300" y2="72" stroke="#636e72" stroke-width="2"/>
+            <line x1="360" y1="50" x2="500" y2="72" stroke="#636e72" stroke-width="2"/>
 
-            <rect x="10" y="90" width="180" height="55" rx="8" fill="#55efc4"/>
-            <text x="100" y="113" text-anchor="middle" font-size="13" font-weight="bold" fill="#2d3436">Encoder-Decoder</text>
-            <text x="100" y="133" text-anchor="middle" font-size="10" fill="#636e72">T5、BART</text>
+            <rect x="10" y="75" width="170" height="50" rx="6" fill="#55efc4"/>
+            <text x="95" y="98" text-anchor="middle" font-size="13" font-weight="bold" fill="#2d3436">Encoder-Decoder</text>
+            <text x="95" y="116" text-anchor="middle" font-size="10" fill="#636e72">T5, BART</text>
 
-            <rect x="220" y="90" width="180" height="55" rx="8" fill="#74b9ff"/>
-            <text x="310" y="113" text-anchor="middle" font-size="13" font-weight="bold" fill="#fff">Encoder Only</text>
-            <text x="310" y="133" text-anchor="middle" font-size="10" fill="#dfe6e9">BERT、RoBERTa</text>
+            <rect x="210" y="75" width="180" height="50" rx="6" fill="#74b9ff"/>
+            <text x="300" y="98" text-anchor="middle" font-size="13" font-weight="bold" fill="white">Encoder Only</text>
+            <text x="300" y="116" text-anchor="middle" font-size="10" fill="#dfe6e9">BERT, RoBERTa</text>
 
-            <rect x="430" y="90" width="180" height="55" rx="8" fill="#fdcb6e"/>
-            <text x="520" y="113" text-anchor="middle" font-size="13" font-weight="bold" fill="#2d3436">Decoder Only</text>
-            <text x="520" y="133" text-anchor="middle" font-size="10" fill="#636e72">GPT-1/2/3/4、LLaMA</text>
+            <rect x="420" y="75" width="170" height="50" rx="6" fill="#fdcb6e"/>
+            <text x="505" y="98" text-anchor="middle" font-size="13" font-weight="bold" fill="#2d3436">Decoder Only</text>
+            <text x="505" y="116" text-anchor="middle" font-size="10" fill="#636e72">GPT, LLaMA</text>
 
-            <text x="310" y="188" text-anchor="middle" font-size="10" fill="#636e72">三条路线各有侧重，Decoder Only 最终胜出成为 LLM 主流架构</text>
+            <text x="300" y="168" text-anchor="middle" font-size="10" fill="#636e72">Decoder Only 最终胜出成为 LLM 主流架构</text>
         </svg>
-        <div class="diagram-caption">图2：Transformer 的三条发展分支。Encoder-Decoder 延续原始设计，Encoder Only 专注理解（BERT），Decoder Only 专注生成（GPT）并最终胜出。</div>
+        <div class="diagram-caption">图2：Transformer 的三条发展分支。</div>
     </div>
 
     <h2>六、为什么这篇文章如此重要</h2>
