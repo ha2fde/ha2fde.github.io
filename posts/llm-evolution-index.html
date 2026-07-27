@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM 进化史 · 目录</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans SC', serif;
+            background: #f5f0eb; color: #2d3436; line-height: 1.8;
+        }
+        .container { max-width: 720px; margin: 0 auto; padding: 2rem 1.5rem; }
+        header { padding: 2rem 0; border-bottom: 1px solid #dcd3cc; margin-bottom: 2rem; }
+        header a { color: #636e72; text-decoration: none; font-size: 0.9rem; }
+        header a:hover { text-decoration: underline; }
+
+        /* book cover */
+        .book-cover {
+            background: linear-gradient(135deg, #2d3436 0%, #636e72 50%, #2d3436 100%);
+            border-radius: 4px 12px 12px 4px;
+            padding: 2.5rem 2rem;
+            margin-bottom: 2.5rem;
+            color: #fff;
+            position: relative;
+            box-shadow: 6px 6px 20px rgba(0,0,0,0.15);
+        }
+        .book-cover::before {
+            content: '';
+            position: absolute; left: 0; top: 0; bottom: 0; width: 6px;
+            background: #e84393; border-radius: 4px 0 0 4px;
+        }
+        .book-cover .label {
+            font-size: 0.75rem; text-transform: uppercase; letter-spacing: 3px;
+            color: #b2bec3; margin-bottom: 0.8rem;
+        }
+        .book-cover h1 {
+            font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;
+            font-family: -apple-system, 'Noto Sans SC', sans-serif;
+        }
+        .book-cover .subtitle {
+            font-size: 1rem; color: #dfe6e9; margin-bottom: 1.2rem;
+        }
+        .book-cover .meta {
+            font-size: 0.85rem; color: #b2bec3;
+        }
+        .book-cover .meta span { margin-right: 1.5rem; }
+
+        /* TOC */
+        .toc { margin-bottom: 2rem; }
+        .toc h2 {
+            font-size: 1.1rem; color: #636e72; margin: 1.5rem 0 0.8rem;
+            padding-bottom: 0.4rem; border-bottom: 1px solid #dcd3cc;
+            font-weight: 600;
+        }
+        .toc .part-label {
+            display: inline-block; font-size: 0.7rem; padding: 0.15rem 0.5rem;
+            border-radius: 3px; margin-left: 0.5rem; font-weight: 600;
+            vertical-align: middle;
+        }
+
+        .chapter {
+            display: flex; gap: 1rem; align-items: flex-start;
+            padding: 0.7rem 0; border-bottom: 1px solid #ede5dd;
+            transition: background 0.15s;
+        }
+        .chapter:hover { background: #ede5dd; margin: 0 -0.8rem; padding: 0.7rem 0.8rem; border-radius: 6px; }
+        .chapter-num {
+            font-size: 0.85rem; font-weight: 700; color: #e84393;
+            min-width: 2rem; padding-top: 0.15rem;
+        }
+        .chapter-info { flex: 1; }
+        .chapter-title {
+            font-size: 1rem; font-weight: 600; color: #2d3436;
+        }
+        .chapter-title a { color: inherit; text-decoration: none; }
+        .chapter-title a:hover { color: #0984e3; }
+        .chapter-desc {
+            font-size: 0.85rem; color: #636e72; margin-top: 0.15rem;
+        }
+        .chapter-meta {
+            font-size: 0.75rem; color: #b2bec3; white-space: nowrap;
+            padding-top: 0.2rem;
+        }
+        .chapter-meta .tag {
+            display: inline-block; font-size: 0.65rem; padding: 0.1rem 0.4rem;
+            border-radius: 3px; margin-left: 0.4rem; font-weight: 600;
+        }
+        .tag.key { background: #fce4ec; color: #e84393; }
+        .tag.part0 { background: #eef6ff; color: #0984e3; }
+        .tag.part1 { background: #e6ffe6; color: #00b894; }
+        .tag.part2 { background: #fff3e0; color: #e67e22; }
+        .tag.part3 { background: #f0e6ff; color: #6c5ce7; }
+
+        .toc-footer {
+            text-align: center; padding: 2rem 0; color: #b2bec3;
+            font-size: 0.85rem; border-top: 1px solid #dcd3cc; margin-top: 1rem;
+        }
+        .toc-footer a { color: #636e72; }
+
+        @media (max-width: 600px) {
+            .container { padding: 1rem; }
+            .book-cover { padding: 1.5rem; }
+            .book-cover h1 { font-size: 1.4rem; }
+            .chapter { gap: 0.6rem; }
+            .chapter-meta { white-space: normal; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header><a href="../index.html">← 首页</a></header>
+
+    <div class="book-cover">
+        <div class="label">A Ha2fde Series</div>
+        <h1>LLM 进化史</h1>
+        <div class="subtitle">从 Transformer 到 AI Agent — 十篇论文读懂大语言模型进化之路</div>
+        <div class="meta">
+            <span>10 篇文章</span>
+            <span>约 170 分钟阅读</span>
+            <span>更新于 2026-07-27</span>
+        </div>
+    </div>
+
+    <div class="toc">
+
+        <h2>阅读指南 <span class="part-label" style="background:#fce4ec;color:#e84393;">必读</span></h2>
+        <div class="chapter">
+            <div class="chapter-num">⓪</div>
+            <div class="chapter-info">
+                <div class="chapter-title"><a href="llm-evolution-overview.html">从 Transformer 到 AI Agent：LLM 进化全景图</a></div>
+                <div class="chapter-desc">系列综述，一张全景图串联 10 个关键节点，建议首先阅读</div>
+            </div>
+            <div class="chapter-meta">35 min <span class="tag key">综述</span></div>
+        </div>
+
+        <h2>Part ⓪ &nbsp; 架构革命 <span class="part-label" style="background:#eef6ff;color:#0984e3;">起点</span></h2>
+        <div class="chapter">
+            <div class="chapter-num">①</div>
+            <div class="chapter-info">
+                <div class="chapter-title"><a href="transformer-attention.html">Transformer：Attention Is All You Need</a></div>
+                <div class="chapter-desc">2017 · 注意力机制替代 RNN，可并行训练，一切 LLM 的基石</div>
+            </div>
+            <div class="chapter-meta">20 min <span class="tag part0">架构</span></div>
+        </div>
+
+        <h2>Part I &nbsp; 规模 Scaling <span class="part-label" style="background:#e6ffe6;color:#00b894;">更大 = 更好</span></h2>
+        <div class="chapter">
+            <div class="chapter-num">②</div>
+            <div class="chapter-info">
+                <div class="chapter-title"><a href="gpt1-pretrain-finetune.html">GPT-1：生成式预训练统一 NLP 框架</a></div>
+                <div class="chapter-desc">2018 · 1.17 亿参数，「预测下一个词」比监督学习更好</div>
+            </div>
+            <div class="chapter-meta">15 min <span class="tag part1">预训练</span></div>
+        </div>
+        <div class="chapter">
+            <div class="chapter-num">③</div>
+            <div class="chapter-info">
+                <div class="chapter-title"><a href="gpt2-zero-shot.html">GPT-2：更大即更好的先声</a></div>
+                <div class="chapter-desc">2019 · 15 亿参数，零样本能力被发现，分阶段发布风波</div>
+            </div>
+            <div class="chapter-meta">15 min <span class="tag part1">零样本</span></div>
+        </div>
+        <div class="chapter">
+            <div class="chapter-num">④</div>
+            <div class="chapter-info">
+                <div class="chapter-title"><a href="gpt3-few-shot.html">GPT-3：1750 亿参数与上下文学习</a></div>
+                <div class="chapter-desc">2020 · 1750 亿参数，涌现与 In-Context Learning，Scaling Laws 验证</div>
+            </div>
+            <div class="chapter-meta">20 min <span class="tag part1">涌现</span></div>
+        </div>
+
+        <h2>Part II &nbsp; 能力跃迁 <span class="part-label" style="background:#fff3e0;color:#e67e22;">推理 · 对齐 · 行动</span></h2>
+        <div class="chapter">
+            <div class="chapter-num">⑤</div>
+            <div class="chapter-info">
+                <div class="chapter-title"><a href="chain-of-thought.html">Chain-of-Thought：让模型先想再答</a></div>
+                <div class="chapter-desc">2022.01 · 推理过程白盒化，GSM8K 从 18% 跃升至 58%</div>
+            </div>
+            <div class="chapter-meta">15 min <span class="tag part2">推理</span></div>
+        </div>
+        <div class="chapter">
+            <div class="chapter-num">⑥</div>
+            <div class="chapter-info">
+                <div class="chapter-title"><a href="instructgpt-rlhf.html">InstructGPT：RLHF 让模型学会听人话</a></div>
+                <div class="chapter-desc">2022.03 · 13 亿参数超越 1750 亿，ChatGPT 的技术基石</div>
+            </div>
+            <div class="chapter-meta">18 min <span class="tag part2">对齐</span></div>
+        </div>
+        <div class="chapter">
+            <div class="chapter-num">⑦</div>
+            <div class="chapter-info">
+                <div class="chapter-title"><a href="react-agent.html">ReAct：Agent 的思考—行动循环</a></div>
+                <div class="chapter-desc">2022.10 · Thought→Action→Observation，一切 Agent 的原型</div>
+            </div>
+            <div class="chapter-meta">15 min <span class="tag part2">行动</span></div>
+        </div>
+
+        <h2>Part III &nbsp; 产品与系统 <span class="part-label" style="background:#f0e6ff;color:#6c5ce7;">工具 · 自主</span></h2>
+        <div class="chapter">
+            <div class="chapter-num">⑧</div>
+            <div class="chapter-info">
+                <div class="chapter-title"><a href="chatgpt-milestone.html">ChatGPT：一个产品如何改变世界</a></div>
+                <div class="chapter-desc">2022.11 · 2 个月 1 亿用户，AI 进入主流视野</div>
+            </div>
+            <div class="chapter-meta">12 min <span class="tag part3">产品</span></div>
+        </div>
+        <div class="chapter">
+            <div class="chapter-num">⑨</div>
+            <div class="chapter-info">
+                <div class="chapter-title"><a href="toolformer.html">Toolformer：让语言模型学会用工具</a></div>
+                <div class="chapter-desc">2023.02 · 自学工具调用，Function Calling 和 MCP 的精神先驱</div>
+            </div>
+            <div class="chapter-meta">15 min <span class="tag part3">工具</span></div>
+        </div>
+        <div class="chapter">
+            <div class="chapter-num">⑩</div>
+            <div class="chapter-info">
+                <div class="chapter-title"><a href="agent-frameworks.html">Agent 框架：LLM 进化的终点</a></div>
+                <div class="chapter-desc">2024+ · 五线交汇，LLM 从模型到系统的工程化集成</div>
+            </div>
+            <div class="chapter-meta">15 min <span class="tag part3">系统</span></div>
+        </div>
+
+    </div>
+
+    <div class="toc-footer">
+        <a href="../index.html">← 返回首页</a>
+    </div>
+</div>
+</body>
+</html>

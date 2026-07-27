@@ -77,115 +77,14 @@
             <div class="tab" data-tab="paper" onclick="filterPosts('paper')">论文解读</div>
         </div>
 
-        <!-- ===== LLM 进化史：综述 ===== -->
+        <!-- ===== LLM 进化史 ===== -->
         <div class="post" data-category="evolution">
-            <div class="post-thumb" style="background:#fce4ec;">🧬</div>
+            <div class="post-thumb" style="background:#fce4ec; font-size: 1.8rem;">📖</div>
             <div class="post-content">
                 <div class="post-cat evolution">LLM 进化史</div>
-                <div class="post-title"><a href="posts/llm-evolution-overview.html">从 Transformer 到 AI Agent：LLM 进化全景图</a></div>
-                <div class="post-meta">2026-07-27 · 约 30 分钟 · 系列综述</div>
-                <div class="post-desc">梳理 LLM 进化链上的 10 个关键节点：Transformer → GPT-1 → GPT-2 → GPT-3 → CoT → InstructGPT → ReAct → ChatGPT → Toolformer → Agent 框架。五条并行线索贯穿全文：架构、规模、推理、对齐、工具。系列入口。</div>
-            </div>
-        </div>
-
-        <!-- ===== LLM 进化史: 个体文章 ===== -->
-        <div class="post" data-category="evolution">
-            <div class="post-thumb" style="background:#fce4ec;">①</div>
-            <div class="post-content">
-                <div class="post-cat evolution">LLM 进化史</div>
-                <div class="post-title"><a href="posts/transformer-attention.html">Transformer：Attention Is All You Need——整个 LLM 时代的基石</a></div>
-                <div class="post-meta">2026-07-27 · 约 20 分钟</div>
-                <div class="post-desc">2017 · 提出 Encoder-Decoder 架构 + 多头注意力 + 位置编码，完全取代 RNN/CNN。可并行训练的特性让大模型扩展成为可能。BERT、GPT、T5——所有后续模型都建立在此基础上。</div>
-            </div>
-        </div>
-
-        <div class="post" data-category="evolution">
-            <div class="post-thumb" style="background:#fce4ec;">②</div>
-            <div class="post-content">
-                <div class="post-cat evolution">LLM 进化史</div>
-                <div class="post-title"><a href="posts/gpt1-pretrain-finetune.html">GPT-1：生成式预训练如何统一 NLP 框架</a></div>
-                <div class="post-meta">2026-07-27 · 约 15 分钟</div>
-                <div class="post-desc">2018 · 1.17 亿参数。证明了「预测下一个词」学到的知识比监督学习更好。两阶段框架（预训练+微调）定义了此后所有 LLM 的基本范式。12/12  NLP 任务超越 SOTA。</div>
-            </div>
-        </div>
-
-        <div class="post" data-category="evolution">
-            <div class="post-thumb" style="background:#fce4ec;">③</div>
-            <div class="post-content">
-                <div class="post-cat evolution">LLM 进化史</div>
-                <div class="post-title"><a href="posts/gpt2-zero-shot.html">GPT-2：更大即更好的先声——零样本能力从何而来</a></div>
-                <div class="post-meta">2026-07-27 · 约 15 分钟</div>
-                <div class="post-desc">2019 · 15 亿参数。模型大了不用微调也能做任务。发现零样本迁移能力——翻译、问答、摘要皆可。分阶段发布引发 AI 伦理讨论。</div>
-            </div>
-        </div>
-
-        <div class="post" data-category="evolution">
-            <div class="post-thumb" style="background:#fce4ec;">④</div>
-            <div class="post-content">
-                <div class="post-cat evolution">LLM 进化史</div>
-                <div class="post-title"><a href="posts/gpt3-few-shot.html">GPT-3：1750 亿参数与「举一反三」的能力从何而来</a></div>
-                <div class="post-meta">2026-07-27 · 约 20 分钟</div>
-                <div class="post-desc">2020 · 1750 亿参数。上下文学习（In-Context Learning）出现，仅凭几个示例无需微调即可完成广泛任务。Scaling Laws 的终极验证，引爆大模型时代。</div>
-            </div>
-        </div>
-
-        <div class="post" data-category="evolution">
-            <div class="post-thumb" style="background:#fce4ec;">⑤</div>
-            <div class="post-content">
-                <div class="post-cat evolution">LLM 进化史</div>
-                <div class="post-title"><a href="posts/chain-of-thought.html">Chain-of-Thought：让大模型学会「先想再答」</a></div>
-                <div class="post-meta">2026-07-27 · 约 15 分钟</div>
-                <div class="post-desc">2022.01 · 让模型在给出答案前先写推理过程。GSM8K 上从 18% 跃升至 58%。LLM 推理从「直接出答案」变为「白盒推理」，为 Agent 奠定基础。</div>
-            </div>
-        </div>
-
-        <div class="post" data-category="evolution">
-            <div class="post-thumb" style="background:#fce4ec;">⑥</div>
-            <div class="post-content">
-                <div class="post-cat evolution">LLM 进化史</div>
-                <div class="post-title"><a href="posts/instructgpt-rlhf.html">InstructGPT：RLHF 如何让语言模型学会听人话</a></div>
-                <div class="post-meta">2026-07-27 · 约 18 分钟</div>
-                <div class="post-desc">2022.03 · 用人类反馈微调 GPT-3，13 亿参数模型在指令遵循上超越 1750 亿原始模型。RLHF 三阶段流程：SFT → 奖励模型 → PPO。ChatGPT 的技术基石。</div>
-            </div>
-        </div>
-
-        <div class="post" data-category="evolution">
-            <div class="post-thumb" style="background:#fce4ec;">⑦</div>
-            <div class="post-content">
-                <div class="post-cat evolution">LLM 进化史</div>
-                <div class="post-title"><a href="posts/react-agent.html">ReAct：LLM Agent 的思考—行动循环</a></div>
-                <div class="post-meta">2026-07-27 · 约 15 分钟</div>
-                <div class="post-desc">2022.10 · 让模型在 Thought ↔ Action ↔ Observation 之间交替。首个 LLM Agent 雏形。今天 Claude Code、Deep Research、AutoGPT 等所有 Agent 的架构原型。</div>
-            </div>
-        </div>
-
-        <div class="post" data-category="evolution">
-            <div class="post-thumb" style="background:#fce4ec;">⑧</div>
-            <div class="post-content">
-                <div class="post-cat evolution">LLM 进化史</div>
-                <div class="post-title"><a href="posts/chatgpt-milestone.html">ChatGPT：一个产品如何改变世界</a></div>
-                <div class="post-meta">2026-07-27 · 约 12 分钟</div>
-                <div class="post-desc">2022.11 · 2 个月 1 亿用户。InstructGPT + 规模 + 对话界面 = 历史最快增长应用。让全世界第一次真正体验到 LLM 的潜力，从此 AI 进入主流视野。</div>
-            </div>
-        </div>
-
-        <div class="post" data-category="evolution">
-            <div class="post-thumb" style="background:#fce4ec;">⑨</div>
-            <div class="post-content">
-                <div class="post-cat evolution">LLM 进化史</div>
-                <div class="post-title"><a href="posts/toolformer.html">Toolformer：让语言模型学会自己用工具</a></div>
-                <div class="post-meta">2026-07-27 · 约 15 分钟</div>
-                <div class="post-desc">2023.02 · 模型自学决定何时调用搜索引擎、计算器、翻译等外部工具。从纯文本处理器变为能操作外部世界的信息枢纽。Function Calling API 和 MCP 的精神先驱。</div>
-            </div>
-        </div>
-
-        <div class="post" data-category="evolution">
-            <div class="post-thumb" style="background:#fce4ec;">⑩</div>
-            <div class="post-content">
-                <div class="post-cat evolution">LLM 进化史</div>
-                <div class="post-title"><a href="posts/agent-frameworks.html">Agent 框架：LLM 进化的终点与 AGI 的工程化路径</a></div>
-                <div class="post-meta">2026-07-27 · 约 15 分钟</div>
-                <div class="post-desc">2024+ · LLM + 推理 + 工具 + 记忆 + ReAct 循环 = 自主 Agent。AutoGPT、LangChain、Claude Code、Codex、Deep Research。整条进化链的最终汇聚点。</div>
+                <div class="post-title"><a href="posts/llm-evolution-index.html">从 Transformer 到 AI Agent：一部 LLM 进化史</a></div>
+                <div class="post-meta">10 篇文章 · 约 170 分钟 · 2026-07-27</div>
+                <div class="post-desc">以书本形式收录 10 篇论文解读：Transformer → GPT-1/2/3 → CoT → InstructGPT → ReAct → ChatGPT → Toolformer → Agent 框架。每篇独立成章，按顺序阅读效果更佳。</div>
             </div>
         </div>
 
