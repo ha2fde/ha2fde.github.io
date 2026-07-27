@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>体验时代：Silver & Sutton 谈 AI 的下一次跃迁</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif;
+            background: #f8f9fa; color: #333; line-height: 1.8;
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem; }
+        header { padding: 2rem 0; border-bottom: 1px solid #eee; margin-bottom: 2rem; }
+        header a { color: #3498db; text-decoration: none; }
+        header a:hover { text-decoration: underline; }
+        h1 { font-size: 1.8rem; line-height: 1.4; margin-bottom: 0.8rem; }
+        .meta { color: #999; font-size: 0.9rem; margin-bottom: 2rem; }
+        h2 { font-size: 1.3rem; margin: 2rem 0 0.8rem; color: #1a1a2e; border-left: 4px solid #0984e3; padding-left: 0.8rem; }
+        h3 { font-size: 1.1rem; margin: 1.5rem 0 0.6rem; color: #2d3436; }
+        p { margin: 0.8rem 0; }
+        blockquote {
+            border-left: 3px solid #0984e3; margin: 1rem 0; padding: 0.5rem 1rem;
+            background: #f1f8ff; color: #2d3436;
+        }
+        blockquote cite { display: block; margin-top: 0.3rem; font-size: 0.85rem; color: #666; }
+        ul, ol { margin: 0.8rem 0; padding-left: 1.5rem; }
+        li { margin: 0.4rem 0; }
+        pre {
+            background: #2d3436; color: #dfe6e9; padding: 1rem; border-radius: 6px;
+            overflow-x: auto; font-size: 0.85rem; margin: 1rem 0;
+        }
+        code { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+        p code { background: #eee; padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.9rem; }
+        .callout {
+            padding: 1rem; border-radius: 6px; margin: 1rem 0;
+            border-left: 4px solid;
+        }
+        .callout.info { background: #eef6ff; border-color: #0984e3; }
+        .callout.warn { background: #fff3e0; border-color: #e67e22; }
+        .callout.success { background: #e6ffe6; border-color: #27ae60; }
+        table {
+            width: 100%; border-collapse: collapse; margin: 1rem 0;
+        }
+        th, td {
+            padding: 0.5rem 0.8rem; border: 1px solid #dfe6e9; text-align: left;
+        }
+        th { background: #f1f8ff; font-weight: 600; }
+        .ref { font-size: 0.85rem; color: #666; }
+        footer { text-align: center; padding: 3rem 0 1rem; color: #999; font-size: 0.85rem; }
+        .diagram {
+            background: #fff; border: 1px solid #dfe6e9; border-radius: 8px;
+            padding: 1.5rem; margin: 1.5rem 0; text-align: center;
+        }
+        .diagram svg { max-width: 100%; height: auto; }
+        .diagram-caption { font-size: 0.85rem; color: #666; margin-top: 0.5rem; }
+        .highlight { background: #fff3cd; padding: 0.1rem 0.2rem; border-radius: 2px; }
+        @media (max-width: 600px) {
+            .container { padding: 1rem; }
+            h1 { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header><a href="../index.html">← 返回首页</a></header>
+    <h1>体验时代：Silver & Sutton 谈 AI 的下一次跃迁</h1>
+    <div class="meta">2026-07-27 · 约 20 分钟</div>
+
+    <p>2025 年 4 月，David Silver 和 Richard Sutton——两位强化学习领域的奠基人——发表了一篇注定被反复引用的文章：<b>《Welcome to the Era of Experience》</b>（欢迎来到体验时代）。这篇文章将出现在 MIT Press 即将出版的《Designing an Intelligence》一书中。</p>
+
+    <p>Silver 和 Sutton 分别是谁？Silver 是 AlphaGo、AlphaZero、AlphaStar 的核心研究者，Sutton 是强化学习的教父、<em>Reinforcement Learning: An Introduction</em> 的作者、2019 年那篇著名的<a href="http://www.incompleteideas.net/IncIdeas/BitterLesson.html">「苦教训」</a>（The Bitter Lesson）的作者，也是 Silver 的博士导师。两人联手发表这篇宣言，重量不言而喻。</p>
+
+    <p>这篇文章不长，但信息密度极高。它提出了一个清晰的时间框架、一个核心论断、四个关键维度，以及一个已经发生的实证案例。以下是对这篇论文的系统性解读。</p>
+
+    <div class="diagram">
+        <svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg" style="font-family: -apple-system, sans-serif;">
+            <defs>
+                <linearGradient id="era1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#74b9ff"/><stop offset="1" stop-color="#0984e3"/></linearGradient>
+                <linearGradient id="era2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fd79a8"/><stop offset="1" stop-color="#e84393"/></linearGradient>
+                <linearGradient id="era3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#55efc4"/><stop offset="1" stop-color="#00b894"/></linearGradient>
+            </defs>
+            <text x="350" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="#2d3436">AI 发展的三个时代</text>
+
+            <rect x="30" y="55" width="190" height="110" rx="10" fill="url(#era1)"/>
+            <text x="125" y="95" text-anchor="middle" font-size="18" font-weight="bold" fill="#fff">仿真时代</text>
+            <text x="125" y="118" text-anchor="middle" font-size="12" fill="#dfe6e9">Era of Simulation</text>
+            <text x="125" y="142" text-anchor="middle" font-size="11" fill="#dfe6e9">AlphaGo / AlphaZero</text>
+            <text x="125" y="155" text-anchor="middle" font-size="10" fill="#81ecec">模拟环境中的强化学习</text>
+
+            <text x="245" y="110" font-size="24" fill="#636e72">&rarr;</text>
+
+            <rect x="270" y="55" width="190" height="110" rx="10" fill="url(#era2)"/>
+            <text x="365" y="95" text-anchor="middle" font-size="18" font-weight="bold" fill="#fff">人类数据时代</text>
+            <text x="365" y="118" text-anchor="middle" font-size="12" fill="#dfe6e9">Era of Human Data</text>
+            <text x="365" y="142" text-anchor="middle" font-size="11" fill="#dfe6e9">GPT-3 / LLM</text>
+            <text x="365" y="155" text-anchor="middle" font-size="10" fill="#fab1a0">大规模互联网文本预训练</text>
+
+            <text x="485" y="110" font-size="24" fill="#636e72">&rarr;</text>
+
+            <rect x="510" y="55" width="170" height="110" rx="10" fill="url(#era3)"/>
+            <text x="595" y="95" text-anchor="middle" font-size="18" font-weight="bold" fill="#fff">体验时代</text>
+            <text x="595" y="118" text-anchor="middle" font-size="12" fill="#dfe6e9">Era of Experience</text>
+            <text x="595" y="142" text-anchor="middle" font-size="11" fill="#dfe6e9">AlphaProof 2024</text>
+            <text x="595" y="155" text-anchor="middle" font-size="10" fill="#81ecec">智能体从交互中自主学习</text>
+        </svg>
+        <div class="diagram-caption">图1：Silver & Sutton 划分的 AI 三时代。来源：<em>Welcome to the Era of Experience</em> (2025)</div>
+    </div>
+
+    <h2>一、三个时代</h2>
+
+    <p>Silver 和 Sutton 将 AI 的近期发展划分为三个清晰的阶段：</p>
+
+    <h3>1. 仿真时代（Era of Simulation）</h3>
+    <p>以 2016 年的 AlphaGo 为代表。这个时代的标志是：AI 在<b>模拟环境</b>中通过强化学习从零开始学会复杂任务。规则完全已知，反馈即时明确（赢/输），但动作空间巨大（围棋有 10¹⁷⁰ 种局面）。核心成就是证明了「从交互经验中学习，而不依赖人类示范」的可行性。</p>
+
+    <h3>2. 人类数据时代（Era of Human Data）</h3>
+    <p>以 2020 年的 GPT-3 为代表。AI 通过<b>大规模互联网文本</b>（人类历史的数字化记录）进行预训练，再通过人类反馈微调（RLHF）。这个时代取得了惊人的成就——但天花板正在逼近。高质量人类数据几乎已被消耗殆尽，而模型能力的进一步提升需要一种全新的数据来源。</p>
+
+    <h3>3. 体验时代（Era of Experience）</h3>
+    <p>Silver 和 Sutton 认为，这个时代始于 2024 年的 AlphaProof——一个在形式化数学证明系统中通过交互学习获得国际数学奥林匹克（IMO）奖牌的 AI 系统。核心特征是：<b>智能体从自身与环境的交互中生成训练数据，并且这些数据的质量会随着智能体变强而不断提高</b>。</p>
+
+    <blockquote>
+        AI 正处于一个新时代的临界点。在这个时代，<b>体验将成为进步的主导媒介</b>，其规模最终将超越当今系统中使用的人类数据。
+        <cite>— Silver & Sutton, 2025</cite>
+    </blockquote>
+
+    <h2>二、体验时代的四个维度</h2>
+
+    <p>论文的核心是：体验时代的智能体将沿着四个维度突破人类中心设计（Human-Centric Design）的局限。</p>
+
+    <div class="diagram">
+        <svg viewBox="0 0 700 380" xmlns="http://www.w3.org/2000/svg" style="font-family: -apple-system, sans-serif;">
+            <defs>
+                <linearGradient id="d1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#74b9ff"/><stop offset="1" stop-color="#0984e3"/></linearGradient>
+                <linearGradient id="d2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a29bfe"/><stop offset="1" stop-color="#6c5ce7"/></linearGradient>
+                <linearGradient id="d3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fd79a8"/><stop offset="1" stop-color="#e84393"/></linearGradient>
+                <linearGradient id="d4" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fdcb6e"/><stop offset="1" stop-color="#e17055"/></linearGradient>
+            </defs>
+            <text x="350" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="#2d3436">体验时代的四个突破维度</text>
+
+            <rect x="40" y="55" width="290" height="130" rx="10" fill="url(#d1)"/>
+            <text x="50" y="80" font-size="22" fill="#fff">&#x1F30A; 体验流</text>
+            <text x="50" y="105" font-size="13" fill="#dfe6e9">Streams of Experience</text>
+            <text x="50" y="130" font-size="12" fill="#dfe6e9">从短片段 → 终身连续流</text>
+            <text x="50" y="148" font-size="11" fill="#81ecec">跨 session 记忆 · 长期目标</text>
+            <text x="50" y="165" font-size="11" fill="#81ecec">环境适应 · 持续学习</text>
+
+            <rect x="370" y="55" width="290" height="130" rx="10" fill="url(#d2)"/>
+            <text x="380" y="80" font-size="22" fill="#fff">&#x1F50D; 观察与行动</text>
+            <text x="380" y="105" font-size="13" fill="#dfe6e9">Grounded Actions &amp; Observations</text>
+            <text x="380" y="130" font-size="12" fill="#dfe6e9">从人类界面 → 机器原生</text>
+            <text x="380" y="148" font-size="11" fill="#81ecec">API 调用 · 无线通信</text>
+            <text x="380" y="165" font-size="11" fill="#81ecec">像素级界面 · 主动探索</text>
+
+            <rect x="40" y="210" width="290" height="130" rx="10" fill="url(#d3)"/>
+            <text x="50" y="235" font-size="22" fill="#fff">&#x1F3C6; 奖励</text>
+            <text x="50" y="260" font-size="13" fill="#dfe6e9">Grounded Rewards</text>
+            <text x="50" y="285" font-size="12" fill="#dfe6e9">从人类偏好 → 环境信号</text>
+            <text x="50" y="303" font-size="11" fill="#81ecec">正确性 · 效率 · 用户反馈</text>
+            <text x="50" y="320" font-size="11" fill="#81ecec">自设计奖励函数</text>
+
+            <rect x="370" y="210" width="290" height="130" rx="10" fill="url(#d4)"/>
+            <text x="380" y="235" font-size="22" fill="#fff">&#x1F4AD; 规划与推理</text>
+            <text x="380" y="260" font-size="13" fill="#dfe6e9">Planning &amp; Reasoning</text>
+            <text x="380" y="285" font-size="12" fill="#dfe6e9">从人类语言 → 超越人类思维</text>
+            <text x="380" y="303" font-size="11" fill="#81ecec">非语言推理 · 世界模型</text>
+            <text x="380" y="320" font-size="11" fill="#81ecec">可验证假设 · 非人类最优</text>
+        </svg>
+        <div class="diagram-caption">图2：体验时代智能体的四个关键特征。改编自 Silver & Sutton (2025)</div>
+    </div>
+
+    <h3>2.1 体验流（Streams of Experience）</h3>
+
+    <p>当前的 LLM 以<b>短片段</b>交互为主——一次对话、一轮问答。信息很少跨 session 传递。这意味着 AI 系统很难适应环境随时间的变化，也无法为长期目标进行规划。</p>
+
+    <p>Silver 和 Sutton 主张：<b>强大的智能体应该拥有自己的体验流</b>，像人类一样在长时间尺度上持续演进。这使得智能体能够：</p>
+    <ul>
+        <li>采取能够实现<b>未来目标</b>的行动</li>
+        <li>持续适应<b>新的行为模式</b></li>
+        <li>积累经验并<b>跨 session 复用</b>知识</li>
+    </ul>
+
+    <p>举例：一个语言学习助手不应只在单次对话中发挥作用。它应该跟踪用户<b>数周甚至数月</b>的进步，记住你学过哪些单词、语法点掌握得如何、整体目标是什么，然后主动调整教学策略。</p>
+
+    <h3>2.2 观察与行动（Actions and Observations）</h3>
+
+    <p>当前的 AI 系统通过<b>人类友好的界面</b>感知世界——文本、图像、语音。而体验时代的智能体将能够通过<b>机器原生的方式</b>直接与环境交互：</p>
+    <ul>
+        <li><b>API 调用</b>：直接与软件系统通信</li>
+        <li><b>无线通信</b>：与物联网设备交互</li>
+        <li><b>像素级界面操控</b>：像人类一样操作 GUI</li>
+        <li><b>物理世界接口</b>：通过数字孪生连接现实</li>
+    </ul>
+
+    <p>2024 年 Claude Computer Use 已经展示了这种能力的早期形态——AI 首次「看到屏幕、点击鼠标」。这只是一个开始。智能体会优先使用机器友好的方式（更快、更精确），在机器方式不可用时退回到类人操作。</p>
+
+    <blockquote>
+        这样的智能体将能够主动探索世界，适应不断变化的环境，并发现人类可能永远想不到的策略。
+        <cite>— Silver &amp; Sutton, 2025</cite>
+    </blockquote>
+
+    <h3>2.3 奖励（Rewards）</h3>
+
+    <p>这是论文中最深刻的论点之一。当前的 AI 系统依赖<b>人类判断</b>来定义「好」和「坏」——无论是 RLHF 中的人类偏好，还是人工标注的正确性。但人类判断是有天花板和偏见的。</p>
+
+    <p>体验时代的智能体将从世界本身获取奖励信号：</p>
+    <ul>
+        <li><b>可验证的正确性</b>：数学证明通过、代码编译、测试通过</li>
+        <li><b>效率指标</b>：运行时间、资源消耗、成本</li>
+        <li><b>环境信号</b>：温度、能耗、生产力、销售额、考试成绩</li>
+        <li><b>组合奖励</b>：综合多个环境信号设计自己的奖励函数</li>
+    </ul>
+
+    <p>更重要的是，智能体可以<b>自适应地调整奖励函数</b>。如果用户说「我想减肥」，AI 健身助手可以结合用户的生命体征、运动数据、饮食记录来创建一个复合奖励函数，并在用户进步时动态调整。</p>
+
+    <div class="callout info">
+        <p><b>关键论据</b>：Silver 和 Sutton 引用他们 2021 年的论文提出：<b>即使一个单一的奖励信号，只要在复杂环境中被有效优化，也可能足以诱导出广泛通用的智能</b>——因为在复杂环境中实现一个简单目标，往往需要掌握大量不同的技能。</p>
+    </div>
+
+    <h3>2.4 规划与推理（Planning and Reasoning）</h3>
+
+    <p>这是最具争议也最大胆的论点。当前最先进的推理模型（如 o1、DeepSeek-R1）都采用<b>思维链（Chain-of-Thought）</b>——让模型用人类的语言来「思考」。但 Silver 和 Sutton 质问道：</p>
+
+    <blockquote>
+        人类的语言极不可能是通用计算机的最优实例。肯定存在更高效的思考机制——使用非人类的语言，比如符号化的、分布式的、连续的、可微的计算。一个自学习系统原则上可以通过从经验中学习如何思考来发现或改进这些方法。
+        <cite>— Silver &amp; Sutton, 2025</cite>
+    </blockquote>
+
+    <p>这意味着：未来的 AI 不需要像人类一样「思考」。它可以发展出自己独特的、更高效的推理方式，就像 AlphaGo 下出了人类从未想过的棋步一样。</p>
+
+    <p>关键前提是<b>接地性（Grounding）</b>：智能体的推理必须能够被现实世界验证，否则「无论多么复杂，都会成为人类知识的回音室」。论文提出的解决方案是<b>世界模型（World Model）</b>——一个预测智能体行动后果的内部模型。</p>
+
+    <div class="diagram">
+        <svg viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg" style="font-family: -apple-system, sans-serif;">
+            <defs>
+                <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#0984e3"/>
+                </marker>
+            </defs>
+            <text x="300" y="25" text-anchor="middle" font-size="14" font-weight="bold" fill="#2d3436">接地推理回路：智能体与世界模型的交互</text>
+
+            <rect x="20" y="60" width="130" height="60" rx="8" fill="#74b9ff" stroke="#0984e3" stroke-width="2"/>
+            <text x="85" y="88" text-anchor="middle" font-size="13" font-weight="bold" fill="#fff">智能体</text>
+            <text x="85" y="105" text-anchor="middle" font-size="10" fill="#dfe6e9">Agent</text>
+
+            <rect x="240" y="60" width="130" height="60" rx="8" fill="#a29bfe" stroke="#6c5ce7" stroke-width="2"/>
+            <text x="305" y="88" text-anchor="middle" font-size="13" font-weight="bold" fill="#fff">世界模型</text>
+            <text x="305" y="105" text-anchor="middle" font-size="10" fill="#dfe6e9">World Model</text>
+
+            <rect x="450" y="60" width="130" height="60" rx="8" fill="#55efc4" stroke="#00b894" stroke-width="2"/>
+            <text x="515" y="88" text-anchor="middle" font-size="13" font-weight="bold" fill="#fff">真实环境</text>
+            <text x="515" y="105" text-anchor="middle" font-size="10" fill="#636e72">Environment</text>
+
+            <line x1="150" y1="80" x2="235" y2="80" stroke="#0984e3" stroke-width="2" marker-end="url(#arrow)"/>
+            <text x="192" y="73" text-anchor="middle" font-size="10" fill="#0984e3">动作 A</text>
+
+            <line x1="370" y1="90" x2="445" y2="90" stroke="#0984e3" stroke-width="2" marker-end="url(#arrow)"/>
+            <text x="408" y="83" text-anchor="middle" font-size="9" fill="#0984e3">规划/模拟</text>
+
+            <line x1="515" y1="120" x2="155" y2="120" stroke="#e84393" stroke-width="2" marker-end="url(#arrow)"/>
+            <text x="335" y="130" text-anchor="middle" font-size="9" fill="#e84393">预测 vs 真实反馈</text>
+
+            <line x1="85" y1="120" x2="85" y2="65" stroke="#636e72" stroke-width="1" stroke-dasharray="4" marker-end="url(#arrow)"/>
+        </svg>
+        <div class="diagram-caption">图3：世界模型将思考与现实连接。智能体在世界模型中模拟行动后果，在真实环境中验证，从而实现接地推理。</div>
+    </div>
+
+    <h2>三、实证案例：AlphaProof</h2>
+
+    <p>Silver 和 Sutton 认为体验时代已经悄然开始——证据是 DeepMind 的 <b>AlphaProof</b>（2024 年 7 月）。AlphaProof 在国际数学奥林匹克（IMO）中获得了银牌水平，这是第一个在 IMO 中达到奖牌水平的 AI 系统。</p>
+
+    <p>AlphaProof 与传统 AI 系统的关键区别：</p>
+
+    <table>
+        <tr><th>特性</th><th>传统 LLM 数学解题</th><th>AlphaProof</th></tr>
+        <tr><td>学习方法</td><td>记忆人类解题模式</td><td>在形式化证明系统中交互探索</td></tr>
+        <tr><td>反馈信号</td><td>人类标注的正确/错误</td><td>形式化验证器：完全正确/不正确</td></tr>
+        <tr><td>数据来源</td><td>静态的人类数学文本</td><td>自身探索产生的证明轨迹</td></tr>
+        <tr><td>能力提升路径</td><td>需要更多人类数据</td><td>自我对弈，越强越能探索更难问题</td></tr>
+    </table>
+
+    <p>AlphaProof 最初接触了约十万个形式化证明（人类多年积累），随后通过<b>持续的自我交互学习</b>达到了前所未有的水平。这正是「体验时代」的缩影：<b>人类数据提供起点，体验数据推动超越</b>。</p>
+
+    <h2>四、与「苦教训」的血脉关系</h2>
+
+    <p>如果不理解 Sutton 2019 年的「苦教训」（The Bitter Lesson），就难以完全理解这篇论文的分量。</p>
+
+    <p>2019 年，Sutton 写道：<b>通用方法 + 算力 scaling 永远会战胜注入人类知识的方法</b>。围棋、语音识别、计算机视觉无不如此。每一次试图把人类知识编码进系统，短期内效果很好，但最终都会被暴力搜索和学习所超越。</p>
+
+    <p>2025 年的《Welcome to the Era of Experience》是苦教训的<b>自然延伸和关键修正</b>：</p>
+
+    <ul>
+        <li><b>延伸</b>：继续强调 scaling 的重要性——但这次 scaling 的对象不再是模型参数或静态数据，而是<b>体验数据</b>的规模和质量</li>
+        <li><b>修正</b>：明确指出<b>当前的 LLM 并不真正满足苦教训</b>——它们通过模仿固定的人类文本学习，而不是通过自身的交互经验。真正的智能必须来自 Agent 在环境中持续学习的能力</li>
+    </ul>
+
+    <div class="callout warn">
+        <p><b>深刻洞察</b>：没有接地体验的 AI，无论多么复杂，都只是人类知识的回声室（echo chamber）。它永远无法发现人类还不知道的东西——而这正是智能的根本意义所在。</p>
+    </div>
+
+    <h2>五、挑战与展望</h2>
+
+    <p>Silver 和 Sutton 并不回避体验时代的重大挑战：</p>
+
+    <h3>Sim2Real 鸿沟</h3>
+    <p>之前的强化学习在游戏中取得了惊人成就（AlphaGo、StarCraft II、Dota 2），但始终未能有效跨越从模拟到现实的鸿沟。在真实世界中，环境是部分已知、充满噪声、不断变化的。</p>
+
+    <h3>安全性</h3>
+    <p>一个在长时间尺度上自主行动的智能体，如果奖励函数设计不当，可能产生不可预测的行为。Silver 和 Sutton 承认了这一点：AI 系统可能因为追求错误指标而产生意想不到的后果。</p>
+
+    <h3>可解释性</h3>
+    <p>如果智能体发展出非人类的推理方式，人类可能越来越难以理解它们的决策过程。这是安全性和信任度方面的根本挑战。</p>
+
+    <h3>经济影响</h3>
+    <p>当智能体能够生成海量经验数据、自主优化自身能力时，劳动力市场、产业结构将面临深远变革。</p>
+
+    <h2>六、为什么这篇文章重要</h2>
+
+    <p>这不是一篇技术论文。这是一篇<b>宣言</b>——来自两位深度学习时代最有影响力的思想者。它试图定义 AI 的下一个十年应该做什么。</p>
+
+    <p>如果你只记住三件事：</p>
+
+    <ol>
+        <li><b>人类数据的天花板已到</b>。AI 的下一步发展不能靠消耗更多互联网文本——需要智能体从自身交互中生成体验数据</li>
+        <li><b>体验数据遵循缩放定律</b>。智能体在环境中通过交互学习的能力是可测量、可预测、可优化的，就像预训练阶段的 scaling law 一样</li>
+        <li><b>AI 不需要像人类一样思考</b>。接地到真实世界的推理可以发展出超越人类认知模式的新形式——这是通往真正通用智能的关键</li>
+    </ol>
+
+    <div class="callout success">
+        <p><b>一句话总结</b>：当我们停止教 AI 人类知道的东西，让它自己去经历世界——真正的通用智能才可能开始。</p>
+    </div>
+
+    <hr style="margin: 2rem 0;">
+
+    <h2>参考文献</h2>
+    <ol class="ref">
+        <li>Silver, D. & Sutton, R.S. (2025). <i>Welcome to the Era of Experience</i>. MIT Press (待出版). <a href="https://storage.googleapis.com/deepmind-media/Era-of-Experience%20/The%20Era%20of%20Experience%20Paper.pdf">PDF 链接</a></li>
+        <li>Sutton, R.S. (2019). <i>The Bitter Lesson</i>. <a href="http://www.incompleteideas.net/IncIdeas/BitterLesson.html">http://www.incompleteideas.net/IncIdeas/BitterLesson.html</a></li>
+        <li>Silver, D. et al. (2021). <i>Reward is Sufficient</i>. arXiv:2102.03897.</li>
+        <li>DeepMind (2024). <i>AlphaProof: AI achieves silver-medal standard in International Mathematical Olympiad</i>.</li>
+        <li>Sutton, R.S. & Barto, A.G. (2018). <i>Reinforcement Learning: An Introduction</i>. 2nd ed., MIT Press.</li>
+    </ol>
+
+    <footer>&copy; 2026 Ha2fde</footer>
+</div>
+</body>
+</html>

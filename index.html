@@ -43,6 +43,7 @@
         }
         .post-cat.agent { background: #eef6ff; color: #0984e3; }
         .post-cat.milestone { background: #fff3e0; color: #e67e22; }
+        .post-cat.paper { background: #fff9e6; color: #d4a017; }
         .post-thumb {
             width: 100px; height: 100px; border-radius: 8px; flex-shrink: 0;
             display: flex; align-items: center; justify-content: center;
@@ -71,6 +72,7 @@
             <div class="tab active" data-tab="all" onclick="filterPosts('all')">全部</div>
             <div class="tab" data-tab="agent" onclick="filterPosts('agent')">AI Agent 技术研究</div>
             <div class="tab" data-tab="milestone" onclick="filterPosts('milestone')">AGI 里程碑追踪</div>
+            <div class="tab" data-tab="paper" onclick="filterPosts('paper')">经典论文解读</div>
         </div>
 
         <div class="post" data-category="agent">
@@ -80,6 +82,16 @@
                 <div class="post-title"><a href="posts/agent-agi-scaling.html">Agent 到 AGI：数据、缩放与范式跃迁</a></div>
                 <div class="post-meta">2026-07-27 · 约 30 分钟</div>
                 <div class="post-desc">从 smolagents 架构图出发的一场深度思辨，对照 Sutton 苦教训、EdgeBench 缩放定律、Orca 世界模型等 2026 年前沿研究，重新审视 AI Agent 在通往 AGI 道路上的真实角色。涵盖 Agent 成熟度评估、关键里程碑、数据价值、缩放定律、"预测下一个状态" 作为下一个预训练目标等核心论证。</div>
+            </div>
+        </div>
+
+        <div class="post" data-category="paper">
+            <div class="post-thumb" style="background:#ffeaa7;">📜</div>
+            <div class="post-content">
+                <div class="post-cat paper">经典论文解读</div>
+                <div class="post-title"><a href="posts/era-of-experience.html">体验时代：Silver &amp; Sutton 谈 AI 的下一次跃迁</a></div>
+                <div class="post-meta">2026-07-27 · 约 20 分钟</div>
+                <div class="post-desc">AlphaGo 缔造者 David Silver 与强化学习教父 Richard Sutton 在 2025 年发表的里程碑式宣言。本文系统解读他们提出的 AI 三时代划分（仿真时代→人类数据时代→体验时代）、四个突破维度（体验流、观察与行动、奖励、推理与规划），以及 AlphaProof 如何标志体验时代的到来。</div>
             </div>
         </div>
 
