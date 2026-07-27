@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agent 与 AGI：数据、缩放定律与下一个「预测下一个词」</title>
+    <title>Agent 与 AGI：数据、缩放定律与下一阶段</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -56,11 +56,15 @@
 <body>
 <div class="container">
     <header><a href="../index.html">← 返回首页</a></header>
-    <h1>Agent 与 AGI：数据、缩放定律与下一个「预测下一个词」</h1>
+    <h1>Agent 与 AGI：数据、缩放定律与下一阶段</h1>
     <div class="meta">2026-07-27 · 约 30 分钟</div>
 
-    <p>2026 年中，AI Agent 已从 2024 年的概念泡沫进入生产就绪的早期阶段。然而一个根本问题始终悬而未决：<b>Agent 技术到底在通向 AGI（通用人工智能）的道路上扮演什么角色？</b> 本文从 smolagents 架构图出发，对照 Sutton 的「苦教训」、EdgeBench 缩放定律、Orca 世界模型等 2025–2026 年学术界和工业界最新研究发现，系统性地梳理这一问题的答案。</p>
-    <p>核心问题只有一个：<b>AI Agent 技术到底在通向 AGI 的道路上扮演什么角色？</b></p>
+    <div class="callout info">
+        <p><b>导读</b>：本文系统梳理 AI Agent 技术在通往 AGI 道路上的真实角色。覆盖四项核心论证——架构价值、交互轨迹数据、环境缩放定律、从「预测下一个词」到「预测下一个状态」的范式跃迁——并与 Tesla FSD、AlphaGo Zero 等经典案例对比分析。</p>
+        <p>各节相对独立，可选择感兴趣的部分阅读。</p>
+    </div>
+
+    <p>2026 年中，AI Agent 已从 2024 年的概念泡沫进入生产就绪的早期阶段。然而一个根本问题始终悬而未决：<b>Agent 技术到底在通向 AGI 的道路上扮演什么角色？</b> 本文从 smolagents 架构图出发，对照 Sutton「苦教训」、EdgeBench 缩放定律、Orca 世界模型等最新研究发现，系统性地梳理这一问题的答案。</p>
 
     <h2>一、Agent 技术的当前成熟度</h2>
 
