@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InstructGPT：RLHF 如何让语言模型学会听人话</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif;
+            background: #f8f9fa; color: #333; line-height: 1.8;
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem; }
+        header { padding: 2rem 0; border-bottom: 1px solid #eee; margin-bottom: 2rem; }
+        header a { color: #3498db; text-decoration: none; }
+        header a:hover { text-decoration: underline; }
+        h1 { font-size: 1.8rem; line-height: 1.4; margin-bottom: 0.8rem; }
+        .meta { color: #999; font-size: 0.9rem; margin-bottom: 2rem; }
+        h2 { font-size: 1.3rem; margin: 2rem 0 0.8rem; color: #1a1a2e; border-left: 4px solid #0984e3; padding-left: 0.8rem; }
+        h3 { font-size: 1.1rem; margin: 1.5rem 0 0.6rem; color: #2d3436; }
+        p { margin: 0.8rem 0; }
+        blockquote {
+            border-left: 3px solid #0984e3; margin: 1rem 0; padding: 0.5rem 1rem;
+            background: #f1f8ff; color: #2d3436;
+        }
+        blockquote cite { display: block; margin-top: 0.3rem; font-size: 0.85rem; color: #666; }
+        ul, ol { margin: 0.8rem 0; padding-left: 1.5rem; }
+        li { margin: 0.4rem 0; }
+        pre {
+            background: #2d3436; color: #dfe6e9; padding: 1rem; border-radius: 6px;
+            overflow-x: auto; font-size: 0.85rem; margin: 1rem 0;
+        }
+        code { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+        p code { background: #eee; padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.9rem; }
+        .callout {
+            padding: 1rem; border-radius: 6px; margin: 1rem 0;
+            border-left: 4px solid;
+        }
+        .callout.info { background: #eef6ff; border-color: #0984e3; }
+        .callout.warn { background: #fff3e0; border-color: #e67e22; }
+        .callout.success { background: #e6ffe6; border-color: #27ae60; }
+        table {
+            width: 100%; border-collapse: collapse; margin: 1rem 0;
+        }
+        th, td {
+            padding: 0.5rem 0.8rem; border: 1px solid #dfe6e9; text-align: left;
+        }
+        th { background: #f1f8ff; font-weight: 600; }
+        .ref { font-size: 0.85rem; color: #666; }
+        footer { text-align: center; padding: 3rem 0 1rem; color: #999; font-size: 0.85rem; }
+        .diagram {
+            background: #fff; border: 1px solid #dfe6e9; border-radius: 8px;
+            padding: 1.5rem; margin: 1.5rem 0; text-align: center;
+        }
+        .diagram svg { max-width: 100%; height: auto; }
+        .diagram-caption { font-size: 0.85rem; color: #666; margin-top: 0.5rem; }
+        @media (max-width: 600px) {
+            .container { padding: 1rem; }
+            h1 { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header><a href="../index.html">← 返回首页</a></header>
+    <h1>InstructGPT：RLHF 如何让语言模型学会听人话</h1>
+    <div class="meta">2026-07-27 · 约 18 分钟</div>
+
+    <p>2022 年 3 月，OpenAI 发表了一篇注定改变 AI 历史进程的论文：<b>《Training language models to follow instructions with human feedback》</b>（InstructGPT / RLHF）。这篇论文的方法后来成为 <b>ChatGPT</b> 的核心技术基础，并催生了整个「AI Alignment」（AI 对齐）研究领域。</p>
+
+    <p>论文的核心发现令人震惊：<b>一个 13 亿参数（1.3B）的模型，经过人类反馈微调后，在按指令完成任务方面超过了 1750 亿参数（175B）的原始 GPT-3</b>——参数少了 100 倍，但结果更好。</p>
+
+    <div class="diagram">
+        <svg viewBox="0 0 650 220" xmlns="http://www.w3.org/2000/svg" style="font-family: -apple-system, sans-serif;">
+            <defs>
+                <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#0984e3"/>
+                </marker>
+            </defs>
+            <text x="325" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="#2d3436">核心结果：1.3B InstructGPT vs 175B GPT-3</text>
+
+            <rect x="50" y="55" width="220" height="120" rx="10" fill="#74b9ff" stroke="#0984e3" stroke-width="2"/>
+            <text x="160" y="85" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">GPT-3 175B</text>
+            <text x="160" y="108" text-anchor="middle" font-size="11" fill="#dfe6e9">原始语言模型</text>
+            <text x="160" y="130" text-anchor="middle" font-size="11" fill="#dfe6e9">预测下一个 token</text>
+            <text x="160" y="150" text-anchor="middle" font-size="11" fill="#dfe6e9">不会按要求回答问题</text>
+
+            <text x="295" y="115" font-size="28" fill="#e84393">&gt;</text>
+
+            <rect x="340" y="55" width="260" height="120" rx="10" fill="#55efc4" stroke="#00b894" stroke-width="2"/>
+            <text x="470" y="85" text-anchor="middle" font-size="14" font-weight="bold" fill="#fff">InstructGPT 1.3B</text>
+            <text x="470" y="108" text-anchor="middle" font-size="11" fill="#636e72">参数少 100 倍</text>
+            <text x="470" y="130" text-anchor="middle" font-size="11" fill="#636e72">经 RLHF 微调</text>
+            <text x="470" y="150" text-anchor="middle" font-size="11" fill="#636e72">人类评估中胜出</text>
+
+            <line x1="160" y1="175" x2="470" y2="175" stroke="#e84393" stroke-width="2" stroke-dasharray="6"/>
+            <text x="315" y="195" text-anchor="middle" font-size="11" fill="#e84393">人类偏好评估：InstructGPT 明显更优</text>
+        </svg>
+        <div class="diagram-caption">图1：InstructGPT 的关键结论。来源：Ouyang et al. (2022)</div>
+    </div>
+
+    <h2>一、背景：大模型并不听你的话</h2>
+
+    <p>2022 年初，GPT-3 已经被广泛使用。它擅长写文章、翻译、生成代码，但有一个致命问题：<b>它不按你的指令做事</b>。你问它「请用一句话总结这篇文章」，它可能写成三段。你让它「用中文回答」，它可能开始用法语输出。</p>
+
+    <p>根本原因在于：GPT-3 的训练目标是<b>「预测下一个 token」</b>——从一个巨大的互联网文本语料中学习。这个目标和「帮助、诚实、无害地服从人类指令」之间存在着根本的<b>不一致（misalignment）</b>。</p>
+
+    <blockquote>
+        把语言模型变大并不会让它天生更擅长遵循用户意图。
+        <cite>— Ouyang et al., 2022, InstructGPT 论文开篇</cite>
+    </blockquote>
+
+    <p>论文的作者团队集结了当时 OpenAI 的顶级研究者：Long Ouyang、Jeff Wu、Paul Christiano（RLHF 的发明者）、Jan Leike（后来领导 Anthropic 对齐团队）、John Schulman（PPO 算法发明者）等 20 人。</p>
+
+    <h2>二、三步法：RLHF 训练流程</h2>
+
+    <p>InstructGPT 的核心技术是 <b>RLHF（Reinforcement Learning from Human Feedback，基于人类反馈的强化学习）</b>。这项工作建立在 Christiano et al. (2017) 的基础上，并将其首次扩展到大规模语言模型。</p>
+
+    <p>RLHF 分为三个步骤：</p>
+
+    <div class="diagram">
+        <svg viewBox="0 0 700 380" xmlns="http://www.w3.org/2000/svg" style="font-family: -apple-system, sans-serif;">
+            <defs>
+                <marker id="arrow2" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#636e72"/>
+                </marker>
+                <linearGradient id="step1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#74b9ff"/><stop offset="1" stop-color="#0984e3"/></linearGradient>
+                <linearGradient id="step2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a29bfe"/><stop offset="1" stop-color="#6c5ce7"/></linearGradient>
+                <linearGradient id="step3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fd79a8"/><stop offset="1" stop-color="#e84393"/></linearGradient>
+            </defs>
+            <text x="350" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="#2d3436">RLHF 三阶段流程</text>
+
+            <rect x="40" y="55" width="190" height="130" rx="10" fill="url(#step1)"/>
+            <text x="135" y="82" text-anchor="middle" font-size="24" fill="#fff">① SFT</text>
+            <text x="135" y="107" text-anchor="middle" font-size="13" fill="#dfe6e9">监督微调</text>
+            <text x="135" y="130" text-anchor="middle" font-size="11" fill="#dfe6e9">人类标注理想输出</text>
+            <text x="135" y="148" text-anchor="middle" font-size="11" fill="#81ecec">≈12,000 条提示</text>
+            <text x="135" y="165" text-anchor="middle" font-size="11" fill="#81ecec">GPT-3 → GPT-3-SFT</text>
+
+            <line x1="230" y1="120" x2="260" y2="120" stroke="#636e72" stroke-width="2" marker-end="url(#arrow2)"/>
+
+            <rect x="265" y="55" width="190" height="130" rx="10" fill="url(#step2)"/>
+            <text x="360" y="82" text-anchor="middle" font-size="24" fill="#fff">② RM</text>
+            <text x="360" y="107" text-anchor="middle" font-size="13" fill="#dfe6e9">奖励模型训练</text>
+            <text x="360" y="130" text-anchor="middle" font-size="11" fill="#dfe6e9">人类排序模型输出</text>
+            <text x="360" y="148" text-anchor="middle" font-size="11" fill="#81ecec">≈33,000 条比较</text>
+            <text x="360" y="165" text-anchor="middle" font-size="11" fill="#81ecec">学习预测人类偏好</text>
+
+            <line x1="455" y1="120" x2="485" y2="120" stroke="#636e72" stroke-width="2" marker-end="url(#arrow2)"/>
+
+            <rect x="490" y="55" width="190" height="130" rx="10" fill="url(#step3)"/>
+            <text x="585" y="82" text-anchor="middle" font-size="24" fill="#fff">③ PPO</text>
+            <text x="585" y="107" text-anchor="middle" font-size="13" fill="#dfe6e9">强化学习优化</text>
+            <text x="585" y="130" text-anchor="middle" font-size="11" fill="#dfe6e9">以 RM 为奖励信号</text>
+            <text x="585" y="148" text-anchor="middle" font-size="11" fill="#81ecec">PPO 算法优化策略</text>
+            <text x="585" y="165" text-anchor="middle" font-size="11" fill="#81ecec">KL 惩罚防过拟合</text>
+
+            <text x="350" y="220" text-anchor="middle" font-size="11" fill="#0984e3">40 名标注员 · 来自 OpenAI API 的真实用户提示</text>
+
+            <rect x="100" y="245" width="500" height="110" rx="8" fill="#fff" stroke="#dfe6e9" stroke-width="1.5"/>
+            <text x="350" y="270" text-anchor="middle" font-size="12" font-weight="bold" fill="#2d3436">数据规模</text>
+            <text x="120" y="295" font-size="11" fill="#636e72">SFT 标注：约 12,000 条提示，含标注员编写 + API 真实用户提交</text>
+            <text x="120" y="315" font-size="11" fill="#636e72">RM 标注：约 33,000 条比较，覆盖更广泛的提示分布</text>
+            <text x="120" y="335" font-size="11" fill="#636e72">PPO 训练：使用 RM 评分，同时约束与 SFT 模型的 KL 散度</text>
+        </svg>
+        <div class="diagram-caption">图2：RLHF 三阶段流程。基于 InstructGPT 论文 Figure 2 改编。</div>
+    </div>
+
+    <h3>第一步：监督微调（SFT）</h3>
+    <p>研究人员首先收集了一组<b>标注员编写的示范数据</b>：给定一个用户提示（prompt），标注员写出理想的模型回复。共有约 12,000 条提示，其中一部分来自标注员自己编写，另一部分来自 OpenAI API 的真实用户提交（经匿名化处理）。</p>
+    <p>用这些数据对 GPT-3 进行<b>监督微调</b>，得到 GPT-3-SFT。这一步的目的是让模型初步学会「什么样的回复是好的」。</p>
+
+    <h3>第二步：训练奖励模型（Reward Model / RM）</h3>
+    <p>这一步需要做<b>比较</b>而非<b>生成</b>。标注员看到同一个提示的多个模型输出，然后按质量排序。共收集了约 33,000 条比较数据。</p>
+    <p>用这些数据训练一个<b>奖励模型</b>——它的任务不再是输出文本，而是给任何一段模型回复打分。分数越高，表示人类越可能偏好这个回复。</p>
+
+    <div class="callout info">
+        <p><b>为什么用比较而非打分？</b> 给两段文本排序比给一个绝对分数容易得多，也一致得多。排名数据可以用 Bradley-Terry 模型建模，将人类偏好转化为可优化的奖励函数。</p>
+    </div>
+
+    <h3>第三步：强化学习优化（PPO）</h3>
+    <p>最后一步是结合前两步的成果。将 SFT 模型作为<b>策略（policy）</b>，以奖励模型的评分作为<b>奖励信号</b>，使用 <b>PPO（Proximal Policy Optimization）</b>算法进行强化学习。</p>
+    <p>关键细节：为了防止模型「钻空子」——即找到让奖励模型高分但实际质量很差的方法——训练目标中加入了 <b>KL 散度惩罚</b>，确保策略模型不会偏离 SFT 模型太远。</p>
+
+    <h2>三、核心发现</h2>
+
+    <h3>3.1 1.3B &gt; 175B</h3>
+    <p>这是论文最引人注目的结果。在人类评估中，<b>1.3B 参数的 InstructGPT 模型在各种任务上的表现超过了 175B 的原始 GPT-3</b>——尽管参数少了 100 倍。</p>
+    <p>这意味着：对齐方法（alignment）可以在很大程度上弥补规模的不足。模型不是越大越好，<b>教会模型听指令</b>比简单地增大模型更有效。</p>
+
+    <h3>3.2 真实性提升</h3>
+    <p>InstructGPT 在 TruthfulQA 数据集上的表现明显优于 GPT-3。模型减少了「幻觉」（hallucination）——即编造不存在的事实。在封闭域任务中，InstructGPT 编造信息的倾向显著降低。</p>
+
+    <h3>3.3 毒性降低</h3>
+    <p>在 RealToxicityPrompts 等基准测试中，InstructGPT 生成有毒内容的概率大幅下降。当用户提出恶意或有害的请求时，模型学会了更恰当（但仍然有用）的回应方式。</p>
+
+    <div class="callout success">
+        <p><b>关键数据</b>：InstructGPT 的 SFT 数据仅约 12,000 条提示，RM 数据约 33,000 条比较——这对于训练一个 175B 级别的模型来说，数据量极小。这说明<b>少量高质量的人类反馈就足以显著改善模型行为</b>。</p>
+    </div>
+
+    <h2>四、局限与反思</h2>
+
+    <p>论文本身也非常坦诚地讨论了 RLHF 的局限：</p>
+
+    <h3>标注员偏见</h3>
+    <p>模型对齐的是<b>40 名标注员的偏好</b>，而非全人类的价值观。标注员的背景、文化和教育程度会影响模型的行为。这个「谁的对齐」的问题至今仍是开放挑战。</p>
+
+    <h3>任务退化</h3>
+    <p>InstructGPT 在某些公开 NLP 基准（如 SQuAD 问答）上的表现略有下降。RLHF 可能以牺牲模型在某些任务上的多样性或创造性为代价，换取更好的指令遵循能力。</p>
+
+    <h3>简单错误仍然存在</h3>
+    <p>论文坦率地承认：「InstructGPT 仍然会犯简单的错误。」模型仍然可能误解指令、编造事实、或产生有害内容。RLHF 不是万能的。</p>
+
+    <h2>五、RLHF 的前世今生</h2>
+
+    <p>InstructGPT 不是凭空出现的。它站在一系列关键工作的肩膀上：</p>
+
+    <table>
+        <tr><th>年份</th><th>工作</th><th>贡献</th></tr>
+        <tr><td>2017</td><td>Christiano et al. — Deep RL from Human Preferences</td><td>首次提出用人类偏好反馈训练深度强化学习，在 Atari 和机器人任务上验证</td></tr>
+        <tr><td>2020</td><td>Stiennon et al. — Learning to Summarize with Human Feedback</td><td>将 RLHF 应用于文本摘要任务</td></tr>
+        <tr><td><b>2022</b></td><td><b>Ouyang et al. — InstructGPT</b></td><td><b>将 RLHF 推广到大规模语言模型指令遵循</b></td></tr>
+        <tr><td>2022</td><td>Anthropic — Constitutional AI</td><td>用 AI 反馈代替部分人类反馈，提高可扩展性</td></tr>
+        <tr><td>2023</td><td>Rafailov et al. — DPO</td><td>直接偏好优化，简化 RLHF 的复杂流程</td></tr>
+    </table>
+
+    <h2>六、深远影响</h2>
+
+    <p>InstructGPT 这篇论文的影响怎么强调都不为过：</p>
+
+    <ol>
+        <li><b>ChatGPT 的技术基石</b>：2022 年 11 月发布的 ChatGPT 直接在 InstructGPT 的 RLHF 方法上构建</li>
+        <li><b>开启了 AI 对齐研究</b>：RLHF 成为此后几乎所有主流大模型（GPT-4、Claude、Gemini、Llama）的标准配置</li>
+        <li><b>改变了 AI 研究范式</b>：从「模型能做多难的任务」转向「模型是否按用户意图行事」</li>
+        <li><b>带动了后续创新</b>：Constitutional AI、DPO、GRPO、KTO 等数百篇对齐方法论文应运而生</li>
+    </ol>
+
+    <div class="callout warn">
+        <p><b>展望</b>：2026 年的今天，RLHF 仍然是 AI 对齐的黄金标准。但对齐领域的核心挑战依然存在——如何确保模型不只是「表面服从」，而是真正理解人类的深层意图？这是留给下一代研究者的关键问题。</p>
+    </div>
+
+    <hr style="margin: 2rem 0;">
+
+    <h2>参考文献</h2>
+    <ol class="ref">
+        <li>Ouyang, L. et al. (2022). <i>Training language models to follow instructions with human feedback</i>. arXiv:2203.02155. <a href="https://arxiv.org/abs/2203.02155">https://arxiv.org/abs/2203.02155</a></li>
+        <li>Christiano, P. et al. (2017). <i>Deep reinforcement learning from human preferences</i>. NeurIPS 2017. arXiv:1706.03741.</li>
+        <li>Stiennon, N. et al. (2020). <i>Learning to summarize with human feedback</i>. NeurIPS 2020.</li>
+        <li>Bai, Y. et al. (2022). <i>Constitutional AI: Harmlessness from AI Feedback</i>. arXiv:2212.08073.</li>
+        <li>Rafailov, R. et al. (2023). <i>Direct Preference Optimization</i>. NeurIPS 2023. arXiv:2305.18290.</li>
+        <li>Askell, A. et al. (2021). <i>A general language assistant as a laboratory for alignment</i>. arXiv:2112.00861.</li>
+    </ol>
+
+    <footer>&copy; 2026 Ha2fde</footer>
+</div>
+</body>
+</html>
