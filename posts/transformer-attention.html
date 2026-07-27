@@ -167,29 +167,34 @@ PE(pos, 2i+1) = cos(pos / 10000^(2i/d_model))</pre>
 
     <p>更大的突破在于：<b>Transformer 可以在 GPU 上完全并行训练</b>，这使得扩展到更大的数据、更大的模型成为可能。</p>
 
-    <h2>五、Transformer 的两条分支</h2>
+    <h2>五、Transformer 的三条分支</h2>
 
-    <p>Transformer 架构的妙处在于它的通用性。此后整个 LLM 领域沿着两条分支发展：</p>
+    <p>Transformer 架构的妙处在于它的通用性。此后整个 LLM 领域沿着三条分支发展：</p>
 
     <div class="diagram">
-        <svg viewBox="0 0 640 190" xmlns="http://www.w3.org/2000/svg" style="font-family: -apple-system, sans-serif;">
-            <rect x="220" y="15" width="200" height="50" rx="10" fill="#0984e3"/>
-            <text x="320" y="46" text-anchor="middle" font-size="15" font-weight="bold" fill="#fff">Transformer (2017)</text>
+        <svg viewBox="0 0 620 200" xmlns="http://www.w3.org/2000/svg" style="font-family: -apple-system, sans-serif;">
+            <rect x="210" y="15" width="200" height="45" rx="10" fill="#0984e3"/>
+            <text x="310" y="43" text-anchor="middle" font-size="15" font-weight="bold" fill="#fff">Transformer (2017)</text>
 
-            <line x1="270" y1="65" x2="150" y2="95" stroke="#636e72" stroke-width="2"/>
-            <line x1="370" y1="65" x2="490" y2="95" stroke="#636e72" stroke-width="2"/>
+            <line x1="250" y1="60" x2="100" y2="85" stroke="#636e72" stroke-width="2"/>
+            <line x1="310" y1="60" x2="310" y2="85" stroke="#636e72" stroke-width="2"/>
+            <line x1="370" y1="60" x2="520" y2="85" stroke="#636e72" stroke-width="2"/>
 
-            <rect x="30" y="95" width="200" height="50" rx="8" fill="#55efc4"/>
-            <text x="130" y="120" text-anchor="middle" font-size="13" font-weight="bold" fill="#2d3436">分支一：Encoder <b>+</b> Decoder</text>
-            <text x="130" y="138" text-anchor="middle" font-size="10" fill="#636e72">BERT → T5 → 理解类任务</text>
+            <rect x="10" y="90" width="180" height="55" rx="8" fill="#55efc4"/>
+            <text x="100" y="113" text-anchor="middle" font-size="13" font-weight="bold" fill="#2d3436">Encoder-Decoder</text>
+            <text x="100" y="133" text-anchor="middle" font-size="10" fill="#636e72">T5、BART</text>
 
-            <rect x="410" y="95" width="200" height="50" rx="8" fill="#fdcb6e"/>
-            <text x="510" y="120" text-anchor="middle" font-size="13" font-weight="bold" fill="#2d3436">分支二：Decoder Only</text>
-            <text x="510" y="138" text-anchor="middle" font-size="10" fill="#636e72">GPT-1/2/3/4 → 生成类任务 → ChatGPT</text>
+            <rect x="220" y="90" width="180" height="55" rx="8" fill="#74b9ff"/>
+            <text x="310" y="113" text-anchor="middle" font-size="13" font-weight="bold" fill="#fff">Encoder Only</text>
+            <text x="310" y="133" text-anchor="middle" font-size="10" fill="#dfe6e9">BERT、RoBERTa</text>
 
-            <text x="320" y="178" text-anchor="middle" font-size="10" fill="#636e72">GPT 选择了 Decoder Only 路线，因为自回归生成 = 穷尽一切的下一个词预测</text>
+            <rect x="430" y="90" width="180" height="55" rx="8" fill="#fdcb6e"/>
+            <text x="520" y="113" text-anchor="middle" font-size="13" font-weight="bold" fill="#2d3436">Decoder Only</text>
+            <text x="520" y="133" text-anchor="middle" font-size="10" fill="#636e72">GPT-1/2/3/4、LLaMA</text>
+
+            <text x="310" y="188" text-anchor="middle" font-size="10" fill="#636e72">三条路线各有侧重，Decoder Only 最终胜出成为 LLM 主流架构</text>
         </svg>
-        <div class="diagram-caption">图2：Transformer 的两条发展分支。GPT 选择了 Decoder Only 路线。</div>
+        <div class="diagram-caption">图2：Transformer 的三条发展分支。Encoder-Decoder 延续原始设计，Encoder Only 专注理解（BERT），Decoder Only 专注生成（GPT）并最终胜出。</div>
     </div>
 
     <h2>六、为什么这篇文章如此重要</h2>
