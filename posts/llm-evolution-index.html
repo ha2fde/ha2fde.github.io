@@ -124,6 +124,44 @@
         }
         .paper-link { font-family: 'SF Mono', 'Fira Code', monospace; }
 
+        /* paper table */
+        .paper-table { width: 100%; border-collapse: collapse; margin: 0.5rem 0 1.5rem; }
+        .paper-table th {
+            font-size: 0.75rem; color: #636e72; font-weight: 600;
+            text-align: left; padding: 0.4rem 0.6rem;
+            border-bottom: 2px solid #dcd3cc;
+        }
+        .paper-table td {
+            font-size: 0.8rem; padding: 0.55rem 0.6rem;
+            border-bottom: 1px solid #ede5dd; vertical-align: top;
+            line-height: 1.5;
+        }
+        .paper-table tr:hover td { background: #ede5dd; }
+        .paper-table .col-num { width: 2rem; text-align: center; color: #636e72; font-weight: 600; }
+        .paper-table .col-title { min-width: 180px; }
+        .paper-table .col-title a { color: #0984e3; text-decoration: none; font-weight: 600; }
+        .paper-table .col-title a:hover { text-decoration: underline; }
+        .paper-table .col-authors { color: #636e72; font-size: 0.78rem; }
+        .paper-table .col-venue {
+            font-size: 0.7rem; background: #f0e6ff; color: #6c5ce7;
+            padding: 0.1rem 0.45rem; border-radius: 3px; font-weight: 600;
+            white-space: nowrap;
+        }
+        .paper-table .col-year {
+            font-size: 0.7rem; background: #dfe6e9; color: #636e72;
+            padding: 0.1rem 0.45rem; border-radius: 3px; font-weight: 600;
+            white-space: nowrap;
+        }
+        .paper-table .col-link { font-size: 0.7rem; }
+        .paper-table .col-link a { color: #b2bec3; text-decoration: none; font-family: 'SF Mono', 'Fira Code', monospace; }
+        .paper-table .col-link a:hover { color: #0984e3; }
+        .paper-table .row-product td { background: #fafafa; }
+        .paper-table .row-product:hover td { background: #ede5dd; }
+        .paper-table .prod-badge {
+            font-size: 0.65rem; background: #b2bec3; color: #fff;
+            padding: 0.1rem 0.4rem; border-radius: 3px; font-weight: 600;
+        }
+
         .toc-footer {
             text-align: center; padding: 2rem 0; color: #b2bec3;
             font-size: 0.85rem; border-top: 1px solid #dcd3cc; margin-top: 1rem;
@@ -257,109 +295,92 @@
         <h2>📄 核心论文清单 <span class="part-label" style="background:#fce4ec;color:#e84393;">按时间排序</span></h2>
 
         <div style="font-size:0.85rem;color:#636e72;margin:0.5rem 0 1rem;line-height:1.6;">
-            本系列围绕以下关键论文和产品展开，按时间排列如下：<br>
-            <span style="font-size:0.75rem;color:#b2bec3;">💡 点击标题可跳转到对应解读文章</span>
+            本系列围绕以下关键论文和产品展开，点击标题跳转到解读文章
         </div>
 
-        <div class="paper-entry">
-            <div class="paper-num">①</div>
-            <div class="paper-info">
-                <div class="paper-title"><a href="transformer-attention.html">Attention Is All You Need</a></div>
-                <div class="paper-authors">Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A.N., Kaiser, L., Polosukhin, I.</div>
-                <div class="paper-meta"><span class="venue">NeurIPS 2017</span><span class="tag-y">2017.06</span></div>
-                <div class="paper-link">arXiv:1706.03762</div>
-            </div>
-        </div>
-
-        <div class="paper-entry">
-            <div class="paper-num">②</div>
-            <div class="paper-info">
-                <div class="paper-title"><a href="gpt1-pretrain-finetune.html">Improving Language Understanding by Generative Pre-Training</a></div>
-                <div class="paper-authors">Radford, A., Narasimhan, K., Salimans, T., Sutskever, I.</div>
-                <div class="paper-meta"><span class="venue">OpenAI</span><span class="tag-y">2018.06</span></div>
-                <div class="paper-desc">GPT-1 · 1.17 亿参数，预训练 + 微调框架</div>
-            </div>
-        </div>
-
-        <div class="paper-entry">
-            <div class="paper-num">③</div>
-            <div class="paper-info">
-                <div class="paper-title"><a href="gpt2-zero-shot.html">Language Models are Unsupervised Multitask Learners</a></div>
-                <div class="paper-authors">Radford, A., Wu, J., Child, R., Luan, D., Amodei, D., Sutskever, I.</div>
-                <div class="paper-meta"><span class="venue">OpenAI</span><span class="tag-y">2019.02</span></div>
-                <div class="paper-desc">GPT-2 · 15 亿参数，零样本能力被发现</div>
-            </div>
-        </div>
-
-        <div class="paper-entry">
-            <div class="paper-num">④</div>
-            <div class="paper-info">
-                <div class="paper-title"><a href="gpt3-few-shot.html">Language Models are Few-Shot Learners</a></div>
-                <div class="paper-authors">Brown, T.B., Mann, B., Ryder, N., Subbiah, M., Kaplan, J., Dhariwal, P. et al.</div>
-                <div class="paper-meta"><span class="venue">NeurIPS 2020</span><span class="tag-y">2020.05</span></div>
-                <div class="paper-link">arXiv:2005.14165</div>
-            </div>
-        </div>
-
-        <div class="paper-entry">
-            <div class="paper-num">⑤</div>
-            <div class="paper-info">
-                <div class="paper-title"><a href="chain-of-thought.html">Chain-of-Thought Prompting Elicits Reasoning in Large Language Models</a></div>
-                <div class="paper-authors">Wei, J., Wang, X., Schuurmans, D., Bosma, M., Ichter, B., Xia, F., Chi, E., Le, Q., Zhou, D.</div>
-                <div class="paper-meta"><span class="venue">NeurIPS 2022</span><span class="tag-y">2022.01</span></div>
-                <div class="paper-link">arXiv:2201.11903</div>
-            </div>
-        </div>
-
-        <div class="paper-entry">
-            <div class="paper-num">⑥</div>
-            <div class="paper-info">
-                <div class="paper-title"><a href="instructgpt-rlhf.html">Training language models to follow instructions with human feedback</a></div>
-                <div class="paper-authors">Ouyang, L., Wu, J., Jiang, X., Almeida, D., Wainwright, C.L., Mishkin, P. et al.</div>
-                <div class="paper-meta"><span class="venue">NeurIPS 2022</span><span class="tag-y">2022.03</span></div>
-                <div class="paper-link">arXiv:2203.02155</div>
-            </div>
-        </div>
-
-        <div class="paper-entry">
-            <div class="paper-num">⑦</div>
-            <div class="paper-info">
-                <div class="paper-title"><a href="react-agent.html">ReAct: Synergizing Reasoning and Acting in Language Models</a></div>
-                <div class="paper-authors">Yao, S., Zhao, J., Yu, D., Du, N., Shafran, I., Narasimhan, K., Cao, Y.</div>
-                <div class="paper-meta"><span class="venue">ICLR 2023</span><span class="tag-y">2022.10</span></div>
-                <div class="paper-link">arXiv:2210.03629</div>
-            </div>
-        </div>
-
-        <div class="paper-entry paper-entry-product">
-            <div class="paper-num">⑧</div>
-            <div class="paper-info">
-                <div class="paper-title"><a href="chatgpt-milestone.html">Introducing ChatGPT</a></div>
-                <div class="paper-authors">OpenAI</div>
-                <div class="paper-meta"><span class="venue">产品发布</span><span class="tag-y">2022.11</span></div>
-                <div class="paper-desc">基于 GPT-3.5 + RLHF，2 个月 1 亿用户</div>
-            </div>
-        </div>
-
-        <div class="paper-entry">
-            <div class="paper-num">⑨</div>
-            <div class="paper-info">
-                <div class="paper-title"><a href="toolformer.html">Toolformer: Language Models Can Teach Themselves to Use Tools</a></div>
-                <div class="paper-authors">Schick, T., Dwivedi-Yu, J., Dessì, R., Raileanu, R., Lomeli, M., Zettlemoyer, L., Cancedda, N., Scialom, T.</div>
-                <div class="paper-meta"><span class="venue">arXiv 2023</span><span class="tag-y">2023.02</span></div>
-                <div class="paper-link">arXiv:2302.04761</div>
-            </div>
-        </div>
-
-        <div class="paper-entry paper-entry-product">
-            <div class="paper-num">⑩</div>
-            <div class="paper-info">
-                <div class="paper-title"><a href="agent-frameworks.html">AI Agent 框架综述</a></div>
-                <div class="paper-authors">AutoGPT, LangChain, Claude Code, OpenCode, Deep Research 等</div>
-                <div class="paper-meta"><span class="venue">工程框架</span><span class="tag-y">2024+</span></div>
-                <div class="paper-desc">非单一论文，领域综合总结</div>
-            </div>
-        </div>
+        <table class="paper-table">
+            <thead>
+                <tr>
+                    <th class="col-num">#</th>
+                    <th class="col-title">论文</th>
+                    <th class="col-authors">作者</th>
+                    <th>发表</th>
+                    <th class="col-link">链接</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="col-num">①</td>
+                    <td class="col-title"><a href="transformer-attention.html">Attention Is All You Need</a></td>
+                    <td class="col-authors">Vaswani et al.</td>
+                    <td><span class="col-venue">NeurIPS 2017</span> <span class="col-year">2017.06</span></td>
+                    <td class="col-link"><a href="https://arxiv.org/abs/1706.03762">arXiv:1706.03762</a></td>
+                </tr>
+                <tr>
+                    <td class="col-num">②</td>
+                    <td class="col-title"><a href="gpt1-pretrain-finetune.html">Improving Language Understanding by Generative Pre-Training</a></td>
+                    <td class="col-authors">Radford et al.</td>
+                    <td><span class="col-venue">OpenAI</span> <span class="col-year">2018.06</span></td>
+                    <td class="col-link">—</td>
+                </tr>
+                <tr>
+                    <td class="col-num">③</td>
+                    <td class="col-title"><a href="gpt2-zero-shot.html">Language Models are Unsupervised Multitask Learners</a></td>
+                    <td class="col-authors">Radford et al.</td>
+                    <td><span class="col-venue">OpenAI</span> <span class="col-year">2019.02</span></td>
+                    <td class="col-link">—</td>
+                </tr>
+                <tr>
+                    <td class="col-num">④</td>
+                    <td class="col-title"><a href="gpt3-few-shot.html">Language Models are Few-Shot Learners</a></td>
+                    <td class="col-authors">Brown et al.</td>
+                    <td><span class="col-venue">NeurIPS 2020</span> <span class="col-year">2020.05</span></td>
+                    <td class="col-link"><a href="https://arxiv.org/abs/2005.14165">arXiv:2005.14165</a></td>
+                </tr>
+                <tr>
+                    <td class="col-num">⑤</td>
+                    <td class="col-title"><a href="chain-of-thought.html">Chain-of-Thought Prompting Elicits Reasoning in Large Language Models</a></td>
+                    <td class="col-authors">Wei et al.</td>
+                    <td><span class="col-venue">NeurIPS 2022</span> <span class="col-year">2022.01</span></td>
+                    <td class="col-link"><a href="https://arxiv.org/abs/2201.11903">arXiv:2201.11903</a></td>
+                </tr>
+                <tr>
+                    <td class="col-num">⑥</td>
+                    <td class="col-title"><a href="instructgpt-rlhf.html">Training language models to follow instructions with human feedback</a></td>
+                    <td class="col-authors">Ouyang et al.</td>
+                    <td><span class="col-venue">NeurIPS 2022</span> <span class="col-year">2022.03</span></td>
+                    <td class="col-link"><a href="https://arxiv.org/abs/2203.02155">arXiv:2203.02155</a></td>
+                </tr>
+                <tr>
+                    <td class="col-num">⑦</td>
+                    <td class="col-title"><a href="react-agent.html">ReAct: Synergizing Reasoning and Acting in Language Models</a></td>
+                    <td class="col-authors">Yao et al.</td>
+                    <td><span class="col-venue">ICLR 2023</span> <span class="col-year">2022.10</span></td>
+                    <td class="col-link"><a href="https://arxiv.org/abs/2210.03629">arXiv:2210.03629</a></td>
+                </tr>
+                <tr class="row-product">
+                    <td class="col-num">⑧</td>
+                    <td class="col-title"><a href="chatgpt-milestone.html">ChatGPT</a> <span class="prod-badge">产品</span></td>
+                    <td class="col-authors">OpenAI</td>
+                    <td><span class="col-year">2022.11</span></td>
+                    <td class="col-link">—</td>
+                </tr>
+                <tr>
+                    <td class="col-num">⑨</td>
+                    <td class="col-title"><a href="toolformer.html">Toolformer: Language Models Can Teach Themselves to Use Tools</a></td>
+                    <td class="col-authors">Schick et al.</td>
+                    <td><span class="col-venue">arXiv 2023</span> <span class="col-year">2023.02</span></td>
+                    <td class="col-link"><a href="https://arxiv.org/abs/2302.04761">arXiv:2302.04761</a></td>
+                </tr>
+                <tr class="row-product">
+                    <td class="col-num">⑩</td>
+                    <td class="col-title"><a href="agent-frameworks.html">AI Agent 框架综述</a> <span class="prod-badge">综述</span></td>
+                    <td class="col-authors">AutoGPT, LangChain, Claude Code 等</td>
+                    <td><span class="col-year">2024+</span></td>
+                    <td class="col-link">—</td>
+                </tr>
+            </tbody>
+        </table>
 
     </div>
 
