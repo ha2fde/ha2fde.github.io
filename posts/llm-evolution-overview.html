@@ -405,6 +405,22 @@
         <div class="diagram-caption">图3：完整时间线与四个跃迁阶段。阶段 ⓪（架构革命）为一切铺平道路。</div>
     </div>
 
+    <h3>两类进化：能力型 vs 引导型</h3>
+
+    <p>纵观这 10 个节点，会发现它们其实分成截然不同的<b>两类</b>：</p>
+
+    <table>
+        <tr><th></th><th>能力型（Capacity）</th><th>引导型（Scaffolding）</th></tr>
+        <tr><td><b>做了什么</b></td><td>改造模型本身——架构、参数、训练方式</td><td>改变模型的输入或交互方式，模型不变</td></tr>
+        <tr><td><b>代表节点</b></td><td>Transformer · GPT-1/2/3 · InstructGPT · Toolformer</td><td>CoT · ReAct · Agent 框架</td></tr>
+        <tr><td><b>代价</b></td><td>海量数据、算力、标注</td><td>一行 Prompt 或一个工程框架</td></tr>
+        <tr><td><b>本质</b></td><td>造更好的发动机</td><td>更好的驾驶方法</td></tr>
+    </table>
+
+    <p>这个分类揭示了一个有趣的事实：<b>最「简单」的节点（CoT、ReAct）恰恰是最重要的范式转变。</b>它们不需要改模型、不需要重新训练，却解锁了模型已有的但未被释放的能力。今天的 Agent 框架，本质上就是把 CoT（先想再答）和 ReAct（想→做→观察）做成了自动化系统。</p>
+
+    <p>换句话说：<b>LLM 的能力不仅来自参数和训练，也来自我们如何引导它们思考。</b></p>
+
     <h3>贯穿始终的核心趋势</h3>
 
     <ol>
