@@ -92,6 +92,38 @@
         .tag.part2 { background: #fff3e0; color: #e67e22; }
         .tag.part3 { background: #f0e6ff; color: #6c5ce7; }
 
+        /* paper list */
+        .paper-entry {
+            display: flex; gap: 1rem; align-items: flex-start;
+            padding: 0.7rem 0; border-bottom: 1px solid #ede5dd;
+        }
+        .paper-entry:hover { background: #ede5dd; margin: 0 -0.8rem; padding: 0.7rem 0.8rem; border-radius: 6px; }
+        .paper-entry-product { border-left: 3px solid #b2bec3; padding-left: 0.5rem; }
+        .paper-num {
+            font-size: 0.8rem; font-weight: 700; color: #636e72;
+            min-width: 2rem; padding-top: 0.15rem;
+        }
+        .paper-info { flex: 1; }
+        .paper-title { font-size: 0.95rem; font-weight: 600; }
+        .paper-title a { color: #0984e3; text-decoration: none; }
+        .paper-title a:hover { text-decoration: underline; }
+        .paper-authors {
+            font-size: 0.78rem; color: #636e72; margin-top: 0.1rem;
+        }
+        .paper-meta { margin-top: 0.25rem; }
+        .paper-meta .venue {
+            font-size: 0.7rem; background: #f0e6ff; color: #6c5ce7;
+            padding: 0.1rem 0.45rem; border-radius: 3px; font-weight: 600; margin-right: 0.5rem;
+        }
+        .paper-meta .tag-y {
+            font-size: 0.7rem; background: #dfe6e9; color: #636e72;
+            padding: 0.1rem 0.45rem; border-radius: 3px; font-weight: 600;
+        }
+        .paper-link, .paper-desc {
+            font-size: 0.78rem; color: #b2bec3; margin-top: 0.15rem;
+        }
+        .paper-link { font-family: 'SF Mono', 'Fira Code', monospace; }
+
         .toc-footer {
             text-align: center; padding: 2rem 0; color: #b2bec3;
             font-size: 0.85rem; border-top: 1px solid #dcd3cc; margin-top: 1rem;
@@ -222,6 +254,122 @@
             <div class="chapter-meta">15 min <span class="tag part3">系统</span></div>
         </div>
 
+        <h2>📄 核心论文清单 <span class="part-label" style="background:#fce4ec;color:#e84393;">按时间排序</span></h2>
+
+        <div style="font-size:0.85rem;color:#636e72;margin:0.5rem 0 1rem;line-height:1.6;">
+            本系列围绕以下关键论文和产品展开，按时间排列如下：<br>
+            <span style="font-size:0.75rem;color:#b2bec3;">💡 点击标题可跳转到对应解读文章</span>
+        </div>
+
+        <div class="paper-entry">
+            <div class="paper-num">①</div>
+            <div class="paper-info">
+                <div class="paper-title"><a href="transformer-attention.html">Attention Is All You Need</a></div>
+                <div class="paper-authors">Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A.N., Kaiser, L., Polosukhin, I.</div>
+                <div class="paper-meta"><span class="venue">NeurIPS 2017</span><span class="tag-y">2017.06</span></div>
+                <div class="paper-link">arXiv:1706.03762</div>
+            </div>
+        </div>
+
+        <div class="paper-entry">
+            <div class="paper-num">②</div>
+            <div class="paper-info">
+                <div class="paper-title"><a href="gpt1-pretrain-finetune.html">Improving Language Understanding by Generative Pre-Training</a></div>
+                <div class="paper-authors">Radford, A., Narasimhan, K., Salimans, T., Sutskever, I.</div>
+                <div class="paper-meta"><span class="venue">OpenAI</span><span class="tag-y">2018.06</span></div>
+                <div class="paper-desc">GPT-1 · 1.17 亿参数，预训练 + 微调框架</div>
+            </div>
+        </div>
+
+        <div class="paper-entry">
+            <div class="paper-num">③</div>
+            <div class="paper-info">
+                <div class="paper-title"><a href="gpt2-zero-shot.html">Language Models are Unsupervised Multitask Learners</a></div>
+                <div class="paper-authors">Radford, A., Wu, J., Child, R., Luan, D., Amodei, D., Sutskever, I.</div>
+                <div class="paper-meta"><span class="venue">OpenAI</span><span class="tag-y">2019.02</span></div>
+                <div class="paper-desc">GPT-2 · 15 亿参数，零样本能力被发现</div>
+            </div>
+        </div>
+
+        <div class="paper-entry">
+            <div class="paper-num">④</div>
+            <div class="paper-info">
+                <div class="paper-title"><a href="gpt3-few-shot.html">Language Models are Few-Shot Learners</a></div>
+                <div class="paper-authors">Brown, T.B., Mann, B., Ryder, N., Subbiah, M., Kaplan, J., Dhariwal, P. et al.</div>
+                <div class="paper-meta"><span class="venue">NeurIPS 2020</span><span class="tag-y">2020.05</span></div>
+                <div class="paper-link">arXiv:2005.14165</div>
+            </div>
+        </div>
+
+        <div class="paper-entry">
+            <div class="paper-num">⑤</div>
+            <div class="paper-info">
+                <div class="paper-title"><a href="chain-of-thought.html">Chain-of-Thought Prompting Elicits Reasoning in Large Language Models</a></div>
+                <div class="paper-authors">Wei, J., Wang, X., Schuurmans, D., Bosma, M., Ichter, B., Xia, F., Chi, E., Le, Q., Zhou, D.</div>
+                <div class="paper-meta"><span class="venue">NeurIPS 2022</span><span class="tag-y">2022.01</span></div>
+                <div class="paper-link">arXiv:2201.11903</div>
+            </div>
+        </div>
+
+        <div class="paper-entry">
+            <div class="paper-num">⑥</div>
+            <div class="paper-info">
+                <div class="paper-title"><a href="instructgpt-rlhf.html">Training language models to follow instructions with human feedback</a></div>
+                <div class="paper-authors">Ouyang, L., Wu, J., Jiang, X., Almeida, D., Wainwright, C.L., Mishkin, P. et al.</div>
+                <div class="paper-meta"><span class="venue">NeurIPS 2022</span><span class="tag-y">2022.03</span></div>
+                <div class="paper-link">arXiv:2203.02155</div>
+            </div>
+        </div>
+
+        <div class="paper-entry">
+            <div class="paper-num">⑦</div>
+            <div class="paper-info">
+                <div class="paper-title"><a href="react-agent.html">ReAct: Synergizing Reasoning and Acting in Language Models</a></div>
+                <div class="paper-authors">Yao, S., Zhao, J., Yu, D., Du, N., Shafran, I., Narasimhan, K., Cao, Y.</div>
+                <div class="paper-meta"><span class="venue">ICLR 2023</span><span class="tag-y">2022.10</span></div>
+                <div class="paper-link">arXiv:2210.03629</div>
+            </div>
+        </div>
+
+        <div class="paper-entry paper-entry-product">
+            <div class="paper-num">⑧</div>
+            <div class="paper-info">
+                <div class="paper-title"><a href="chatgpt-milestone.html">Introducing ChatGPT</a></div>
+                <div class="paper-authors">OpenAI</div>
+                <div class="paper-meta"><span class="venue">产品发布</span><span class="tag-y">2022.11</span></div>
+                <div class="paper-desc">基于 GPT-3.5 + RLHF，2 个月 1 亿用户</div>
+            </div>
+        </div>
+
+        <div class="paper-entry">
+            <div class="paper-num">⑨</div>
+            <div class="paper-info">
+                <div class="paper-title"><a href="toolformer.html">Toolformer: Language Models Can Teach Themselves to Use Tools</a></div>
+                <div class="paper-authors">Schick, T., Dwivedi-Yu, J., Dessì, R., Raileanu, R., Lomeli, M., Zettlemoyer, L., Cancedda, N., Scialom, T.</div>
+                <div class="paper-meta"><span class="venue">arXiv 2023</span><span class="tag-y">2023.02</span></div>
+                <div class="paper-link">arXiv:2302.04761</div>
+            </div>
+        </div>
+
+        <div class="paper-entry paper-entry-product">
+            <div class="paper-num">⑩</div>
+            <div class="paper-info">
+                <div class="paper-title"><a href="agent-frameworks.html">AI Agent 框架综述</a></div>
+                <div class="paper-authors">AutoGPT, LangChain, Claude Code, OpenCode, Deep Research 等</div>
+                <div class="paper-meta"><span class="venue">工程框架</span><span class="tag-y">2024+</span></div>
+                <div class="paper-desc">非单一论文，领域综合总结</div>
+            </div>
+        </div>
+
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;margin:2rem 0;gap:1rem;flex-wrap:wrap;">
+        <div style="flex:1;min-width:200px;text-align:right;">
+            <a href="llm-evolution-overview.html" style="display:block;padding:0.8rem 1rem;border-radius:6px;background:#f8f9fa;border:1px solid #dfe6e9;text-decoration:none;color:#2d3436;transition:background 0.15s;" onmouseover="this.style.background='#eef6ff'" onmouseout="this.style.background='#f8f9fa'">
+                <div style="font-size:0.75rem;color:#b2bec3;">开始阅读 →</div>
+                <div style="font-weight:600;">综述：LLM 进化全景图</div>
+            </a>
+        </div>
     </div>
 
     <div class="toc-footer">
