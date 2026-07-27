@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent 与 AGI：数据、缩放定律与下一个「预测下一个词」</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif;
+            background: #f8f9fa; color: #333; line-height: 1.8;
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem; }
+        header { padding: 2rem 0; border-bottom: 1px solid #eee; margin-bottom: 2rem; }
+        header a { color: #3498db; text-decoration: none; }
+        header a:hover { text-decoration: underline; }
+        h1 { font-size: 1.8rem; line-height: 1.4; margin-bottom: 0.8rem; }
+        .meta { color: #999; font-size: 0.9rem; margin-bottom: 2rem; }
+        h2 { font-size: 1.3rem; margin: 2rem 0 0.8rem; color: #1a1a2e; }
+        h3 { font-size: 1.1rem; margin: 1.5rem 0 0.6rem; color: #2d3436; }
+        p { margin: 0.8rem 0; }
+        blockquote {
+            border-left: 3px solid #0984e3; margin: 1rem 0; padding: 0.5rem 1rem;
+            background: #f1f8ff; color: #2d3436;
+        }
+        blockquote cite { display: block; margin-top: 0.3rem; font-size: 0.85rem; color: #666; }
+        ul, ol { margin: 0.8rem 0; padding-left: 1.5rem; }
+        li { margin: 0.4rem 0; }
+        pre {
+            background: #2d3436; color: #dfe6e9; padding: 1rem; border-radius: 6px;
+            overflow-x: auto; font-size: 0.85rem; margin: 1rem 0;
+        }
+        code { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+        p code { background: #eee; padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.9rem; }
+        .callout {
+            padding: 1rem; border-radius: 6px; margin: 1rem 0;
+            border-left: 4px solid;
+        }
+        .callout.info { background: #eef6ff; border-color: #0984e3; }
+        .callout.warn { background: #fff3e0; border-color: #e67e22; }
+        table {
+            width: 100%; border-collapse: collapse; margin: 1rem 0;
+        }
+        th, td {
+            padding: 0.5rem 0.8rem; border: 1px solid #dfe6e9; text-align: left;
+        }
+        th { background: #f1f8ff; font-weight: 600; }
+        .ref { font-size: 0.85rem; color: #666; }
+        footer { text-align: center; padding: 3rem 0 1rem; color: #999; font-size: 0.85rem; }
+        @media (max-width: 600px) {
+            .container { padding: 1rem; }
+            h1 { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header><a href="../index.html">← 返回首页</a></header>
+    <h1>Agent 与 AGI：数据、缩放定律与下一个「预测下一个词」</h1>
+    <div class="meta">2026-07-27 · 约 30 分钟</div>
+
+    <p>这篇文章的起点是一个关于 smolagents 架构图的讨论，最终却演变成了一场关于 AI Agent 技术与 AGI 关系的长对话。我们反复质疑自己的判断、用反例校正、再重新提炼。以下是将整场对话与 2025–2026 年学术界和工业界最新研究发现对照后的最终梳理。</p>
+    <p>核心问题只有一个：<b>AI Agent 技术到底在通向 AGI 的道路上扮演什么角色？</b></p>
+
+    <h2>一、Agent 技术的当前成熟度</h2>
+
+    <p>2026 年中，AI Agent 已度过 2024 年的泡沫顶端，进入「生产就绪的早期」，但远未成熟。</p>
+
+    <ul>
+        <li><b>57.3%</b> 的受访组织已有 Agent 在生产环境运行（LangChain State of AI Agents 2026, n=1,300+）</li>
+        <li>但生产中的 Agent 大多保守可控：<b>68% 执行不超过 10 步</b>就有人工介入，<b>74% 依赖人工评估</b></li>
+        <li>Gartner 预测 <b>40%+ 的 Agent 项目将在 2027 前被取消</b>，原因：成本高企、价值不明、风控不足</li>
+        <li><b>97% 企业预期 12 个月内会发生 Agent 安全事件</b>（State of AI Agents Q2 2026），但仅 6% 安全预算投向此领域</li>
+        <li>McKinsey 2026 AI Trust 调查：平均 RAI 成熟度仅从 2.0 升至 2.3（5 分制），治理与 Agent 控制维度最落后</li>
+    </ul>
+
+    <p><b>一句话总结</b>：Agent 的能力已超过组织准备好接纳它们的速度。瓶颈从「模型不够强」转移到了「如何安全可靠地治理它」。</p>
+
+    <h2>二、关键历史里程碑</h2>
+
+    <p>从 2022 到 2026，AI Agent 的发展可划分为四个阶段：</p>
+
+    <h3>奠基期（2022–2023）：证明「LLM 可以做事」</h3>
+    <ul>
+        <li><b>2022.09</b> Adept ACT-1 — Transformer 联合创始人展示「模型操作软件」的先锋 Demo</li>
+        <li><b>2022.11</b> ChatGPT 发布 — AI 进入大众视野</li>
+        <li><b>2023.03</b> GPT-4 + AutoGPT / BabyAGI — 第一个「自主 Agent」病毒式传播，100k+ GitHub stars，定义公众认知</li>
+        <li><b>2023.06</b> OpenAI Function Calling — Agent 与外部工具交互的标准化 API 契约</li>
+    </ul>
+
+    <h3>基础设施成熟期（2024）：工具链成形，协议诞生</h3>
+    <ul>
+        <li><b>2024.03</b> Devin（Cognition）发布 — 第一个「AI 软件工程师」</li>
+        <li><b>2024.05</b> GPT-4o 发布 — 实时多模态交互</li>
+        <li><b>2024.09</b> OpenAI o1 推理模型 — 链式推理能力质变</li>
+        <li><b>2024.10</b> Claude Computer Use — Agent 首次能「看屏幕、点鼠标」</li>
+        <li><b>2024.11</b> MCP 协议发布 — Agent-工具连接的 USB-C 标准，18 个月内被全行业采纳</li>
+    </ul>
+
+    <h3>企业采纳期（2025）：从 Demo 到生产</h3>
+    <ul>
+        <li><b>2025.01</b> DeepSeek R1 — 开源推理模型以 1/10 成本追平 o1</li>
+        <li><b>2025.01</b> OpenAI Operator — 首个面向消费者的浏览器 Agent</li>
+        <li><b>2025.03</b> Manus 发布 + Agent SDK 大战 — 所有前沿实验室发布第一方 Agent SDK</li>
+        <li><b>2025.05</b> Claude 4 Opus — Agent 任务导向的前沿模型</li>
+        <li><b>2025.12</b> MCP 捐赠 Linux Foundation AAIF — 9700 万月 SDK 下载、1 万+ 服务端</li>
+    </ul>
+
+    <h3>自主运营期（2026）：规模化与治理并进</h3>
+    <ul>
+        <li><b>2026.02</b> ChatGPT Agent — 统一 Operator + deep research，10–30 分钟自主工作流</li>
+        <li><b>2026.03</b> Claude Computer Use GA — 桌面 Agent 正式可用</li>
+        <li><b>2026.04</b> GPT-5.5 — 首个为 Agent 工作流原生训练的模型；Microsoft Agent Framework 1.0 GA 吸收 AutoGen + Semantic Kernel</li>
+        <li><b>2026.04</b> A2A v1.0 — Google 的 Agent-to-Agent 协议达 150+ 生产组织</li>
+        <li><b>2026.05</b> Claude Opus 4.8 — 模型竞争从「能力」转向「自检」，4 倍减少代码缺陷遗漏</li>
+        <li><b>2026.07</b> AIUC-1 安全标准持续迭代，OWASP Top 10 for Agentic Applications 发布</li>
+    </ul>
+
+    <h2>三、核心论证：Agent 对 AGI 的四种价值</h2>
+
+    <h3>3.1 架构层的价值：Agent 是 AGI 的「操作系统」</h3>
+    <p>回看人类自身：我们有通用智能，但仍然需要工具（计算器、电脑）、记忆系统（笔记、Notion）、安全边界（法律、公司制度）、行动执行层（手、嘴、工具）、观察反馈循环。这些是什么？正是 Agent 架构的核心组件——感知→推理→行动→观察→迭代。</p>
+
+    <p><b>一个真正通用的智能，放在现实世界中做事，天然就需要 Agent 这一层。</b>AGI 会吃掉「推理和规划不需要人帮」的那一侧，但 Agent 架构中的身份、权限、工具交互、记忆治理、安全护栏——这些从来不是模型的缺陷补偿，而是任何智能体在现实世界中的生存必需品。</p>
+
+    <p>用 Sutton 的「苦教训」（The Bitter Lesson, 2019）框架看：Agent 框架中的手工工程（ReAct prompt 模板、tool schema 定义、记忆管理策略）大概率会被 scaling 淘汰。但工具调用接口、安全边界、身份与审计——这些是智能体在真实世界中运作的基础设施，不随模型能力提升而消失，只会被吸收进系统架构的更底层。</p>
+
+    <h3>3.2 数据的价值：Agent 生产 AGI 所需的「交互轨迹数据」</h3>
+    <p>这是整场对话中最核心的论点。传统 LLM 训练数据是<b>人类静态产出的快照</b>——互联网文本记录的是「结果」而非「过程」。模型从文本上学习「如何写代码」，但在训练中从未体验过「执行代码 → 看报错 → 修复」的闭环。</p>
+
+    <p>Agent 产生的数据跟传统数据有本质区别：</p>
+    <ul>
+        <li><b>错误数据</b>：什么情况下 Agent 会犯错？为什么？</li>
+        <li><b>恢复数据</b>：犯错之后怎么发现、怎么回滚、怎么修正？</li>
+        <li><b>工具交互数据</b>：API 返回什么格式、什么错误码、什么超时行为？</li>
+        <li><b>长程依赖数据</b>：第 1 步的动作在第 15 步才产生影响，模型能否追踪因果？</li>
+        <li><b>环境反馈数据</b>：shell 输出、网页渲染、数据库错误——多模态环境信号</li>
+    </ul>
+
+    <p>2026 年 ACL 的 TDScaling 工作（Chen et al., ACL 2026 Findings）进一步证明：<b>轨迹数据的多样性比数量更重要</b>——在固定训练预算下，增加轨迹多样性带来的收益远大于单纯堆量。这提示我们，Agent 交互数据的结构化多样性是 scaling 的关键维度，而非简单的「越多越好」。</p>
+
+    <h3>3.3 缩放定律的价值：环境学习遵循可预测的数学规律</h3>
+    <p>EdgeBench（arXiv:2607.05155, 2026）在 134 个真实世界任务、约 38,000 小时的 Agent 环境交互数据中，发现了令人震惊的结果：</p>
+    <ul>
+        <li><b>环境学习遵循精确的 log-sigmoid 缩放定律</b>（R² = 0.998），与预训练的幂律缩放具有相同的数学形式</li>
+        <li><b>Agent 学习速度大约每三个月翻一番</b>——从 2025 年 9 月的 GPT-5-Codex 到 2026 年 4 月的 GPT-5.5，学习速度提升了约 8 倍</li>
+        <li>Agent 从环境中积累和复用经验带来的提升，远超独立重新采样（12 小时后 +6.9 分）</li>
+    </ul>
+
+    <p>ACL 2026 的另一项系统性研究（Scaling Behaviors of LLM RL Post-Training）在 63 次实验、横跨 0.5B–72B 参数的规模上证实：<b>RL 后训练同样遵循可预测的幂律关系</b>，且更大的模型具有更高的计算和数据效率。学习效率随模型规模增长呈现饱和趋势——边际收益在 32B 参数以上递减。</p>
+
+    <p>这些发现共同说明：<b>Agent 在环境中通过交互学习，不是一个黑箱过程，而是一个可测量、可预测、可优化的缩放对象</b>。</p>
+
+    <h3>3.4 「预测下一个词」的类比：下一个可能是「预测下一个状态」</h3>
+    <p>「预测下一个 token」之所以能产生 GPT-3 的所有涌现能力，取决于三个特性：自监督（数据就是标签）、任务均匀性（所有文本是同一格式）、压缩即智能（为准确预测不得不学会语言的全部隐结构）。</p>
+
+    <p>Agent 时代的候选等价物是<b>「预测下一个观测（Next-State Prediction）」</b>：</p>
+    <ul>
+        <li><b>自监督</b>：Agent 执行动作 A 后真实结果是 O——模型的任务是预测 O，预测错了就更新</li>
+        <li><b>任务均匀性</b>：不管是调用 API、执行代码还是移动鼠标，都是 (状态, 动作) → 下一个观测</li>
+        <li><b>压缩即因果</b>：为准确预测「如果我把这个文件删除，会发生什么」——模型必须学习文件系统原理、权限模型、甚至用户心理模型</li>
+    </ul>
+
+    <p>2026 年的多项前沿工作正在验证这个方向：</p>
+    <ul>
+        <li><b>Orca</b>（arXiv:2606.30534）明确将建模目标从 next-token/frame/action 转移到 <b>Next-State-Prediction</b>，学习统一的世界隐空间，通过无意识学习（连续视频的自然状态转换）和有意识学习（语言描述的事件）两种范式互补</li>
+        <li><b>NE-Dreamer</b>（ICLR 2026）在 MBRL 中用因果 Transformer 预测下一个编码器嵌入，在记忆密集型任务上大幅超越 DreamerV3</li>
+        <li><b>WorldEvolver</b>（arXiv:2606.30639）展示了世界模型可以通过测试时的情景记忆和语义记忆自我进化，而不需要更新模型参数</li>
+        <li><b>ACL 2026</b> 的 From Word to World 工作证明，在文本环境中，LLM 可以作为隐式世界模型，通过 next-state prediction 改善下游 Agent 性能（WebShop 上 GPT-4o 提升 5.5%，ScienceWorld 上 warm-started RL 提升 15%）</li>
+    </ul>
+
+    <p>这些工作共同指向一条清晰的路径：<b>「预测下一个 token」让模型学到了语言的隐结构；「预测下一个观测」让模型学到世界的因果结构</b>。两者加在一起，可能就是通用智能的全部。</p>
+
+    <h2>四、关键辩驳与修正</h2>
+
+    <p>以下是在对话中出现的几个关键质疑，以及对照权威来源后的修正：</p>
+
+    <h3>4.1 特斯拉的自动驾驶数据为什么不够？</h3>
+    <p>这是对话中最重要的自我修正。真正区分 Tesla 数据和 Agent 数据的不是「数字 vs 物理」，而是<b>动作空间的通用性和 reward signal 的生成速度</b>：</p>
+
+    <table>
+        <tr><th>维度</th><th>Tesla FSD</th><th>Agent（如 smolagents CodeAgent）</th></tr>
+        <tr><td>动作空间</td><td>3–5 自由度连续控制（转向/加速/刹车）</td><td>任意 Python 代码 + 任意工具 + 任意文本</td></tr>
+        <tr><td>观测空间</td><td>语义闭合（道路、车辆、行人）</td><td>语义无限开放（shell、网页、API、数据库错误）</td></tr>
+        <tr><td>reward 信号</td><td>二元且延迟长（没撞＝好）</td><td>语义丰富（编译通过、测试绿了、用户满意）</td></tr>
+        <tr><td>数据生成速度</td><td>物理线性，1 车 1 小时＝1 小时数据</td><td>可编程并行，一台机器生成百万条轨迹</td></tr>
+    </table>
+
+    <p>特斯拉证明了「即使有数十亿英里的闭环交互数据，只要动作空间闭合，就不会涌现通用智能」。Agent 的动作空间是语言 + 代码 + 工具——这是人类知识的通用接口。</p>
+
+    <p>但这反过来也暴露了 Agent 的弱点：动作空间虽广但深度浅（几步就断、记忆临时、反馈回路脆弱），特斯拉虽窄但深（稳定执行毫秒级连续控制）。完美的 AGI 可能需要两者兼具。</p>
+
+    <h3>4.2 AlphaGo Zero 为什么没有通向 AGI？</h3>
+    <p>区别不在「循环是否足够多」，而在<b>任务空间的开放性</b>：</p>
+    <table>
+        <tr><th>维度</th><th>AlphaGo Zero</th><th>Agent 自我进化</th></tr>
+        <tr><td>目标函数</td><td>固定：赢棋</td><td>开放：任意自然语言目标</td></tr>
+        <tr><td>动作空间</td><td>19×19 = 361 个点</td><td>组合爆炸：任意代码 + 工具</td></tr>
+        <tr><td>环境模拟</td><td>完全已知的规则系统</td><td>部分已知、大量未知（真实 API、网络、代码行为）</td></tr>
+        <tr><td>反馈信号</td><td>二元：胜/负</td><td>模糊：编译过了但逻辑对吗？用户满意吗？</td></tr>
+    </table>
+
+    <p>Agent 自我进化的任务空间是<b>开放且不断扩展的</b>——你今天写一个新的 API，Agent 明天就得学会用它。这种开放性才是 AGI 需要的压力。</p>
+
+    <h3>4.3 Sutton 的「苦教训」在 2025 年的重要更新</h3>
+    <p>2019 年，Richard Sutton 发表了著名的「苦教训」（The Bitter Lesson），核心论点是：<b>通用方法 + 算力 scaling 永远会战胜注入人类知识的方法</b>——围棋、语音识别、计算机视觉无不如此。</p>
+
+    <p>但在 2025 年，Sutton 本人做出了一个关键修正。在与 David Silver 合著的 <b>Welcome to the Era of Experience</b> 中，他提出：<b>今天的 LLM 并不真正满足苦教训</b>——它们通过模仿固定的人类文本来学习（mimicry），而不是从自身的交互经验中学习。真正的智能，来自 Agent 在环境中持续学习的能力。</p>
+
+    <p>这个修正对我们讨论的意义重大：它不是否定 Agent 的价值，而恰恰是<b>反向肯定了 Agent 的必要性</b>——如果 LLM 的「静态文本学习」已经走到天花板，那么下一步必须通过 Agent 的「交互式环境学习」来突破。</p>
+
+    <h2>五、未来展望</h2>
+
+    <h3>5.1 短期（2027）：治理与标准化</h3>
+    <ul>
+        <li><b>Agent-to-Agent 经济</b>：交易量达 $10B，Agent 自动发现、协商、消费第三方服务</li>
+        <li><b>持久化 Agent 成标配</b>：从「临时执行」到「持续运行、主动监控」</li>
+        <li><b>EU AI Act 全面执法</b>：首批 Agent 领域重大执法案例</li>
+        <li><b>MCP + A2A 成为基础设施</b>：像 REST/TLS 一样普遍</li>
+        <li><b>Agent 身份认证层成型</b>：组织证书 + 能力证明 + 委托链</li>
+    </ul>
+
+    <h3>5.2 中期（2028–2029）：自主 Agent 纪元</h3>
+    <ul>
+        <li>Agent 从「执行任务」进化为<b>「设定目标」</b>——自己能定义目标和策略</li>
+        <li><b>自我改进</b>：Agent 自主发现优化方向并实施改进</li>
+        <li>80–90% 的运营决策由 Agent 自主完成</li>
+    </ul>
+
+    <h3>5.3 长期（2030+）：Agent-Native 企业</h3>
+    <ul>
+        <li><b>自组织 Agent 网络</b>：生态系统有机形成与演化</li>
+        <li><b>Agent 经济</b>：Agent 独立创造、交易、消费价值</li>
+        <li><b>Agent-人类混合劳动力</b>：无缝协作成为组织常态</li>
+        <li>Gartner 预测到 2030 年，约 $2340 亿企业应用软件支出将受到 Agent 化影响</li>
+    </ul>
+
+    <h2>六、结论：Agent 不是通往 AGI 的弯路，而是它的「必要中间层」</h2>
+
+    <p>历史上的每个重大技术跃迁都有这样一个阶段：</p>
+    <ul>
+        <li><b>飞行器的扑翼机阶段</b>——在一个「错误」的方向上大量试错，但在这个过程中学会了材料、控制、空气动力学</li>
+        <li><b>AI 的专家系统阶段</b>——没能做出真正的智能，但形成了知识表示、推理引擎这些可迁移的工程遗产</li>
+    </ul>
+
+    <p>Agent 就是 LLM 时代的扑翼机。它大概率不是 AGI 的最终形态，但它在做一件无可替代的事：<b>把通往 AGI 路上必须解决的问题暴露出来</b>——长程推理、记忆整合、安全边界、身份信任、与物理世界的接口——然后倒逼这些领域前进。</p>
+
+    <p>用数据-算力-缩放定律的语言重新表述：</p>
+
+    <div class="callout info">
+        <p><b>Agent 是人类第一次有能力大规模产生「智能体在真实数字世界中完整行动轨迹」的系统。</b>这种数据在 2023 年之前不存在——互联网上找不到「调试 3 小时最终解决的完整 shell 日志」。2026 年的研究已经证明，这种环境学习遵循精确的缩放定律，学习速度本身也在加速。</p>
+    </div>
+
+    <p>如果「预测下一个观测」确实是 Agent 时代的「预测下一个词」，那么需要回看整个历史叠层才能理解它为什么在今天成为可能：</p>
+
+    <ul>
+        <li><b>PC</b> 贡献了通用可编程硬件——Agent 动作空间「任意代码」的物理基础</li>
+        <li><b>互联网</b> 贡献了人类知识的大规模数字化——LLM 的预训练语料</li>
+        <li><b>移动互联网</b> 贡献了十亿级用户规模——支撑千亿美金 GPU 投入的市场经济学</li>
+        <li><b>Agent</b> 贡献了行动-观察-反馈的闭环——前面三层全部到位后才变得可能</li>
+    </ul>
+
+    <p>整条链是：<b>通用计算 → 通用信息 → 通用交互 → 通用行动 → 通用智能。</b>每一步都把「通用」二字往外推了一层。Agent 不是这条链的终点，但它所在的位置，刚好是前面所有「通用化」收网的节点。</p>
+
+    <div class="callout warn">
+        <p><b>关于标准</b>：不会有一个所有人都同意的 AGI「达成时刻」。就像意识一样——当系统覆盖了你关心的所有场景，你就认了；当它在某个你没注意的维度上犯错，你就说还不够。AGI 是逐步承认的，不是一刀切的。</p>
+    </div>
+
+    <hr style="margin: 2rem 0;">
+
+    <h2>参考文献与延伸阅读</h2>
+    <ol class="ref">
+        <li>Sutton, R. (2019). <i>The Bitter Lesson</i>. <a href="http://www.incompleteideas.net/IncIdeas/BitterLesson.html">http://www.incompleteideas.net/IncIdeas/BitterLesson.html</a></li>
+        <li>Sutton, R. & Silver, D. (2025). <i>Welcome to the Era of Experience</i>.</li>
+        <li>LangChain (2026). <i>State of AI Agents 2026</i>. <a href="https://www.langchain.com/state-of-agent-engineering">https://www.langchain.com/state-of-agent-engineering</a></li>
+        <li>Forrester (2026). <i>The State of Agentic AI, 2026</i>.</li>
+        <li>Gartner (2026). <i>$234 Billion in Enterprise Application Software Spend Is at Risk from Agentic AI</i>.</li>
+        <li>EdgeBench (2026). <i>EdgeBench: Unveiling Scaling Laws of Learning from Real-World Environments</i>. arXiv:2607.05155.</li>
+        <li>Orca (2026). <i>Orca: The World is in Your Mind</i>. arXiv:2606.30534.</li>
+        <li>NE-Dreamer (ICLR 2026). <i>Next Embedding Prediction Makes World Models Stronger</i>.</li>
+        <li>WorldEvolver (2026). <i>Self-Evolving World Models for LLM Agent Planning</i>. arXiv:2606.30639.</li>
+        <li>Scaling Behaviors of LLM RL Post-Training (ACL 2026).</li>
+        <li>TDScaling (ACL 2026 Findings). <i>Beyond Quantity: Trajectory Diversity Scaling for Code Agents</i>.</li>
+        <li>From Word to World (ACL 2026). <i>Can Large Language Models be Implicit Text-based World Models?</i></li>
+        <li>OWASP (2025). <i>Top 10 for Agentic Applications 2026 (ASI01–ASI10)</i>.</li>
+        <li>Kairos (2026). <i>A Native World Model Stack for Physical AI</i>. arXiv:2606.16533.</li>
+        <li>Agentic History (2026). <i>AI Agents: A Chronological Research Timeline</i>. <a href="https://agentichistory.org/history.html">https://agentichistory.org/history.html</a></li>
+    </ol>
+
+    <footer>&copy; 2026 Ha2fde</footer>
+</div>
+</body>
+</html>
