@@ -5,90 +5,53 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AGI 路线图：从语言模型到通用智能还需要几步 · LLM 进化史未来展望</title>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
-body {
-  font-family: -apple-system, 'Segoe UI', 'Noto Sans SC', system-ui, sans-serif;
-  background: #f5f6fa; color: #2d3436; line-height: 1.8;
-}
-.article-container { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem; }
-header.article-header { padding: 2rem 0 1.5rem; border-bottom: 2px solid #dfe6e9; margin-bottom: 2rem; }
-header.article-header h1 { font-size: 1.9rem; color: #2d3436; line-height: 1.3; }
-.meta { color: #636e72; font-size: 0.9rem; margin-top: 0.6rem; }
-.back { display:inline-block; margin-bottom:1rem; color:#0984e3; text-decoration:none; font-size:0.9rem; }
-.back:hover { text-decoration:underline; }
-
-h2 { font-size:1.5rem; margin:2.5rem 0 1rem; color:#2d3436; padding-bottom:0.3rem; border-bottom:2px solid #0984e3; display:inline-block; }
-h3 { font-size:1.2rem; margin:1.8rem 0 0.8rem; color:#2d3436; }
-h4 { font-size:1.05rem; margin:1.2rem 0 0.5rem; color:#636e72; }
-p { margin:0.8rem 0; color:#555; }
-.highlight-box {
-  background: #eef6ff; border-left: 4px solid #0984e3; padding: 1rem 1.2rem;
-  margin: 1.2rem 0; border-radius: 0 6px 6px 0;
-}
-.info-box {
-  background: #fef9e7; border-left: 4px solid #f39c12; padding: 1rem 1.2rem;
-  margin: 1.2rem 0; border-radius: 0 6px 6px 0;
-}
-.warn-box {
-  background: #fde8e8; border-left: 4px solid #e74c3c; padding: 1rem 1.2rem;
-  margin: 1.2rem 0; border-radius: 0 6px 6px 0;
-}
-pre {
-  background: #1e272e; color: #d2dae2; padding: 1rem 1.2rem;
-  border-radius: 6px; overflow-x: auto; font-size: 0.85rem; line-height: 1.5;
-  margin: 1rem 0;
-}
-code { font-family: 'Fira Code', 'Cascadia Code', monospace; }
-p code { background: #eee; padding: 0.15rem 0.4rem; border-radius: 3px; font-size: 0.9em; }
-
-table { width:100%; border-collapse:collapse; margin:1rem 0; font-size:0.92rem; }
-th { background:#0984e3; color:#fff; padding:10px 12px; text-align:left; font-weight:600; }
-td { padding:10px 12px; border-bottom:1px solid #dfe6e9; }
-tr:nth-child(even) td { background:#f8f9fa; }
-tr:hover td { background:#eef6ff; }
-
-ul, ol { margin:0.6rem 0; padding-left:1.5rem; color:#555; }
-li { margin:0.3rem 0; }
-
-.diagram-container {
-  text-align:center; margin: 1.5rem 0; padding: 1rem;
-  background: #fff; border: 1px solid #dfe6e9; border-radius: 8px;
-  overflow-x: auto;
-}
-.diagram-container svg { max-width:100%; height:auto; }
-.diagram-caption { font-size:0.85rem; color:#636e72; margin-top:0.6rem; }
-
-.tag {
-  display:inline-block; background:#dfe6e9; color:#636e72;
-  padding:0.1rem 0.6rem; border-radius:3px; font-size:0.8rem; margin-right:0.3rem;
-}
-
-footer { text-align:center; padding:2rem; color:#999; font-size:0.85rem; border-top:1px solid #dfe6e9; margin-top:2rem; }
-
-.summary-card {
-  background: #fff; border: 1px solid #dfe6e9; border-radius: 8px;
-  padding: 1.2rem; margin: 1rem 0;
-}
-.summary-card .sc-title { font-weight:600; color:#0984e3; margin-bottom:0.5rem; }
-.summary-card ul { margin:0; }
-
-.step-label {
-  display:inline-block; padding:0.1rem 0.5rem; border-radius:3px; font-size:0.8rem; font-weight:600; margin-right:0.3rem;
-}
-.step-done { background:#eef6ff; color:#0984e3; }
-.step-now { background:#e8f8e8; color:#27ae60; }
-.step-next { background:#fef9e7; color:#f39c12; }
-.step-far { background:#fde8e8; color:#e74c3c; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif;
+        background: #f8f9fa; color: #333; line-height: 1.8;
+    }
+    .container { max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem; }
+    header { padding: 2rem 0; border-bottom: 1px solid #eee; margin-bottom: 2rem; }
+    header a { color: #3498db; text-decoration: none; }
+    h1 { font-size: 1.8rem; line-height: 1.4; margin-bottom: 0.8rem; }
+    .meta { color: #999; font-size: 0.9rem; margin-bottom: 2rem; }
+    h2 { font-size: 1.3rem; margin: 2rem 0 0.8rem; color: #1a1a2e; border-left: 4px solid #0984e3; padding-left: 0.8rem; }
+    h3 { font-size: 1.1rem; margin: 1.5rem 0 0.6rem; color: #2d3436; }
+    p { margin: 0.8rem 0; }
+    blockquote { border-left: 3px solid #0984e3; margin: 1rem 0; padding: 0.5rem 1rem; background: #eef6ff; }
+    ul, ol { margin: 0.8rem 0; padding-left: 1.5rem; }
+    li { margin: 0.4rem 0; }
+    pre { background: #2d3436; color: #dfe6e9; padding: 1rem; border-radius: 6px; overflow-x: auto; font-size: 0.85rem; margin: 1rem 0; }
+    code { font-family: 'JetBrains Mono', 'Fira Code', monospace; }
+    p code { background: #eee; padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.9rem; }
+    .callout { padding: 1rem; border-radius: 6px; margin: 1rem 0; border-left: 4px solid; }
+    .callout.info { background: #eef6ff; border-color: #0984e3; }
+    .callout.warn { background: #fff3e0; border-color: #e67e22; }
+    .callout.success { background: #e6ffe6; border-color: #27ae60; }
+    table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+    th, td { padding: 0.5rem 0.8rem; border: 1px solid #dfe6e9; text-align: left; }
+    th { background: #eef6ff; font-weight: 600; }
+    .ref { font-size: 0.85rem; color: #666; }
+    footer { text-align: center; padding: 3rem 0 1rem; color: #999; font-size: 0.85rem; }
+    .diagram { background: #fff; border: 1px solid #dfe6e9; border-radius: 8px; padding: 1.5rem; margin: 1.5rem 0; text-align: center; }
+    .diagram svg { max-width: 100%; height: auto; }
+    .diagram-caption { font-size: 0.85rem; color: #666; margin-top: 0.5rem; }
+    .summary-card { background: #fff; border: 1px solid #dfe6e9; border-radius: 8px; padding: 1.2rem; margin: 1rem 0; }
+    .summary-card .sc-title { font-weight: 600; color: #0984e3; margin-bottom: 0.5rem; }
+    .summary-card ul { margin: 0; }
+    .step-label { display: inline-block; padding: 0.1rem 0.5rem; border-radius: 3px; font-size: 0.8rem; font-weight: 600; margin-right: 0.3rem; }
+    .step-done { background: #eef6ff; color: #0984e3; }
+    .step-now { background: #e8f8e8; color: #27ae60; }
+    .step-next { background: #fef9e7; color: #f39c12; }
+    .step-far { background: #fde8e8; color: #e74c3c; }
+    @media (max-width: 600px) { .container { padding: 1rem; } h1 { font-size: 1.4rem; } }
 </style>
 </head>
 <body>
-<div class="article-container">
-<a href="../index.html" class="back">← 返回首页</a>
-<span style="font-size:0.8rem;color:#0984e3;margin-left:0.5rem;">LLM 进化史 · 未来展望</span>
-<header class="article-header">
-<h1>AGI 路线图：从语言模型到通用智能还需要几步</h1>
-<div class="meta">2026-07-25 · 约 30 分钟 · AGI 六阶梯框架</div>
-</header>
+<div class="container">
+    <header><a href="../index.html">← 返回首页</a> / <a href="llm-evolution-index.html">LLM 进化史</a></header>
+    <h1>AGI 路线图：从语言模型到通用智能还需要几步</h1>
+    <div class="meta">2026-07-25 · 约 30 分钟 · 未来展望 ⑪</div>
 
 <div class="summary-card">
 <div class="sc-title">本文核心逻辑</div>
@@ -107,7 +70,7 @@ footer { text-align:center; padding:2rem; color:#999; font-size:0.85rem; border-
 
 <p>综合当前学术界的主流共识和产业界的前沿实践，我们可以提炼出一条清晰、递进的 AGI 路线图。这条路从语言模型出发，经过推理能力的增强、自主行动能力的获得、持续学习机制的建立，最终走向自我进化和物理世界的具身化。</p>
 
-<div class="diagram-container">
+<div class="diagram">
 <svg viewBox="0 0 700 480" xmlns="http://www.w3.org/2000/svg">
   <rect x="10" y="10" width="680" height="460" rx="10" fill="none" stroke="#dfe6e9" stroke-width="1"/>
   <text x="350" y="38" text-anchor="middle" fill="#2d3436" font-size="15" font-weight="bold">AGI 六阶梯</text>
@@ -187,7 +150,7 @@ footer { text-align:center; padding:2rem; color:#999; font-size:0.85rem; border-
 
 <p>这看似简单，但意义深远——它意味着模型学会了一种<strong>"内省"的能力</strong>：不是直接跳到一个结论，而是先"思考"（生成中间推理步骤），再给出答案。这种"先想后说"的模式，与人类解决问题的方式高度一致。</p>
 
-<div class="highlight-box">
+<div class="callout info">
 <strong>关键突破：</strong>CoT 让语言模型从"一步预测器"变成了"多步推理器"。这种能力上的飞跃，是后续 Agent 范式的必要前提——因为 Agent 本质上就是一个"持续推理直到完成任务"的循环。
 </div>
 
@@ -197,7 +160,7 @@ footer { text-align:center; padding:2rem; color:#999; font-size:0.85rem; border-
 
 <p>这是本文的核心，也是当前 AI 发展的主战场。LLM-based Agent 的本质可以概括为一句话：</p>
 
-<div class="highlight-box">
+<div class="callout info">
 <strong>核心定义：</strong>LLM-based Agent = 语言推理引擎（LLM）+ 自主控制循环（Harness）+ 外部能力扩展（工具 · 记忆 · 感知）
 </div>
 
@@ -207,7 +170,7 @@ footer { text-align:center; padding:2rem; color:#999; font-size:0.85rem; border-
 
 <p>所有 LLM-based Agent，不管它叫"AI Agent"还是"Agentic AI"，不管它的应用场景是编程、搜索还是自动化，底层架构高度一致：</p>
 
-<div class="diagram-container">
+<div class="diagram">
 <svg viewBox="0 0 750 240" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <marker id="archArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
@@ -289,7 +252,7 @@ footer { text-align:center; padding:2rem; color:#999; font-size:0.85rem; border-
 </tr>
 </table>
 
-<div class="info-box">
+<div class="callout warn">
 <strong>重要洞察：</strong>对 Harness 层的研究还处在早期阶段。现有系统在控制循环、工具数量、记忆策略上的差异远大于在 LLM 选择上的差异。这意味着在模型能力接近天花板后，Harness 层的创新将是推动 Agent 能力进步的主要驱动力。
 </div>
 
@@ -305,7 +268,7 @@ footer { text-align:center; padding:2rem; color:#999; font-size:0.85rem; border-
 
 <p><strong>反思（Reflection）：</strong>Agent 可以评估自己的输出，发现错误并纠正。Reflexion 模式让 Agent 在每次行动后记录经验反馈，在后续决策中参考。这是 Agent 具备"学习能力"的雏形。</p>
 
-<div class="diagram-container">
+<div class="diagram">
 <svg viewBox="0 0 600 140" xmlns="http://www.w3.org/2000/svg">
   <rect x="20" y="15" width="120" height="110" rx="8" fill="#eef6ff" stroke="#0984e3" stroke-width="1.5"/>
   <text x="80" y="45" text-anchor="middle" fill="#0984e3" font-size="12" font-weight="bold">工具调用</text>
@@ -338,7 +301,7 @@ footer { text-align:center; padding:2rem; color:#999; font-size:0.85rem; border-
 
 <p>LLM-based Agent 已经能够完成令人惊叹的任务——编写代码、撰写报告、分析数据、自动化工作流。但它仍然<strong>无法替代人类员工</strong>。原因只有一个：它不能像人一样持续学习。</p>
 
-<div class="info-box">
+<div class="callout warn">
 <strong>核心差距：</strong>你招一个员工，他花两个月熟悉公司环境、了解业务、认识同事之后就能独立工作。但 AI 没有这两个月的"学习期"——每次对话都是一次全新的开始。你必须把所有的上下文（"小王是谁、负责什么、邮件地址是什么"）都塞进提示词里。
 </div>
 
@@ -384,7 +347,7 @@ footer { text-align:center; padding:2rem; color:#999; font-size:0.85rem; border-
 
 <p>为什么把它放在最后？因为<strong>物理世界的交互要求认知能力先成熟</strong>——一个连数字世界都无法自主操作的 AI，不可能安全地操作物理设备。具身智能是 AGI 的"毕业项目"：在认知能力完备之后，把智能扩展到物理维度。</p>
 
-<div class="diagram-container">
+<div class="diagram">
 <svg viewBox="0 0 750 140" xmlns="http://www.w3.org/2000/svg">
   <rect x="15" y="20" width="110" height="100" rx="8" fill="#0984e3" opacity="0.8"/>
   <text x="70" y="55" text-anchor="middle" fill="#fff" font-size="11" font-weight="bold">数字世界</text>
@@ -434,7 +397,7 @@ footer { text-align:center; padding:2rem; color:#999; font-size:0.85rem; border-
 
 <p>多模态大模型的视觉处理流程完全不同。我们一步步拆解：</p>
 
-<div class="diagram-container">
+<div class="diagram">
 <svg viewBox="0 0 700 180" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <marker id="mmArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
@@ -490,7 +453,7 @@ footer { text-align:center; padding:2rem; color:#999; font-size:0.85rem; border-
 
 <p>这是理解 AI 最核心也最容易困惑的概念。请记住这个比喻：</p>
 
-<div class="highlight-box">
+<div class="callout info">
 <strong>Embedding = 一个东西的"数字身份证"。</strong> 只不过这张身份证上写的不是文字，而是一长串数字。这些数字编码了这个东西的"含义"——它是什么、它跟什么有关、它像什么。两个相似的"东西"会有相似的数字串。
 </div>
 
@@ -503,7 +466,7 @@ footer { text-align:center; padding:2rem; color:#999; font-size:0.85rem; border-
 
 <p>在 AI 内部，所有东西都被转换成了这种数字形式——文字、图片、声音、代码。然后 AI 通过计算这些数字之间的距离来判断"它们是不是相关的"。这就是为什么多模态模型能"看懂"图片：它把图片也翻译成了同一种数字语言。</p>
 
-<div class="info-box">
+<div class="callout warn">
 <strong>一句话总结：</strong>多模态模型不是真的在"看"图片，而是把图片翻译成跟文本一样的"数字语言"，然后在同一个数字空间里做推理。视觉信息在进入推理核心之前，已经被"语言化"了。
 </div>
 
@@ -535,13 +498,13 @@ footer { text-align:center; padding:2rem; color:#999; font-size:0.85rem; border-
 
 <p>你不需要知道游戏源代码，也不需要逐帧计算物理方程。你的大脑内部有一个简化的因果模拟器——这就是世界模型的核心思想。</p>
 
-<div class="highlight-box">
+<div class="callout info">
 <strong>世界模型 = AI 内部的一个"因果模拟器"。</strong> 它能回答一个问题：<strong>"如果我做 A，接下来会发生什么？"</strong> 不需要真实地执行 A，只需要在"脑中"模拟一遍。
 </div>
 
 <p>更技术一点的定义：世界模型是一个能根据当前状态和智能体的行动，预测下一时刻世界状态的系统。</p>
 
-<div class="diagram-container">
+<div class="diagram">
 <svg viewBox="0 0 600 130" xmlns="http://www.w3.org/2000/svg">
   <rect x="20" y="15" width="130" height="50" rx="8" fill="#eef6ff" stroke="#0984e3" stroke-width="1.5"/>
   <text x="85" y="38" text-anchor="middle" fill="#0984e3" font-size="11" font-weight="bold">当前世界状态</text>
@@ -606,7 +569,7 @@ footer { text-align:center; padding:2rem; color:#999; font-size:0.85rem; border-
 
 <p>目前世界模型的研究进展可以用一句话概括：</p>
 
-<div class="info-box">
+<div class="callout warn">
 <strong>在简单环境中有进展，在复杂世界中还差得远。</strong> 目前的几个代表性工作：
 </div>
 
@@ -634,7 +597,7 @@ footer { text-align:center; padding:2rem; color:#999; font-size:0.85rem; border-
   <li><strong>远期理想</strong>：语言模型（处理抽象知识和推理）+ 世界模型（处理物理因果和空间） + Agent（自主行动和控制循环），三者融合为统一的智能系统。</li>
 </ul>
 
-<div class="diagram-container">
+<div class="diagram">
 <svg viewBox="0 0 650 140" xmlns="http://www.w3.org/2000/svg">
   <rect x="15" y="20" width="150" height="100" rx="8" fill="#eef6ff" stroke="#0984e3" stroke-width="1.5"/>
   <text x="90" y="50" text-anchor="middle" fill="#0984e3" font-size="12" font-weight="bold">语言模型</text>
@@ -683,7 +646,7 @@ footer { text-align:center; padding:2rem; color:#999; font-size:0.85rem; border-
 
 <p><strong>第四，这条路径的"必然性"源于语言的地位。</strong> 语言是人类认知的唯一已知载体，也是 AI 与人类交互、传承知识、表达推理过程的天然媒介。以 LLM 为核心的 Agent 架构不是偶然的工程选择——它是当前通往 AGI 的唯一已知路径，就像内燃机不是汽车的唯一可能动力，但在当时的工程技术条件下，它是最可行的选择。AI 的"内燃机"就是语言模型。</p>
 
-<div class="diagram-container">
+<div class="diagram">
 <svg viewBox="0 0 750 130" xmlns="http://www.w3.org/2000/svg">
   <rect x="30" y="15" width="100" height="100" rx="50" fill="#0984e3" opacity="0.9"/>
   <text x="80" y="72" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">路线图</text>
@@ -735,7 +698,7 @@ footer { text-align:center; padding:2rem; color:#999; font-size:0.85rem; border-
     </div>
 
 </div>
-<footer>&copy; 2026 Ha2fde</footer>
+<footer>&copy; 2026 Ha2fde · LLM 进化史系列</footer>
 </div>
 </body>
 </html>
