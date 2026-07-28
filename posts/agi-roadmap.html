@@ -133,7 +133,7 @@ footer { text-align:center; padding:2rem; color:#999; font-size:0.85rem; border-
   <!-- Step 3 (current) -->
   <rect x="150" y="215" width="400" height="50" rx="10" fill="#e8f8e8" stroke="#27ae60" stroke-width="2.5"/>
   <text x="350" y="238" text-anchor="middle" fill="#27ae60" font-size="15" font-weight="bold">③ LLM-based Agent ◄ 当前阶段</text>
-  <text x="350" y="256" text-anchor="middle" fill="#636e72" font-size="10">语言推理引擎 + 工具/记忆/感知 + Scaffold 控制循环</text>
+  <text x="350" y="256" text-anchor="middle" fill="#636e72" font-size="10">语言推理引擎 + 工具/记忆/感知 + Harness 控制循环</text>
   <text x="530" y="240" text-anchor="middle" fill="#27ae60" font-size="10">2025-2026</text>
 
   <line x1="350" y1="267" x2="350" y2="287" stroke="#f39c12" stroke-width="2"/>
@@ -198,7 +198,7 @@ footer { text-align:center; padding:2rem; color:#999; font-size:0.85rem; border-
 <p>这是本文的核心，也是当前 AI 发展的主战场。LLM-based Agent 的本质可以概括为一句话：</p>
 
 <div class="highlight-box">
-<strong>核心定义：</strong>LLM-based Agent = 语言推理引擎（LLM）+ 自主控制循环（Scaffold）+ 外部能力扩展（工具 · 记忆 · 感知）
+<strong>核心定义：</strong>LLM-based Agent = 语言推理引擎（LLM）+ 自主控制循环（Harness）+ 外部能力扩展（工具 · 记忆 · 感知）
 </div>
 
 <p>语言模型不再只是回答问题，而是坐在一个循环中，反复进行<strong>观察 → 推理 → 行动 → 再观察</strong>的迭代，直到完成任务。这个循环使得语言模型从"对话工具"变成了"自主行动体"。</p>
@@ -222,7 +222,7 @@ footer { text-align:center; padding:2rem; color:#999; font-size:0.85rem; border-
   <line x1="380" y1="60" x2="380" y2="90" stroke="#b2bec3" stroke-width="1.5" marker-end="url(#archArrow)"/>
 
   <rect x="50" y="105" width="150" height="50" rx="6" fill="#dfe6e9" stroke="#b2bec3" stroke-width="1"/>
-  <text x="125" y="128" text-anchor="middle" fill="#2d3436" font-size="11">Scaffold 控制循环</text>
+  <text x="125" y="128" text-anchor="middle" fill="#2d3436" font-size="11">Harness 控制循环</text>
   <text x="125" y="145" text-anchor="middle" fill="#636e72" font-size="10">ReAct / Plan-Execute / MCTS</text>
 
   <rect x="215" y="105" width="150" height="50" rx="6" fill="#dfe6e9" stroke="#b2bec3" stroke-width="1"/>
@@ -243,10 +243,10 @@ footer { text-align:center; padding:2rem; color:#999; font-size:0.85rem; border-
   <line x1="470" y1="37" x2="620" y2="105" stroke="#b2bec3" stroke-width="1" marker-end="url(#archArrow)"/>
 
   <rect x="120" y="175" width="500" height="45" rx="6" fill="#fef9e7" stroke="#f39c12" stroke-width="1"/>
-  <text x="370" y="195" text-anchor="middle" fill="#2d3436" font-size="12">核心不变：LLM 语言中枢 — 多样性的来源：Scaffold 层的组合方式</text>
+  <text x="370" y="195" text-anchor="middle" fill="#2d3436" font-size="12">核心不变：LLM 语言中枢 — 多样性的来源：Harness 层的组合方式</text>
   <text x="370" y="212" text-anchor="middle" fill="#636e72" font-size="10">控制循环 × 工具集 × 记忆策略 × 编排拓扑 = 架构多样性</text>
 </svg>
-<div class="diagram-caption">LLM-based Agent 的统一架构。所有现代 AI Agent 共享同一个 LLM 语言中枢，真正的差异化来自 Scaffold 层的设计选择。</div>
+<div class="diagram-caption">LLM-based Agent 的统一架构。所有现代 AI Agent 共享同一个 LLM 语言中枢，真正的差异化来自 Harness 层的设计选择。</div>
 </div>
 
 <h3>4.2 为什么所有主流"AI Agent"本质上都是 LLM-based Agent？</h3>
@@ -263,12 +263,12 @@ footer { text-align:center; padding:2rem; color:#999; font-size:0.85rem; border-
 
 <p>但精确的术语有助于精确地理解问题。当我们清楚地说出"我们研究的是 LLM-based Agent"时，我们就知道：这个系统的能力天花板取决于 LLM 的推理质量，扩展能力需要通过工具接口和记忆系统来实现，下一步的关键突破是让模型能够持续学习而不是每个任务都从零开始。</p>
 
-<h3>4.3 多样性从哪来？Scaffold 层的设计空间</h3>
+<h3>4.3 多样性从哪来？Harness 层的设计空间</h3>
 
-<p>如果核心都是 LLM，那不同 Agent 之间的差异从何而来？答案在 Scaffold 层——LLM 之外的"骨架代码"。Scaffold 的设计选择决定了 Agent 的行为特征和适用场景。</p>
+<p>如果核心都是 LLM，那不同 Agent 之间的差异从何而来？答案在 Harness 层——LLM 之外的"骨架代码"。Harness 的设计选择决定了 Agent 的行为特征和适用场景。</p>
 
 <table>
-<tr><th>Scaffold 维度</th><th>设计选项</th><th>影响</th></tr>
+<tr><th>Harness 维度</th><th>设计选项</th><th>影响</th></tr>
 <tr>
   <td>控制循环</td><td>ReAct / Plan-Execute / Tree Search / 组合</td><td>决定推理深度和灵活性</td>
 </tr>
@@ -290,7 +290,7 @@ footer { text-align:center; padding:2rem; color:#999; font-size:0.85rem; border-
 </table>
 
 <div class="info-box">
-<strong>重要洞察：</strong>对 Scaffold 层的研究还处在早期阶段。现有系统在控制循环、工具数量、记忆策略上的差异远大于在 LLM 选择上的差异。这意味着在模型能力接近天花板后，Scaffold 层的创新将是推动 Agent 能力进步的主要驱动力。
+<strong>重要洞察：</strong>对 Harness 层的研究还处在早期阶段。现有系统在控制循环、工具数量、记忆策略上的差异远大于在 LLM 选择上的差异。这意味着在模型能力接近天花板后，Harness 层的创新将是推动 Agent 能力进步的主要驱动力。
 </div>
 
 <h3>4.4 Agent 的四种核心能力</h3>
@@ -677,7 +677,7 @@ footer { text-align:center; padding:2rem; color:#999; font-size:0.85rem; border-
 
 <p><strong>第一，AGI 不是单一突破，而是递进阶梯。</strong> 它不会在某一天突然出现，而是沿着清晰的路径逐步实现。每一阶都有明确的科学问题和工程挑战。认识这条路径，有助于我们判断当前工作的优先级：我们是否在解决当前阶段最关键的问题？</p>
 
-<p><strong>第二，当前的重心在 LLM-based Agent。</strong> 大规模的模型预训练红利正在放缓，真正的增量创新正在向 Agent 层迁移——工具接口的标准化（MCP）、Scaffold 架构的创新、多 Agent 协作的编排、记忆系统的深度整合。这些才是接下来 1-2 年的主战场。</p>
+<p><strong>第二，当前的重心在 LLM-based Agent。</strong> 大规模的模型预训练红利正在放缓，真正的增量创新正在向 Agent 层迁移——工具接口的标准化（MCP）、Harness 架构的创新、多 Agent 协作的编排、记忆系统的深度整合。这些才是接下来 1-2 年的主战场。</p>
 
 <p><strong>第三，持续学习是通往 AGI 的"最后一公里瓶颈"。</strong> 在 Agent 能力日趋成熟之后，下一个必须攻克的难关就是让 AI 具备持续学习的能力。这个问题的解决，将直接触发第五阶（自我迭代）的出现，从而启动自我加速的飞轮。</p>
 
@@ -694,7 +694,7 @@ footer { text-align:center; padding:2rem; color:#999; font-size:0.85rem; border-
   <rect x="170" y="15" width="140" height="100" rx="12" fill="#eef6ff" stroke="#0984e3" stroke-width="1.5"/>
   <text x="240" y="50" text-anchor="middle" fill="#0984e3" font-size="12" font-weight="bold">第③阶：LLM-based Agent</text>
   <text x="240" y="72" text-anchor="middle" fill="#2d3436" font-size="11">当前的主战场</text>
-  <text x="240" y="92" text-anchor="middle" fill="#636e72" font-size="10">Scaffold 创新 · 工具标准化</text>
+  <text x="240" y="92" text-anchor="middle" fill="#636e72" font-size="10">Harness 创新 · 工具标准化</text>
 
   <text x="325" y="65" text-anchor="middle" fill="#636e72" font-size="16">→</text>
 
