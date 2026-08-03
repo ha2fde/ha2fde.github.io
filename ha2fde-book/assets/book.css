@@ -243,6 +243,9 @@ body.wide #bk-bar{left:0}
 @media print{
   @page{size:960pt 540pt;margin:0}
   :root{--bk-scale:1 !important}
+  /* Chrome 打印默认不画背景，绿色要点条、深色代码卡、淡色方框全会掉成白底，
+     导出的 PDF 跟屏幕上完全不是一个东西。强制保留。 */
+  *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}
   body{background:#fff}
   #bk-side,#bk-top,#bk-bar,#bk-up,.bk-search{display:none !important}
   #bk-main{padding:0 !important}
@@ -1162,10 +1165,10 @@ body.bk-debug .bk-sheet[data-fitted] .bk-paper{outline:2px solid #DC2626;outline
    颜色一律走 var(--accent/--key/--ink/--sub/--panel/--border)，这些变量各章
    自己定义（见 .ch4{...}），所以同一套组件放进任何一章都自动跟着该章配色。 */
 .bk-diag{display:flex;flex-direction:column;justify-content:center;gap:9px;
-  font-size:14px;line-height:1.55;color:var(--ink)}
+  font-size:14px;line-height:1.55;color:var(--ink,#1E293B)}
 .bk-diag .dg-row{display:flex;align-items:stretch;gap:11px}
 .bk-diag .dg-col{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:6px}
-.bk-diag .dg-hd{font-weight:700;font-size:.92em;color:var(--sub)}
+.bk-diag .dg-hd{font-weight:700;font-size:.92em;color:var(--sub,#64748B)}
 /* 底色和描边都由本章主色调出来，所以同一套组件放进第 5 章是青的、
    第 3 章是紫的，不必每章单配。原来用 --panel 那档浅灰压在白纸上几乎
    看不出边界，方框读不出「块」的感觉。 */
@@ -1178,40 +1181,76 @@ body.bk-debug .bk-sheet[data-fitted] .bk-paper{outline:2px solid #DC2626;outline
   .bk-diag .dg-br li::before{color:color-mix(in srgb,var(--accent,#2563EB) 45%,#fff)}
 }
 .bk-diag .dg-row>.dg-box{flex:1 1 0}
-.bk-diag .dg-box>b{display:block;font-weight:700;color:var(--key);margin-bottom:2px}
-.bk-diag .dg-box span b{color:var(--key);margin-right:5px}
-.bk-diag .dg-box span i,.bk-diag .dg-box>i{font-style:normal;color:var(--sub)}
+.bk-diag .dg-box>b{display:block;font-weight:700;color:var(--key,#0F172A);margin-bottom:2px}
+.bk-diag .dg-box span b{color:var(--key,#0F172A);margin-right:5px}
+.bk-diag .dg-box span i,.bk-diag .dg-box>i{font-style:normal;color:var(--sub,#64748B)}
 .bk-diag .dg-box span i{margin-right:5px}
-.bk-diag .dg-note{color:var(--sub);font-size:.9em;margin-top:3px}
+.bk-diag .dg-note{color:var(--sub,#64748B);font-size:.9em;margin-top:3px}
 /* 箭头夹在两个盒子之间，自己不占伸缩份额 */
-.bk-diag .dg-arw{flex:0 0 auto;align-self:center;color:var(--accent);
+.bk-diag .dg-arw{flex:0 0 auto;align-self:center;color:var(--accent,#2563EB);
   font-size:1.35em;font-weight:700;line-height:1}
 .bk-diag .dg-arw.dg-down{align-self:flex-start;margin-left:34px}
-.bk-diag .dg-cap{color:var(--sub);font-size:.93em}
-.bk-diag .dg-cap em{font-style:normal;color:var(--warn);font-weight:700;margin-right:4px}
+.bk-diag .dg-cap{color:var(--sub,#64748B);font-size:.93em}
+.bk-diag .dg-cap em{font-style:normal;color:var(--warn,#B45309);font-weight:700;margin-right:4px}
 /* 轴线：两端文字 + 中间自动撑开的横线 */
-.bk-diag .dg-axis{display:flex;align-items:center;gap:9px;color:var(--sub);font-size:.9em}
-.bk-diag .dg-ln{flex:1 1 auto;min-width:16px;height:0;border-top:1px solid var(--border)}
+.bk-diag .dg-axis{display:flex;align-items:center;gap:9px;color:var(--sub,#64748B);font-size:.9em}
+.bk-diag .dg-ln{flex:1 1 auto;min-width:16px;height:0;border-top:1px solid var(--border,#E2E8F0)}
 /* 分支列表：├ / └ 由 CSS 画，不再写进正文 */
 .bk-diag .dg-br{list-style:none}
 .bk-diag .dg-br li{position:relative;padding-left:15px}
-.bk-diag .dg-br li::before{content:"├";position:absolute;left:0;color:var(--border)}
+.bk-diag .dg-br li::before{content:"├";position:absolute;left:0;color:var(--border,#E2E8F0)}
 .bk-diag .dg-br li:last-child::before{content:"└"}
-.bk-diag .dg-br em{font-style:normal;font-weight:700;color:var(--key)}
-.bk-diag .dg-br u{text-decoration:none;color:var(--accent);margin-left:6px;font-size:.9em}
+.bk-diag .dg-br em{font-style:normal;font-weight:700;color:var(--key,#0F172A)}
+.bk-diag .dg-br u{text-decoration:none;color:var(--accent,#2563EB);margin-left:6px;font-size:.9em}
 /* 图节点小胶囊 */
 .bk-diag .dg-graph{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-bottom:2px}
-.bk-diag .dg-graph span{border:1px solid var(--border);border-radius:5px;
+.bk-diag .dg-graph span{border:1px solid var(--border,#E2E8F0);border-radius:5px;
   padding:1px 7px;background:#fff;font-weight:600;font-size:.92em}
-.bk-diag .dg-graph em{font-style:normal;color:var(--accent);font-weight:700}
-.bk-diag .dg-graph i{font-style:normal;color:var(--sub);font-size:.86em}
-.bk-diag .dg-loop{color:var(--accent);font-size:.9em}
+.bk-diag .dg-graph em{font-style:normal;color:var(--accent,#2563EB);font-weight:700}
+.bk-diag .dg-graph i{font-style:normal;color:var(--sub,#64748B);font-size:.86em}
+.bk-diag .dg-loop{color:var(--accent,#2563EB);font-size:.9em}
 /* 名称 + 说明两列，名称列宽由最长的那个自己撑出来，天然对齐 */
 .bk-diag .dg-kv{display:grid;grid-template-columns:auto 1fr;gap:3px 14px}
-.bk-diag .dg-kv dt{font-weight:700;color:var(--key)}
-.bk-diag .dg-kv dd{color:var(--ink)}
+.bk-diag .dg-kv dt{font-weight:700;color:var(--key,#0F172A)}
+.bk-diag .dg-kv dd{color:var(--ink,#1E293B)}
 /* 代码型内容仍用等宽，但每行是独立元素，不存在跨行对齐问题 */
 .bk-diag .dg-mono span,.bk-diag .dg-mono-in{
   font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   font-size:.93em;white-space:pre}
 .bk-diag.dg-4{display:grid;grid-template-columns:1fr 1fr;gap:13px 24px;align-content:center}
+/* 网格 / 堆叠 / 阶梯：第 2、3、5 章的字符画比第 4 章多这三种排布 */
+.bk-diag .dg-g2{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px}
+.bk-diag .dg-g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 14px}
+.bk-diag .dg-g4{display:grid;grid-template-columns:repeat(4,1fr);gap:9px 12px}
+.bk-diag .dg-g2>.dg-box,.bk-diag .dg-g3>.dg-box,.bk-diag .dg-g4>.dg-box{flex:0 0 auto}
+/* 分层堆叠：相邻层共边，读起来才是「一摞」而不是四个独立方框 */
+.bk-diag .dg-stack{display:flex;flex-direction:column}
+.bk-diag .dg-stack>.dg-box{border-radius:0;margin-top:-1px}
+.bk-diag .dg-stack>.dg-box:first-child{border-radius:7px 7px 0 0;margin-top:0}
+.bk-diag .dg-stack>.dg-box:last-child{border-radius:0 0 7px 7px}
+/* 阶梯：底对齐、逐级抬高，用 padding-bottom 拉出台阶 */
+.bk-diag .dg-steps{display:flex;align-items:flex-end;gap:7px}
+.bk-diag .dg-steps>.dg-box{flex:1 1 0;justify-content:flex-start}
+.bk-diag .dg-steps>.dg-box>b{color:var(--accent,#2563EB)}
+/* 盒内要点列表 */
+.bk-diag .dg-ul{list-style:none;display:flex;flex-direction:column;gap:1px}
+.bk-diag .dg-ul>li{padding-left:12px;position:relative}
+.bk-diag .dg-ul>li::before{content:"·";position:absolute;left:2px;
+  color:var(--accent,#2563EB);font-weight:700}
+/* 竖向箭头，居中 */
+.bk-diag .dg-vt{align-self:center;color:var(--accent,#2563EB);font-weight:700;line-height:1}
+.bk-diag .dg-vt i{font-style:normal;color:var(--sub,#64748B);font-weight:400;
+  font-size:.86em;margin-left:8px}
+/* 中心块：拼图类图里的「核心」要比周围支柱更实 */
+@supports (background:color-mix(in srgb,red 7%,#fff)){
+  .bk-diag .dg-core{background:color-mix(in srgb,var(--accent,#2563EB) 16%,#fff);
+    border-color:color-mix(in srgb,var(--accent,#2563EB) 55%,#fff)}
+}
+.bk-diag .dg-core>b{color:var(--accent,#2563EB)}
+/* 第 5 章的 .diagram 本身是一张浅灰卡片，里面再放淡色方框就成了框套框，
+   托管 .bk-diag 时把卡片自己的底色和描边让出来。 */
+.ch5 .diagram.bk-diag,.ch2 .diagram.bk-diag,.ch3 .diagram.bk-diag{
+  background:none;border:0;padding:2px 0;
+  /* 原来的 <pre> 是宽块，卡片 align-self:center 会让盒子布局收缩成一条，
+     页面中段空出一大片，所以这里改成占满内容宽 */
+  align-self:stretch;width:100%;font-size:15px}
