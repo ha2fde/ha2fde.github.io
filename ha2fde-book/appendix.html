@@ -202,7 +202,7 @@ N = <span class="nu">3</span>  <span class="cm"># 用前 2 个字预测第 3 个
 
 <span class="kw">if</span> __name__ == <span class="st">&quot;__main__&quot;</span>:
     <span class="fn">main</span>()
-</code></pre><div class="bk-code-path">路径：scripts/lecture2/ngram_demo.py</div></div></div>
+</code></pre></div></div>
 <div class="bk-code-card" id="code2"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">02</span><div class="bk-code-meta"><b>embedding_demo.py</b><span>词向量：把词义变成可计算的向量</span></div><span class="bk-code-lines">127 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
 <span class="st">&quot;&quot;&quot;
 embedding_demo.py —— 演示&quot;词义 = 向量&quot;：语义相近的词，向量也相近。
@@ -329,7 +329,7 @@ WINDOW = <span class="nu">2</span>  <span class="cm"># 左右各看 2 个词，�
 
 <span class="kw">if</span> __name__ == <span class="st">&quot;__main__&quot;</span>:
     <span class="fn">main</span>()
-</code></pre><div class="bk-code-path">路径：scripts/lecture2/embedding_demo.py</div></div></div>
+</code></pre></div></div>
 <div class="bk-code-card" id="code3"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">03</span><div class="bk-code-meta"><b>tiny_lm_train_demo.py</b><span>迷你语言模型：几分钟训一个会续写的小网络</span></div><span class="bk-code-lines">125 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
 <span class="st">&quot;&quot;&quot;
 tiny_lm_train_demo.py —— 亲手训练一个极小的语言模型（对应 PPT 第 3~9 章）。
@@ -454,7 +454,7 @@ n_params = <span class="fn">sum</span>(p.size <span class="kw">for</span> p <spa
 <span class="fn">print</span>(<span class="st">&quot;  · loss 一路下降 —— “训练”就是在压这个预测错误；&quot;</span>)
 <span class="fn">print</span>(<span class="st">&quot;  · 生成的字从乱码变成了有诗的样子 —— 规律是从数据里学出来的，没人教它；&quot;</span>)
 <span class="fn">print</span>(<span class="st">&quot;  · 把模型放大到千亿参数、文本换成整个互联网 —— 那就是 GPT 的预训练。&quot;</span>)
-</code></pre><div class="bk-code-path">路径：scripts/lecture2/tiny_lm_train_demo.py</div></div></div>
+</code></pre></div></div>
 <div class="bk-code-card" id="code4"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">04</span><div class="bk-code-meta"><b>tokenizer_demo.py</b><span>分词：一句中文到底被切成几个 token</span></div><span class="bk-code-lines">39 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
 <span class="st">&quot;&quot;&quot;
 第 1 章: 它是不是在搜答案? —— token 切分 + 逐 token 续写
@@ -493,7 +493,7 @@ MODEL = <span class="st">&quot;Qwen/Qwen2.5-0.5B-Instruct&quot;</span>   <span c
 
 <span class="kw">if</span> __name__ == <span class="st">&quot;__main__&quot;</span>:
     <span class="fn">main</span>()
-</code></pre><div class="bk-code-path">路径：scripts/lecture3/tokenizer_demo.py</div></div></div>
+</code></pre></div></div>
 <div class="bk-code-card" id="code5"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">05</span><div class="bk-code-meta"><b>sampling_demo.py</b><span>采样：temperature / top-p 怎么改变输出</span></div><span class="bk-code-lines">40 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
 <span class="st">&quot;&quot;&quot;
 第 4 章: 为什么同样的问题, 答案每次不一样? —— temperature / top_p 采样对比
@@ -533,7 +533,7 @@ N = <span class="nu">3</span>  <span class="cm"># 每种设置各生成几次</s
 
 <span class="kw">if</span> __name__ == <span class="st">&quot;__main__&quot;</span>:
     <span class="fn">main</span>()
-</code></pre><div class="bk-code-path">路径：scripts/lecture3/sampling_demo.py</div></div></div>
+</code></pre></div></div>
 <div class="bk-code-card" id="code6"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">06</span><div class="bk-code-meta"><b>training_stages_demo.py</b><span>训练三阶段：预训练 → SFT → 对齐</span></div><span class="bk-code-lines">41 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
 <span class="st">&quot;&quot;&quot;
 第 2 章: 它凭什么会&quot;回答问题&quot;? —— base 模型 vs chat 模型同题对比
@@ -574,7 +574,7 @@ CHAT = <span class="st">&quot;Qwen/Qwen2.5-0.5B-Instruct&quot;</span>   <span cl
 
 <span class="kw">if</span> __name__ == <span class="st">&quot;__main__&quot;</span>:
     <span class="fn">main</span>()
-</code></pre><div class="bk-code-path">路径：scripts/lecture3/training_stages_demo.py</div></div></div>
+</code></pre></div></div>
 <div class="bk-code-card" id="code7"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">07</span><div class="bk-code-meta"><b>train_sft.py</b><span>SFT 实战：loss masking 与 QLoRA 微调</span></div><span class="bk-code-lines">102 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="kw">import</span> os
 os.environ[<span class="st">&#x27;HF_HOME&#x27;</span>] = <span class="st">&#x27;D:\\huggingface&#x27;</span>
 
@@ -676,7 +676,7 @@ trainer.<span class="fn">train</span>()
 model.<span class="fn">save_pretrained</span>(<span class="st">&#x27;D:\\huggingface\\output\\lora_model&#x27;</span>)
 tokenizer.<span class="fn">save_pretrained</span>(<span class="st">&#x27;D:\\huggingface\\output\\lora_model&#x27;</span>)
 <span class="fn">print</span>(<span class="st">&#x27;训练完成，模型已保存&#x27;</span>)
-</code></pre><div class="bk-code-path">路径：scripts/lecture3/train_sft.py</div></div></div>
+</code></pre></div></div>
 <div class="bk-code-card" id="code8"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">08</span><div class="bk-code-meta"><b>chat_context_demo.py</b><span>上下文：多轮对话是怎么拼进 prompt 的</span></div><span class="bk-code-lines">63 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
 <span class="st">&quot;&quot;&quot;
 第 3 章: 它怎么&quot;记得&quot;我们聊过什么? —— 历史拼接 / 模板渲染 / 超长截断
@@ -739,7 +739,7 @@ ROUNDS = [
 
 <span class="kw">if</span> __name__ == <span class="st">&quot;__main__&quot;</span>:
     <span class="fn">main</span>()
-</code></pre><div class="bk-code-path">路径：scripts/lecture3/chat_context_demo.py</div></div></div>
+</code></pre></div></div>
 <div class="bk-code-card" id="code9"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">09</span><div class="bk-code-meta"><b>cot_demo.py</b><span>思维链：加一句「逐步思考」的效果对比</span></div><span class="bk-code-lines">43 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
 <span class="st">&quot;&quot;&quot;
 第 5 章: 为什么它会一本正经地胡说八道? —— 思维链 CoT 对比
@@ -782,7 +782,7 @@ MODEL = <span class="st">&quot;Qwen/Qwen2.5-0.5B-Instruct&quot;</span>
 
 <span class="kw">if</span> __name__ == <span class="st">&quot;__main__&quot;</span>:
     <span class="fn">main</span>()
-</code></pre><div class="bk-code-path">路径：scripts/lecture3/cot_demo.py</div></div></div>
+</code></pre></div></div>
 <div class="bk-code-card" id="code10"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">10</span><div class="bk-code-meta"><b>rag_demo.py</b><span>RAG：切分 → 向量化 → 检索 → 拼接</span></div><span class="bk-code-lines">94 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
 <span class="st">&quot;&quot;&quot;
 第 6 章: 怎么让它知道&quot;没学过&quot;的东西? —— 最小 RAG 演示
@@ -876,7 +876,7 @@ DOCS = {
 
 <span class="kw">if</span> __name__ == <span class="st">&quot;__main__&quot;</span>:
     <span class="fn">main</span>()
-</code></pre><div class="bk-code-path">路径：scripts/lecture3/rag_demo.py</div></div></div>
+</code></pre></div></div>
 <div class="bk-code-card" id="code11"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">11</span><div class="bk-code-meta"><b>agent_tool_demo.py</b><span>工具调用：function calling 完整往返</span></div><span class="bk-code-lines">128 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
 <span class="st">&quot;&quot;&quot;
 第 7 章: 怎么让它&quot;动手干活&quot;? —— 工具调用 + ReAct 循环
@@ -1004,7 +1004,7 @@ SYSTEM_PROMPT = <span class="st">&quot;&quot;&quot;你是一个会使用工具�
 
 <span class="kw">if</span> __name__ == <span class="st">&quot;__main__&quot;</span>:
     <span class="fn">main</span>()
-</code></pre><div class="bk-code-path">路径：scripts/lecture3/agent_tool_demo.py</div></div></div>
+</code></pre></div></div>
 <div class="bk-code-card" id="code12"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">12</span><div class="bk-code-meta"><b>mcp_server.py</b><span>MCP Server：最小可用实现</span></div><span class="bk-code-lines">44 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
 <span class="st">&quot;&quot;&quot;
 第 8 章配套: 一个最小 MCP 工具服务器(stdio 传输)
@@ -1048,7 +1048,7 @@ _OPS = {ast.Add: op.add, ast.Sub: op.sub, ast.Mult: op.mul,
 
 <span class="kw">if</span> __name__ == <span class="st">&quot;__main__&quot;</span>:
     mcp.<span class="fn">run</span>()   <span class="cm"># 默认 stdio 传输: 通过标准输入输出与客户端通信</span>
-</code></pre><div class="bk-code-path">路径：scripts/lecture3/mcp_server.py</div></div></div>
+</code></pre></div></div>
 <div class="bk-code-card" id="code13"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">13</span><div class="bk-code-meta"><b>mcp_skills_demo.py</b><span>MCP + Skills：两者怎么配合</span></div><span class="bk-code-lines">72 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
 <span class="st">&quot;&quot;&quot;
 第 8 章: 工具从哪来, 怎么批量接进来? —— MCP 协议调用 + Skill 流程执行
@@ -1120,7 +1120,7 @@ HERE = <span class="fn">Path</span>(__file__).parent
 
 <span class="kw">if</span> __name__ == <span class="st">&quot;__main__&quot;</span>:
     <span class="fn">main</span>()
-</code></pre><div class="bk-code-path">路径：scripts/lecture3/mcp_skills_demo.py</div></div></div>
+</code></pre></div></div>
 <div class="bk-code-card" id="code14"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">14</span><div class="bk-code-meta"><b>api_server.py</b><span>OpenAI 兼容 API：自己起一个服务端</span></div><span class="bk-code-lines">112 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
 <span class="st">&quot;&quot;&quot;
 第 9 章: 怎么让别的程序用上它? —— 本地 Chat Completions 兼容服务
@@ -1232,7 +1232,7 @@ app = <span class="fn">FastAPI</span>(title=<span class="st">&quot;Local Chat Co
 <span class="kw">if</span> __name__ == <span class="st">&quot;__main__&quot;</span>:
     <span class="kw">import</span> uvicorn
     uvicorn.<span class="fn">run</span>(app, host=<span class="st">&quot;127.0.0.1&quot;</span>, port=<span class="nu">8000</span>)
-</code></pre><div class="bk-code-path">路径：scripts/lecture3/api_server.py</div></div></div>
+</code></pre></div></div>
 <div class="bk-code-card" id="code15"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">15</span><div class="bk-code-meta"><b>direct_api_demo.py</b><span>裸 API：手拼请求体、手解返回</span></div><span class="bk-code-lines">59 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
 <span class="st">&quot;&quot;&quot;
 direct_api_demo.py —— 第2章配套脚本：最底层，直接调 API
@@ -1291,7 +1291,7 @@ QUESTION = <span class="st">&quot;用一句话解释：什么是 Agent 的 ReAct
 
 <span class="kw">if</span> __name__ == <span class="st">&quot;__main__&quot;</span>:
     <span class="fn">main</span>()
-</code></pre><div class="bk-code-path">路径：scripts/lecture4/direct_api_demo.py</div></div></div>
+</code></pre></div></div>
 <div class="bk-code-card" id="code16"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">16</span><div class="bk-code-meta"><b>sdk_react_demo.py</b><span>SDK + 手写 ReAct 主循环</span></div><span class="bk-code-lines">84 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
 <span class="st">&quot;&quot;&quot;
 sdk_react_demo.py —— 第4章配套脚本：用 SDK 手写 ReAct 循环
@@ -1375,7 +1375,7 @@ TOOLS_SCHEMA = [{
 
 <span class="kw">if</span> __name__ == <span class="st">&quot;__main__&quot;</span>:
     <span class="fn">main</span>()
-</code></pre><div class="bk-code-path">路径：scripts/lecture4/sdk_react_demo.py</div></div></div>
+</code></pre></div></div>
 <div class="bk-code-card" id="code17"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">17</span><div class="bk-code-meta"><b>langgraph_plan_demo.py</b><span>LangGraph：把流程画成图来编排</span></div><span class="bk-code-lines">89 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
 <span class="st">&quot;&quot;&quot;
 langgraph_plan_demo.py —— 第7章配套脚本：用 LangGraph 画一张 Plan-and-Execute 图
@@ -1464,7 +1464,7 @@ llm = <span class="fn">ChatOpenAI</span>(base_url=BASE_URL, api_key=API_KEY, mod
 
 <span class="kw">if</span> __name__ == <span class="st">&quot;__main__&quot;</span>:
     <span class="fn">main</span>()
-</code></pre><div class="bk-code-path">路径：scripts/lecture4/langgraph_plan_demo.py</div></div></div>
+</code></pre></div></div>
   </section>
 <nav class="bk-pager">
 <a class="prev" href="ch07.html"><small>← 上一章</small><b>第 7 章 深造 — 大模型与 AI Agent 权威资料索引</b></a>

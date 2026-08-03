@@ -204,8 +204,6 @@ body.wide #bk-bar{left:0}
 .bk-code-body .cm{color:#94A3B8;font-style:italic}
 .bk-code-body .nu{color:#B45309}
 .bk-code-body .fn{color:#2563EB}
-.bk-code-path{padding:9px 20px;border-top:1px solid var(--bk-line);font-size:11.5px;
-  color:var(--bk-faint);background:#fff}
 
 /* 版权页 */
 .bk-colophon{margin-top:34px;padding:30px 56px 34px;background:#fff;border:1px solid var(--bk-line);
