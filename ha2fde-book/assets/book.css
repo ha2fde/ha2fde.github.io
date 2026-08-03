@@ -1157,9 +1157,17 @@ body.bk-debug .bk-sheet[data-fitted] .bk-paper{outline:2px solid #DC2626;outline
 .bk-diag .dg-row{display:flex;align-items:stretch;gap:11px}
 .bk-diag .dg-col{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:6px}
 .bk-diag .dg-hd{font-weight:700;font-size:.92em;color:var(--sub)}
-.bk-diag .dg-box{flex:1 1 auto;min-width:0;background:var(--panel);
-  border:1px solid var(--border);border-radius:7px;padding:9px 13px;
-  display:flex;flex-direction:column;justify-content:center;gap:3px}
+/* 底色和描边都由本章主色调出来，所以同一套组件放进第 5 章是青的、
+   第 3 章是紫的，不必每章单配。原来用 --panel 那档浅灰压在白纸上几乎
+   看不出边界，方框读不出「块」的感觉。 */
+.bk-diag .dg-box{flex:1 1 auto;min-width:0;border-radius:7px;padding:9px 13px;
+  display:flex;flex-direction:column;justify-content:center;gap:3px;
+  background:var(--panel,#F8FAFC);border:1px solid var(--border,#E2E8F0)}
+@supports (background:color-mix(in srgb,red 7%,#fff)){
+  .bk-diag .dg-box{background:color-mix(in srgb,var(--accent,#2563EB) 7%,#fff);
+    border-color:color-mix(in srgb,var(--accent,#2563EB) 38%,#fff)}
+  .bk-diag .dg-br li::before{color:color-mix(in srgb,var(--accent,#2563EB) 45%,#fff)}
+}
 .bk-diag .dg-row>.dg-box{flex:1 1 0}
 .bk-diag .dg-box>b{display:block;font-weight:700;color:var(--key);margin-bottom:2px}
 .bk-diag .dg-box span b{color:var(--key);margin-right:5px}
