@@ -618,8 +618,6 @@ display:flex;align-items:center;justify-content:center;letter-spacing:1px;}
 .ch4 .takeaway{background:var(--takebg);border-radius:10px;color:var(--takefg);font-size:16px;
 display:flex;align-items:center;padding:0 22px;}
 .ch4 .takeaway b{margin-right:2px;}
-.ch4 .ascii{font-family:"Sarasa Mono SC","Sarasa Term SC","更纱黑体 Mono SC","NSimSun","SimSun-ExtB","SimSun",monospace;
-line-height:1.32;white-space:pre;letter-spacing:0;}
 .ch4 .panel{background:var(--panel);border:1px solid var(--border);border-radius:6px;
 padding:10px 14px;display:flex;flex-direction:column;justify-content:center;}
 .ch4 .code{background:var(--codebg);color:var(--codefg);border-radius:10px;padding:12px 16px;
@@ -1143,3 +1141,60 @@ body.bk-debug .bk-sheet[data-fitted] .bk-paper{outline:2px solid #DC2626;outline
     width:100% !important;height:100% !important}
   .bk-pager{display:none !important}
 }
+
+/* ================= 字符画组件 .bk-diag =================
+   替代 <pre class="ascii"> 手绘的方框流程图。原来那些图靠等宽字体的
+   「中文正好 2 倍西文」对齐，可这套字体（Sarasa Mono SC 等）是 Windows
+   专有的，别的系统上全部退化成 1.66 倍，于是每行多一个汉字就右移 1/3 格；
+   更要命的是源文本本身也没画在字符网格上（第 4 章边框 73 格、内容行 97 格），
+   就算字体修好也还是歪。所以这里换成真正的盒子布局：宽度由浏览器算，
+   不依赖任何字体，跟着 --bk-scale / --fit 一起缩放，文字还能被选中和搜索。
+
+   颜色一律走 var(--accent/--key/--ink/--sub/--panel/--border)，这些变量各章
+   自己定义（见 .ch4{...}），所以同一套组件放进任何一章都自动跟着该章配色。 */
+.bk-diag{display:flex;flex-direction:column;justify-content:center;gap:9px;
+  font-size:14px;line-height:1.55;color:var(--ink)}
+.bk-diag .dg-row{display:flex;align-items:stretch;gap:11px}
+.bk-diag .dg-col{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:6px}
+.bk-diag .dg-hd{font-weight:700;font-size:.92em;color:var(--sub)}
+.bk-diag .dg-box{flex:1 1 auto;min-width:0;background:var(--panel);
+  border:1px solid var(--border);border-radius:7px;padding:9px 13px;
+  display:flex;flex-direction:column;justify-content:center;gap:3px}
+.bk-diag .dg-row>.dg-box{flex:1 1 0}
+.bk-diag .dg-box>b{display:block;font-weight:700;color:var(--key);margin-bottom:2px}
+.bk-diag .dg-box span b{color:var(--key);margin-right:5px}
+.bk-diag .dg-box span i,.bk-diag .dg-box>i{font-style:normal;color:var(--sub)}
+.bk-diag .dg-box span i{margin-right:5px}
+.bk-diag .dg-note{color:var(--sub);font-size:.9em;margin-top:3px}
+/* 箭头夹在两个盒子之间，自己不占伸缩份额 */
+.bk-diag .dg-arw{flex:0 0 auto;align-self:center;color:var(--accent);
+  font-size:1.35em;font-weight:700;line-height:1}
+.bk-diag .dg-arw.dg-down{align-self:flex-start;margin-left:34px}
+.bk-diag .dg-cap{color:var(--sub);font-size:.93em}
+.bk-diag .dg-cap em{font-style:normal;color:var(--warn);font-weight:700;margin-right:4px}
+/* 轴线：两端文字 + 中间自动撑开的横线 */
+.bk-diag .dg-axis{display:flex;align-items:center;gap:9px;color:var(--sub);font-size:.9em}
+.bk-diag .dg-ln{flex:1 1 auto;min-width:16px;height:0;border-top:1px solid var(--border)}
+/* 分支列表：├ / └ 由 CSS 画，不再写进正文 */
+.bk-diag .dg-br{list-style:none}
+.bk-diag .dg-br li{position:relative;padding-left:15px}
+.bk-diag .dg-br li::before{content:"├";position:absolute;left:0;color:var(--border)}
+.bk-diag .dg-br li:last-child::before{content:"└"}
+.bk-diag .dg-br em{font-style:normal;font-weight:700;color:var(--key)}
+.bk-diag .dg-br u{text-decoration:none;color:var(--accent);margin-left:6px;font-size:.9em}
+/* 图节点小胶囊 */
+.bk-diag .dg-graph{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-bottom:2px}
+.bk-diag .dg-graph span{border:1px solid var(--border);border-radius:5px;
+  padding:1px 7px;background:#fff;font-weight:600;font-size:.92em}
+.bk-diag .dg-graph em{font-style:normal;color:var(--accent);font-weight:700}
+.bk-diag .dg-graph i{font-style:normal;color:var(--sub);font-size:.86em}
+.bk-diag .dg-loop{color:var(--accent);font-size:.9em}
+/* 名称 + 说明两列，名称列宽由最长的那个自己撑出来，天然对齐 */
+.bk-diag .dg-kv{display:grid;grid-template-columns:auto 1fr;gap:3px 14px}
+.bk-diag .dg-kv dt{font-weight:700;color:var(--key)}
+.bk-diag .dg-kv dd{color:var(--ink)}
+/* 代码型内容仍用等宽，但每行是独立元素，不存在跨行对齐问题 */
+.bk-diag .dg-mono span,.bk-diag .dg-mono-in{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-size:.93em;white-space:pre}
+.bk-diag.dg-4{display:grid;grid-template-columns:1fr 1fr;gap:13px 24px;align-content:center}
