@@ -106,10 +106,19 @@ GPT 也一样 —— 它只是把这件事做到了极致。</pre>
 <div class="bk-sheet" id="p28" data-ch="2" data-page="28" data-title="全篇地图：一条因果链 不是概念清单 —— 每一环都为解决上一环的痛而生"><div class="bk-paper ch2"><div class="bk-fit"><section class="slide active">
   <header><span class="tag">导读</span><h1>全篇地图：一条因果链<span class="sub">不是概念清单 —— 每一环都为解决上一环的痛而生</span></h1></header>
   <div class="art-wrap">
-<pre class="art"> 文字 ──→ 数字 ──→ 词向量 ──→ 神经网络 ──→ 注意力 ──→ Transformer ──→ 预训练 ──→ <span class="hl">GPT</span>
-          │        │         │          │          │             │
-        <span class="ok">机器只懂</span>   <span class="ok">数字没有</span>   <span class="ok">记词组</span>     <span class="ok">顺序读</span>      <span class="ok">光并行会</span>     <span class="ok">架构有了</span>
-        <span class="ok">数字 ①</span>   <span class="ok">"意思" ②</span>  <span class="ok">太笨 ③④</span>  <span class="ok">慢且健忘 ⑤</span>  <span class="ok">乱顺序 ⑥⑦</span>   <span class="ok">没"知识"⑧⑨</span></pre>
+<div class="art bk-diag">
+<div class="dg-row" style="gap:3px;font-size:12.8px">
+<div class="dg-box"><b>文字</b></div><div class="dg-arw">→</div>
+<div class="dg-box"><b>数字</b><i>机器只懂数字 ①</i></div><div class="dg-arw">→</div>
+<div class="dg-box"><b>词向量</b><i>数字没有“意思” ②</i></div><div class="dg-arw">→</div>
+<div class="dg-box"><b>神经网络</b><i>记词组太笨 ③④</i></div><div class="dg-arw">→</div>
+<div class="dg-box"><b>注意力</b><i>顺序读慢且健忘 ⑤</i></div><div class="dg-arw">→</div>
+<div class="dg-box"><b>Transformer</b><i>光并行会乱顺序 ⑥⑦</i></div><div class="dg-arw">→</div>
+<div class="dg-box"><b>预训练</b><i>架构有了没“知识” ⑧⑨</i></div><div class="dg-arw">→</div>
+<div class="dg-box dg-core"><b>GPT</b></div>
+</div>
+<div class="dg-cap">每一格下面写的，是它为什么还不够 —— 也就是下一格出现的理由</div>
+</div>
   </div>
   <div class="foot">
     <div class="take"><span class="lbl">阅读约定 · 每章四块</span>① 你可能的疑惑 → ② 点破卡点 → ③ 一张字符画（承载 80% 的理解）→ ④ 右下角几行主干代码。全篇零公式。</div>
@@ -122,13 +131,16 @@ GPT 也一样 —— 它只是把这件事做到了极致。</pre>
     <div class="pt"><span class="lbl">② 点破卡点</span>机器里只有高低电平，它从没"见过"文字。文字、图片、声音进计算机的第一件事，都是<b>变成数字</b>——后面所有故事都建立在这之上。</div>
   </div>
   <div class="art-wrap">
-<pre class="art">     你看到的                机器看到的
- ┌────────────┐      ┌───────────────────────┐
- │ "猫"        │  →   │ 231, 140, 171  (字节)  │
- │ 一张猫的照片 │  →   │ 255, 200, 180, 45, …  │
- │ 一段猫叫声   │  →   │ 0.12, -0.87, 0.33, …  │
- └────────────┘      └───────────────────────┘
-        <span class="hl">机器世界里只有一种数据：数字</span></pre>
+<div class="art bk-diag">
+<div class="dg-row">
+<div class="dg-col"><div class="dg-hd">你看到的</div>
+<div class="dg-box"><span>“猫”</span><span>一张猫的照片</span><span>一段猫叫声</span></div></div>
+<div class="dg-arw">→</div>
+<div class="dg-col" style="flex:1.5 1 0"><div class="dg-hd">机器看到的</div>
+<div class="dg-box dg-mono"><span>231, 140, 171　(字节)</span><span>255, 200, 180, 45, …</span><span>0.12, -0.87, 0.33, …</span></div></div>
+</div>
+<div class="dg-cap">机器世界里只有一种数据：数字</div>
+</div>
   </div>
   <div class="foot">
     <div class="take"><span class="lbl">一句话说清</span>数字化解决"机器无法表示文字"——一切先变数字，机器才能接手。</div>
@@ -144,14 +156,15 @@ print(list(numbers))         <span class="cm"># [231, 140, 171]</span></pre></di
     <div class="pt"><span class="lbl">② 点破卡点</span>编号里没有"意思"。"猫"是 3 号、"狗"是 4 号，3 和 4 挨得近，<b>不代表猫和狗像</b>。机器拿到的只有"一样 / 不一样"，永远算不出"有多像"。</div>
   </div>
   <div class="art-wrap">
-<pre class="art"> 词表 = ["我", "爱", "猫", "狗", …]   共 50000 个词
-
- "猫" → [0, 0, <span class="hl">1</span>, 0, 0, 0, …, 0]   ← 第 3 位是 1，其余全 0
- "狗" → [0, 0, 0, <span class="hl">1</span>, 0, 0, …, 0]   ← 第 4 位是 1，其余全 0
-
- 这只是一个"位置号码"：
-   "猫"和"狗"的距离  <span class="hl">==</span>  "猫"和"汽车"的距离
-   → 语义信息：<span class="hl">零</span></pre>
+<div class="art bk-diag">
+<div class="dg-hd">词表 = ["我", "爱", "猫", "狗", …]　　共 50000 个词</div>
+<div class="dg-box dg-mono"><span>"猫" → [0, 0, 1, 0, 0, 0, …, 0]<i>　← 第 3 位是 1，其余全 0</i></span>
+<span>"狗" → [0, 0, 0, 1, 0, 0, …, 0]<i>　← 第 4 位是 1，其余全 0</i></span></div>
+<div class="dg-col" style="gap:2px">
+<div class="dg-cap">这只是一个“位置号码”：</div>
+<div class="dg-cap">　“猫”和“狗”的距离　==　“猫”和“汽车”的距离</div>
+<div class="dg-cap"><em>→</em>语义信息：零</div></div>
+</div>
   </div>
   <div class="foot">
     <div class="take"><span class="lbl">一句话说清</span>one-hot 让每个词有了数字表示，但表示里不含语义——这正是下一个瓶颈的入口。</div>
@@ -168,17 +181,18 @@ print(onehot[<span class="st">"猫"</span>])  <span class="cm"># [0, 0, 1, 0] �
     <div class="pt"><span class="lbl">② 点破卡点</span>需要的不是"编号"，而是<b>"坐标"</b>：让意思相近的词，坐标也相近——"像不像"从此变成"距离近不近"，机器就能算了。</div>
   </div>
   <div class="art-wrap">
-<pre class="art">        语义空间（几百维，压成 2 维示意）
-   高 │
- 王   │     ●国王            ●女王
- 室   │            ●男人   ●女人
-      │
- 水   │          ●苹果(水果)
- 果   │    ●香蕉
-      └──────────────────────────→
-
- 关键性质：<span class="hl">方向也带含义</span>   国王 − 男人 + 女人 ≈ <span class="hl">女王</span>
- <span class="dim">坐标不用人设计：读够多文本，"上下文相似的词"会自动凑到一块儿</span></pre>
+<div class="art bk-diag">
+<div class="dg-hd">语义空间（几百维，压成 2 维示意）</div>
+<div class="dg-plot">
+<em style="left:-2px;top:2px;transform:translateX(-100%)">王室</em>
+<em style="left:-2px;top:56%;transform:translateX(-100%)">水果</em>
+<b style="left:24%;top:14%">国王</b><b style="left:56%;top:14%">女王</b>
+<b style="left:37%;top:34%">男人</b><b style="left:58%;top:34%">女人</b>
+<b style="left:32%;top:66%">苹果(水果)</b><b style="left:16%;top:84%">香蕉</b>
+</div>
+<div class="dg-cap"><em>关键性质</em>方向也带含义　　国王 − 男人 + 女人 ≈ 女王</div>
+<div class="dg-cap">坐标不用人设计：读够多文本，“上下文相似的词”会自动凑到一块儿</div>
+</div>
   </div>
   <div class="foot">
     <div class="take"><span class="lbl">一句话说清</span>embedding 解决"数字没有语义"——词义被编码成向量，语义相近则向量相近。（动手：附录脚本 1 embedding_demo.py）</div>
@@ -194,15 +208,14 @@ similarity(embeddings[<span class="st">"猫"</span>], embeddings[<span class="st
     <div class="pt"><span class="lbl">② 点破卡点</span>造句不是一口气生成，而是一连串"下一个词该接什么"的小决定。<b>全篇主线任务：给定前文，预测下一个词。</b>最早的解法朴素到可爱：数频次。</div>
   </div>
   <div class="art-wrap">
-<pre class="art"> 主线任务：<span class="hl">预测下一个词</span>   "我 今天 想吃 ___" → 饭? 苹果? 火锅?
-
- n-gram 的做法：翻统计表（历史上"想吃"后面接过什么）
-   "想吃" → 饭×80   苹果×45   火锅×30  …   谁次数多谁赢
-
- 两个致命伤：
- ① <span class="hl">组合爆炸</span>：前 3 个词的组合数 = 词表³，表根本装不下
- ② <span class="hl">没有泛化</span>："他想吃 ___"表里没见过 → 直接抓瞎
-   <span class="dim">（明明和"我想吃"很像，但表格不懂"很像"）</span></pre>
+<div class="art bk-diag">
+<div class="dg-hd">主线任务：预测下一个词　　“我 今天 想吃 ___” → 饭? 苹果? 火锅?</div>
+<div class="dg-box"><b>n-gram 的做法：翻统计表</b><i>历史上“想吃”后面接过什么</i>
+<span class="dg-mono-in">“想吃” → 饭×80　苹果×45　火锅×30　…　谁次数多谁赢</span></div>
+<div class="dg-hd">两个致命伤</div>
+<ul class="dg-br"><li><em>组合爆炸</em>　前 3 个词的组合数 = 词表³，表根本装不下</li>
+<li><em>没有泛化</em>　“他想吃 ___”表里没见过 → 直接抓瞎（明明和“我想吃”很像，但表格不懂“很像”）</li></ul>
+</div>
   </div>
   <div class="foot">
     <div class="take"><span class="lbl">一句话说清</span>n-gram 用"统计前文后最常接什么"来预测，直观但只会死记硬背。（动手：附录脚本 2 ngram_demo.py）</div>
@@ -218,16 +231,17 @@ next_word = most_common(counts[(<span class="st">"想"</span>, <span class="st">
     <div class="pt"><span class="lbl">② 点破卡点</span>n-gram 是背答案：装不下所有组合，更不会举一反三。要换成<b>"学规律"</b>：相似的前文应该给出相似的预测——前文是向量，"像不像"终于能算了。</div>
   </div>
   <div class="art-wrap">
-<pre class="art"> 前文词向量 → [加权变换] → [加权变换] → [加权变换] → 词表上每个词的概率
- "我 今天 想吃"                                   饭    0.41
-                                                 苹果  0.27
-                                                 火锅  0.18
-                                                 <span class="dim">…（其余 5 万个词）</span>
-
- 关键：输入是<span class="hl">向量</span>
- "他喜欢吃苹果" ≈ "我喜欢吃苹果"（向量相近）
- → 输出概率自动相近 = <span class="hl">举一反三</span>，没见过也能猜
- <span class="dim">权重怎么来？预测错了就微调，重复亿万次（细节本篇不展开）</span></pre>
+<div class="art bk-diag">
+<div class="dg-row">
+<div class="dg-box"><b>前文词向量</b><i>“我 今天 想吃”</i></div><div class="dg-arw">→</div>
+<div class="dg-box">加权变换</div><div class="dg-arw">→</div>
+<div class="dg-box">加权变换</div><div class="dg-arw">→</div>
+<div class="dg-box">加权变换</div><div class="dg-arw">→</div>
+<div class="dg-box dg-core dg-mono"><b>词表上每个词的概率</b><span>饭　　0.41</span><span>苹果　0.27</span><span>火锅　0.18</span><i>…（其余 5 万个词）</i></div>
+</div>
+<div class="dg-cap"><em>关键</em>输入是向量　—　“他喜欢吃苹果” ≈ “我喜欢吃苹果”（向量相近）→ 输出概率自动相近 = 举一反三，没见过也能猜</div>
+<div class="dg-note">权重怎么来？预测错了就微调，重复亿万次（细节本篇不展开）</div>
+</div>
   </div>
   <div class="foot">
     <div class="take"><span class="lbl">一句话说清</span>神经网络解决"背不下、不会类推"——把查表换成学规律，向量进、概率出。</div>
@@ -243,16 +257,20 @@ probs = to_vocab_probs(h)     <span class="cm"># -&gt; 每个候选词的概率<
     <div class="pt"><span class="lbl">② 点破卡点</span>早期标准答案 RNN/LSTM 就是逐词顺序读、滚动更新"记忆"。两个治不好的病：<b>慢</b>——前一个不算完下一个不能开始，GPU 干瞪眼；<b>健忘</b>——读到句尾，句首已被冲刷干净。</div>
   </div>
   <div class="art-wrap">
-<pre class="art"> RNN 顺序读：
-  我 → 今天 → 想 → 吃 → …
-  ↓     ↓    ↓   ↓
- [记忆]→[记忆]→[记忆]→[记忆]→…   <span class="hl">第 1000 个词要等前 999 个算完</span>
-
- 长句实测：
- "我出生在中国，……（隔了 50 个词）……所以我说一口流利的 ___"
- 读到结尾时，"中国"的信息已磨损殆尽 → 填不出"中文"
-
- <span class="dim">病根：信息只能从前往后、挤一条缝传过来</span></pre>
+<div class="art bk-diag">
+<div class="dg-hd">RNN 顺序读</div>
+<div class="dg-row" style="gap:5px">
+<div class="dg-box"><b>我</b><i>记忆</i></div><div class="dg-arw">→</div>
+<div class="dg-box"><b>今天</b><i>记忆</i></div><div class="dg-arw">→</div>
+<div class="dg-box"><b>想</b><i>记忆</i></div><div class="dg-arw">→</div>
+<div class="dg-box"><b>吃</b><i>记忆</i></div><div class="dg-arw">→</div>
+<div class="dg-box"><i>…</i></div>
+</div>
+<div class="dg-cap"><em>慢</em>第 1000 个词要等前 999 个算完</div>
+<div class="dg-box"><b>长句实测</b><span>“我出生在中国，……（隔了 50 个词）……所以我说一口流利的 ___”</span>
+<i>读到结尾时，“中国”的信息已磨损殆尽 → 填不出“中文”</i></div>
+<div class="dg-cap"><em>病根</em>信息只能从前往后、挤一条缝传过来</div>
+</div>
   </div>
   <div class="foot">
     <div class="take"><span class="lbl">一句话说清</span>RNN 用"顺序读 + 滚动记忆"处理序列，慢且记不住长的——瓶颈就在"顺序"本身。</div>
@@ -269,17 +287,17 @@ probs = predict(memory)          <span class="cm"># 用最后的记忆预测</sp
     <div class="pt"><span class="lbl">② 点破卡点</span>RNN 的病根是"信息只能排队往前挤"。反过来：<b>每个词确定自己含义时，直接同时看整句话所有词，重点看跟自己相关的</b>。词义不再是死的——由上下文现场决定。</div>
   </div>
   <div class="art-wrap">
-<pre class="art"> 句子："我 买了 一部 苹果 手机"
-
- 确定"苹果"的含义时，它同时看所有词（线粗 = 关注多）：
-
-           我  ············  弱
-   苹果 →  买了 ───────────  中
-           手机 <span class="hl">═══════════  强 ← 重点！</span>
-           一部 ············  弱
-
- "苹果"的新向量 = 全句按关注度加权汇总
- → 挨着"手机"它是<span class="hl">公司</span>，挨着"吃"它是<span class="ok">水果</span></pre>
+<div class="art bk-diag">
+<div class="dg-hd">句子：“我 买了 一部 苹果 手机”　　确定“苹果”的含义时，它同时看所有词（线越粗 = 关注越多）</div>
+<div class="dg-box dg-bar">
+<b>苹果 →</b><u style="border-top-width:1px;border-style:dotted"></u><i>我　弱</i>
+<span></span><u style="border-top-width:2px"></u><i>买了　中</i>
+<span></span><u style="border-top-width:5px"></u><i>手机　强 ← 重点！</i>
+<span></span><u style="border-top-width:1px;border-style:dotted"></u><i>一部　弱</i>
+</div>
+<div class="dg-cap">“苹果”的新向量 = 全句按关注度加权汇总</div>
+<div class="dg-cap"><em>→</em>挨着“手机”它是公司，挨着“吃”它是水果</div>
+</div>
   </div>
   <div class="foot">
     <div class="take"><span class="lbl">一句话说清</span>注意力解决"看不见全局"——词义由上下文决定，任意两个词都能直接连线，不管隔多远。</div>
@@ -295,17 +313,21 @@ probs = predict(memory)          <span class="cm"># 用最后的记忆预测</sp
     <div class="pt"><span class="lbl">② 点破卡点</span>每个词"看全句"这件事互相不用等——"苹果"看它的，"手机"看它的，<b>所有词同时算</b>。RNN 的"慢"被一起治了：GPU 终于火力全开。</div>
   </div>
   <div class="art-wrap">
-<pre class="art">   我     买了    一部    苹果    手机
-   ↓      ↓      ↓      ↓      ↓
- ┌──────────────────────────────┐
- │  各自看全句，<span class="hl">同时算，互不等待</span>  │ ← 一次矩阵运算全部算完
- └──────────────────────────────┘
-   ↓      ↓      ↓      ↓      ↓
-  新向量  新向量  新向量  新向量  新向量
- <span class="dim">（每个新向量都"泡过"整句上下文）</span>
-
- 对比 RNN：必须等"苹果"算完，才能开始算"手机"
- 拿"泡过上下文"的向量去预测下一个词，质量远超那份"被冲刷的记忆"</pre>
+<div class="art bk-diag">
+<div class="dg-g4" style="grid-template-columns:repeat(5,1fr)">
+<div class="dg-cap" style="text-align:center">我</div><div class="dg-cap" style="text-align:center">买了</div>
+<div class="dg-cap" style="text-align:center">一部</div><div class="dg-cap" style="text-align:center">苹果</div>
+<div class="dg-cap" style="text-align:center">手机</div></div>
+<div class="dg-vt">↓</div>
+<div class="dg-box dg-core"><b>各自看全句，同时算，互不等待</b><i>一次矩阵运算全部算完</i></div>
+<div class="dg-vt">↓</div>
+<div class="dg-g4" style="grid-template-columns:repeat(5,1fr)">
+<div class="dg-cap" style="text-align:center">新向量</div><div class="dg-cap" style="text-align:center">新向量</div>
+<div class="dg-cap" style="text-align:center">新向量</div><div class="dg-cap" style="text-align:center">新向量</div>
+<div class="dg-cap" style="text-align:center">新向量</div></div>
+<div class="dg-cap">（每个新向量都“泡过”整句上下文）　对比 RNN：必须等“苹果”算完，才能开始算“手机”</div>
+<div class="dg-note">拿“泡过上下文”的向量去预测下一个词，质量远超那份“被冲刷的记忆”</div>
+</div>
   </div>
   <div class="foot">
     <div class="take"><span class="lbl">一句话说清</span>注意力天然并行——全局感知和速度，一次解决。</div>
@@ -320,18 +342,16 @@ context_vecs = attention(embed(sentence))  <span class="cm"># 并行</span></pre
     <div class="pt"><span class="lbl">② 点破卡点</span>不玄，就是三块拼图各治一病——前两块你已经见过了。唯一的真问题：<b>所有词同时看，不就不知道谁先谁后了吗？</b>所以补一块"位置编码"。</div>
   </div>
   <div class="art-wrap">
-<pre class="art"> ① <span class="hl">注意力</span>   → 全局感知（治"看不见全局"，第 6 节）
- ② <span class="hl">并行</span>     → 治 RNN 的慢（第 5 节）
- ③ <span class="hl">位置编码</span> → 治"并行导致的乱序"：把"第几个词"直接加进向量
-
- 输入: [词向量 + 位置戳]   ← 每个词自带"我排第几"
-        ↓
- ┌────────────────────────┐
- │ 注意力：每个词看全句      │
- │ 变换层：加权变换提取规律  │
- └────────────────────────┘
-        ↓  <span class="dim">同样的块，堆几十层</span>
- 输出：每个位置的向量 → 预测下一个词的概率</pre>
+<div class="art bk-diag">
+<ul class="dg-br"><li><em>① 注意力</em>　→ 全局感知（治“看不见全局”，第 6 节）</li>
+<li><em>② 并行</em>　　→ 治 RNN 的慢（第 5 节）</li>
+<li><em>③ 位置编码</em>→ 治“并行导致的乱序”：把“第几个词”直接加进向量</li></ul>
+<div class="dg-box"><b>输入：[词向量 + 位置戳]</b><i>每个词自带“我排第几”</i></div>
+<div class="dg-vt">↓</div>
+<div class="dg-box dg-core"><span><b>注意力</b>每个词看全句</span><span><b>变换层</b>加权变换提取规律</span></div>
+<div class="dg-vt">↓<i>同样的块，堆几十层</i></div>
+<div class="dg-box"><b>输出：每个位置的向量</b><i>→ 预测下一个词的概率</i></div>
+</div>
   </div>
   <div class="foot">
     <div class="take"><span class="lbl">一句话说清</span>Transformer = 注意力（全局）+ 并行（快）+ 位置编码（不乱序）。三块各治一病，合起来就是全部。</div>
@@ -348,13 +368,16 @@ probs = vocab_head(x[-1])              <span class="cm"># -&gt; 下一个词概�
     <div class="pt"><span class="lbl">② 点破卡点</span>不是它更"聪明"，是它<b>吃得下</b>：并行让它能吃互联网级数据，注意力让它能学长距离规律。两者相加，才撑得起后面的"大力出奇迹"。</div>
   </div>
   <div class="art-wrap">
-<pre class="art">                RNN                     Transformer
- 读法      逐词顺序，等前一个          所有词同时看
- 速度      慢，GPU 大量闲置            并行，GPU 跑满
- 长程信息  句首信息一路磨损            任意两词直接连线，距离无关
- 能吃数据  小                         <span class="hl">互联网级</span>
-
- → 架构竞争的终点不是"谁巧妙"，是<span class="hl">"谁能吃下更多数据"</span></pre>
+<div class="art bk-diag">
+<div class="dg-box dg-cmp">
+<u></u><b>RNN</b><b>Transformer</b>
+<u>读法</u><span>逐词顺序，等前一个</span><span>所有词同时看</span>
+<u>速度</u><span>慢，GPU 大量闲置</span><span>并行，GPU 跑满</span>
+<u>长程信息</u><span>句首信息一路磨损</span><span>任意两词直接连线，距离无关</span>
+<u>能吃数据</u><span>小</span><span>互联网级</span>
+</div>
+<div class="dg-cap"><em>→</em>架构竞争的终点不是“谁巧妙”，是“谁能吃下更多数据”</div>
+</div>
   </div>
   <div class="foot">
     <div class="take"><span class="lbl">一句话说清</span>Transformer 赢在工程属性——并行吃数据、连线学长程，为规模化铺平了路。</div>
@@ -370,17 +393,17 @@ probs = transformer(context_tokens)</pre></div>
     <div class="pt"><span class="lbl">② 点破卡点</span>答案简单得不像话：把互联网文本切成无数道"前文 → 下一个词"练习题，反复做、错了就调权重。<b>不需要人工标注——原文的下一个词就是标准答案。</b></div>
   </div>
   <div class="art-wrap">
-<pre class="art"> 互联网海量文本 → 自动切成练习题（免费，要多少有多少）
-   "巴黎是法国的___"   答案："首都"（原文自带）
-   "水在零度会___"     答案："结冰"
- 亿万道题 × 反复练习 → 权重慢慢调好 = <span class="hl">基础模型</span>
-
- 练完它会的不只是接词：语法、常识、推理雏形都被压进权重
-
- 两条路线：
-   <span class="hl">GPT</span>：从左往右"续写" → 擅长生成（写、说、编）
-   BERT：遮住中间"填空" → 擅长理解（分类、检索）
- <span class="dim">生成式应用爆发，走的是 GPT 路线</span></pre>
+<div class="art bk-diag">
+<div class="dg-box"><b>互联网海量文本 → 自动切成练习题</b><i>免费，要多少有多少</i>
+<span class="dg-mono-in">“巴黎是法国的___”　答案：“首都”（原文自带）</span>
+<span class="dg-mono-in">“水在零度会___”　　答案：“结冰”</span></div>
+<div class="dg-cap">亿万道题 × 反复练习 → 权重慢慢调好 = <em></em>基础模型；练完它会的不只是接词：语法、常识、推理雏形都被压进权重</div>
+<div class="dg-row">
+<div class="dg-box"><b>GPT</b><i>从左往右“续写” → 擅长生成（写、说、编）</i></div>
+<div class="dg-box"><b>BERT</b><i>遮住中间“填空” → 擅长理解（分类、检索）</i></div>
+</div>
+<div class="dg-cap">生成式应用爆发，走的是 GPT 路线</div>
+</div>
   </div>
   <div class="foot">
     <div class="take"><span class="lbl">一句话说清</span>预训练解决"知识从哪来"——用文本自身当答案，在海量续写练习中学会语言。</div>
@@ -397,12 +420,18 @@ probs = transformer(context_tokens)</pre></div>
     <div class="pt"><span class="lbl">② 点破卡点</span>不用从头再练。预训练已把"语言本身"学完（贵，但只练一次）；之后用<b>少量任务样本再练一小段</b>——这叫微调。分工：预训练学语言，微调学干活。</div>
   </div>
   <div class="art-wrap">
-<pre class="art"> 预训练（贵，一次）          微调（便宜，随便多少次）
- 海量文本 → 基础模型 ──┬─ + 客服对话样本 → <span class="hl">客服机器人</span>
- （续写练习）          ├─ + 代码样本     → <span class="hl">编程助手</span>
-                      └─ + 法律文书样本 → <span class="hl">法律助手</span>
-
- 类比：预训练 = 读完整个图书馆；微调 = <span class="ok">入职培训</span></pre>
+<div class="art bk-diag">
+<div class="dg-row">
+<div class="dg-col" style="flex:0 0 auto;justify-content:center"><div class="dg-hd">预训练（贵，一次）</div>
+<div class="dg-box"><b>海量文本 → 基础模型</b><i>（续写练习）</i></div></div>
+<div class="dg-arw">→</div>
+<div class="dg-col"><div class="dg-hd">微调（便宜，随便多少次）</div>
+<ul class="dg-br"><li>+ 客服对话样本　<u>→ 客服机器人</u></li>
+<li>+ 代码样本　　　<u>→ 编程助手</u></li>
+<li>+ 法律文书样本　<u>→ 法律助手</u></li></ul></div>
+</div>
+<div class="dg-cap"><em>类比</em>预训练 = 读完整个图书馆；微调 = 入职培训</div>
+</div>
   </div>
   <div class="foot">
     <div class="take"><span class="lbl">一句话说清</span>微调解决"通用不会干活"——在基础模型上用少量样本二次训练，便宜的定制化。</div>
@@ -418,15 +447,24 @@ for sample in task_samples:            <span class="cm"># 少量任务样本</sp
     <div class="pt"><span class="lbl">② 点破卡点</span>因为"变大"本身就是可靠的进步路线：参数量、数据量、算力<b>同步</b>放大时，错误率平滑持续下降（缩放定律）。更意外的是<b>涌现</b>——有些能力小模型几乎为零，过了某个规模突然就会了。</div>
   </div>
   <div class="art-wrap">
-<pre class="art"> 预测错误率 │╲
-           │ ╲___ <span class="hl">随规模平滑下降，还没看到头</span>（缩放定律）
-           │
- 某项能力  │           ····· 大到一定程度：<span class="hl">突然会了</span>（涌现）
-           │ ········· 小模型：几乎为零
-           └──────────────────────→ 参数↑ 数据↑ 算力↑（同步放大）
-
- <span class="dim">直觉：足够大的"预测下一个词"机器，
- 为了把预测压得更准，被迫学会了语言背后的规律</span></pre>
+<div class="art bk-diag">
+<div class="dg-row">
+<div class="dg-col"><div class="dg-hd">预测错误率</div>
+<div class="dg-box" style="padding:6px 10px">
+<svg viewBox="0 0 220 96" style="width:100%;height:88px" preserveAspectRatio="none" aria-hidden="true">
+<path d="M8 8 C 60 62, 110 78, 212 86" fill="none" stroke="var(--accent,#2563EB)" stroke-width="2.5"/>
+</svg></div>
+<div class="dg-cap">随规模平滑下降，还没看到头（缩放定律）</div></div>
+<div class="dg-col"><div class="dg-hd">某项能力</div>
+<div class="dg-box" style="padding:6px 10px">
+<svg viewBox="0 0 220 96" style="width:100%;height:88px" preserveAspectRatio="none" aria-hidden="true">
+<path d="M8 88 L120 84 C 150 82, 158 20, 212 12" fill="none" stroke="var(--accent,#2563EB)" stroke-width="2.5"/>
+</svg></div>
+<div class="dg-cap">小模型几乎为零；大到一定程度：突然会了（涌现）</div></div>
+</div>
+<div class="dg-axis"><span>参数↑　数据↑　算力↑（同步放大）</span><span class="dg-ln"></span><span>→</span></div>
+<div class="dg-cap"><em>直觉</em>足够大的“预测下一个词”机器，为了把预测压得更准，被迫学会了语言背后的规律</div>
+</div>
   </div>
   <div class="foot">
     <div class="take"><span class="lbl">一句话说清</span>缩放定律解决"怎么稳定变强"——规模同步放大，能力非线性提升，这就是"大力出奇迹"的依据。</div>
@@ -438,19 +476,22 @@ train(big_model, big_data)</pre></div>
 <div class="bk-sheet" id="p42" data-ch="2" data-page="42" data-title="总结与衔接：一张递进图"><div class="bk-paper ch2"><div class="bk-fit"><section class="slide active">
   <header><span class="tag">第 10 节 · 收束</span><h1>总结与衔接：一张递进图</h1></header>
   <div class="art-wrap">
-<pre class="art"> 文字 ─①→ 数字 ─②→ 词向量 ─④→ 神经网络 ─⑥→ 注意力 ─⑦→ Transformer
-        机器只懂数字  编号没语义   记词组太笨    顺序读慢且健忘  并行会乱序
-                                                                │
-                                            预训练+微调 ←⑧──────┘
-                                                │⑨
-                                                ↓
-                                            <span class="hl">LLM（大模型）</span>
-                                                │
-                            <span class="ok">"它本质上，还是一台很会预测下一个词的机器"</span>
-                                                │
-                              对齐 → 会聊天的助手 → 会用工具的智能体
-                                                │
-                              <span class="hl">▶▶ 系列下一篇《从 token 到 agent》</span></pre>
+<div class="art bk-diag">
+<div class="dg-row" style="gap:3px;font-size:12.8px">
+<div class="dg-box"><b>文字</b></div><div class="dg-arw">①→</div>
+<div class="dg-box"><b>数字</b><i>机器只懂数字</i></div><div class="dg-arw">②→</div>
+<div class="dg-box"><b>词向量</b><i>编号没语义</i></div><div class="dg-arw">④→</div>
+<div class="dg-box"><b>神经网络</b><i>记词组太笨</i></div><div class="dg-arw">⑥→</div>
+<div class="dg-box"><b>注意力</b><i>顺序读慢且健忘</i></div><div class="dg-arw">⑦→</div>
+<div class="dg-box"><b>Transformer</b><i>并行会乱序</i></div>
+</div>
+<div class="dg-vt">↓<i>⑧ 预训练 + 微调　⑨</i></div>
+<div class="dg-box dg-core" style="align-self:center"><b>LLM（大模型）</b>
+<i>“它本质上，还是一台很会预测下一个词的机器”</i></div>
+<div class="dg-vt">↓</div>
+<div class="dg-cap" style="text-align:center">对齐 → 会聊天的助手 → 会用工具的智能体</div>
+<div class="dg-cap" style="text-align:center"><em>▶▶</em>系列下一篇《从 token 到 agent》</div>
+</div>
   </div>
   <div class="foot">
     <div class="take"><span class="lbl">留给下一篇的三个钩子</span>1. token 是什么？为什么大模型按 token 算钱？　2. 只会"预测下一个词"的机器，为什么能听懂指令、还会一本正经地胡说八道？　3. 从"会说"到"会做"——agent 是怎么调用工具的？</div>

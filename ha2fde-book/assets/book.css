@@ -1254,3 +1254,21 @@ body.bk-debug .bk-sheet[data-fitted] .bk-paper{outline:2px solid #DC2626;outline
   /* 原来的 <pre> 是宽块，卡片 align-self:center 会让盒子布局收缩成一条，
      页面中段空出一大片，所以这里改成占满内容宽 */
   align-self:stretch;width:100%;font-size:15px}
+/* 二维语义空间散点：点位用百分比绝对定位，不依赖字符网格 */
+.bk-diag .dg-plot{position:relative;height:158px;margin:2px 0 2px 40px;
+  border-left:1px solid var(--border,#E2E8F0);border-bottom:1px solid var(--border,#E2E8F0)}
+.bk-diag .dg-plot b{position:absolute;transform:translate(-50%,-50%);white-space:nowrap;
+  font-weight:600;font-size:.9em;color:var(--key,#0F172A)}
+.bk-diag .dg-plot b::before{content:"●";color:var(--accent,#2563EB);margin-right:4px;font-size:.85em}
+.bk-diag .dg-plot em{position:absolute;font-style:normal;color:var(--sub,#64748B);font-size:.86em}
+/* 注意力强度：线宽由内联 border-width 给，粗细就是权重 */
+.bk-diag .dg-bar{display:grid;grid-template-columns:auto 1fr auto;gap:3px 12px;align-items:center}
+.bk-diag .dg-bar u{text-decoration:none;height:0;border-top:1px solid var(--accent,#2563EB)}
+.bk-diag .dg-bar i{font-style:normal;color:var(--sub,#64748B);font-size:.9em}
+/* 两列对比：行首是维度名，右边两栏对照 */
+.bk-diag .dg-cmp{display:grid;grid-template-columns:auto 1fr 1fr;gap:5px 22px;align-items:baseline}
+.bk-diag .dg-cmp>u{text-decoration:none;color:var(--sub,#64748B);font-weight:700;font-size:.92em}
+.bk-diag .dg-cmp>b{color:var(--key,#0F172A);font-size:.95em}
+/* 第 2 章的 art-wrap 会把内容居中收缩，同第 5 章处理 */
+.ch2 .art-wrap>.bk-diag{width:100%;font-size:14.5px}
+.ch2 .bk-diag{--accent:#4338CA;--sub:#667085;--key:#1C2333;--border:#E5E7EE;--warn:#B45309}
