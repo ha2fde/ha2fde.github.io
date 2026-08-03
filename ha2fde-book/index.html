@@ -1,24 +1,189 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI Agent 实战手册 · ha2fde-book</title>
-<style>
-  body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; max-width: 720px; margin: 48px auto; padding: 0 20px; line-height: 1.7; color: #24292f; }
-  h1 { font-size: 1.6em; }
-  ul { padding-left: 20px; }
-  a { color: #0969da; text-decoration: none; }
-  a:hover { text-decoration: underline; }
-</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Agent 实战手册 · 目录</title>
+<link rel="stylesheet" href="assets/book.css">
 </head>
 <body>
-<h1>AI Agent 实战手册</h1>
-<p>七讲一条主线：用起来 → 懂原理 → 会开发 → 能落地 → 看远方。</p>
-<ul>
-  <li><a href="book.html">全书在线阅读（book.html）</a></li>
-  <li><a href="README.md">说明文档（README.md）</a></li>
-  <li><a href="scripts/">配套脚本（scripts/）</a></li>
-</ul>
+
+<aside id="bk-side">
+  <div class="bk-brand">
+    <div class="bk-b-k">AI AGENT 系列培训</div>
+    <h1>AI Agent 实战手册</h1>
+    <p>从装上第一个 Agent，到把它送进生产</p>
+  </div>
+  <div class="bk-search"><input id="bk-q" type="search" placeholder="筛选章节标题…" autocomplete="off"></div>
+  <div id="bk-nav">
+    <div class="bk-nav-extra" style="margin-top:0;padding-top:0;border:none">
+      <a href="#bk-cover"><b>—</b>扉页与目录</a>
+    </div>
+    <div class="bk-nav-ch" data-ch="1"><a class="bk-nav-ch-t" href="ch01.html#p1" style="--ac:#2563EB"><b>01</b><span>破冰</span><i>1</i></a><ul>
+<li><a href="ch01.html#p2">开篇与导读</a></li>
+<li><a href="ch01.html#p4">破误解：Agent 是干活不是回答</a></li>
+<li><a href="ch01.html#p7">形态一：终端与编辑器里的 Agent</a></li>
+<li><a href="ch01.html#p10">大脑从哪来：云端 API 与本地部署</a></li>
+<li><a href="ch01.html#p17">形态二三：消息里与办公里的 Agent</a></li>
+<li><a href="ch01.html#p19">选型总表与 0 成本方案</a></li>
+<li><a href="ch01.html#p23">今晚就动手与总结</a></li>
+</ul></div>
+<div class="bk-nav-ch" data-ch="2"><a class="bk-nav-ch-t" href="ch02.html#p26" style="--ac:#0F766E"><b>02</b><span>前传</span><i>26</i></a><ul>
+<li><a href="ch02.html#p27">全篇地图：一条因果链</a></li>
+<li><a href="ch02.html#p29">机器怎么表示文字：one-hot 与 embedding</a></li>
+<li><a href="ch02.html#p32">怎么学会造句：n-gram → 神经网络 → RNN</a></li>
+<li><a href="ch02.html#p35">注意力机制与 Transformer</a></li>
+<li><a href="ch02.html#p39">预训练、微调与缩放定律</a></li>
+<li><a href="ch02.html#p42">递进小结与可运行实验</a></li>
+</ul></div>
+<div class="bk-nav-ch" data-ch="3"><a class="bk-nav-ch-t" href="ch03.html#p45" style="--ac:#7C3AED"><b>03</b><span>机制</span><i>45</i></a><ul>
+<li><a href="ch03.html#p46">10 个困惑总览</a></li>
+<li><a href="ch03.html#p48">生成机制：不是检索，是逐 token 预测</a></li>
+<li><a href="ch03.html#p50">训练与对齐：base / instruct、SFT、QLoRA</a></li>
+<li><a href="ch03.html#p54">上下文与记忆：它其实没有记忆</a></li>
+<li><a href="ch03.html#p57">采样、幻觉与思维链</a></li>
+<li><a href="ch03.html#p60">外部知识：RAG 检索增强</a></li>
+<li><a href="ch03.html#p62">工具调用与 MCP / CLI / Skills</a></li>
+<li><a href="ch03.html#p67">API 调用与全景回顾</a></li>
+</ul></div>
+<div class="bk-nav-ch" data-ch="4"><a class="bk-nav-ch-t" href="ch04.html#p70" style="--ac:#B45309"><b>04</b><span>开发</span><i>70</i></a><ul>
+<li><a href="ch04.html#p71">主线：抽象降级与三条路线</a></li>
+<li><a href="ch04.html#p75">手写：裸 API → SDK → ReAct 主循环</a></li>
+<li><a href="ch04.html#p79">范式选择：ReAct vs Plan-and-Execute</a></li>
+<li><a href="ch04.html#p81">框架全景、总对比表与选型决策树</a></li>
+<li><a href="ch04.html#p86">落地 checklist 与可运行脚本</a></li>
+</ul></div>
+<div class="bk-nav-ch" data-ch="5"><a class="bk-nav-ch-t" href="ch05.html#p90" style="--ac:#0D9488"><b>05</b><span>工程化</span><i>90</i></a><ul>
+<li><a href="ch05.html#p91">本章要回答的问题与三模块总览</a></li>
+<li><a href="ch05.html#p94">模块 A：六大能力支柱</a></li>
+<li><a href="ch05.html#p102">模块 B：四层协议生态与 MCP</a></li>
+<li><a href="ch05.html#p109">模块 C：企业落地与成熟度五级</a></li>
+<li><a href="ch05.html#p114">总结与落地评估速查表</a></li>
+</ul></div>
+<div class="bk-nav-ch" data-ch="6"><a class="bk-nav-ch-t" href="ch06.html#p117" style="--ac:#4F46E5"><b>06</b><span>收束</span><i>117</i></a><ul>
+<li><a href="ch06.html#p118">本章定位与全篇地图</a></li>
+<li><a href="ch06.html#p120">序章 · 苦涩的教训</a></li>
+<li><a href="ch06.html#p126">Chat 的实现（回顾串讲）</a></li>
+<li><a href="ch06.html#p133">Agent 的实现（回顾串讲）</a></li>
+<li><a href="ch06.html#p139">终章 · 体验的时代</a></li>
+</ul></div>
+<div class="bk-nav-ch" data-ch="7"><a class="bk-nav-ch-t" href="ch07.html#p145" style="--ac:#475569"><b>07</b><span>深造</span><i>145</i></a><ul>
+<li><a href="ch07.html#p146">怎么读这份索引</a></li>
+<li><a href="ch07.html#p148">第 1 组 · 大模型基础</a></li>
+<li><a href="ch07.html#p149">第 2 组 · Agent 范式</a></li>
+<li><a href="ch07.html#p151">第 3 组 · 工程架构</a></li>
+<li><a href="ch07.html#p152">第 4 组 · 协议生态</a></li>
+<li><a href="ch07.html#p153">第 5 组 · 落地实践</a></li>
+<li><a href="ch07.html#p155">第 6 组 · 课程路径与总览</a></li>
+</ul></div>
+    <div class="bk-nav-extra">
+      <a href="appendix.html"><b>附</b>配套代码（17 个脚本）</a>
+    </div>
+  </div>
+</aside>
+
+<div id="bk-top">
+  <button id="bk-burger" title="收起 / 展开目录">☰</button>
+  <div id="bk-crumb"><b>扉页</b></div>
+  <div class="bk-tools">
+    <button onclick="bkPrint()">打印 / 导出 PDF</button>
+    <button onclick="bkAll(1)">展开全部代码</button>
+  </div>
+  <div id="bk-pageno"><b>—</b> / 156</div>
+</div>
+<div id="bk-bar"><i></i></div>
+
+<main id="bk-main"><div class="bk-wrap">
+<section class="bk-title-page" id="bk-cover">
+    <div class="bk-tp-k">AI AGENT 系列培训 · 整合版 v2</div>
+    <h1>AI Agent 实战手册</h1>
+    <h2>从装上第一个 Agent，到把它送进生产<br>七章一条主线：用起来 → 懂原理 → 会开发 → 能落地 → 看远方</h2>
+    <div class="bk-tp-rule"></div>
+    <div class="bk-tp-facts">
+      <div><b>7</b><span>章</span></div>
+      <div><b>156</b><span>页</span></div>
+      <div><b>17</b><span>配套脚本</span></div>
+      <div><b>23</b><span>条参考资料</span></div>
+      <div><b>9</b><span>个页面</span></div>
+    </div>
+    <p class="bk-tp-note">
+      全书按章拆分，每章单独一页，打开快、改起来也清爽；浏览器 <code>Ctrl</code>+<code>F</code> 在当前章内搜索。<br>
+      左侧目录树跳转，<code>←</code> <code>→</code> 逐页翻，<code>Ctrl</code>+<code>P</code> 导出 16:9 PDF。
+    </p>
+  </section>
+<section class="bk-toc" id="bk-toc">
+    <div class="bk-toc-h">CONTENTS</div>
+    <div class="bk-toc-t">目　录</div>
+    <div class="bk-toc-ch"><a href="ch01.html#p1" style="--ac:#2563EB"><b>第 一 章</b><span>破冰 — 装上你的第一个 Agent</span><i></i><em>1</em></a></div>
+<div class="bk-toc-sec"><a href="ch01.html#p2"><span>开篇与导读</span><i></i><em>2</em></a></div>
+<div class="bk-toc-sec"><a href="ch01.html#p4"><span>破误解：Agent 是干活不是回答</span><i></i><em>4</em></a></div>
+<div class="bk-toc-sec"><a href="ch01.html#p7"><span>形态一：终端与编辑器里的 Agent</span><i></i><em>7</em></a></div>
+<div class="bk-toc-sec"><a href="ch01.html#p10"><span>大脑从哪来：云端 API 与本地部署</span><i></i><em>10</em></a></div>
+<div class="bk-toc-sec"><a href="ch01.html#p17"><span>形态二三：消息里与办公里的 Agent</span><i></i><em>17</em></a></div>
+<div class="bk-toc-sec"><a href="ch01.html#p19"><span>选型总表与 0 成本方案</span><i></i><em>19</em></a></div>
+<div class="bk-toc-sec"><a href="ch01.html#p23"><span>今晚就动手与总结</span><i></i><em>23</em></a></div>
+<div class="bk-toc-ch"><a href="ch02.html#p26" style="--ac:#0F766E"><b>第 二 章</b><span>前传 — 大模型是怎么一步步长出来的</span><i></i><em>26</em></a></div>
+<div class="bk-toc-sec"><a href="ch02.html#p27"><span>全篇地图：一条因果链</span><i></i><em>27</em></a></div>
+<div class="bk-toc-sec"><a href="ch02.html#p29"><span>机器怎么表示文字：one-hot 与 embedding</span><i></i><em>29</em></a></div>
+<div class="bk-toc-sec"><a href="ch02.html#p32"><span>怎么学会造句：n-gram → 神经网络 → RNN</span><i></i><em>32</em></a></div>
+<div class="bk-toc-sec"><a href="ch02.html#p35"><span>注意力机制与 Transformer</span><i></i><em>35</em></a></div>
+<div class="bk-toc-sec"><a href="ch02.html#p39"><span>预训练、微调与缩放定律</span><i></i><em>39</em></a></div>
+<div class="bk-toc-sec"><a href="ch02.html#p42"><span>递进小结与可运行实验</span><i></i><em>42</em></a></div>
+<div class="bk-toc-ch"><a href="ch03.html#p45" style="--ac:#7C3AED"><b>第 三 章</b><span>机制 — 从接话机器到会干活的助手</span><i></i><em>45</em></a></div>
+<div class="bk-toc-sec"><a href="ch03.html#p46"><span>10 个困惑总览</span><i></i><em>46</em></a></div>
+<div class="bk-toc-sec"><a href="ch03.html#p48"><span>生成机制：不是检索，是逐 token 预测</span><i></i><em>48</em></a></div>
+<div class="bk-toc-sec"><a href="ch03.html#p50"><span>训练与对齐：base / instruct、SFT、QLoRA</span><i></i><em>50</em></a></div>
+<div class="bk-toc-sec"><a href="ch03.html#p54"><span>上下文与记忆：它其实没有记忆</span><i></i><em>54</em></a></div>
+<div class="bk-toc-sec"><a href="ch03.html#p57"><span>采样、幻觉与思维链</span><i></i><em>57</em></a></div>
+<div class="bk-toc-sec"><a href="ch03.html#p60"><span>外部知识：RAG 检索增强</span><i></i><em>60</em></a></div>
+<div class="bk-toc-sec"><a href="ch03.html#p62"><span>工具调用与 MCP / CLI / Skills</span><i></i><em>62</em></a></div>
+<div class="bk-toc-sec"><a href="ch03.html#p67"><span>API 调用与全景回顾</span><i></i><em>67</em></a></div>
+<div class="bk-toc-ch"><a href="ch04.html#p70" style="--ac:#B45309"><b>第 四 章</b><span>开发 — 从直接调 API 到用框架编排</span><i></i><em>70</em></a></div>
+<div class="bk-toc-sec"><a href="ch04.html#p71"><span>主线：抽象降级与三条路线</span><i></i><em>71</em></a></div>
+<div class="bk-toc-sec"><a href="ch04.html#p75"><span>手写：裸 API → SDK → ReAct 主循环</span><i></i><em>75</em></a></div>
+<div class="bk-toc-sec"><a href="ch04.html#p79"><span>范式选择：ReAct vs Plan-and-Execute</span><i></i><em>79</em></a></div>
+<div class="bk-toc-sec"><a href="ch04.html#p81"><span>框架全景、总对比表与选型决策树</span><i></i><em>81</em></a></div>
+<div class="bk-toc-sec"><a href="ch04.html#p86"><span>落地 checklist 与可运行脚本</span><i></i><em>86</em></a></div>
+<div class="bk-toc-ch"><a href="ch05.html#p90" style="--ac:#0D9488"><b>第 五 章</b><span>工程化 — 从能用到能信、能管、能连、能落地</span><i></i><em>90</em></a></div>
+<div class="bk-toc-sec"><a href="ch05.html#p91"><span>本章要回答的问题与三模块总览</span><i></i><em>91</em></a></div>
+<div class="bk-toc-sec"><a href="ch05.html#p94"><span>模块 A：六大能力支柱</span><i></i><em>94</em></a></div>
+<div class="bk-toc-sec"><a href="ch05.html#p102"><span>模块 B：四层协议生态与 MCP</span><i></i><em>102</em></a></div>
+<div class="bk-toc-sec"><a href="ch05.html#p109"><span>模块 C：企业落地与成熟度五级</span><i></i><em>109</em></a></div>
+<div class="bk-toc-sec"><a href="ch05.html#p114"><span>总结与落地评估速查表</span><i></i><em>114</em></a></div>
+<div class="bk-toc-ch"><a href="ch06.html#p117" style="--ac:#4F46E5"><b>第 六 章</b><span>收束 — 通往 AGI 之路</span><i></i><em>117</em></a></div>
+<div class="bk-toc-sec"><a href="ch06.html#p118"><span>本章定位与全篇地图</span><i></i><em>118</em></a></div>
+<div class="bk-toc-sec"><a href="ch06.html#p120"><span>序章 · 苦涩的教训</span><i></i><em>120</em></a></div>
+<div class="bk-toc-sec"><a href="ch06.html#p126"><span>Chat 的实现（回顾串讲）</span><i></i><em>126</em></a></div>
+<div class="bk-toc-sec"><a href="ch06.html#p133"><span>Agent 的实现（回顾串讲）</span><i></i><em>133</em></a></div>
+<div class="bk-toc-sec"><a href="ch06.html#p139"><span>终章 · 体验的时代</span><i></i><em>139</em></a></div>
+<div class="bk-toc-ch"><a href="ch07.html#p145" style="--ac:#475569"><b>第 七 章</b><span>深造 — 大模型与 AI Agent 权威资料索引</span><i></i><em>145</em></a></div>
+<div class="bk-toc-sec"><a href="ch07.html#p146"><span>怎么读这份索引</span><i></i><em>146</em></a></div>
+<div class="bk-toc-sec"><a href="ch07.html#p148"><span>第 1 组 · 大模型基础</span><i></i><em>148</em></a></div>
+<div class="bk-toc-sec"><a href="ch07.html#p149"><span>第 2 组 · Agent 范式</span><i></i><em>149</em></a></div>
+<div class="bk-toc-sec"><a href="ch07.html#p151"><span>第 3 组 · 工程架构</span><i></i><em>151</em></a></div>
+<div class="bk-toc-sec"><a href="ch07.html#p152"><span>第 4 组 · 协议生态</span><i></i><em>152</em></a></div>
+<div class="bk-toc-sec"><a href="ch07.html#p153"><span>第 5 组 · 落地实践</span><i></i><em>153</em></a></div>
+<div class="bk-toc-sec"><a href="ch07.html#p155"><span>第 6 组 · 课程路径与总览</span><i></i><em>155</em></a></div>
+    <div class="bk-toc-sec" style="margin-top:22px">
+      <a href="appendix.html"><span>附录 · 配套代码（17 个可运行脚本）</span><i></i><em>后附</em></a>
+    </div>
+    <div class="bk-toc-foot">
+      <span>整合版 v2 · 2026-08-03</span>
+      <span>全书 156 页</span>
+    </div>
+  </section>
+<section class="bk-colophon">
+    <b>关于这本书</b><br>
+    本书由七份独立培训胶片整合而成，已完成内容去重与衔接标注：协议（第 1 章点名 / 第 3 章入门 / 第 5 章分层）、
+    ReAct（第 3 章原理 / 第 4 章代码）、训练三步（第 2 章历史 / 第 3 章选型）。<br>
+    第 6 章采用概念版，其工程章 3 页已并入第 3 章。<br>
+    每页原为 16:9 幻灯片；内容超过一页高度的，会自动等比缩放以保证不被裁切。<br>
+    配套脚本见 <a href="appendix.html">附录</a>，源码同时放在 <code>scripts/</code> 目录下。　｜　整合版 v2 · 分章版
+  </section>
+</div></main>
+
+<button id="bk-up" onclick="scrollTo({top:0,behavior:'smooth'})" title="回到顶部">↑</button>
+
+<script src="assets/book.js"></script>
 </body>
 </html>

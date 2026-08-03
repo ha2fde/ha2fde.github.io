@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>附录 · 配套代码 · AI Agent 实战手册</title>
+<link rel="stylesheet" href="assets/book.css">
+</head>
+<body>
+
+<aside id="bk-side">
+  <div class="bk-brand">
+    <div class="bk-b-k">AI AGENT 系列培训</div>
+    <h1>AI Agent 实战手册</h1>
+    <p>从装上第一个 Agent，到把它送进生产</p>
+  </div>
+  <div class="bk-search"><input id="bk-q" type="search" placeholder="筛选章节标题…" autocomplete="off"></div>
+  <div id="bk-nav">
+    <div class="bk-nav-extra" style="margin-top:0;padding-top:0;border:none">
+      <a href="index.html#bk-cover"><b>—</b>扉页与目录</a>
+    </div>
+    <div class="bk-nav-ch" data-ch="1"><a class="bk-nav-ch-t" href="ch01.html#p1" style="--ac:#2563EB"><b>01</b><span>破冰</span><i>1</i></a><ul>
+<li><a href="ch01.html#p2">开篇与导读</a></li>
+<li><a href="ch01.html#p4">破误解：Agent 是干活不是回答</a></li>
+<li><a href="ch01.html#p7">形态一：终端与编辑器里的 Agent</a></li>
+<li><a href="ch01.html#p10">大脑从哪来：云端 API 与本地部署</a></li>
+<li><a href="ch01.html#p17">形态二三：消息里与办公里的 Agent</a></li>
+<li><a href="ch01.html#p19">选型总表与 0 成本方案</a></li>
+<li><a href="ch01.html#p23">今晚就动手与总结</a></li>
+</ul></div>
+<div class="bk-nav-ch" data-ch="2"><a class="bk-nav-ch-t" href="ch02.html#p26" style="--ac:#0F766E"><b>02</b><span>前传</span><i>26</i></a><ul>
+<li><a href="ch02.html#p27">全篇地图：一条因果链</a></li>
+<li><a href="ch02.html#p29">机器怎么表示文字：one-hot 与 embedding</a></li>
+<li><a href="ch02.html#p32">怎么学会造句：n-gram → 神经网络 → RNN</a></li>
+<li><a href="ch02.html#p35">注意力机制与 Transformer</a></li>
+<li><a href="ch02.html#p39">预训练、微调与缩放定律</a></li>
+<li><a href="ch02.html#p42">递进小结与可运行实验</a></li>
+</ul></div>
+<div class="bk-nav-ch" data-ch="3"><a class="bk-nav-ch-t" href="ch03.html#p45" style="--ac:#7C3AED"><b>03</b><span>机制</span><i>45</i></a><ul>
+<li><a href="ch03.html#p46">10 个困惑总览</a></li>
+<li><a href="ch03.html#p48">生成机制：不是检索，是逐 token 预测</a></li>
+<li><a href="ch03.html#p50">训练与对齐：base / instruct、SFT、QLoRA</a></li>
+<li><a href="ch03.html#p54">上下文与记忆：它其实没有记忆</a></li>
+<li><a href="ch03.html#p57">采样、幻觉与思维链</a></li>
+<li><a href="ch03.html#p60">外部知识：RAG 检索增强</a></li>
+<li><a href="ch03.html#p62">工具调用与 MCP / CLI / Skills</a></li>
+<li><a href="ch03.html#p67">API 调用与全景回顾</a></li>
+</ul></div>
+<div class="bk-nav-ch" data-ch="4"><a class="bk-nav-ch-t" href="ch04.html#p70" style="--ac:#B45309"><b>04</b><span>开发</span><i>70</i></a><ul>
+<li><a href="ch04.html#p71">主线：抽象降级与三条路线</a></li>
+<li><a href="ch04.html#p75">手写：裸 API → SDK → ReAct 主循环</a></li>
+<li><a href="ch04.html#p79">范式选择：ReAct vs Plan-and-Execute</a></li>
+<li><a href="ch04.html#p81">框架全景、总对比表与选型决策树</a></li>
+<li><a href="ch04.html#p86">落地 checklist 与可运行脚本</a></li>
+</ul></div>
+<div class="bk-nav-ch" data-ch="5"><a class="bk-nav-ch-t" href="ch05.html#p90" style="--ac:#0D9488"><b>05</b><span>工程化</span><i>90</i></a><ul>
+<li><a href="ch05.html#p91">本章要回答的问题与三模块总览</a></li>
+<li><a href="ch05.html#p94">模块 A：六大能力支柱</a></li>
+<li><a href="ch05.html#p102">模块 B：四层协议生态与 MCP</a></li>
+<li><a href="ch05.html#p109">模块 C：企业落地与成熟度五级</a></li>
+<li><a href="ch05.html#p114">总结与落地评估速查表</a></li>
+</ul></div>
+<div class="bk-nav-ch" data-ch="6"><a class="bk-nav-ch-t" href="ch06.html#p117" style="--ac:#4F46E5"><b>06</b><span>收束</span><i>117</i></a><ul>
+<li><a href="ch06.html#p118">本章定位与全篇地图</a></li>
+<li><a href="ch06.html#p120">序章 · 苦涩的教训</a></li>
+<li><a href="ch06.html#p126">Chat 的实现（回顾串讲）</a></li>
+<li><a href="ch06.html#p133">Agent 的实现（回顾串讲）</a></li>
+<li><a href="ch06.html#p139">终章 · 体验的时代</a></li>
+</ul></div>
+<div class="bk-nav-ch" data-ch="7"><a class="bk-nav-ch-t" href="ch07.html#p145" style="--ac:#475569"><b>07</b><span>深造</span><i>145</i></a><ul>
+<li><a href="ch07.html#p146">怎么读这份索引</a></li>
+<li><a href="ch07.html#p148">第 1 组 · 大模型基础</a></li>
+<li><a href="ch07.html#p149">第 2 组 · Agent 范式</a></li>
+<li><a href="ch07.html#p151">第 3 组 · 工程架构</a></li>
+<li><a href="ch07.html#p152">第 4 组 · 协议生态</a></li>
+<li><a href="ch07.html#p153">第 5 组 · 落地实践</a></li>
+<li><a href="ch07.html#p155">第 6 组 · 课程路径与总览</a></li>
+</ul></div>
+    <div class="bk-nav-extra">
+      <a href="#bk-appendix"><b>附</b>配套代码（17 个脚本）</a>
+    </div>
+  </div>
+</aside>
+
+<div id="bk-top">
+  <button id="bk-burger" title="收起 / 展开目录">☰</button>
+  <div id="bk-crumb"><b>扉页</b></div>
+  <div class="bk-tools">
+    <button onclick="bkPrint()">打印 / 导出 PDF</button>
+    <button onclick="bkAll(1)">展开全部代码</button>
+  </div>
+  <div id="bk-pageno"><b>—</b> / 156</div>
+</div>
+<div id="bk-bar"><i></i></div>
+
+<main id="bk-main"><div class="bk-wrap">
+<section class="bk-apx" id="bk-appendix">
+    <div class="bk-apx-k">APPENDIX</div>
+    <h2>附录 · 配套代码</h2>
+    <p class="bk-apx-lead">17 个可运行脚本，覆盖第二、三、四章的全部演示。纯 CPU 可跑，Python 3.10+。
+      点击任意条目展开完整源码；代码已内嵌在本文件中，离线可读。</p>
+    <div class="bk-code-index"><div class="bk-code-group">第二章 · 从计算机到 GPT</div>
+<a class="bk-code-link" href="#code1"><b>ngram_demo.py</b><span>n-gram 语言模型：统计共现，看它为什么会崩</span></a>
+<a class="bk-code-link" href="#code2"><b>embedding_demo.py</b><span>词向量：把词义变成可计算的向量</span></a>
+<a class="bk-code-link" href="#code3"><b>tiny_lm_train_demo.py</b><span>迷你语言模型：几分钟训一个会续写的小网络</span></a>
+<div class="bk-code-group">第三章 · ChatGPT 是怎么工作的</div>
+<a class="bk-code-link" href="#code4"><b>tokenizer_demo.py</b><span>分词：一句中文到底被切成几个 token</span></a>
+<a class="bk-code-link" href="#code5"><b>sampling_demo.py</b><span>采样：temperature / top-p 怎么改变输出</span></a>
+<a class="bk-code-link" href="#code6"><b>training_stages_demo.py</b><span>训练三阶段：预训练 → SFT → 对齐</span></a>
+<a class="bk-code-link" href="#code7"><b>train_sft.py</b><span>SFT 实战：loss masking 与 QLoRA 微调</span></a>
+<a class="bk-code-link" href="#code8"><b>chat_context_demo.py</b><span>上下文：多轮对话是怎么拼进 prompt 的</span></a>
+<a class="bk-code-link" href="#code9"><b>cot_demo.py</b><span>思维链：加一句「逐步思考」的效果对比</span></a>
+<a class="bk-code-link" href="#code10"><b>rag_demo.py</b><span>RAG：切分 → 向量化 → 检索 → 拼接</span></a>
+<a class="bk-code-link" href="#code11"><b>agent_tool_demo.py</b><span>工具调用：function calling 完整往返</span></a>
+<a class="bk-code-link" href="#code12"><b>mcp_server.py</b><span>MCP Server：最小可用实现</span></a>
+<a class="bk-code-link" href="#code13"><b>mcp_skills_demo.py</b><span>MCP + Skills：两者怎么配合</span></a>
+<a class="bk-code-link" href="#code14"><b>api_server.py</b><span>OpenAI 兼容 API：自己起一个服务端</span></a>
+<div class="bk-code-group">第四章 · 开发 Agent</div>
+<a class="bk-code-link" href="#code15"><b>direct_api_demo.py</b><span>裸 API：手拼请求体、手解返回</span></a>
+<a class="bk-code-link" href="#code16"><b>sdk_react_demo.py</b><span>SDK + 手写 ReAct 主循环</span></a>
+<a class="bk-code-link" href="#code17"><b>langgraph_plan_demo.py</b><span>LangGraph：把流程画成图来编排</span></a></div>
+    <div class="bk-code-card" id="code1"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">01</span><div class="bk-code-meta"><b>ngram_demo.py</b><span>n-gram 语言模型：统计共现，看它为什么会崩</span></div><span class="bk-code-lines">84 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
+<span class="st">&quot;&quot;&quot;
+ngram_demo.py —— 演示&quot;统计造句&quot;：n-gram 是怎么学说话的（对应 PPT 第 3 章）。
+
+做法：
+  1. 统计文本里&quot;前 N-1 个字之后，最常接哪个字&quot;（数频次，不做任何理解）
+  2. 生成时不断查表、按频次抽下一个字 —— 得到&quot;模仿腔&quot;文本
+
+你会看到：腔调很像原文，但细看全是破绽 —— 这就是&quot;只会记词组&quot;的上限。
+
+运行：python ngram_demo.py   （纯标准库，无需安装任何东西）
+&quot;&quot;&quot;</span>
+
+<span class="kw">import</span> random
+<span class="kw">from</span> collections <span class="kw">import</span> defaultdict
+
+<span class="cm"># 一段&quot;有腔调&quot;的样本文本（武侠风）。换成任何文本都能模仿。</span>
+TEXT = <span class="st">&quot;&quot;&quot;
+江湖夜雨，孤灯如豆。少年仗剑而立，衣袂猎猎作响。远处传来一阵箫声，
+箫声幽幽，如泣如诉。少年收剑入鞘，循声而去。山道蜿蜒，松涛阵阵，
+一轮冷月悬于绝壁之上。少年抬头望月，忽见一道白影掠过山巅，快如闪电。
+少年提气纵身，追了上去。白影忽隐忽现，箫声忽远忽近。少年追到断崖边，
+只见云雾翻腾，深不见底。箫声戛然而止。少年仗剑四顾，松风依旧，冷月无声。
+&quot;&quot;&quot;</span>
+
+N = <span class="nu">3</span>  <span class="cm"># 用前 2 个字预测第 3 个字（3-gram）</span>
+
+
+<span class="kw">def</span> <span class="fn">train</span>(text, n):
+    <span class="st">&quot;&quot;&quot;统计：前 n-1 个字 -&gt; 下一个字的频次表。&quot;&quot;&quot;</span>
+    table = <span class="fn">defaultdict</span>(<span class="kw">lambda</span>: <span class="fn">defaultdict</span>(int))
+    chars = [c <span class="kw">for</span> c <span class="kw">in</span> text <span class="kw">if</span> <span class="kw">not</span> c.<span class="fn">isspace</span>()]
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">len</span>(chars) - n + <span class="nu">1</span>):
+        prefix = <span class="st">&quot;&quot;</span>.<span class="fn">join</span>(chars[i : i + n - <span class="nu">1</span>])
+        nxt = chars[i + n - <span class="nu">1</span>]
+        table[prefix][nxt] += <span class="nu">1</span>
+    <span class="kw">return</span> table
+
+
+<span class="kw">def</span> <span class="fn">generate</span>(table, n, seed, length=<span class="nu">60</span>):
+    <span class="st">&quot;&quot;&quot;从种子开头出发，每次查表、按频次随机抽下一个字。&quot;&quot;&quot;</span>
+    out = <span class="fn">list</span>(seed)
+    <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(length):
+        prefix = <span class="st">&quot;&quot;</span>.<span class="fn">join</span>(out[-(n - <span class="nu">1</span>):])
+        candidates = table.<span class="fn">get</span>(prefix)
+        <span class="kw">if</span> <span class="kw">not</span> candidates:  <span class="cm"># 表里没有这个前文 —— 抓瞎，随机挑一个字续命</span>
+            nxt = random.<span class="fn">choice</span>(<span class="fn">list</span>(<span class="st">&quot;的一是不了我人在他有上&quot;</span>))
+        <span class="kw">else</span>:
+            chars, weights = <span class="fn">zip</span>(*candidates.<span class="fn">items</span>())
+            nxt = random.<span class="fn">choices</span>(chars, weights=weights)[<span class="nu">0</span>]
+        out.<span class="fn">append</span>(nxt)
+    <span class="kw">return</span> <span class="st">&quot;&quot;</span>.<span class="fn">join</span>(out)
+
+
+<span class="kw">def</span> <span class="fn">main</span>():
+    random.<span class="fn">seed</span>(<span class="nu">42</span>)
+    table = <span class="fn">train</span>(TEXT, N)
+
+    <span class="fn">print</span>(<span class="st">&quot;=&quot;</span> * <span class="nu">64</span>)
+    <span class="fn">print</span>(f<span class="st">&quot;第 1 步：统计表长这样（{N-1} 个字 -&gt; 下一个字的频次）&quot;</span>)
+    <span class="fn">print</span>(<span class="st">&quot;=&quot;</span> * <span class="nu">64</span>)
+    <span class="kw">for</span> prefix <span class="kw">in</span> [<span class="st">&quot;少年仗&quot;</span>, <span class="st">&quot;年仗剑&quot;</span>, <span class="st">&quot;箫声&quot;</span>, <span class="st">&quot;月&quot;</span>]:
+        key = prefix[-(N - <span class="nu">1</span>):]
+        <span class="kw">if</span> key <span class="kw">in</span> table:
+            items = <span class="fn">sorted</span>(table[key].<span class="fn">items</span>(), key=<span class="kw">lambda</span> kv: -kv[<span class="nu">1</span>])
+            top = <span class="st">&quot;  &quot;</span>.<span class="fn">join</span>(f<span class="st">&quot;{c}×{n}&quot;</span> <span class="kw">for</span> c, n <span class="kw">in</span> items[:<span class="nu">5</span>])
+            <span class="fn">print</span>(f<span class="st">&quot;  「{key}」之后接过 → {top}&quot;</span>)
+
+    <span class="fn">print</span>(<span class="st">&quot;\n&quot;</span> + <span class="st">&quot;=&quot;</span> * <span class="nu">64</span>)
+    <span class="fn">print</span>(<span class="st">&quot;第 2 步：查表生成 3 段「模仿腔」文本&quot;</span>)
+    <span class="fn">print</span>(<span class="st">&quot;=&quot;</span> * <span class="nu">64</span>)
+    <span class="kw">for</span> i, seed <span class="kw">in</span> <span class="fn">enumerate</span>([<span class="st">&quot;少年仗剑&quot;</span>, <span class="st">&quot;箫声幽幽&quot;</span>, <span class="st">&quot;冷月无声&quot;</span>], <span class="nu">1</span>):
+        <span class="fn">print</span>(f<span class="st">&quot;\n【生成 {i}】（开头：{seed}）&quot;</span>)
+        <span class="fn">print</span>(<span class="st">&quot;  &quot;</span> + <span class="fn">generate</span>(table, N, seed))
+
+    <span class="fn">print</span>(<span class="st">&quot;\n&quot;</span> + <span class="st">&quot;=&quot;</span> * <span class="nu">64</span>)
+    <span class="fn">print</span>(<span class="st">&quot;观察：字都是原文里的字，腔调也像 —— 但句子讲不通。&quot;</span>)
+    <span class="fn">print</span>(<span class="st">&quot;这就是 n-gram 的天花板：只会「背词组」，从不「懂意思」。&quot;</span>)
+    <span class="fn">print</span>(<span class="st">&quot;而且换一段它没背过的前文，它就只能瞎接。&quot;</span>)
+
+
+<span class="kw">if</span> __name__ == <span class="st">&quot;__main__&quot;</span>:
+    <span class="fn">main</span>()
+</code></pre><div class="bk-code-path">路径：scripts/lecture2/ngram_demo.py</div></div></div>
+<div class="bk-code-card" id="code2"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">02</span><div class="bk-code-meta"><b>embedding_demo.py</b><span>词向量：把词义变成可计算的向量</span></div><span class="bk-code-lines">127 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
+<span class="st">&quot;&quot;&quot;
+embedding_demo.py —— 演示&quot;词义 = 向量&quot;：语义相近的词，向量也相近。
+
+原理（对应 PPT 第 2 章）：
+  让机器读一堆句子，统计每个词&quot;身边经常出现哪些词&quot;（共现向量）。
+  不用人教：上下文相似的词，向量自动就相似了 —— 这就是 embedding 的思想。
+
+运行：python embedding_demo.py   （纯标准库，无需安装任何东西）
+&quot;&quot;&quot;</span>
+
+<span class="kw">from</span> math <span class="kw">import</span> sqrt
+
+<span class="cm"># ---------- 1. 一个小语料库（已按空格分好词） ----------</span>
+<span class="cm"># 故意写成&quot;成对换词&quot;的句子：猫/狗、国王/女王、苹果/香蕉、手机/电脑</span>
+<span class="cm"># 出现的上下文几乎一样 —— 它们的向量应该会自己靠近。</span>
+CORPUS = <span class="st">&quot;&quot;&quot;
+猫 喜欢 吃 鱼
+狗 喜欢 吃 骨头
+我 养 了 一 只 猫
+我 养 了 一 只 狗
+猫 很 可爱
+狗 很 可爱
+猫 喜欢 晒 太阳
+狗 喜欢 晒 太阳
+小猫 喵喵 叫
+小狗 汪汪 叫
+宠物 猫 在 沙发 上 睡觉
+宠物 狗 在 院子 里 玩耍
+猫 的 毛 很 软
+狗 的 毛 很 软
+国王 戴 着 王冠
+女王 戴 着 王冠
+国王 住 在 王宫 里
+女王 住 在 王宫 里
+国王 统治 国家
+女王 统治 国家
+国王 的 权力 很 大
+女王 的 权力 很 大
+王子 是 国王 的 儿子
+公主 是 女王 的 女儿
+苹果 是 一 种 水果
+香蕉 是 一 种 水果
+苹果 很 甜
+香蕉 很 甜
+我 喜欢 吃 苹果
+我 喜欢 吃 香蕉
+苹果 可以 榨 果汁
+香蕉 可以 做 奶昔
+手机 有 一 块 屏幕
+电脑 有 一 块 屏幕
+我 用 手机 打 电话
+我 用 电脑 写 代码
+手机 很 智能
+电脑 很 智能
+手机 需要 充电
+电脑 需要 充电
+汽车 在 公路 上 行驶
+汽车 需要 加油
+我 开 汽车 去 上班
+汽车 有 四 个 轮子
+&quot;&quot;&quot;</span>
+
+WINDOW = <span class="nu">2</span>  <span class="cm"># 左右各看 2 个词，作为&quot;上下文&quot;</span>
+
+
+<span class="cm"># ---------- 2. 统计共现：每个词 -&gt; {上下文词: 次数} ----------</span>
+<span class="kw">def</span> <span class="fn">build_vectors</span>(corpus, window):
+    counts = {}
+    <span class="kw">for</span> line <span class="kw">in</span> corpus.<span class="fn">strip</span>().<span class="fn">splitlines</span>():
+        words = line.<span class="fn">split</span>()
+        <span class="kw">for</span> i, w <span class="kw">in</span> <span class="fn">enumerate</span>(words):
+            vec = counts.<span class="fn">setdefault</span>(w, {})
+            <span class="kw">for</span> j <span class="kw">in</span> <span class="fn">range</span>(<span class="fn">max</span>(<span class="nu">0</span>, i - window), <span class="fn">min</span>(<span class="fn">len</span>(words), i + window + <span class="nu">1</span>)):
+                <span class="kw">if</span> i != j:
+                    ctx = words[j]
+                    vec[ctx] = vec.<span class="fn">get</span>(ctx, <span class="nu">0</span>) + <span class="nu">1</span>
+    <span class="kw">return</span> counts
+
+
+<span class="kw">def</span> <span class="fn">cosine</span>(v1, v2):
+    <span class="st">&quot;&quot;&quot;余弦相似度：两个向量&quot;方向&quot;有多像（-1 ~ 1，越接近 1 越像）。&quot;&quot;&quot;</span>
+    dot = <span class="fn">sum</span>(v * v2.<span class="fn">get</span>(k, <span class="nu">0</span>) <span class="kw">for</span> k, v <span class="kw">in</span> v1.<span class="fn">items</span>())
+    n1 = <span class="fn">sqrt</span>(<span class="fn">sum</span>(v * v <span class="kw">for</span> v <span class="kw">in</span> v1.<span class="fn">values</span>()))
+    n2 = <span class="fn">sqrt</span>(<span class="fn">sum</span>(v * v <span class="kw">for</span> v <span class="kw">in</span> v2.<span class="fn">values</span>()))
+    <span class="kw">return</span> dot / (n1 * n2) <span class="kw">if</span> n1 <span class="kw">and</span> n2 <span class="kw">else</span> <span class="nu">0.0</span>
+
+
+<span class="kw">def</span> <span class="fn">main</span>():
+    vectors = <span class="fn">build_vectors</span>(CORPUS, WINDOW)
+
+    probes = [<span class="st">&quot;猫&quot;</span>, <span class="st">&quot;狗&quot;</span>, <span class="st">&quot;国王&quot;</span>, <span class="st">&quot;女王&quot;</span>, <span class="st">&quot;苹果&quot;</span>, <span class="st">&quot;香蕉&quot;</span>, <span class="st">&quot;手机&quot;</span>, <span class="st">&quot;电脑&quot;</span>, <span class="st">&quot;汽车&quot;</span>]
+
+    <span class="fn">print</span>(<span class="st">&quot;=&quot;</span> * <span class="nu">64</span>)
+    <span class="fn">print</span>(<span class="st">&quot;词义 = 向量：两两相似度（越接近 1 越像，越接近 0 越没关系）&quot;</span>)
+    <span class="fn">print</span>(<span class="st">&quot;=&quot;</span> * <span class="nu">64</span>)
+
+    <span class="cm"># 打印相似度矩阵</span>
+    header = <span class="st">&quot;        &quot;</span> + <span class="st">&quot;&quot;</span>.<span class="fn">join</span>(f<span class="st">&quot;{w:&gt;8}&quot;</span> <span class="kw">for</span> w <span class="kw">in</span> probes)
+    <span class="fn">print</span>(header)
+    <span class="kw">for</span> w1 <span class="kw">in</span> probes:
+        row = f<span class="st">&quot;{w1:&lt;6}&quot;</span> + <span class="st">&quot;&quot;</span>.<span class="fn">join</span>(
+            f<span class="st">&quot;{cosine(vectors[w1], vectors[w2]):&gt;8.2f}&quot;</span> <span class="kw">for</span> w2 <span class="kw">in</span> probes
+        )
+        <span class="fn">print</span>(row)
+
+    <span class="cm"># 每个词的&quot;最近邻居&quot;</span>
+    <span class="fn">print</span>(<span class="st">&quot;\n&quot;</span> + <span class="st">&quot;=&quot;</span> * <span class="nu">64</span>)
+    <span class="fn">print</span>(<span class="st">&quot;每个词最像谁？（自动找出的最近邻居）&quot;</span>)
+    <span class="fn">print</span>(<span class="st">&quot;=&quot;</span> * <span class="nu">64</span>)
+    <span class="kw">for</span> w <span class="kw">in</span> [<span class="st">&quot;猫&quot;</span>, <span class="st">&quot;国王&quot;</span>, <span class="st">&quot;苹果&quot;</span>, <span class="st">&quot;手机&quot;</span>]:
+        sims = <span class="fn">sorted</span>(
+            ((<span class="fn">cosine</span>(vectors[w], vectors[o]), o) <span class="kw">for</span> o <span class="kw">in</span> vectors <span class="kw">if</span> o != w),
+            reverse=<span class="kw">True</span>,
+        )[:<span class="nu">3</span>]
+        top = <span class="st">&quot;，&quot;</span>.<span class="fn">join</span>(f<span class="st">&quot;{o}({s:.2f})&quot;</span> <span class="kw">for</span> s, o <span class="kw">in</span> sims)
+        <span class="fn">print</span>(f<span class="st">&quot;  {w}  →  {top}&quot;</span>)
+
+    <span class="fn">print</span>(<span class="st">&quot;\n看到了吗：猫-狗、国王-女王、苹果-香蕉、手机-电脑 的分数明显高，&quot;</span>)
+    <span class="fn">print</span>(<span class="st">&quot;而 猫-汽车 这种八竿子打不着的组合分数接近 0。&quot;</span>)
+    <span class="fn">print</span>(<span class="st">&quot;没有人告诉机器这些词的意思 —— 是它从上下文里自己「凑」出来的。&quot;</span>)
+    <span class="fn">print</span>(<span class="st">&quot;真实的 embedding 就是这个思路，只是语料是整个互联网，维度是几百维。&quot;</span>)
+
+
+<span class="kw">if</span> __name__ == <span class="st">&quot;__main__&quot;</span>:
+    <span class="fn">main</span>()
+</code></pre><div class="bk-code-path">路径：scripts/lecture2/embedding_demo.py</div></div></div>
+<div class="bk-code-card" id="code3"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">03</span><div class="bk-code-meta"><b>tiny_lm_train_demo.py</b><span>迷你语言模型：几分钟训一个会续写的小网络</span></div><span class="bk-code-lines">125 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
+<span class="st">&quot;&quot;&quot;
+tiny_lm_train_demo.py —— 亲手训练一个极小的语言模型（对应 PPT 第 3~9 章）。
+
+它做的事情，和训练 GPT 在结构上一模一样：
+  1. 任务：给定前面几个字，预测下一个字（语言模型的主线任务）
+  2. 模型：字 -&gt; 向量(embedding) -&gt; 若干层加权变换 -&gt; 每个候选字的概率
+  3. 训练：预测错了就算&quot;错多少&quot;(loss)，再微调权重，重复几千次
+  4. 看 loss 一路下降，再让它续写 —— 从乱码长成&quot;有点像&quot;
+
+规模：约 4 万个参数（GPT 是千亿级，但流程相同），普通 CPU 几秒跑完。
+
+运行：python tiny_lm_train_demo.py   （需要 numpy：pip install numpy）
+&quot;&quot;&quot;</span>
+
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># ---------- 训练文本：几首古诗（字符级建模，字就是&quot;词&quot;） ----------</span>
+TEXT = <span class="st">&quot;&quot;&quot;
+床前明月光，疑是地上霜。举头望明月，低头思故乡。
+春眠不觉晓，处处闻啼鸟。夜来风雨声，花落知多少。
+白日依山尽，黄河入海流。欲穷千里目，更上一层楼。
+红豆生南国，春来发几枝。愿君多采撷，此物最相思。
+空山不见人，但闻人语响。返景入深林，复照青苔上。
+千山鸟飞绝，万径人踪灭。孤舟蓑笠翁，独钓寒江雪。
+&quot;&quot;&quot;</span>
+
+CTX = <span class="nu">8</span>     <span class="cm"># 用前 8 个字预测下一个字</span>
+DIM = <span class="nu">24</span>    <span class="cm"># 每个字的向量维度（embedding）</span>
+HID = <span class="nu">128</span>   <span class="cm"># 隐藏层大小</span>
+STEPS = <span class="nu">3000</span>
+BATCH = <span class="nu">32</span>
+LR = <span class="nu">0.3</span>
+
+rng = np.random.<span class="fn">default_rng</span>(<span class="nu">42</span>)
+
+<span class="cm"># ---------- 字表 ----------</span>
+chars = <span class="fn">sorted</span>(<span class="fn">set</span>(TEXT))
+V = <span class="fn">len</span>(chars)
+c2i = {c: i <span class="kw">for</span> i, c <span class="kw">in</span> <span class="fn">enumerate</span>(chars)}
+i2c = <span class="fn">dict</span>(<span class="fn">enumerate</span>(chars))
+data = np.<span class="fn">array</span>([c2i[c] <span class="kw">for</span> c <span class="kw">in</span> TEXT])
+
+<span class="cm"># ---------- 模型参数（随机初始化） ----------</span>
+E = rng.<span class="fn">normal</span>(<span class="nu">0</span>, <span class="nu">0.1</span>, (V, DIM))            <span class="cm"># 字向量表</span>
+W1 = rng.<span class="fn">normal</span>(<span class="nu">0</span>, <span class="nu">0.1</span>, (CTX * DIM, HID))   <span class="cm"># 隐藏层权重</span>
+b1 = np.<span class="fn">zeros</span>(HID)
+W2 = rng.<span class="fn">normal</span>(<span class="nu">0</span>, <span class="nu">0.1</span>, (HID, V))           <span class="cm"># 输出层权重</span>
+b2 = np.<span class="fn">zeros</span>(V)
+
+n_params = <span class="fn">sum</span>(p.size <span class="kw">for</span> p <span class="kw">in</span> [E, W1, b1, W2, b2])
+<span class="fn">print</span>(f<span class="st">&quot;字表大小 {V}，模型参数 {n_params:,} 个（GPT 是千亿级，流程相同）\n&quot;</span>)
+
+
+<span class="kw">def</span> <span class="fn">forward</span>(X):
+    <span class="st">&quot;&quot;&quot;X: (batch, CTX) 个字 -&gt; 每个候选字的概率。&quot;&quot;&quot;</span>
+    emb = E[X].<span class="fn">reshape</span>(<span class="fn">len</span>(X), -<span class="nu">1</span>)       <span class="cm"># 字 -&gt; 向量，拼成一长条</span>
+    h = np.<span class="fn">tanh</span>(emb @ W1 + b1)           <span class="cm"># 一层加权变换</span>
+    z = h @ W2 + b2                      <span class="cm"># 再一层 -&gt; 每个候选字的得分</span>
+    z -= z.<span class="fn">max</span>(axis=<span class="nu">1</span>, keepdims=<span class="kw">True</span>)    <span class="cm"># 数值稳定</span>
+    p = np.<span class="fn">exp</span>(z)
+    p /= p.<span class="fn">sum</span>(axis=<span class="nu">1</span>, keepdims=<span class="kw">True</span>)    <span class="cm"># 得分 -&gt; 概率</span>
+    <span class="kw">return</span> emb, h, p
+
+
+<span class="kw">def</span> <span class="fn">sample_batch</span>():
+    ix = rng.<span class="fn">integers</span>(CTX, <span class="fn">len</span>(data), size=BATCH)
+    X = np.<span class="fn">stack</span>([data[i - CTX : i] <span class="kw">for</span> i <span class="kw">in</span> ix])
+    <span class="kw">return</span> X, data[ix]
+
+
+<span class="cm"># ---------- 生成：给它一个开头，让它自己往下续 ----------</span>
+<span class="kw">def</span> <span class="fn">generate</span>(seed_text, length=<span class="nu">40</span>, temperature=<span class="nu">0.8</span>):
+    ctx = ([<span class="nu">0</span>] * CTX + [c2i.<span class="fn">get</span>(c, <span class="nu">0</span>) <span class="kw">for</span> c <span class="kw">in</span> seed_text])[-CTX:]  <span class="cm"># 不足 8 个字前面补 0</span>
+    out = <span class="fn">list</span>(seed_text)
+    <span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(length):
+        X = np.<span class="fn">array</span>([ctx[-CTX:]])
+        _, _, p = <span class="fn">forward</span>(X)
+        p = p[<span class="nu">0</span>] ** (<span class="nu">1</span> / temperature)
+        p /= p.<span class="fn">sum</span>()
+        nxt = rng.<span class="fn">choice</span>(V, p=p)
+        out.<span class="fn">append</span>(i2c[nxt])
+        ctx.<span class="fn">append</span>(nxt)
+    <span class="kw">return</span> <span class="st">&quot;&quot;</span>.<span class="fn">join</span>(out)
+
+
+<span class="cm"># ---------- 训练前：模型还是&quot;白纸&quot;，续写是乱码 ----------</span>
+<span class="fn">print</span>(<span class="st">&quot;【训练前】让它续写「床前明月光」—— 纯随机，是乱码：&quot;</span>)
+<span class="fn">print</span>(<span class="st">&quot;   &quot;</span> + <span class="fn">generate</span>(<span class="st">&quot;床前明月光&quot;</span>, <span class="nu">20</span>) + <span class="st">&quot;\n&quot;</span>)
+
+<span class="cm"># ---------- 训练：就是不断重复&quot;预测 -&gt; 算错多少 -&gt; 微调权重&quot; ----------</span>
+<span class="fn">print</span>(<span class="st">&quot;开始训练（训练 = 不断把预测错误往下压）：&quot;</span>)
+<span class="kw">for</span> step <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, STEPS + <span class="nu">1</span>):
+    X, Y = <span class="fn">sample_batch</span>()
+    emb, h, p = <span class="fn">forward</span>(X)
+
+    loss = -np.<span class="fn">log</span>(p[np.<span class="fn">arange</span>(<span class="fn">len</span>(X)), Y]).<span class="fn">mean</span>()   <span class="cm"># 预测错多少</span>
+
+    <span class="cm"># 反向算&quot;每个参数该往哪调&quot;（梯度），再微调</span>
+    dz = p
+    dz[np.<span class="fn">arange</span>(<span class="fn">len</span>(X)), Y] -= <span class="nu">1</span>      <span class="cm"># 正确答案那一维，误差最大</span>
+    dz /= <span class="fn">len</span>(X)
+    dW2, db2 = h.T @ dz, dz.<span class="fn">sum</span>(axis=<span class="nu">0</span>)
+    dh = (dz @ W2.T) * (<span class="nu">1</span> - h**<span class="nu">2</span>)
+    dW1, db1 = emb.T @ dh, dh.<span class="fn">sum</span>(axis=<span class="nu">0</span>)
+    demb = (dh @ W1.T).<span class="fn">reshape</span>(<span class="fn">len</span>(X), CTX, DIM)
+
+    <span class="kw">for</span> param, grad <span class="kw">in</span> [(W1, dW1), (b1, db1), (W2, dW2), (b2, db2)]:
+        param -= LR * grad             <span class="cm"># 错了就微调权重</span>
+    np.add.<span class="fn">at</span>(E, X, -LR * demb)        <span class="cm"># 字向量表也一样微调</span>
+
+    <span class="kw">if</span> step % <span class="nu">500</span> == <span class="nu">0</span> <span class="kw">or</span> step == <span class="nu">1</span>:
+        <span class="fn">print</span>(f<span class="st">&quot;  第 {step:&gt;5} 步   loss = {loss:.3f}&quot;</span>)
+
+
+<span class="fn">print</span>(<span class="st">&quot;\n【训练后】再让它续写几句（开头是我们给的，后面全是它自己接的）：&quot;</span>)
+<span class="kw">for</span> seed <span class="kw">in</span> [<span class="st">&quot;床前明月光&quot;</span>, <span class="st">&quot;春眠不觉晓&quot;</span>, <span class="st">&quot;白日依山尽&quot;</span>, <span class="st">&quot;千山鸟飞绝&quot;</span>]:
+    <span class="fn">print</span>(f<span class="st">&quot;\n  【{seed} ……】&quot;</span>)
+    <span class="fn">print</span>(<span class="st">&quot;   &quot;</span> + <span class="fn">generate</span>(seed))
+
+<span class="fn">print</span>(<span class="st">&quot;\n看到了吗：&quot;</span>)
+<span class="fn">print</span>(<span class="st">&quot;  · loss 一路下降 —— “训练”就是在压这个预测错误；&quot;</span>)
+<span class="fn">print</span>(<span class="st">&quot;  · 生成的字从乱码变成了有诗的样子 —— 规律是从数据里学出来的，没人教它；&quot;</span>)
+<span class="fn">print</span>(<span class="st">&quot;  · 把模型放大到千亿参数、文本换成整个互联网 —— 那就是 GPT 的预训练。&quot;</span>)
+</code></pre><div class="bk-code-path">路径：scripts/lecture2/tiny_lm_train_demo.py</div></div></div>
+<div class="bk-code-card" id="code4"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">04</span><div class="bk-code-meta"><b>tokenizer_demo.py</b><span>分词：一句中文到底被切成几个 token</span></div><span class="bk-code-lines">39 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
+<span class="st">&quot;&quot;&quot;
+第 1 章: 它是不是在搜答案? —— token 切分 + 逐 token 续写
+输入: 一句中文(默认 &quot;今天天气真&quot;, 可用命令行第一个参数覆盖)
+输出: 1) 切分后的 token 列表(id + 文本对照)  2) token 数量  3) 基于前半句的续写结果
+运行: python tokenizer_demo.py [你的句子]
+依赖: pip install torch transformers   (模型首次运行自动下载, 约 1GB)
+国内加速: 取消下面 HF_ENDPOINT 注释, 使用 hf-mirror 镜像
+&quot;&quot;&quot;</span>
+<span class="kw">import</span> sys
+<span class="cm"># import os; os.environ[&quot;HF_ENDPOINT&quot;] = &quot;https://hf-mirror.com&quot;  # 国内镜像开关</span>
+<span class="kw">from</span> transformers <span class="kw">import</span> AutoTokenizer, AutoModelForCausalLM
+
+MODEL = <span class="st">&quot;Qwen/Qwen2.5-0.5B-Instruct&quot;</span>   <span class="cm"># 续写演示也可用 base 版 &quot;Qwen/Qwen2.5-0.5B&quot;</span>
+
+
+<span class="kw">def</span> <span class="fn">main</span>():
+    text = sys.argv[<span class="nu">1</span>] <span class="kw">if</span> <span class="fn">len</span>(sys.argv) &gt; <span class="nu">1</span> <span class="kw">else</span> <span class="st">&quot;今天天气真&quot;</span>
+    tok = AutoTokenizer.<span class="fn">from_pretrained</span>(MODEL)
+    model = AutoModelForCausalLM.<span class="fn">from_pretrained</span>(MODEL)
+
+    <span class="cm"># ---- 1) 看一句话被切成哪些 token ----</span>
+    ids = tok.<span class="fn">encode</span>(text)
+    <span class="fn">print</span>(f<span class="st">&quot;输入: {text}&quot;</span>)
+    <span class="fn">print</span>(f<span class="st">&quot;token 数量: {len(ids)}&quot;</span>)
+    <span class="kw">for</span> i, t <span class="kw">in</span> <span class="fn">enumerate</span>(ids):
+        <span class="fn">print</span>(f<span class="st">&quot;  [{i}] id={t:&lt;7} 文本={tok.decode([t])!r}&quot;</span>)
+
+    <span class="cm"># ---- 2) 给前半句, 看模型逐个 token 续写 ----</span>
+    half = text[: <span class="fn">max</span>(<span class="nu">1</span>, <span class="fn">len</span>(text) // <span class="nu">2</span>)]
+    inputs = <span class="fn">tok</span>(half, return_tensors=<span class="st">&quot;pt&quot;</span>)
+    out = model.<span class="fn">generate</span>(**inputs, max_new_tokens=<span class="nu">30</span>, do_sample=<span class="kw">False</span>)
+    <span class="fn">print</span>(f<span class="st">&quot;\n前半句: {half!r}&quot;</span>)
+    <span class="fn">print</span>(f<span class="st">&quot;模型续写: {tok.decode(out[0], skip_special_tokens=True)!r}&quot;</span>)
+
+
+<span class="kw">if</span> __name__ == <span class="st">&quot;__main__&quot;</span>:
+    <span class="fn">main</span>()
+</code></pre><div class="bk-code-path">路径：scripts/lecture3/tokenizer_demo.py</div></div></div>
+<div class="bk-code-card" id="code5"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">05</span><div class="bk-code-meta"><b>sampling_demo.py</b><span>采样：temperature / top-p 怎么改变输出</span></div><span class="bk-code-lines">40 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
+<span class="st">&quot;&quot;&quot;
+第 4 章: 为什么同样的问题, 答案每次不一样? —— temperature / top_p 采样对比
+输入: 内置同一问题(可用命令行参数覆盖)
+输出: temperature=0(贪心) 与 temperature=0.9(top_p=0.9) 各生成 3 次, 共 6 条结果对比
+运行: python sampling_demo.py [你的问题]
+依赖: pip install torch transformers
+&quot;&quot;&quot;</span>
+<span class="kw">import</span> sys
+<span class="cm"># import os; os.environ[&quot;HF_ENDPOINT&quot;] = &quot;https://hf-mirror.com&quot;</span>
+<span class="kw">from</span> transformers <span class="kw">import</span> AutoTokenizer, AutoModelForCausalLM
+
+MODEL = <span class="st">&quot;Qwen/Qwen2.5-0.5B-Instruct&quot;</span>
+N = <span class="nu">3</span>  <span class="cm"># 每种设置各生成几次</span>
+
+
+<span class="kw">def</span> <span class="fn">main</span>():
+    q = sys.argv[<span class="nu">1</span>] <span class="kw">if</span> <span class="fn">len</span>(sys.argv) &gt; <span class="nu">1</span> <span class="kw">else</span> <span class="st">&quot;给我写一句关于秋天的文案&quot;</span>
+    tok = AutoTokenizer.<span class="fn">from_pretrained</span>(MODEL)
+    model = AutoModelForCausalLM.<span class="fn">from_pretrained</span>(MODEL)
+    msgs = [{<span class="st">&quot;role&quot;</span>: <span class="st">&quot;user&quot;</span>, <span class="st">&quot;content&quot;</span>: q}]
+    text = tok.<span class="fn">apply_chat_template</span>(msgs, tokenize=<span class="kw">False</span>, add_generation_prompt=<span class="kw">True</span>)
+    ids = <span class="fn">tok</span>(text, return_tensors=<span class="st">&quot;pt&quot;</span>)
+    <span class="fn">print</span>(f<span class="st">&quot;问题: {q}\n&quot;</span>)
+
+    configs = [
+        (<span class="st">&quot;temperature=0 (贪心, 稳定)&quot;</span>, <span class="fn">dict</span>(do_sample=<span class="kw">False</span>)),
+        (<span class="st">&quot;temperature=0.9, top_p=0.9 (发散)&quot;</span>, <span class="fn">dict</span>(do_sample=<span class="kw">True</span>, temperature=<span class="nu">0.9</span>, top_p=<span class="nu">0.9</span>)),
+    ]
+    <span class="kw">for</span> label, kw <span class="kw">in</span> configs:
+        <span class="fn">print</span>(<span class="st">&quot;=&quot;</span> * <span class="nu">25</span>, label, <span class="st">&quot;=&quot;</span> * <span class="nu">25</span>)
+        <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, N + <span class="nu">1</span>):
+            out = model.<span class="fn">generate</span>(**ids, max_new_tokens=<span class="nu">60</span>, **kw)
+            ans = tok.<span class="fn">decode</span>(out[<span class="nu">0</span>][ids.input_ids.shape[<span class="nu">1</span>]:], skip_special_tokens=<span class="kw">True</span>)
+            <span class="fn">print</span>(f<span class="st">&quot;[{i}] {ans.strip()}\n&quot;</span>)
+
+
+<span class="kw">if</span> __name__ == <span class="st">&quot;__main__&quot;</span>:
+    <span class="fn">main</span>()
+</code></pre><div class="bk-code-path">路径：scripts/lecture3/sampling_demo.py</div></div></div>
+<div class="bk-code-card" id="code6"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">06</span><div class="bk-code-meta"><b>training_stages_demo.py</b><span>训练三阶段：预训练 → SFT → 对齐</span></div><span class="bk-code-lines">41 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
+<span class="st">&quot;&quot;&quot;
+第 2 章: 它凭什么会&quot;回答问题&quot;? —— base 模型 vs chat 模型同题对比
+输入: 内置同一问题(可用命令行参数覆盖)
+输出: base 模型的&quot;续写&quot;结果 与 instruct 模型的&quot;问答&quot;结果, 并排打印
+运行: python training_stages_demo.py [你的问题]
+依赖: pip install torch transformers
+说明: base 版约 1GB, instruct 版约 1GB, 首次运行自动下载
+      base 不套聊天模板(直接续写原文), instruct 走 apply_chat_template
+&quot;&quot;&quot;</span>
+<span class="kw">import</span> sys
+<span class="cm"># import os; os.environ[&quot;HF_ENDPOINT&quot;] = &quot;https://hf-mirror.com&quot;</span>
+<span class="kw">from</span> transformers <span class="kw">import</span> AutoTokenizer, AutoModelForCausalLM
+
+BASE = <span class="st">&quot;Qwen/Qwen2.5-0.5B&quot;</span>            <span class="cm"># 只做预训练: 会续写, 不会对话</span>
+CHAT = <span class="st">&quot;Qwen/Qwen2.5-0.5B-Instruct&quot;</span>   <span class="cm"># 预训练 + SFT + 对齐: 会回答问题</span>
+
+
+<span class="kw">def</span> <span class="fn">gen</span>(model_name, prompt, use_template):
+    tok = AutoTokenizer.<span class="fn">from_pretrained</span>(model_name)
+    model = AutoModelForCausalLM.<span class="fn">from_pretrained</span>(model_name)
+    <span class="kw">if</span> use_template:
+        msgs = [{<span class="st">&quot;role&quot;</span>: <span class="st">&quot;user&quot;</span>, <span class="st">&quot;content&quot;</span>: prompt}]
+        prompt = tok.<span class="fn">apply_chat_template</span>(msgs, tokenize=<span class="kw">False</span>, add_generation_prompt=<span class="kw">True</span>)
+    ids = <span class="fn">tok</span>(prompt, return_tensors=<span class="st">&quot;pt&quot;</span>)
+    out = model.<span class="fn">generate</span>(**ids, max_new_tokens=<span class="nu">80</span>, do_sample=<span class="kw">False</span>)
+    <span class="kw">return</span> tok.<span class="fn">decode</span>(out[<span class="nu">0</span>][ids.input_ids.shape[<span class="nu">1</span>]:], skip_special_tokens=<span class="kw">True</span>)
+
+
+<span class="kw">def</span> <span class="fn">main</span>():
+    q = sys.argv[<span class="nu">1</span>] <span class="kw">if</span> <span class="fn">len</span>(sys.argv) &gt; <span class="nu">1</span> <span class="kw">else</span> <span class="st">&quot;怎么煮咖啡?&quot;</span>
+    <span class="fn">print</span>(f<span class="st">&quot;问题: {q}\n&quot;</span>)
+    <span class="fn">print</span>(<span class="st">&quot;=&quot;</span> * <span class="nu">20</span>, <span class="st">&quot;base 模型(只预训练)&quot;</span>, <span class="st">&quot;=&quot;</span> * <span class="nu">20</span>)
+    <span class="fn">print</span>(<span class="fn">gen</span>(BASE, q, use_template=<span class="kw">False</span>))
+    <span class="fn">print</span>(<span class="st">&quot;\n&quot;</span> + <span class="st">&quot;=&quot;</span> * <span class="nu">20</span>, <span class="st">&quot;chat 模型(+SFT+对齐)&quot;</span>, <span class="st">&quot;=&quot;</span> * <span class="nu">20</span>)
+    <span class="fn">print</span>(<span class="fn">gen</span>(CHAT, q, use_template=<span class="kw">True</span>))
+
+
+<span class="kw">if</span> __name__ == <span class="st">&quot;__main__&quot;</span>:
+    <span class="fn">main</span>()
+</code></pre><div class="bk-code-path">路径：scripts/lecture3/training_stages_demo.py</div></div></div>
+<div class="bk-code-card" id="code7"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">07</span><div class="bk-code-meta"><b>train_sft.py</b><span>SFT 实战：loss masking 与 QLoRA 微调</span></div><span class="bk-code-lines">102 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="kw">import</span> os
+os.environ[<span class="st">&#x27;HF_HOME&#x27;</span>] = <span class="st">&#x27;D:\\huggingface&#x27;</span>
+
+<span class="kw">import</span> torch
+<span class="kw">from</span> unsloth <span class="kw">import</span> FastLanguageModel
+<span class="kw">from</span> datasets <span class="kw">import</span> load_dataset
+<span class="kw">from</span> trl <span class="kw">import</span> SFTTrainer
+<span class="kw">from</span> transformers <span class="kw">import</span> TrainingArguments
+<span class="kw">from</span> peft <span class="kw">import</span> LoraConfig
+<span class="kw">import</span> json
+
+<span class="cm"># ================================================================</span>
+<span class="cm"># 1. 加载模型和分词器</span>
+<span class="cm"># ================================================================</span>
+model, tokenizer = FastLanguageModel.<span class="fn">from_pretrained</span>(
+    model_name=<span class="st">&#x27;D:\\huggingface\\models\\Qwen2.5-1.5B&#x27;</span>,
+    max_seq_length=<span class="nu">512</span>,       <span class="cm"># 训练时每个样本最多 512 个 token</span>
+    dtype=torch.float16,      <span class="cm"># 半精度</span>
+    load_in_4bit=<span class="kw">True</span>,        <span class="cm"># 4-bit 量化（QLoRA），显存从 3GB 降到 1.5GB</span>
+)
+
+<span class="cm"># ================================================================</span>
+<span class="cm"># 2. 给模型加 LoRA 适配器</span>
+<span class="cm"># ================================================================</span>
+model = FastLanguageModel.<span class="fn">get_peft_model</span>(
+    model,
+    r=<span class="nu">16</span>,                     <span class="cm"># LoRA rank：越大越强但也越耗显存，16 是平衡点</span>
+    target_modules=[          <span class="cm"># 哪些层插 LoRA 矩阵？只插 Attention 的 Q/K/V/O</span>
+        <span class="st">&#x27;q_proj&#x27;</span>, <span class="st">&#x27;k_proj&#x27;</span>, <span class="st">&#x27;v_proj&#x27;</span>, <span class="st">&#x27;o_proj&#x27;</span>,
+    ],
+    lora_alpha=<span class="nu">16</span>,            <span class="cm"># 缩放系数，通常设成和 r 一样</span>
+    lora_dropout=<span class="nu">0</span>,           <span class="cm"># dropout=0 反而更稳定</span>
+    use_gradient_checkpointing=<span class="st">&#x27;unsloth&#x27;</span>,  <span class="cm"># 用梯度换显存，显存不够时用</span>
+    random_state=<span class="nu">42</span>,
+)
+
+<span class="cm"># 给分词器添加对话需要的特殊 token</span>
+special_tokens = [<span class="st">&#x27;&lt;|im_start|&gt;&#x27;</span>, <span class="st">&#x27;&lt;|im_end|&gt;&#x27;</span>]
+<span class="kw">for</span> tok <span class="kw">in</span> special_tokens:
+    <span class="kw">if</span> tok <span class="kw">not</span> <span class="kw">in</span> tokenizer.<span class="fn">get_vocab</span>():
+        tokenizer.<span class="fn">add_tokens</span>([tok], special_tokens=<span class="kw">True</span>)
+model.<span class="fn">resize_token_embeddings</span>(<span class="fn">len</span>(tokenizer))
+tokenizer.chat_template = <span class="st">&#x27;{% for message in messages %}{{ \&#x27;&lt;|im_start|&gt;\&#x27; + message[\&#x27;role\&#x27;] + \&#x27;\\n\&#x27; + message[\&#x27;content\&#x27;] + \&#x27;&lt;|im_end|&gt;\&#x27; + \&#x27;\\n\&#x27; }}{% endfor %}&#x27;</span>
+
+<span class="cm"># ================================================================</span>
+<span class="cm"># 3. 准备训练数据</span>
+<span class="cm"># ================================================================</span>
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">&#x27;D:\\huggingface\\data\\train_200.json&#x27;</span>, <span class="st">&#x27;r&#x27;</span>, encoding=<span class="st">&#x27;utf-8&#x27;</span>) <span class="kw">as</span> f:
+    raw_data = json.<span class="fn">load</span>(f)[:<span class="nu">50</span>]  <span class="cm"># 先跑 50 条看效果</span>
+
+<span class="cm"># 手动拼对话格式（基座模型没有 chat_template）</span>
+<span class="kw">def</span> <span class="fn">format_chat</span>(examples):
+    texts = []
+    <span class="kw">for</span> inst, out <span class="kw">in</span> <span class="fn">zip</span>(examples[<span class="st">&#x27;instruction&#x27;</span>], examples[<span class="st">&#x27;output&#x27;</span>]):
+        text = (
+            <span class="st">&#x27;&lt;|im_start|&gt;user\n&#x27;</span> + inst + <span class="st">&#x27;&lt;|im_end|&gt;\n&#x27;</span>
+            <span class="st">&#x27;&lt;|im_start|&gt;assistant\n&#x27;</span> + out + <span class="st">&#x27;&lt;|im_end|&gt;&#x27;</span>
+        )
+        texts.<span class="fn">append</span>(text)
+    <span class="kw">return</span> texts
+
+formatted = [<span class="fn">format_chat</span>(x) <span class="kw">for</span> x <span class="kw">in</span> raw_data]
+
+<span class="fn">print</span>(<span class="st">&#x27;训练数据格式示例:&#x27;</span>)
+<span class="fn">print</span>(formatted[<span class="nu">0</span>])
+<span class="fn">print</span>()
+
+<span class="cm"># 组装成 datasets 格式</span>
+dataset = <span class="fn">load_dataset</span>(<span class="st">&#x27;json&#x27;</span>, data_files={<span class="st">&#x27;train&#x27;</span>: <span class="st">&#x27;D:\\huggingface\\data\\train_200.json&#x27;</span>}, split=<span class="st">&#x27;train&#x27;</span>)
+
+<span class="cm"># ================================================================</span>
+<span class="cm"># 4. 配置训练器</span>
+<span class="cm"># ================================================================</span>
+trainer = <span class="fn">SFTTrainer</span>(
+    model=model,
+    tokenizer=tokenizer,
+    train_dataset=dataset,
+    args=<span class="fn">TrainingArguments</span>(
+        output_dir=<span class="st">&#x27;D:\\huggingface\\output&#x27;</span>,   <span class="cm"># 存模型的地方</span>
+        per_device_train_batch_size=<span class="nu">1</span>,           <span class="cm"># 批次=1，你 4GB 显存只能塞 1 条</span>
+        gradient_accumulation_steps=<span class="nu">4</span>,           <span class="cm"># 累积 4 步再更新权重（等效 batch=4）</span>
+        num_train_epochs=<span class="nu">3</span>,                      <span class="cm"># 整个数据集重复训练 3 轮</span>
+        learning_rate=<span class="nu">2e</span>-<span class="nu">4</span>,                      <span class="cm"># LoRA 常用学习率</span>
+        fp16=<span class="kw">True</span>,                               <span class="cm"># 半精度训练</span>
+        save_strategy=<span class="st">&#x27;no&#x27;</span>,                      <span class="cm"># 不保存中间节点</span>
+        logging_steps=<span class="nu">10</span>,
+        report_to=<span class="st">&#x27;none&#x27;</span>,                        <span class="cm"># 不上报给 wandb</span>
+    ),
+    formatting_func=format_chat,                 <span class="cm"># 自动把数据转成对话格式</span>
+)
+
+<span class="cm"># ================================================================</span>
+<span class="cm"># 5. 开始训练</span>
+<span class="cm"># ================================================================</span>
+<span class="fn">print</span>(<span class="st">&#x27;开始训练...&#x27;</span>)
+trainer.<span class="fn">train</span>()
+
+<span class="cm"># 保存 LoRA 权重</span>
+model.<span class="fn">save_pretrained</span>(<span class="st">&#x27;D:\\huggingface\\output\\lora_model&#x27;</span>)
+tokenizer.<span class="fn">save_pretrained</span>(<span class="st">&#x27;D:\\huggingface\\output\\lora_model&#x27;</span>)
+<span class="fn">print</span>(<span class="st">&#x27;训练完成，模型已保存&#x27;</span>)
+</code></pre><div class="bk-code-path">路径：scripts/lecture3/train_sft.py</div></div></div>
+<div class="bk-code-card" id="code8"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">08</span><div class="bk-code-meta"><b>chat_context_demo.py</b><span>上下文：多轮对话是怎么拼进 prompt 的</span></div><span class="bk-code-lines">63 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
+<span class="st">&quot;&quot;&quot;
+第 3 章: 它怎么&quot;记得&quot;我们聊过什么? —— 历史拼接 / 模板渲染 / 超长截断
+输入: 内置 6 轮模拟对话(含 system 设定)
+输出: 每轮渲染后的模板文本片段 + token 数; 超过上限时演示截断过程:
+      system 永远保留, 最老的消息被逐条丢弃
+运行: python chat_context_demo.py
+依赖: pip install transformers   (本脚本只用 tokenizer, 下载 tokenizer 即可)
+&quot;&quot;&quot;</span>
+<span class="cm"># import os; os.environ[&quot;HF_ENDPOINT&quot;] = &quot;https://hf-mirror.com&quot;</span>
+<span class="kw">from</span> transformers <span class="kw">import</span> AutoTokenizer
+
+MODEL = <span class="st">&quot;Qwen/Qwen2.5-0.5B-Instruct&quot;</span>
+MAX_TOKENS = <span class="nu">180</span>   <span class="cm"># 故意调小的&quot;上下文窗口&quot;, 方便演示截断</span>
+
+SYSTEM = {<span class="st">&quot;role&quot;</span>: <span class="st">&quot;system&quot;</span>, <span class="st">&quot;content&quot;</span>: <span class="st">&quot;你是简洁的助手，回答不超过两句话。&quot;</span>}
+
+<span class="cm"># 模拟一段多轮对话历史( user / assistant 交替 )</span>
+ROUNDS = [
+    (<span class="st">&quot;我叫小明，是一名后端工程师，平时主要写 Python 和 Go。&quot;</span>, <span class="st">&quot;你好小明，很高兴认识你。&quot;</span>),
+    (<span class="st">&quot;我最近在研究大模型的上下文管理机制。&quot;</span>, <span class="st">&quot;上下文管理是理解对话系统的关键。&quot;</span>),
+    (<span class="st">&quot;你能解释一下什么是聊天模板吗？&quot;</span>, <span class="st">&quot;聊天模板把消息列表渲染成模型认得的纯文本格式。&quot;</span>),
+    (<span class="st">&quot;那上下文窗口超限了怎么办？&quot;</span>, <span class="st">&quot;一般会丢弃最老的历史消息，保留最近的对话。&quot;</span>),
+    (<span class="st">&quot;我们刚才聊到我叫什么来着？&quot;</span>, <span class="st">&quot;你叫小明，是一名后端工程师。&quot;</span>),
+    (<span class="st">&quot;今天天气不错，适合出去跑步吗？&quot;</span>, <span class="st">&quot;天气好的话跑步很合适，注意补水。&quot;</span>),
+]
+
+
+<span class="kw">def</span> <span class="fn">render</span>(tok, msgs):
+    <span class="kw">return</span> tok.<span class="fn">apply_chat_template</span>(msgs, tokenize=<span class="kw">False</span>, add_generation_prompt=<span class="kw">True</span>)
+
+
+<span class="kw">def</span> <span class="fn">main</span>():
+    tok = AutoTokenizer.<span class="fn">from_pretrained</span>(MODEL)
+    history = []
+
+    <span class="kw">for</span> i, (u, a) <span class="kw">in</span> <span class="fn">enumerate</span>(ROUNDS, <span class="nu">1</span>):
+        history.<span class="fn">append</span>({<span class="st">&quot;role&quot;</span>: <span class="st">&quot;user&quot;</span>, <span class="st">&quot;content&quot;</span>: u})
+        history.<span class="fn">append</span>({<span class="st">&quot;role&quot;</span>: <span class="st">&quot;assistant&quot;</span>, <span class="st">&quot;content&quot;</span>: a})
+
+        <span class="cm"># ---- 组装: system + 全部历史, 渲染成一段纯文本 ----</span>
+        msgs = [SYSTEM] + history
+        text = <span class="fn">render</span>(tok, msgs)
+        n = <span class="fn">len</span>(<span class="fn">tok</span>(text).input_ids)
+        <span class="fn">print</span>(f<span class="st">&quot;--- 第 {i} 轮: 当前上下文 {n} tokens ---&quot;</span>)
+
+        <span class="cm"># ---- 超长截断: 丢最老的历史, system 永不丢 ----</span>
+        <span class="kw">while</span> n &gt; MAX_TOKENS <span class="kw">and</span> history:
+            dropped = history.<span class="fn">pop</span>(<span class="nu">0</span>)
+            <span class="fn">print</span>(f<span class="st">&quot;  [截断] 丢弃最老消息({dropped[&#x27;role&#x27;]}): {dropped[&#x27;content&#x27;][:18]}...&quot;</span>)
+            msgs = [SYSTEM] + history
+            text = <span class="fn">render</span>(tok, msgs)
+            n = <span class="fn">len</span>(<span class="fn">tok</span>(text).input_ids)
+        <span class="fn">print</span>(f<span class="st">&quot;  最终送入模型: {n} tokens, system 保留: {msgs[0] == SYSTEM}&quot;</span>)
+
+    <span class="cm"># ---- 展示最后一轮模型实际看到的文本(节选) ----</span>
+    <span class="fn">print</span>(<span class="st">&quot;\n=== 模型实际看到的渲染文本(末尾 300 字) ===&quot;</span>)
+    <span class="fn">print</span>(text[-<span class="nu">300</span>:])
+
+
+<span class="kw">if</span> __name__ == <span class="st">&quot;__main__&quot;</span>:
+    <span class="fn">main</span>()
+</code></pre><div class="bk-code-path">路径：scripts/lecture3/chat_context_demo.py</div></div></div>
+<div class="bk-code-card" id="code9"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">09</span><div class="bk-code-meta"><b>cot_demo.py</b><span>思维链：加一句「逐步思考」的效果对比</span></div><span class="bk-code-lines">43 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
+<span class="st">&quot;&quot;&quot;
+第 5 章: 为什么它会一本正经地胡说八道? —— 思维链 CoT 对比
+输入: 内置一道多步算术题(可用命令行参数覆盖)
+输出: &quot;直接给出答案&quot; 与 &quot;请一步一步思考&quot; 两种提示的输出对比
+运行: python cot_demo.py [你的题目]
+依赖: pip install torch transformers
+说明: 0.5B 小模型能力有限, 重点演示提示法的结构差异;
+      把 MODEL 换成 Qwen/Qwen2.5-1.5B-Instruct 或更大, 效果对比会更明显
+&quot;&quot;&quot;</span>
+<span class="kw">import</span> sys
+<span class="cm"># import os; os.environ[&quot;HF_ENDPOINT&quot;] = &quot;https://hf-mirror.com&quot;</span>
+<span class="kw">from</span> transformers <span class="kw">import</span> AutoTokenizer, AutoModelForCausalLM
+
+MODEL = <span class="st">&quot;Qwen/Qwen2.5-0.5B-Instruct&quot;</span>
+
+
+<span class="kw">def</span> <span class="fn">ask</span>(tok, model, prompt):
+    msgs = [{<span class="st">&quot;role&quot;</span>: <span class="st">&quot;user&quot;</span>, <span class="st">&quot;content&quot;</span>: prompt}]
+    text = tok.<span class="fn">apply_chat_template</span>(msgs, tokenize=<span class="kw">False</span>, add_generation_prompt=<span class="kw">True</span>)
+    ids = <span class="fn">tok</span>(text, return_tensors=<span class="st">&quot;pt&quot;</span>)
+    out = model.<span class="fn">generate</span>(**ids, max_new_tokens=<span class="nu">200</span>, do_sample=<span class="kw">False</span>)
+    <span class="kw">return</span> tok.<span class="fn">decode</span>(out[<span class="nu">0</span>][ids.input_ids.shape[<span class="nu">1</span>]:], skip_special_tokens=<span class="kw">True</span>).<span class="fn">strip</span>()
+
+
+<span class="kw">def</span> <span class="fn">main</span>():
+    q = sys.argv[<span class="nu">1</span>] <span class="kw">if</span> <span class="fn">len</span>(sys.argv) &gt; <span class="nu">1</span> <span class="kw">else</span> <span class="st">&quot;3个人4天摘了72千克苹果，平均每人每天摘多少千克？&quot;</span>
+    tok = AutoTokenizer.<span class="fn">from_pretrained</span>(MODEL)
+    model = AutoModelForCausalLM.<span class="fn">from_pretrained</span>(MODEL)
+    <span class="fn">print</span>(f<span class="st">&quot;题目: {q}\n&quot;</span>)
+
+    <span class="fn">print</span>(<span class="st">&quot;=&quot;</span> * <span class="nu">22</span>, <span class="st">&quot;提示一: 直接回答&quot;</span>, <span class="st">&quot;=&quot;</span> * <span class="nu">22</span>)
+    <span class="fn">print</span>(<span class="fn">ask</span>(tok, model, f<span class="st">&quot;{q}\n直接给出答案。&quot;</span>))
+
+    <span class="fn">print</span>(<span class="st">&quot;\n&quot;</span> + <span class="st">&quot;=&quot;</span> * <span class="nu">22</span>, <span class="st">&quot;提示二: 逐步思考(CoT)&quot;</span>, <span class="st">&quot;=&quot;</span> * <span class="nu">22</span>)
+    <span class="fn">print</span>(<span class="fn">ask</span>(tok, model, f<span class="st">&quot;{q}\n请一步一步思考，再给出答案。&quot;</span>))
+
+    <span class="fn">print</span>(<span class="st">&quot;\n(正确答案: 72 / 4 / 3 = 6 千克)&quot;</span>)
+
+
+<span class="kw">if</span> __name__ == <span class="st">&quot;__main__&quot;</span>:
+    <span class="fn">main</span>()
+</code></pre><div class="bk-code-path">路径：scripts/lecture3/cot_demo.py</div></div></div>
+<div class="bk-code-card" id="code10"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">10</span><div class="bk-code-meta"><b>rag_demo.py</b><span>RAG：切分 → 向量化 → 检索 → 拼接</span></div><span class="bk-code-lines">94 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
+<span class="st">&quot;&quot;&quot;
+第 6 章: 怎么让它知道&quot;没学过&quot;的东西? —— 最小 RAG 演示
+输入: 内置 4 段中文资料(报销/考勤/产品/假期) + 一个相关问题(可用命令行参数覆盖)
+输出: 1) 切块列表  2) Top-2 检索结果(含相似度)  3) 拼接后的完整 prompt
+      4) 模型基于资料的回答
+运行: python rag_demo.py [你的问题]
+依赖: pip install torch transformers sentence-transformers
+模型: BAAI/bge-small-zh-v1.5 (向量, ~100MB) + Qwen/Qwen2.5-0.5B-Instruct (生成)
+      不引入向量数据库, 用 numpy 直接算余弦相似度
+&quot;&quot;&quot;</span>
+<span class="kw">import</span> sys
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="cm"># import os; os.environ[&quot;HF_ENDPOINT&quot;] = &quot;https://hf-mirror.com&quot;</span>
+<span class="kw">from</span> sentence_transformers <span class="kw">import</span> SentenceTransformer
+<span class="kw">from</span> transformers <span class="kw">import</span> AutoTokenizer, AutoModelForCausalLM
+
+EMB_MODEL = <span class="st">&quot;BAAI/bge-small-zh-v1.5&quot;</span>
+LLM_MODEL = <span class="st">&quot;Qwen/Qwen2.5-0.5B-Instruct&quot;</span>
+CHUNK_SIZE = <span class="nu">200</span>   <span class="cm"># 每块最多多少字</span>
+TOP_K = <span class="nu">2</span>
+
+<span class="cm"># ---- 本地资料库(模拟公司内部文档) ----</span>
+DOCS = {
+    <span class="st">&quot;报销制度.md&quot;</span>: (
+        <span class="st">&quot;差旅报销标准：员工出差住宿费用，一线城市每晚不超过500元，二线城市每晚不超过400元，&quot;</span>
+        <span class="st">&quot;其他城市每晚不超过300元。餐饮补助按自然日计算，每人每天100元。&quot;</span>
+        <span class="st">&quot;报销需在出差结束后15个工作日内提交，附发票原件。打车费用仅报销晚于21点的行程。&quot;</span>
+    ),
+    <span class="st">&quot;考勤规定.md&quot;</span>: (
+        <span class="st">&quot;公司实行弹性工作制，核心工作时间为上午10点至下午4点，员工需保证每天在岗8小时。&quot;</span>
+        <span class="st">&quot;每月允许2次远程办公申请，需提前一天在系统中报备。迟到30分钟以上记为缺勤半天。&quot;</span>
+    ),
+    <span class="st">&quot;产品手册.md&quot;</span>: (
+        <span class="st">&quot;旗舰产品X200支持双卡双待，电池容量5000mAh，支持65W快充，&quot;</span>
+        <span class="st">&quot;可在30分钟内充电至80%。整机重量189克，提供黑、白、蓝三种配色，质保期24个月。&quot;</span>
+    ),
+    <span class="st">&quot;假期制度.md&quot;</span>: (
+        <span class="st">&quot;员工每年享有带薪年假5天起步，每满一年增加1天，上限15天。&quot;</span>
+        <span class="st">&quot;年假可拆分使用，最小单位为半天。法定节假日按国家统一安排执行，加班可调休。&quot;</span>
+    ),
+}
+
+
+<span class="kw">def</span> <span class="fn">chunk</span>(text, size):
+    <span class="st">&quot;&quot;&quot;把长文本切成若干小块&quot;&quot;&quot;</span>
+    <span class="kw">return</span> [text[i:i + size] <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">0</span>, <span class="fn">len</span>(text), size)]
+
+
+<span class="kw">def</span> <span class="fn">main</span>():
+    question = sys.argv[<span class="nu">1</span>] <span class="kw">if</span> <span class="fn">len</span>(sys.argv) &gt; <span class="nu">1</span> <span class="kw">else</span> <span class="st">&quot;出差住宿报销上限是多少？&quot;</span>
+
+    <span class="cm"># ---- 离线: 切块 -&gt; 向量化 -&gt; 存&quot;向量库&quot;(这里就是一个 numpy 数组) ----</span>
+    chunks, metas = [], []
+    <span class="kw">for</span> name, text <span class="kw">in</span> DOCS.<span class="fn">items</span>():
+        <span class="kw">for</span> c <span class="kw">in</span> <span class="fn">chunk</span>(text, CHUNK_SIZE):
+            chunks.<span class="fn">append</span>(c)
+            metas.<span class="fn">append</span>(name)
+    <span class="fn">print</span>(f<span class="st">&quot;共 {len(chunks)} 个块:&quot;</span>)
+    <span class="kw">for</span> i, (c, m) <span class="kw">in</span> <span class="fn">enumerate</span>(<span class="fn">zip</span>(chunks, metas)):
+        <span class="fn">print</span>(f<span class="st">&quot;  [块{i}] ({m}) {c[:24]}...&quot;</span>)
+
+    encoder = <span class="fn">SentenceTransformer</span>(EMB_MODEL)
+    doc_vecs = encoder.<span class="fn">encode</span>(chunks, normalize_embeddings=<span class="kw">True</span>)
+
+    <span class="cm"># ---- 在线: 问题向量化 -&gt; 相似度检索 Top-K ----</span>
+    <span class="cm"># bge 中文模型官方建议查询侧加一句检索指令前缀</span>
+    q_vec = encoder.<span class="fn">encode</span>([<span class="st">&quot;为这个句子生成表示以用于检索相关文章：&quot;</span> + question],
+                           normalize_embeddings=<span class="kw">True</span>)
+    scores = (doc_vecs @ q_vec.T).<span class="fn">ravel</span>()
+    top_idx = scores.<span class="fn">argsort</span>()[::-<span class="nu">1</span>][:TOP_K]
+    <span class="fn">print</span>(f<span class="st">&quot;\n问题: {question}&quot;</span>)
+    <span class="fn">print</span>(<span class="st">&quot;Top-2 检索结果:&quot;</span>)
+    <span class="kw">for</span> i <span class="kw">in</span> top_idx:
+        <span class="fn">print</span>(f<span class="st">&quot;  分数={scores[i]:.3f}  ({metas[i]}) {chunks[i][:30]}...&quot;</span>)
+
+    <span class="cm"># ---- 拼上下文 -&gt; 模型基于资料回答 ----</span>
+    context = <span class="st">&quot;\n&quot;</span>.<span class="fn">join</span>(chunks[i] <span class="kw">for</span> i <span class="kw">in</span> top_idx)
+    prompt = f<span class="st">&quot;资料：\n{context}\n\n问题：{question}\n请根据资料回答，资料没有的信息不要编造。&quot;</span>
+    <span class="fn">print</span>(f<span class="st">&quot;\n拼接后的 prompt:\n{prompt}&quot;</span>)
+
+    tok = AutoTokenizer.<span class="fn">from_pretrained</span>(LLM_MODEL)
+    model = AutoModelForCausalLM.<span class="fn">from_pretrained</span>(LLM_MODEL)
+    msgs = [{<span class="st">&quot;role&quot;</span>: <span class="st">&quot;user&quot;</span>, <span class="st">&quot;content&quot;</span>: prompt}]
+    text = tok.<span class="fn">apply_chat_template</span>(msgs, tokenize=<span class="kw">False</span>, add_generation_prompt=<span class="kw">True</span>)
+    ids = <span class="fn">tok</span>(text, return_tensors=<span class="st">&quot;pt&quot;</span>)
+    out = model.<span class="fn">generate</span>(**ids, max_new_tokens=<span class="nu">150</span>, do_sample=<span class="kw">False</span>)
+    answer = tok.<span class="fn">decode</span>(out[<span class="nu">0</span>][ids.input_ids.shape[<span class="nu">1</span>]:], skip_special_tokens=<span class="kw">True</span>)
+    <span class="fn">print</span>(f<span class="st">&quot;\n模型回答: {answer.strip()}&quot;</span>)
+
+
+<span class="kw">if</span> __name__ == <span class="st">&quot;__main__&quot;</span>:
+    <span class="fn">main</span>()
+</code></pre><div class="bk-code-path">路径：scripts/lecture3/rag_demo.py</div></div></div>
+<div class="bk-code-card" id="code11"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">11</span><div class="bk-code-meta"><b>agent_tool_demo.py</b><span>工具调用：function calling 完整往返</span></div><span class="bk-code-lines">128 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
+<span class="st">&quot;&quot;&quot;
+第 7 章: 怎么让它&quot;动手干活&quot;? —— 工具调用 + ReAct 循环
+输入: 需要计算的提问(默认 &quot;38乘27再加100是多少?&quot;, 可用命令行参数覆盖)
+输出: 每轮 Thought / Action / Observation 日志 + 最终回答
+运行: python agent_tool_demo.py [你的问题]
+依赖: pip install torch transformers
+原理: 工具说明写进提示词 -&gt; 模型输出 &quot;Action: 工具(参数)&quot; 或 &quot;Final: 答案&quot;
+      -&gt; 程序解析并真正执行 -&gt; 结果以 role=tool 回填 -&gt; 继续循环, 上限 5 轮
+说明: 0.5B 小模型不一定每次都遵守格式, 脚本带解析失败兜底; 换更大模型更稳
+&quot;&quot;&quot;</span>
+<span class="kw">import</span> sys
+<span class="kw">import</span> ast
+<span class="kw">import</span> operator <span class="kw">as</span> op
+<span class="kw">import</span> datetime
+<span class="cm"># import os; os.environ[&quot;HF_ENDPOINT&quot;] = &quot;https://hf-mirror.com&quot;</span>
+<span class="kw">from</span> transformers <span class="kw">import</span> AutoTokenizer, AutoModelForCausalLM
+
+MODEL = <span class="st">&quot;Qwen/Qwen2.5-0.5B-Instruct&quot;</span>
+MAX_LOOPS = <span class="nu">5</span>
+
+<span class="cm"># ---------------- 工具实现(程序真正执行的部分) ----------------</span>
+_OPS = {ast.Add: op.add, ast.Sub: op.sub, ast.Mult: op.mul,
+        ast.Div: op.truediv, ast.Pow: op.pow, ast.Mod: op.mod, ast.USub: op.neg}
+
+
+<span class="kw">def</span> <span class="fn">safe_eval</span>(expr):
+    <span class="st">&quot;&quot;&quot;只允许四则运算/乘方/取余的安全计算器(不用 eval)&quot;&quot;&quot;</span>
+    <span class="kw">def</span> <span class="fn">ev</span>(node):
+        <span class="kw">if</span> <span class="fn">isinstance</span>(node, ast.Expression):
+            <span class="kw">return</span> <span class="fn">ev</span>(node.body)
+        <span class="kw">if</span> <span class="fn">isinstance</span>(node, ast.Constant) <span class="kw">and</span> <span class="fn">isinstance</span>(node.value, (int, float)):
+            <span class="kw">return</span> node.value
+        <span class="kw">if</span> <span class="fn">isinstance</span>(node, ast.BinOp) <span class="kw">and</span> <span class="fn">type</span>(node.op) <span class="kw">in</span> _OPS:
+            <span class="kw">return</span> _OPS[<span class="fn">type</span>(node.op)](<span class="fn">ev</span>(node.left), <span class="fn">ev</span>(node.right))
+        <span class="kw">if</span> <span class="fn">isinstance</span>(node, ast.UnaryOp) <span class="kw">and</span> <span class="fn">type</span>(node.op) <span class="kw">in</span> _OPS:
+            <span class="kw">return</span> _OPS[<span class="fn">type</span>(node.op)](<span class="fn">ev</span>(node.operand))
+        <span class="kw">raise</span> <span class="fn">ValueError</span>(f<span class="st">&quot;不支持的表达式: {ast.dump(node)}&quot;</span>)
+    <span class="kw">return</span> <span class="fn">ev</span>(ast.<span class="fn">parse</span>(expr, mode=<span class="st">&quot;eval&quot;</span>))
+
+
+<span class="kw">def</span> <span class="fn">calc</span>(expr: str) -&gt; str:
+    <span class="kw">try</span>:
+        <span class="kw">return</span> <span class="fn">str</span>(<span class="fn">safe_eval</span>(expr))
+    <span class="kw">except</span> Exception <span class="kw">as</span> e:
+        <span class="kw">return</span> f<span class="st">&quot;计算失败: {e}&quot;</span>
+
+
+<span class="kw">def</span> <span class="fn">current_date</span>() -&gt; str:
+    <span class="kw">return</span> datetime.date.<span class="fn">today</span>().<span class="fn">isoformat</span>()
+
+
+TOOLS = {<span class="st">&quot;calc&quot;</span>: calc, <span class="st">&quot;current_date&quot;</span>: current_date}
+
+SYSTEM_PROMPT = <span class="st">&quot;&quot;&quot;你是一个会使用工具的助手。可用工具：
+- calc(expr): 计算器，计算数学表达式，如 calc(38*27+100)
+- current_date(): 返回今天的日期
+
+工作方式：每一步你只能输出以下两种格式之一：
+1) 需要工具时输出一行： Action: 工具名(参数)
+2) 信息足够回答时输出一行： Final: 你的最终答案
+不要输出其他内容。&quot;&quot;&quot;</span>
+
+
+<span class="kw">def</span> <span class="fn">llm</span>(tok, model, messages):
+    text = tok.<span class="fn">apply_chat_template</span>(messages, tokenize=<span class="kw">False</span>, add_generation_prompt=<span class="kw">True</span>)
+    ids = <span class="fn">tok</span>(text, return_tensors=<span class="st">&quot;pt&quot;</span>)
+    out = model.<span class="fn">generate</span>(**ids, max_new_tokens=<span class="nu">120</span>, do_sample=<span class="kw">False</span>)
+    <span class="kw">return</span> tok.<span class="fn">decode</span>(out[<span class="nu">0</span>][ids.input_ids.shape[<span class="nu">1</span>]:], skip_special_tokens=<span class="kw">True</span>).<span class="fn">strip</span>()
+
+
+<span class="kw">def</span> <span class="fn">parse_action</span>(out):
+    <span class="st">&quot;&quot;&quot;从模型输出中解析 Action: name(args), 解析不到返回 None&quot;&quot;&quot;</span>
+    <span class="kw">for</span> line <span class="kw">in</span> out.<span class="fn">splitlines</span>():
+        line = line.<span class="fn">strip</span>()
+        <span class="kw">if</span> line.<span class="fn">startswith</span>(<span class="st">&quot;Action:&quot;</span>):
+            call = line[<span class="fn">len</span>(<span class="st">&quot;Action:&quot;</span>):].<span class="fn">strip</span>()
+            name, _, rest = call.<span class="fn">partition</span>(<span class="st">&quot;(&quot;</span>)
+            args = rest.<span class="fn">rsplit</span>(<span class="st">&quot;)&quot;</span>, <span class="nu">1</span>)[<span class="nu">0</span>].<span class="fn">strip</span>().<span class="fn">strip</span>(<span class="st">&quot;&#x27;\&quot;&quot;</span>)
+            <span class="kw">return</span> name.<span class="fn">strip</span>(), args
+    <span class="kw">return</span> <span class="kw">None</span>
+
+
+<span class="kw">def</span> <span class="fn">main</span>():
+    question = sys.argv[<span class="nu">1</span>] <span class="kw">if</span> <span class="fn">len</span>(sys.argv) &gt; <span class="nu">1</span> <span class="kw">else</span> <span class="st">&quot;38乘27再加100是多少？&quot;</span>
+    tok = AutoTokenizer.<span class="fn">from_pretrained</span>(MODEL)
+    model = AutoModelForCausalLM.<span class="fn">from_pretrained</span>(MODEL)
+    messages = [
+        {<span class="st">&quot;role&quot;</span>: <span class="st">&quot;system&quot;</span>, <span class="st">&quot;content&quot;</span>: SYSTEM_PROMPT},
+        {<span class="st">&quot;role&quot;</span>: <span class="st">&quot;user&quot;</span>, <span class="st">&quot;content&quot;</span>: question},
+    ]
+    <span class="fn">print</span>(f<span class="st">&quot;问题: {question}\n&quot;</span>)
+
+    <span class="cm"># ---------------- ReAct 主循环 ----------------</span>
+    <span class="kw">for</span> step <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, MAX_LOOPS + <span class="nu">1</span>):
+        out = <span class="fn">llm</span>(tok, model, messages)            <span class="cm"># Thought</span>
+        <span class="fn">print</span>(f<span class="st">&quot;--- 第 {step} 轮 ---&quot;</span>)
+        <span class="fn">print</span>(f<span class="st">&quot;模型输出: {out}&quot;</span>)
+
+        <span class="kw">if</span> <span class="st">&quot;Final:&quot;</span> <span class="kw">in</span> out:                      <span class="cm"># 决定直接回答</span>
+            <span class="fn">print</span>(f<span class="st">&quot;\n最终回答: {out.split(&#x27;Final:&#x27;)[-1].strip()}&quot;</span>)
+            <span class="kw">return</span>
+
+        parsed = <span class="fn">parse_action</span>(out)               <span class="cm"># 解析 Action</span>
+        <span class="kw">if</span> parsed <span class="kw">is</span> <span class="kw">None</span>:
+            <span class="fn">print</span>(<span class="st">&quot;未解析到 Action, 要求模型按格式重试&quot;</span>)
+            messages.<span class="fn">append</span>({<span class="st">&quot;role&quot;</span>: <span class="st">&quot;assistant&quot;</span>, <span class="st">&quot;content&quot;</span>: out})
+            messages.<span class="fn">append</span>({<span class="st">&quot;role&quot;</span>: <span class="st">&quot;user&quot;</span>, <span class="st">&quot;content&quot;</span>:
+                             <span class="st">&quot;请严格按格式输出: Action: 工具名(参数) 或 Final: 答案&quot;</span>})
+            <span class="kw">continue</span>
+
+        name, args = parsed
+        <span class="kw">if</span> name <span class="kw">not</span> <span class="kw">in</span> TOOLS:
+            result = f<span class="st">&quot;未知工具: {name}&quot;</span>
+        <span class="kw">else</span>:
+            result = TOOLS[name](args) <span class="kw">if</span> args <span class="kw">else</span> TOOLS[name]()
+        <span class="fn">print</span>(f<span class="st">&quot;执行工具: {name}({args}) -&gt; {result}&quot;</span>)
+
+        <span class="cm"># Observation: 结果以 role=tool 回填进上下文</span>
+        messages.<span class="fn">append</span>({<span class="st">&quot;role&quot;</span>: <span class="st">&quot;assistant&quot;</span>, <span class="st">&quot;content&quot;</span>: out})
+        messages.<span class="fn">append</span>({<span class="st">&quot;role&quot;</span>: <span class="st">&quot;tool&quot;</span>, <span class="st">&quot;content&quot;</span>: f<span class="st">&quot;Observation: {result}&quot;</span>})
+
+    <span class="fn">print</span>(<span class="st">&quot;\n达到循环上限, 强制结束(防止死循环)&quot;</span>)
+
+
+<span class="kw">if</span> __name__ == <span class="st">&quot;__main__&quot;</span>:
+    <span class="fn">main</span>()
+</code></pre><div class="bk-code-path">路径：scripts/lecture3/agent_tool_demo.py</div></div></div>
+<div class="bk-code-card" id="code12"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">12</span><div class="bk-code-meta"><b>mcp_server.py</b><span>MCP Server：最小可用实现</span></div><span class="bk-code-lines">44 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
+<span class="st">&quot;&quot;&quot;
+第 8 章配套: 一个最小 MCP 工具服务器(stdio 传输)
+暴露两个工具: add(加法) / calc(四则运算表达式)
+任何支持 MCP 的客户端都能通过协议发现并调用它们, 无需单独写对接代码
+被 mcp_skills_demo.py 以子进程方式启动; 也可独立调试: python mcp_server.py
+依赖: pip install mcp
+&quot;&quot;&quot;</span>
+<span class="kw">import</span> ast
+<span class="kw">import</span> operator <span class="kw">as</span> op
+<span class="kw">from</span> mcp.server.fastmcp <span class="kw">import</span> FastMCP
+
+mcp = <span class="fn">FastMCP</span>(<span class="st">&quot;demo-tools&quot;</span>)
+
+
+@mcp.<span class="fn">tool</span>()
+<span class="kw">def</span> <span class="fn">add</span>(a: int, b: int) -&gt; int:
+    <span class="st">&quot;&quot;&quot;两个整数相加&quot;&quot;&quot;</span>
+    <span class="kw">return</span> a + b
+
+
+_OPS = {ast.Add: op.add, ast.Sub: op.sub, ast.Mult: op.mul,
+        ast.Div: op.truediv, ast.Pow: op.pow, ast.Mod: op.mod, ast.USub: op.neg}
+
+
+@mcp.<span class="fn">tool</span>()
+<span class="kw">def</span> <span class="fn">calc</span>(expr: str) -&gt; str:
+    <span class="st">&quot;&quot;&quot;计算一个数学表达式, 如 &quot;38*27+100&quot; &quot;&quot;&quot;</span>
+    <span class="kw">def</span> <span class="fn">ev</span>(node):
+        <span class="kw">if</span> <span class="fn">isinstance</span>(node, ast.Expression):
+            <span class="kw">return</span> <span class="fn">ev</span>(node.body)
+        <span class="kw">if</span> <span class="fn">isinstance</span>(node, ast.Constant) <span class="kw">and</span> <span class="fn">isinstance</span>(node.value, (int, float)):
+            <span class="kw">return</span> node.value
+        <span class="kw">if</span> <span class="fn">isinstance</span>(node, ast.BinOp) <span class="kw">and</span> <span class="fn">type</span>(node.op) <span class="kw">in</span> _OPS:
+            <span class="kw">return</span> _OPS[<span class="fn">type</span>(node.op)](<span class="fn">ev</span>(node.left), <span class="fn">ev</span>(node.right))
+        <span class="kw">if</span> <span class="fn">isinstance</span>(node, ast.UnaryOp) <span class="kw">and</span> <span class="fn">type</span>(node.op) <span class="kw">in</span> _OPS:
+            <span class="kw">return</span> _OPS[<span class="fn">type</span>(node.op)](<span class="fn">ev</span>(node.operand))
+        <span class="kw">raise</span> <span class="fn">ValueError</span>(<span class="st">&quot;不支持的表达式&quot;</span>)
+    <span class="kw">return</span> <span class="fn">str</span>(<span class="fn">ev</span>(ast.<span class="fn">parse</span>(expr, mode=<span class="st">&quot;eval&quot;</span>)))
+
+
+<span class="kw">if</span> __name__ == <span class="st">&quot;__main__&quot;</span>:
+    mcp.<span class="fn">run</span>()   <span class="cm"># 默认 stdio 传输: 通过标准输入输出与客户端通信</span>
+</code></pre><div class="bk-code-path">路径：scripts/lecture3/mcp_server.py</div></div></div>
+<div class="bk-code-card" id="code13"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">13</span><div class="bk-code-meta"><b>mcp_skills_demo.py</b><span>MCP + Skills：两者怎么配合</span></div><span class="bk-code-lines">72 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
+<span class="st">&quot;&quot;&quot;
+第 8 章: 工具从哪来, 怎么批量接进来? —— MCP 协议调用 + Skill 流程执行
+输入: 无(内置演示)
+输出: 1) 通过 MCP 协议发现工具列表  2) 调用 add / calc 的结果
+      3) Skill 演示: 读取 SKILL.md 操作手册, 按步骤执行配套脚本
+运行: python mcp_skills_demo.py
+依赖: pip install mcp
+结构: mcp_server.py 为本脚本启动的 MCP 服务器(同目录)
+      skills/expense_report/ 为一个 skill 示例(SKILL.md + scripts/fill.py)
+&quot;&quot;&quot;</span>
+<span class="kw">import</span> asyncio
+<span class="kw">import</span> subprocess
+<span class="kw">import</span> sys
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+<span class="kw">from</span> mcp <span class="kw">import</span> ClientSession, StdioServerParameters
+<span class="kw">from</span> mcp.client.stdio <span class="kw">import</span> stdio_client
+
+HERE = <span class="fn">Path</span>(__file__).parent
+
+
+<span class="kw">async</span> <span class="kw">def</span> <span class="fn">mcp_demo</span>():
+    <span class="st">&quot;&quot;&quot;启动 MCP 服务器(子进程), 通过协议发现工具并调用&quot;&quot;&quot;</span>
+    params = <span class="fn">StdioServerParameters</span>(
+        command=sys.executable,
+        args=[<span class="fn">str</span>(HERE / <span class="st">&quot;mcp_server.py&quot;</span>)],
+    )
+    <span class="kw">async</span> <span class="kw">with</span> <span class="fn">stdio_client</span>(params) <span class="kw">as</span> (read, write):
+        <span class="kw">async</span> <span class="kw">with</span> <span class="fn">ClientSession</span>(read, write) <span class="kw">as</span> session:
+            <span class="kw">await</span> session.<span class="fn">initialize</span>()
+
+            <span class="cm"># 1) 发现: 不问不知道, 一问全知道</span>
+            tools = <span class="kw">await</span> session.<span class="fn">list_tools</span>()
+            <span class="fn">print</span>(<span class="st">&quot;=== MCP 发现到的工具 ===&quot;</span>)
+            <span class="kw">for</span> t <span class="kw">in</span> tools.tools:
+                <span class="fn">print</span>(f<span class="st">&quot;  {t.name}: {t.description}&quot;</span>)
+
+            <span class="cm"># 2) 调用: 按协议传名称和参数, 结果原样返回</span>
+            r1 = <span class="kw">await</span> session.<span class="fn">call_tool</span>(<span class="st">&quot;add&quot;</span>, {<span class="st">&quot;a&quot;</span>: <span class="nu">38</span>, <span class="st">&quot;b&quot;</span>: <span class="nu">27</span>})
+            <span class="fn">print</span>(f<span class="st">&quot;\nadd(38, 27) -&gt; {r1.content[0].text}&quot;</span>)
+
+            r2 = <span class="kw">await</span> session.<span class="fn">call_tool</span>(<span class="st">&quot;calc&quot;</span>, {<span class="st">&quot;expr&quot;</span>: <span class="st">&quot;38*27+100&quot;</span>})
+            <span class="fn">print</span>(f<span class="st">&quot;calc(&#x27;38*27+100&#x27;) -&gt; {r2.content[0].text}&quot;</span>)
+
+
+<span class="kw">def</span> <span class="fn">skill_demo</span>():
+    <span class="st">&quot;&quot;&quot;演示 Skill: AI 遇到对应任务时, 加载&quot;操作手册&quot;并按流程执行&quot;&quot;&quot;</span>
+    skill_dir = HERE / <span class="st">&quot;skills&quot;</span> / <span class="st">&quot;expense_report&quot;</span>
+    manual = skill_dir / <span class="st">&quot;SKILL.md&quot;</span>
+    <span class="fn">print</span>(<span class="st">&quot;\n=== Skill 演示: 加载操作手册 ===&quot;</span>)
+    text = manual.<span class="fn">read_text</span>(encoding=<span class="st">&quot;utf-8&quot;</span>)
+    <span class="fn">print</span>(f<span class="st">&quot;已加载 {manual.name}, 共 {len(text)} 字; 手册开头:&quot;</span>)
+    <span class="fn">print</span>(<span class="st">&quot;\n&quot;</span>.<span class="fn">join</span>(text.<span class="fn">splitlines</span>()[:<span class="nu">8</span>]))
+
+    <span class="fn">print</span>(<span class="st">&quot;\n=== 按手册第 2 步, 执行配套脚本 scripts/fill.py ===&quot;</span>)
+    script = skill_dir / <span class="st">&quot;scripts&quot;</span> / <span class="st">&quot;fill.py&quot;</span>
+    result = subprocess.<span class="fn">run</span>([sys.executable, <span class="fn">str</span>(script)],
+                            capture_output=<span class="kw">True</span>, text=<span class="kw">True</span>, cwd=<span class="fn">str</span>(skill_dir))
+    <span class="fn">print</span>(result.stdout)
+    <span class="kw">if</span> result.returncode != <span class="nu">0</span>:
+        <span class="fn">print</span>(<span class="st">&quot;脚本执行出错:&quot;</span>, result.stderr, file=sys.stderr)
+
+
+<span class="kw">def</span> <span class="fn">main</span>():
+    asyncio.<span class="fn">run</span>(<span class="fn">mcp_demo</span>())
+    <span class="fn">skill_demo</span>()
+
+
+<span class="kw">if</span> __name__ == <span class="st">&quot;__main__&quot;</span>:
+    <span class="fn">main</span>()
+</code></pre><div class="bk-code-path">路径：scripts/lecture3/mcp_skills_demo.py</div></div></div>
+<div class="bk-code-card" id="code14"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">14</span><div class="bk-code-meta"><b>api_server.py</b><span>OpenAI 兼容 API：自己起一个服务端</span></div><span class="bk-code-lines">112 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
+<span class="st">&quot;&quot;&quot;
+第 9 章: 怎么让别的程序用上它? —— 本地 Chat Completions 兼容服务
+输入: HTTP POST /v1/chat/completions  JSON: {model, messages, stream}
+输出: 非流式 -&gt; choices JSON; 流式 -&gt; SSE 逐 token 推送(delta) + data: [DONE]
+运行: pip install torch transformers fastapi uvicorn
+      python api_server.py   (默认 http://127.0.0.1:8000)
+
+curl 示例(非流式):
+  curl http://127.0.0.1:8000/v1/chat/completions -H &quot;Content-Type: application/json&quot; -d &quot;{\&quot;model\&quot;:\&quot;qwen\&quot;,\&quot;messages\&quot;:[{\&quot;role\&quot;:\&quot;user\&quot;,\&quot;content\&quot;:\&quot;你好\&quot;}]}&quot;
+
+curl 示例(流式, 逐字返回):
+  curl http://127.0.0.1:8000/v1/chat/completions -H &quot;Content-Type: application/json&quot; -d &quot;{\&quot;model\&quot;:\&quot;qwen\&quot;,\&quot;messages\&quot;:[{\&quot;role\&quot;:\&quot;user\&quot;,\&quot;content\&quot;:\&quot;你好\&quot;}],\&quot;stream\&quot;:true}&quot;
+
+说明: 字段与 OpenAI 契约对齐; 现有 OpenAI 客户端只需把 base_url 指向本服务
+&quot;&quot;&quot;</span>
+<span class="kw">import</span> json
+<span class="kw">import</span> time
+<span class="kw">import</span> uuid
+<span class="kw">from</span> threading <span class="kw">import</span> Thread
+
+<span class="cm"># import os; os.environ[&quot;HF_ENDPOINT&quot;] = &quot;https://hf-mirror.com&quot;</span>
+<span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI
+<span class="kw">from</span> fastapi.responses <span class="kw">import</span> StreamingResponse
+<span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel
+<span class="kw">from</span> transformers <span class="kw">import</span> AutoTokenizer, AutoModelForCausalLM, TextIteratorStreamer
+
+MODEL = <span class="st">&quot;Qwen/Qwen2.5-0.5B-Instruct&quot;</span>
+
+<span class="fn">print</span>(f<span class="st">&quot;加载模型 {MODEL} ...&quot;</span>)
+tok = AutoTokenizer.<span class="fn">from_pretrained</span>(MODEL)
+model = AutoModelForCausalLM.<span class="fn">from_pretrained</span>(MODEL)
+app = <span class="fn">FastAPI</span>(title=<span class="st">&quot;Local Chat Completions&quot;</span>)
+
+
+<span class="kw">class</span> <span class="fn">ChatRequest</span>(BaseModel):
+    model: str = <span class="st">&quot;qwen&quot;</span>
+    messages: list
+    stream: bool = <span class="kw">False</span>
+    max_tokens: int = <span class="nu">512</span>
+    temperature: float = <span class="nu">0.7</span>
+
+
+<span class="kw">def</span> <span class="fn">build_inputs</span>(messages):
+    text = tok.<span class="fn">apply_chat_template</span>(messages, tokenize=<span class="kw">False</span>, add_generation_prompt=<span class="kw">True</span>)
+    <span class="kw">return</span> <span class="fn">tok</span>(text, return_tensors=<span class="st">&quot;pt&quot;</span>)
+
+
+<span class="kw">def</span> <span class="fn">sse_chunk</span>(content, model_name, finish=<span class="kw">False</span>):
+    <span class="st">&quot;&quot;&quot;按 OpenAI 流式格式组装一条 SSE 事件&quot;&quot;&quot;</span>
+    payload = {
+        <span class="st">&quot;id&quot;</span>: f<span class="st">&quot;chatcmpl-{uuid.uuid4().hex[:8]}&quot;</span>,
+        <span class="st">&quot;object&quot;</span>: <span class="st">&quot;chat.completion.chunk&quot;</span>,
+        <span class="st">&quot;created&quot;</span>: <span class="fn">int</span>(time.<span class="fn">time</span>()),
+        <span class="st">&quot;model&quot;</span>: model_name,
+        <span class="st">&quot;choices&quot;</span>: [{
+            <span class="st">&quot;index&quot;</span>: <span class="nu">0</span>,
+            <span class="st">&quot;delta&quot;</span>: {} <span class="kw">if</span> finish <span class="kw">else</span> {<span class="st">&quot;content&quot;</span>: content},
+            <span class="st">&quot;finish_reason&quot;</span>: <span class="st">&quot;stop&quot;</span> <span class="kw">if</span> finish <span class="kw">else</span> <span class="kw">None</span>,
+        }],
+    }
+    <span class="kw">return</span> f<span class="st">&quot;data: {json.dumps(payload, ensure_ascii=False)}\n\n&quot;</span>
+
+
+@app.<span class="fn">post</span>(<span class="st">&quot;/v1/chat/completions&quot;</span>)
+<span class="kw">def</span> <span class="fn">chat</span>(req: ChatRequest):
+    ids = <span class="fn">build_inputs</span>(req.messages)
+    do_sample = req.temperature &gt; <span class="nu">0</span>
+    gen_kwargs = <span class="fn">dict</span>(max_new_tokens=req.max_tokens,
+                      do_sample=do_sample,
+                      temperature=req.temperature <span class="kw">if</span> do_sample <span class="kw">else</span> <span class="kw">None</span>,
+                      top_p=<span class="nu">0.9</span> <span class="kw">if</span> do_sample <span class="kw">else</span> <span class="kw">None</span>)
+
+    <span class="kw">if</span> <span class="kw">not</span> req.stream:
+        out = model.<span class="fn">generate</span>(**ids, **gen_kwargs)
+        answer = tok.<span class="fn">decode</span>(out[<span class="nu">0</span>][ids.input_ids.shape[<span class="nu">1</span>]:], skip_special_tokens=<span class="kw">True</span>)
+        <span class="kw">return</span> {
+            <span class="st">&quot;id&quot;</span>: f<span class="st">&quot;chatcmpl-{uuid.uuid4().hex[:8]}&quot;</span>,
+            <span class="st">&quot;object&quot;</span>: <span class="st">&quot;chat.completion&quot;</span>,
+            <span class="st">&quot;created&quot;</span>: <span class="fn">int</span>(time.<span class="fn">time</span>()),
+            <span class="st">&quot;model&quot;</span>: req.model,
+            <span class="st">&quot;choices&quot;</span>: [{
+                <span class="st">&quot;index&quot;</span>: <span class="nu">0</span>,
+                <span class="st">&quot;message&quot;</span>: {<span class="st">&quot;role&quot;</span>: <span class="st">&quot;assistant&quot;</span>, <span class="st">&quot;content&quot;</span>: answer},
+                <span class="st">&quot;finish_reason&quot;</span>: <span class="st">&quot;stop&quot;</span>,
+            }],
+        }
+
+    <span class="kw">def</span> <span class="fn">stream</span>():
+        streamer = <span class="fn">TextIteratorStreamer</span>(tok, skip_prompt=<span class="kw">True</span>, skip_special_tokens=<span class="kw">True</span>)
+        kwargs = {**ids, **gen_kwargs, <span class="st">&quot;streamer&quot;</span>: streamer}
+        <span class="fn">Thread</span>(target=model.generate, kwargs=kwargs, daemon=<span class="kw">True</span>).<span class="fn">start</span>()
+        <span class="kw">for</span> piece <span class="kw">in</span> streamer:                       <span class="cm"># 模型每出一个 token</span>
+            <span class="kw">yield</span> <span class="fn">sse_chunk</span>(piece, req.model)        <span class="cm"># 就推一条 SSE 事件</span>
+        <span class="kw">yield</span> <span class="fn">sse_chunk</span>(<span class="st">&quot;&quot;</span>, req.model, finish=<span class="kw">True</span>)
+        <span class="kw">yield</span> <span class="st">&quot;data: [DONE]\n\n&quot;</span>
+
+    <span class="kw">return</span> <span class="fn">StreamingResponse</span>(<span class="fn">stream</span>(), media_type=<span class="st">&quot;text/event-stream&quot;</span>)
+
+
+@app.<span class="fn">get</span>(<span class="st">&quot;/v1/models&quot;</span>)
+<span class="kw">def</span> <span class="fn">models</span>():
+    <span class="kw">return</span> {<span class="st">&quot;object&quot;</span>: <span class="st">&quot;list&quot;</span>, <span class="st">&quot;data&quot;</span>: [
+        {<span class="st">&quot;id&quot;</span>: req_model, <span class="st">&quot;object&quot;</span>: <span class="st">&quot;model&quot;</span>, <span class="st">&quot;created&quot;</span>: <span class="fn">int</span>(time.<span class="fn">time</span>()), <span class="st">&quot;owned_by&quot;</span>: <span class="st">&quot;local&quot;</span>}
+        <span class="kw">for</span> req_model <span class="kw">in</span> [MODEL, <span class="st">&quot;qwen&quot;</span>]
+    ]}
+
+
+<span class="kw">if</span> __name__ == <span class="st">&quot;__main__&quot;</span>:
+    <span class="kw">import</span> uvicorn
+    uvicorn.<span class="fn">run</span>(app, host=<span class="st">&quot;127.0.0.1&quot;</span>, port=<span class="nu">8000</span>)
+</code></pre><div class="bk-code-path">路径：scripts/lecture3/api_server.py</div></div></div>
+<div class="bk-code-card" id="code15"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">15</span><div class="bk-code-meta"><b>direct_api_demo.py</b><span>裸 API：手拼请求体、手解返回</span></div><span class="bk-code-lines">59 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
+<span class="st">&quot;&quot;&quot;
+direct_api_demo.py —— 第2章配套脚本：最底层，直接调 API
+=========================================================
+只用标准 HTTP 库（requests，非 SDK）调一次 Chat Completions 完成问答，
+展示三步：构造 JSON -&gt; POST -&gt; 解析 choices，并打印原始返回。
+
+运行前：pip install requests
+接口配置：修改下方 CONFIG 区即可（兼容任何 Chat Completions 接口）
+  - 云端：BASE_URL 填官方/代理地址，API_KEY 填你的 Key
+  - 本地：BASE_URL 填本地服务地址（如 http://localhost:11434/v1），API_KEY 任意非空串
+&quot;&quot;&quot;</span>
+<span class="kw">import</span> json
+
+<span class="kw">import</span> requests
+
+<span class="cm"># ============ CONFIG：在这里配置你的接口 ============</span>
+BASE_URL = <span class="st">&quot;https://api.openai.com/v1&quot;</span>   <span class="cm"># 或本地服务，如 &quot;http://localhost:11434/v1&quot;</span>
+API_KEY = <span class="st">&quot;sk-xxx&quot;</span>                        <span class="cm"># 你的 Key；本地服务可填任意非空串</span>
+MODEL = <span class="st">&quot;gpt-4o-mini&quot;</span>                     <span class="cm"># 换成你接口支持的模型名</span>
+<span class="cm"># ====================================================</span>
+
+QUESTION = <span class="st">&quot;用一句话解释：什么是 Agent 的 ReAct 循环？&quot;</span>
+
+
+<span class="kw">def</span> <span class="fn">main</span>():
+    <span class="cm"># 第 1 步：构造请求体 —— Agent 的一切魔法，底层就是这么一个 JSON</span>
+    payload = {
+        <span class="st">&quot;model&quot;</span>: MODEL,
+        <span class="st">&quot;messages&quot;</span>: [{<span class="st">&quot;role&quot;</span>: <span class="st">&quot;user&quot;</span>, <span class="st">&quot;content&quot;</span>: QUESTION}],
+    }
+
+    <span class="cm"># 第 2 步：POST 到 Chat Completions 端点</span>
+    resp = requests.<span class="fn">post</span>(
+        f<span class="st">&quot;{BASE_URL}/chat/completions&quot;</span>,
+        headers={<span class="st">&quot;Authorization&quot;</span>: f<span class="st">&quot;Bearer {API_KEY}&quot;</span>},
+        json=payload,
+        timeout=<span class="nu">60</span>,
+    )
+    resp.<span class="fn">raise_for_status</span>()
+    data = resp.<span class="fn">json</span>()
+
+    <span class="cm"># 打印原始返回：看清 API 的真面目（choices / usage / finish_reason ...）</span>
+    <span class="fn">print</span>(<span class="st">&quot;=&quot;</span> * <span class="nu">60</span>)
+    <span class="fn">print</span>(<span class="st">&quot;原始返回 JSON：&quot;</span>)
+    <span class="fn">print</span>(json.<span class="fn">dumps</span>(data, ensure_ascii=<span class="kw">False</span>, indent=<span class="nu">2</span>))
+    <span class="fn">print</span>(<span class="st">&quot;=&quot;</span> * <span class="nu">60</span>)
+
+    <span class="cm"># 第 3 步：解析 choices[0].message —— 如果有 tool_calls，就该去执行工具了</span>
+    msg = data[<span class="st">&quot;choices&quot;</span>][<span class="nu">0</span>][<span class="st">&quot;message&quot;</span>]
+    <span class="kw">if</span> msg.<span class="fn">get</span>(<span class="st">&quot;tool_calls&quot;</span>):
+        <span class="fn">print</span>(<span class="st">&quot;模型想调工具：&quot;</span>, msg[<span class="st">&quot;tool_calls&quot;</span>])   <span class="cm"># 本demo未提供工具，不会走到</span>
+    <span class="kw">else</span>:
+        <span class="fn">print</span>(<span class="st">&quot;模型回答：&quot;</span>, msg[<span class="st">&quot;content&quot;</span>])
+
+
+<span class="kw">if</span> __name__ == <span class="st">&quot;__main__&quot;</span>:
+    <span class="fn">main</span>()
+</code></pre><div class="bk-code-path">路径：scripts/lecture4/direct_api_demo.py</div></div></div>
+<div class="bk-code-card" id="code16"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">16</span><div class="bk-code-meta"><b>sdk_react_demo.py</b><span>SDK + 手写 ReAct 主循环</span></div><span class="bk-code-lines">84 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
+<span class="st">&quot;&quot;&quot;
+sdk_react_demo.py —— 第4章配套脚本：用 SDK 手写 ReAct 循环
+=============================================================
+用官方 SDK 手写一个 Agent 主循环，内置一个计算器工具。
+每轮打印中间过程：模型要调哪个工具 -&gt; 参数是什么 -&gt; 执行结果 -&gt; 回填。
+核心结构不到 10 行：发消息+工具描述，有 tool_calls 就执行回填，否则输出。
+
+运行前：pip install openai
+接口配置：修改下方 CONFIG 区（base_url 指向任何兼容 Chat Completions 的接口）
+&quot;&quot;&quot;</span>
+<span class="kw">import</span> json
+
+<span class="kw">from</span> openai <span class="kw">import</span> OpenAI
+
+<span class="cm"># ============ CONFIG：在这里配置你的接口 ============</span>
+BASE_URL = <span class="st">&quot;https://api.openai.com/v1&quot;</span>   <span class="cm"># 或本地服务，如 &quot;http://localhost:11434/v1&quot;</span>
+API_KEY = <span class="st">&quot;sk-xxx&quot;</span>
+MODEL = <span class="st">&quot;gpt-4o-mini&quot;</span>
+<span class="cm"># ====================================================</span>
+
+TASK = <span class="st">&quot;(128 + 256) * 3 等于多少？算完告诉我结果。&quot;</span>
+
+client = <span class="fn">OpenAI</span>(base_url=BASE_URL, api_key=API_KEY)
+
+
+<span class="cm"># ---- 工具 1：计算器（真实执行体）----</span>
+<span class="kw">def</span> <span class="fn">calc</span>(expr: str) -&gt; str:
+    <span class="kw">try</span>:
+        <span class="kw">return</span> <span class="fn">str</span>(<span class="fn">eval</span>(expr, {<span class="st">&quot;__builtins__&quot;</span>: {}}, {}))  <span class="cm"># demo 用；生产请换安全求值</span>
+    <span class="kw">except</span> Exception <span class="kw">as</span> e:
+        <span class="kw">return</span> f<span class="st">&quot;计算出错: {e}&quot;</span>
+
+
+TOOLS = {<span class="st">&quot;calc&quot;</span>: calc}
+
+<span class="cm"># ---- 工具描述（发给模型的 JSON Schema）----</span>
+TOOLS_SCHEMA = [{
+    <span class="st">&quot;type&quot;</span>: <span class="st">&quot;function&quot;</span>,
+    <span class="st">&quot;function&quot;</span>: {
+        <span class="st">&quot;name&quot;</span>: <span class="st">&quot;calc&quot;</span>,
+        <span class="st">&quot;description&quot;</span>: <span class="st">&quot;计算一个数学表达式，返回结果字符串&quot;</span>,
+        <span class="st">&quot;parameters&quot;</span>: {
+            <span class="st">&quot;type&quot;</span>: <span class="st">&quot;object&quot;</span>,
+            <span class="st">&quot;properties&quot;</span>: {<span class="st">&quot;expr&quot;</span>: {<span class="st">&quot;type&quot;</span>: <span class="st">&quot;string&quot;</span>, <span class="st">&quot;description&quot;</span>: <span class="st">&quot;如 (128+256)*3&quot;</span>}},
+            <span class="st">&quot;required&quot;</span>: [<span class="st">&quot;expr&quot;</span>],
+        },
+    },
+}]
+
+
+<span class="kw">def</span> <span class="fn">main</span>():
+    messages = [{<span class="st">&quot;role&quot;</span>: <span class="st">&quot;user&quot;</span>, <span class="st">&quot;content&quot;</span>: TASK}]
+    round_no = <span class="nu">0</span>
+    <span class="cm"># ============ ReAct 主循环（本脚本唯一的核心） ============</span>
+    <span class="kw">while</span> <span class="kw">True</span>:
+        round_no += <span class="nu">1</span>
+        <span class="fn">print</span>(f<span class="st">&quot;\n----- 第 {round_no} 轮 -----&quot;</span>)
+        msg = client.chat.completions.<span class="fn">create</span>(
+            model=MODEL, messages=messages, tools=TOOLS_SCHEMA
+        ).choices[<span class="nu">0</span>].message
+        messages.<span class="fn">append</span>(msg)
+
+        <span class="kw">if</span> <span class="kw">not</span> msg.tool_calls:                      <span class="cm"># 没有工具调用 -&gt; 想完了</span>
+            <span class="fn">print</span>(<span class="st">&quot;最终回答：&quot;</span>, msg.content)
+            <span class="kw">break</span>
+
+        <span class="kw">for</span> c <span class="kw">in</span> msg.tool_calls:                    <span class="cm"># 想调工具 -&gt; 执行并回填</span>
+            args = json.<span class="fn">loads</span>(c.function.arguments)
+            <span class="fn">print</span>(f<span class="st">&quot;模型要调工具: {c.function.name}  参数: {args}&quot;</span>)
+            result = TOOLS[c.function.name](**args)
+            <span class="fn">print</span>(f<span class="st">&quot;工具执行结果: {result}  -&gt; 回填 messages&quot;</span>)
+            messages.<span class="fn">append</span>({
+                <span class="st">&quot;role&quot;</span>: <span class="st">&quot;tool&quot;</span>, <span class="st">&quot;tool_call_id&quot;</span>: c.id, <span class="st">&quot;content&quot;</span>: <span class="fn">str</span>(result),
+            })
+        <span class="kw">if</span> round_no &gt;= <span class="nu">8</span>:                           <span class="cm"># 安全护栏：轮次上限</span>
+            <span class="fn">print</span>(<span class="st">&quot;超过最大轮次，强制结束&quot;</span>)
+            <span class="kw">break</span>
+    <span class="cm"># ==========================================================</span>
+
+
+<span class="kw">if</span> __name__ == <span class="st">&quot;__main__&quot;</span>:
+    <span class="fn">main</span>()
+</code></pre><div class="bk-code-path">路径：scripts/lecture4/sdk_react_demo.py</div></div></div>
+<div class="bk-code-card" id="code17"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">17</span><div class="bk-code-meta"><b>langgraph_plan_demo.py</b><span>LangGraph：把流程画成图来编排</span></div><span class="bk-code-lines">89 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
+<span class="st">&quot;&quot;&quot;
+langgraph_plan_demo.py —— 第7章配套脚本：用 LangGraph 画一张 Plan-and-Execute 图
+===================================================================================
+把流程画成图，而不是写 if/else：
+    START -&gt; plan（规划：任务拆成步骤）-&gt; act（逐步执行）-&gt; sum（汇总答案）-&gt; END
+每个节点是一个普通函数，节点间通过 State 共享数据。
+运行时会打印节点流转顺序与最终答案。
+
+运行前：pip install langgraph langchain-openai
+接口配置：修改下方 CONFIG 区（ChatOpenAI 的 base_url 指向任何兼容接口）
+提示：compile() 时传入 checkpointer 即可获得断点恢复/人审，demo 从简。
+&quot;&quot;&quot;</span>
+<span class="kw">import</span> operator
+<span class="kw">from</span> typing <span class="kw">import</span> Annotated, TypedDict
+
+<span class="kw">from</span> langchain_openai <span class="kw">import</span> ChatOpenAI
+<span class="kw">from</span> langgraph.graph <span class="kw">import</span> END, START, StateGraph
+
+<span class="cm"># ============ CONFIG：在这里配置你的接口 ============</span>
+BASE_URL = <span class="st">&quot;https://api.openai.com/v1&quot;</span>   <span class="cm"># 或本地服务，如 &quot;http://localhost:11434/v1&quot;</span>
+API_KEY = <span class="st">&quot;sk-xxx&quot;</span>
+MODEL = <span class="st">&quot;gpt-4o-mini&quot;</span>
+<span class="cm"># ====================================================</span>
+
+TASK = <span class="st">&quot;估算一家 30 人的远程团队一年的协作软件开销，并给出节省建议。&quot;</span>
+
+llm = <span class="fn">ChatOpenAI</span>(base_url=BASE_URL, api_key=API_KEY, model=MODEL, temperature=<span class="nu">0</span>)
+
+
+<span class="cm"># ---- State：节点之间共享的数据结构（图的&quot;血液&quot;）----</span>
+<span class="kw">class</span> <span class="fn">PlanState</span>(TypedDict):
+    task: str
+    plan: list[str]                                <span class="cm"># 规划出的步骤</span>
+    results: Annotated[list[str], operator.add]    <span class="cm"># 各步结果（reducer：追加而非覆盖）</span>
+    answer: str
+
+
+<span class="cm"># ---- 节点 1：规划 —— 把任务拆成可执行的步骤列表 ----</span>
+<span class="kw">def</span> <span class="fn">plan_node</span>(state: PlanState):
+    <span class="fn">print</span>(f<span class="st">&quot;\n[NODE plan] 进入规划，任务：{state[&#x27;task&#x27;]}&quot;</span>)
+    resp = llm.<span class="fn">invoke</span>(
+        <span class="st">&quot;把任务拆成 3 个有序步骤，每步一行，只输出步骤本身。\n任务：&quot;</span> + state[<span class="st">&quot;task&quot;</span>]
+    )
+    steps = [s.<span class="fn">strip</span>() <span class="kw">for</span> s <span class="kw">in</span> resp.content.<span class="fn">strip</span>().<span class="fn">splitlines</span>() <span class="kw">if</span> s.<span class="fn">strip</span>()][:<span class="nu">3</span>]
+    <span class="fn">print</span>(f<span class="st">&quot;[NODE plan] 产出计划：{steps}&quot;</span>)
+    <span class="kw">return</span> {<span class="st">&quot;plan&quot;</span>: steps, <span class="st">&quot;results&quot;</span>: []}
+
+
+<span class="cm"># ---- 节点 2：执行 —— 逐步完成计划，结果追加进 State ----</span>
+<span class="kw">def</span> <span class="fn">act_node</span>(state: PlanState):
+    <span class="kw">for</span> i, step <span class="kw">in</span> <span class="fn">enumerate</span>(state[<span class="st">&quot;plan&quot;</span>], <span class="nu">1</span>):
+        <span class="fn">print</span>(f<span class="st">&quot;\n[NODE act] 执行步骤 {i}/{len(state[&#x27;plan&#x27;])}：{step}&quot;</span>)
+        resp = llm.<span class="fn">invoke</span>(f<span class="st">&quot;执行任务中的一步，给出简洁结果。\n任务：{state[&#x27;task&#x27;]}\n步骤：{step}&quot;</span>)
+        <span class="fn">print</span>(f<span class="st">&quot;[NODE act] 步骤 {i} 结果：{resp.content[:80]}...&quot;</span>)
+        state[<span class="st">&quot;results&quot;</span>].<span class="fn">append</span>(f<span class="st">&quot;步骤{i}({step})：{resp.content}&quot;</span>)
+    <span class="kw">return</span> {<span class="st">&quot;results&quot;</span>: state[<span class="st">&quot;results&quot;</span>]}
+
+
+<span class="cm"># ---- 节点 3：汇总 —— 把各步结果合成最终答案 ----</span>
+<span class="kw">def</span> <span class="fn">sum_node</span>(state: PlanState):
+    <span class="fn">print</span>(<span class="st">&quot;\n[NODE sum] 汇总各步结果&quot;</span>)
+    resp = llm.<span class="fn">invoke</span>(
+        <span class="st">&quot;把以下各步结果汇总成最终回答。\n&quot;</span> + <span class="st">&quot;\n&quot;</span>.<span class="fn">join</span>(state[<span class="st">&quot;results&quot;</span>])
+    )
+    <span class="kw">return</span> {<span class="st">&quot;answer&quot;</span>: resp.content}
+
+
+<span class="kw">def</span> <span class="fn">main</span>():
+    <span class="cm"># ---- 画图：节点是函数，边是流转规则 ----</span>
+    g = <span class="fn">StateGraph</span>(PlanState)
+    g.<span class="fn">add_node</span>(<span class="st">&quot;plan&quot;</span>, plan_node)
+    g.<span class="fn">add_node</span>(<span class="st">&quot;act&quot;</span>, act_node)
+    g.<span class="fn">add_node</span>(<span class="st">&quot;sum&quot;</span>, sum_node)
+    g.<span class="fn">add_edge</span>(START, <span class="st">&quot;plan&quot;</span>)
+    g.<span class="fn">add_edge</span>(<span class="st">&quot;plan&quot;</span>, <span class="st">&quot;act&quot;</span>)
+    g.<span class="fn">add_edge</span>(<span class="st">&quot;act&quot;</span>, <span class="st">&quot;sum&quot;</span>)
+    g.<span class="fn">add_edge</span>(<span class="st">&quot;sum&quot;</span>, END)
+    app = g.<span class="fn">compile</span>()   <span class="cm"># 传 checkpointer=... 即获得断点恢复/人审能力</span>
+
+    <span class="fn">print</span>(<span class="st">&quot;图的流转：START -&gt; plan -&gt; act -&gt; sum -&gt; END&quot;</span>)
+    final = app.<span class="fn">invoke</span>({<span class="st">&quot;task&quot;</span>: TASK, <span class="st">&quot;plan&quot;</span>: [], <span class="st">&quot;results&quot;</span>: [], <span class="st">&quot;answer&quot;</span>: <span class="st">&quot;&quot;</span>})
+    <span class="fn">print</span>(<span class="st">&quot;\n&quot;</span> + <span class="st">&quot;=&quot;</span> * <span class="nu">60</span>)
+    <span class="fn">print</span>(<span class="st">&quot;最终答案：\n&quot;</span> + final[<span class="st">&quot;answer&quot;</span>])
+
+
+<span class="kw">if</span> __name__ == <span class="st">&quot;__main__&quot;</span>:
+    <span class="fn">main</span>()
+</code></pre><div class="bk-code-path">路径：scripts/lecture4/langgraph_plan_demo.py</div></div></div>
+  </section>
+<nav class="bk-pager">
+<a class="prev" href="ch07.html"><small>← 上一章</small><b>第 7 章 深造 — 大模型与 AI Agent 权威资料索引</b></a>
+<span class="sp"></span>
+</nav>
+</div></main>
+
+<button id="bk-up" onclick="scrollTo({top:0,behavior:'smooth'})" title="回到顶部">↑</button>
+
+<script src="assets/book.js"></script>
+</body>
+</html>

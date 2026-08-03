@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第 3 章 机制 — 从接话机器到会干活的助手 · AI Agent 实战手册</title>
+<link rel="stylesheet" href="assets/book.css">
+</head>
+<body>
+
+<aside id="bk-side">
+  <div class="bk-brand">
+    <div class="bk-b-k">AI AGENT 系列培训</div>
+    <h1>AI Agent 实战手册</h1>
+    <p>从装上第一个 Agent，到把它送进生产</p>
+  </div>
+  <div class="bk-search"><input id="bk-q" type="search" placeholder="筛选章节标题…" autocomplete="off"></div>
+  <div id="bk-nav">
+    <div class="bk-nav-extra" style="margin-top:0;padding-top:0;border:none">
+      <a href="index.html#bk-cover"><b>—</b>扉页与目录</a>
+    </div>
+    <div class="bk-nav-ch" data-ch="1"><a class="bk-nav-ch-t" href="ch01.html#p1" style="--ac:#2563EB"><b>01</b><span>破冰</span><i>1</i></a><ul>
+<li><a href="ch01.html#p2">开篇与导读</a></li>
+<li><a href="ch01.html#p4">破误解：Agent 是干活不是回答</a></li>
+<li><a href="ch01.html#p7">形态一：终端与编辑器里的 Agent</a></li>
+<li><a href="ch01.html#p10">大脑从哪来：云端 API 与本地部署</a></li>
+<li><a href="ch01.html#p17">形态二三：消息里与办公里的 Agent</a></li>
+<li><a href="ch01.html#p19">选型总表与 0 成本方案</a></li>
+<li><a href="ch01.html#p23">今晚就动手与总结</a></li>
+</ul></div>
+<div class="bk-nav-ch" data-ch="2"><a class="bk-nav-ch-t" href="ch02.html#p26" style="--ac:#0F766E"><b>02</b><span>前传</span><i>26</i></a><ul>
+<li><a href="ch02.html#p27">全篇地图：一条因果链</a></li>
+<li><a href="ch02.html#p29">机器怎么表示文字：one-hot 与 embedding</a></li>
+<li><a href="ch02.html#p32">怎么学会造句：n-gram → 神经网络 → RNN</a></li>
+<li><a href="ch02.html#p35">注意力机制与 Transformer</a></li>
+<li><a href="ch02.html#p39">预训练、微调与缩放定律</a></li>
+<li><a href="ch02.html#p42">递进小结与可运行实验</a></li>
+</ul></div>
+<div class="bk-nav-ch" data-ch="3"><a class="bk-nav-ch-t" href="#p45" style="--ac:#7C3AED"><b>03</b><span>机制</span><i>45</i></a><ul>
+<li><a href="#p46">10 个困惑总览</a></li>
+<li><a href="#p48">生成机制：不是检索，是逐 token 预测</a></li>
+<li><a href="#p50">训练与对齐：base / instruct、SFT、QLoRA</a></li>
+<li><a href="#p54">上下文与记忆：它其实没有记忆</a></li>
+<li><a href="#p57">采样、幻觉与思维链</a></li>
+<li><a href="#p60">外部知识：RAG 检索增强</a></li>
+<li><a href="#p62">工具调用与 MCP / CLI / Skills</a></li>
+<li><a href="#p67">API 调用与全景回顾</a></li>
+</ul></div>
+<div class="bk-nav-ch" data-ch="4"><a class="bk-nav-ch-t" href="ch04.html#p70" style="--ac:#B45309"><b>04</b><span>开发</span><i>70</i></a><ul>
+<li><a href="ch04.html#p71">主线：抽象降级与三条路线</a></li>
+<li><a href="ch04.html#p75">手写：裸 API → SDK → ReAct 主循环</a></li>
+<li><a href="ch04.html#p79">范式选择：ReAct vs Plan-and-Execute</a></li>
+<li><a href="ch04.html#p81">框架全景、总对比表与选型决策树</a></li>
+<li><a href="ch04.html#p86">落地 checklist 与可运行脚本</a></li>
+</ul></div>
+<div class="bk-nav-ch" data-ch="5"><a class="bk-nav-ch-t" href="ch05.html#p90" style="--ac:#0D9488"><b>05</b><span>工程化</span><i>90</i></a><ul>
+<li><a href="ch05.html#p91">本章要回答的问题与三模块总览</a></li>
+<li><a href="ch05.html#p94">模块 A：六大能力支柱</a></li>
+<li><a href="ch05.html#p102">模块 B：四层协议生态与 MCP</a></li>
+<li><a href="ch05.html#p109">模块 C：企业落地与成熟度五级</a></li>
+<li><a href="ch05.html#p114">总结与落地评估速查表</a></li>
+</ul></div>
+<div class="bk-nav-ch" data-ch="6"><a class="bk-nav-ch-t" href="ch06.html#p117" style="--ac:#4F46E5"><b>06</b><span>收束</span><i>117</i></a><ul>
+<li><a href="ch06.html#p118">本章定位与全篇地图</a></li>
+<li><a href="ch06.html#p120">序章 · 苦涩的教训</a></li>
+<li><a href="ch06.html#p126">Chat 的实现（回顾串讲）</a></li>
+<li><a href="ch06.html#p133">Agent 的实现（回顾串讲）</a></li>
+<li><a href="ch06.html#p139">终章 · 体验的时代</a></li>
+</ul></div>
+<div class="bk-nav-ch" data-ch="7"><a class="bk-nav-ch-t" href="ch07.html#p145" style="--ac:#475569"><b>07</b><span>深造</span><i>145</i></a><ul>
+<li><a href="ch07.html#p146">怎么读这份索引</a></li>
+<li><a href="ch07.html#p148">第 1 组 · 大模型基础</a></li>
+<li><a href="ch07.html#p149">第 2 组 · Agent 范式</a></li>
+<li><a href="ch07.html#p151">第 3 组 · 工程架构</a></li>
+<li><a href="ch07.html#p152">第 4 组 · 协议生态</a></li>
+<li><a href="ch07.html#p153">第 5 组 · 落地实践</a></li>
+<li><a href="ch07.html#p155">第 6 组 · 课程路径与总览</a></li>
+</ul></div>
+    <div class="bk-nav-extra">
+      <a href="appendix.html"><b>附</b>配套代码（17 个脚本）</a>
+    </div>
+  </div>
+</aside>
+
+<div id="bk-top">
+  <button id="bk-burger" title="收起 / 展开目录">☰</button>
+  <div id="bk-crumb"><b>扉页</b></div>
+  <div class="bk-tools">
+    <button onclick="bkPrint()">打印 / 导出 PDF</button>
+    <button onclick="bkAll(1)">展开全部代码</button>
+  </div>
+  <div id="bk-pageno"><b>—</b> / 156</div>
+</div>
+<div id="bk-bar"><i></i></div>
+
+<main id="bk-main"><div class="bk-wrap">
+<div class="bk-sheet bk-sheet-opener" id="p45" data-ch="3" data-page="45"><div class="bk-paper"><div class="bk-fit"><div class="bk-opener" style="--ac:#7C3AED"><div class="bk-op-left"><div class="bk-op-cn">第 三 章</div><div class="bk-op-num">03</div><div class="bk-op-en">HOW CHATGPT WORKS</div></div><div class="bk-op-right"><h1>机制<small>从接话机器到会干活的助手</small></h1><p class="bk-op-lead">用 10 个真实困惑串起整个系统：生成、训练、上下文、采样、RAG、工具调用、协议、API——每一环都配一个能跑的脚本。</p><div class="bk-op-meta"><span>懂技术</span><span>24 页</span><span>本章 8 节</span></div><ul class="bk-op-secs"><li><span>10 个困惑总览</span><i></i><em>46</em></li><li><span>生成机制：不是检索，是逐 token 预测</span><i></i><em>48</em></li><li><span>训练与对齐：base / instruct、SFT、QLoRA</span><i></i><em>50</em></li><li><span>上下文与记忆：它其实没有记忆</span><i></i><em>54</em></li><li><span>采样、幻觉与思维链</span><i></i><em>57</em></li><li><span>外部知识：RAG 检索增强</span><i></i><em>60</em></li><li><span>工具调用与 MCP / CLI / Skills</span><i></i><em>62</em></li><li><span>API 调用与全景回顾</span><i></i><em>67</em></li></ul></div></div></div></div><div class="bk-folio"><span>45</span></div></div>
+<div class="bk-sheet" id="p46" data-ch="3" data-page="46" data-title="ChatGPT 是怎么工作的"><div class="bk-paper ch3"><div class="bk-fit"><section class="slide cover active">
+  <div class="badge">技术科普 · 破除 10 个常见误解</div>
+  <h1>ChatGPT 是怎么工作的</h1>
+  <div class="sub">从"接话机器"到"会干活的助手" —— 写给懂技术的你</div>
+  <div class="typed">输入"今天天气" → <b>[今天][天气][真][的][很][好]</b> …… 它正在一个词一个词地"编"答案</div>
+  <div class="meta">大模型对话系统与智能体生态 · 21 页</div>
+</section></div></div><div class="bk-folio"><span>46</span><em>第三章 · 机制</em></div></div>
+<div class="bk-sheet" id="p47" data-ch="3" data-page="47" data-title="关于 ChatGPT 的 10 个困惑，其实都能用一句话解释"><div class="bk-paper ch3"><div class="bk-fit"><section class="slide active" style="--accent:#0f766e">
+  <header>
+    <span class="chip">导览</span>
+    <h2 class="q" style="font-size:26px">关于 ChatGPT 的 10 个困惑，其实都能用一句话解释</h2>
+    <p class="debunk">主线：<b>它不是"查"答案，是"逐词编"答案</b>——后面所有现象都是这一点的推论。</p>
+  </header>
+  <pre class="diagram"> 一切的起点: 它不是"查"答案, 是"逐词编"答案
+      |
+      v
+ [1] 它在搜答案吗?        --&gt; 逐 token 生成
+ [2] 它凭什么会回答?      --&gt; 预训练 + SFT + 对齐
+ [3] 它怎么记得聊天?      --&gt; 历史每次重新塞进输入
+ [4] 答案为何每次不同?    --&gt; 按概率抽样
+ [5] 为何一本正经胡说?    --&gt; 生成而非检索 + 思维链缓解
+ [6] 怎么知道新东西?      --&gt; RAG 检索增强
+ [7] 怎么动手干活?        --&gt; 工具调用 + ReAct 循环
+ [8] 工具怎么批量接入?    --&gt; MCP / CLI / Skills
+ [9] 程序怎么用上它?      --&gt; Chat Completions API
+      |
+      v
+ [10] 总结: 不是魔法, 是可复现的工程组合</pre>
+  <div class="bottom full">
+    <div class="points"><h4>怎么读这份 PPT</h4><ol>
+      <li><b>前 5 章</b>讲"它本身"：生成、训练、上下文、采样、幻觉</li>
+      <li><b>后 4 章</b>讲"它的生态"：补知识、接工具、标准化、服务化</li>
+      <li>每章从一个你可能真的想问的问题开始，先点破错误直觉，再讲原理</li>
+    </ol></div>
+  </div>
+  <div class="foot">导览 · 10 个疑惑 1 条主线</div>
+</section></div></div><div class="bk-folio"><span>47</span><em>第三章 · 机制</em></div></div>
+<div class="bk-sheet" id="p48" data-ch="3" data-page="48" data-title="我问它问题，它是不是像搜索引擎一样去查答案？"><div class="bk-paper ch3"><div class="bk-fit"><section class="slide active" style="--accent:#2563eb">
+  <header>
+    <span class="chip">第 1 章 · 它在搜答案吗</span>
+    <h2 class="q">我问它问题，它是不是像搜索引擎一样去查答案？</h2>
+    <p class="debunk">不是。默认形态下，它<b>不连数据库、不搜索</b>，没有任何"答案库"。</p>
+  </header>
+  <pre class="diagram"> 你以为的:                          实际上的:
+ 问题 --&gt; 搜索 --&gt; 找到答案 --&gt; 念给你听     问题 --&gt; 预测下一个词 --&gt; 再下一个 --&gt; ...
+ (从已有内容里"找")                          (按概率"编"一段从未存在过的文本)
+
+ +------------------------------------------------------------+
+ | 模型只做一件事: 给定上文, 计算"下一个 token 最可能是什么"     |
+ +------------------------------------------------------------+</pre>
+  <div class="bottom">
+    <div class="points"><h4>要点</h4><ol>
+      <li><b>生成 vs 检索</b>是本质区别：搜索引擎从索引里找已存在的网页；模型按概率现场编一段新文本</li>
+      <li>每个词都是"现编"的，所以答案每次可能不同，也可能编出看似合理但不存在的内容</li>
+      <li>后面所有章节（会变、胡说、记不住）都是这一点的推论</li>
+    </ol></div>
+    <pre class="code"><span class="tag">主干代码 · 伪代码</span><code class="py"># 模型的全部工作（伪代码）
+while not 结束:
+    next_token = model.预测下一个(text)  # 只出一个
+    text += next_token                   # 接回去再猜</code></pre>
+  </div>
+  <div class="foot">第 1 章 · 生成 vs 检索</div>
+</section></div></div><div class="bk-folio"><span>48</span><em>第三章 · 机制</em></div></div>
+<div class="bk-sheet" id="p49" data-ch="3" data-page="49" data-title="token 是单词吗？为什么它说话是一个词一个词往外蹦？"><div class="bk-paper ch3"><div class="bk-fit"><section class="slide active" style="--accent:#2563eb">
+  <header>
+    <span class="chip">第 1 章 · 它在搜答案吗</span>
+    <h2 class="q">token 是单词吗？为什么它说话是一个词一个词往外蹦？</h2>
+    <p class="debunk">token 不是单词，是文本被切分后的<b>最小单位</b>——可能是一个字、一个词、半个词或一个标点。</p>
+  </header>
+  <pre class="diagram"> 输入: "今天天气"
+    |
+    v 切分 (tokenizer)
+ [今天] [天气]
+    |
+    v
+ +---------------+     下一个 token 的概率分布
+ |     模型       | --&gt;  真:0.30  很:0.25  不:0.15  晴:0.10 ...
+ +---------------+
+    |
+    v 选(采样)一个 -&gt; "真"
+ [今天] [天气] [真]
+    |
+    +----&gt; 把新 token 接回输入, 再预测下一个, 循环直到结束</pre>
+  <div class="bottom">
+    <div class="points"><h4>要点</h4><ol>
+      <li>模型词表固定（几万~十几万个 token），每次输出 = <b>从词表里选 1 个</b></li>
+      <li>"ChatGPT" 可能被切成 Chat + G + PT 多个 token；中文常按字/词混合切</li>
+      <li>网页上"打字机"效果的根源：<b>本来就是逐 token 生成</b>，不是特效</li>
+    </ol></div>
+    <pre class="code"><span class="tag">主干代码 · 加载模型看续写</span><code class="py">from transformers import AutoTokenizer, AutoModelForCausalLM
+tok = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-0.5B-Instruct")
+model = AutoModelForCausalLM.from_pretrained("Qwen/Qwen2.5-0.5B-Instruct")
+ids = tok("今天天气真", return_tensors="pt")      # 半句话
+out = model.generate(**ids, max_new_tokens=20)    # 看它怎么接
+print(tok.decode(out[0]))</code></pre>
+  </div>
+  <div class="foot">第 1 章 · token 与逐词生成</div>
+</section></div></div><div class="bk-folio"><span>49</span><em>第三章 · 机制</em></div></div>
+<div class="bk-sheet" id="p50" data-ch="3" data-page="50" data-title="我一问它就会答，是它天生就会聊天吗？"><div class="bk-paper ch3"><div class="bk-fit"><section class="slide active" style="--accent:#7c3aed">
+  <header>
+    <span class="chip">第 2 章 · 它凭什么会回答</span>
+    <h2 class="q">我一问它就会答，是它天生就会聊天吗？</h2>
+    <p class="debunk">不是天生的，是"训"出来的。训练分<b>三步</b>，每一步解决一个问题。</p>
+  <span class="wb-xlink">系列衔接 ｜ 训练方法的历史脉络（embedding → Transformer → 预训练），详见第 2 讲《从计算机到 GPT》</span>
+  </header>
+  <pre class="diagram"> 海量互联网文本 (几万亿 token)
+      |
+      v  [第1步] 预训练: 反复练习"接下一个词"
+ ==================&gt;  基础模型 base     (会续写, 不会对话)
+      |
+      |  对话样本: "问题 -&gt; 好回答" (几万~几百万条)
+      v  [第2步] 监督微调 SFT: 学会"问-&gt;答"的格式
+ ==================&gt;  SFT 模型         (会回答, 未必讨喜)
+      |
+      |  人类偏好数据: "回答A 比 回答B 好"
+      v  [第3步] 偏好对齐: 学会有用 / 礼貌 / 守规矩
+ ==================&gt;  对话模型 chat    (你日常用的就是它)</pre>
+  <div class="bottom">
+    <div class="points"><h4>要点</h4><ol>
+      <li><b>预训练</b>：在海量文本上练"接话"，语言能力和世界知识都在这一步灌进去</li>
+      <li><b>SFT（监督微调）</b>：用"问题→好回答"样本，教它把接话能力组织成"回答"</li>
+      <li><b>偏好对齐</b>：让人类标注哪个回答更好，教它什么回答更讨喜、更安全</li>
+    </ol></div>
+    <pre class="code"><span class="tag">主干代码 · 概念伪代码</span><code class="py"># 三步训练（概念伪代码）
+base = pretrain(语料, 目标="预测下一个token")
+sft  = finetune(base, 数据="问题-&gt;好回答")
+chat = align(sft, 数据="人类偏好排序")</code></pre>
+  </div>
+  <div class="foot">第 2 章 · 训练三步漏斗</div>
+</section></div></div><div class="bk-folio"><span>50</span><em>第三章 · 机制</em></div></div>
+<div class="bk-sheet" id="p51" data-ch="3" data-page="51" data-title="开源模型为什么总分 base 版和 chat/instruct 版？"><div class="bk-paper ch3"><div class="bk-fit"><section class="slide active" style="--accent:#7c3aed">
+  <header>
+    <span class="chip">第 2 章 · 它凭什么会回答</span>
+    <h2 class="q">开源模型为什么总分 base 版和 chat/instruct 版？</h2>
+    <p class="debunk">这正对应训练三步——<b>base 只做了第 1 步</b>，chat 多做后两步。</p>
+  </header>
+  <pre class="diagram"> 同一个输入: "怎么煮咖啡?"
+
+ base 模型 (只预训练)                  chat 模型 (预训练+SFT+对齐)
+ --------------------------            ---------------------------
+ "怎么煮咖啡? 咖啡的种类有很多,         "1. 准备咖啡豆并磨粉
+  煮咖啡的方法因地区而异, 常见的         2. 按 1:15 的比例加入热水
+  有手冲、意式..."                      3. 90-95 度水温冲泡约 2 分钟"
+
+ (它在"续写这段话", 不像在回答)         (它在"回答这个问题")</pre>
+  <div class="bottom">
+    <div class="points"><h4>要点</h4><ol>
+      <li>base 模型眼里没有问题/回答之分，给它问题，它可能<b>续写出更多问题</b></li>
+      <li>chat/instruct = base + SFT + 对齐，才听得懂"指令"和"提问"</li>
+      <li>选型经验：聊天、做 Agent 选 instruct/chat 版；灌领域语料继续训练可从 base 起步</li>
+    </ol></div>
+    <pre class="code"><span class="tag">主干代码 · 同题对比</span><code class="py">base = load("Qwen/Qwen2.5-0.5B")            # 只会续写
+chat = load("Qwen/Qwen2.5-0.5B-Instruct")   # 会问答
+print(base.generate(q))   # 续写出一堆"类似文本"
+print(chat.generate(q))   # 给出结构化的回答</code></pre>
+  </div>
+  <div class="foot">第 2 章 · base vs chat</div>
+</section></div></div><div class="bk-folio"><span>51</span><em>第三章 · 机制</em></div></div>
+<div class="bk-sheet" id="p52" data-ch="3" data-page="52" data-title="训练时，模型不会把&quot;提问&quot;也一起学进去吗？"><div class="bk-paper ch3"><div class="bk-fit"><section class="slide active" style="--accent:#7c3aed">
+  <header>
+    <span class="chip">第 2 章 · 它凭什么会回答</span>
+    <h2 class="q">训练时，模型不会把"提问"也一起学进去吗？</h2>
+    <p class="debunk">不会。SFT 的样本是整段对话，但 <b>loss 只在 assistant 的回答上计算</b>——模型看到全部，只被教"怎么回答"。</p>
+  </header>
+  <pre class="diagram"> SFT 训练样本 = 一段渲染好的对话文本:
+
+ &lt;|im_start|&gt;system 你是助手 &lt;|im_end|&gt;          ← 看到, 但不学 (被 mask)
+ &lt;|im_start|&gt;user 法国的首都是什么? &lt;|im_end|&gt;     ← 看到, 但不学 (被 mask)
+ &lt;|im_start|&gt;assistant 巴黎。 &lt;|im_end|&gt;            ← 只在这里算 loss
+
+ 机制: prompt 部分的 label 置为 -100 (框架的 ignore_index),
+       这些 token 不参与损失计算 —— 自然学不到"怎么提问".</pre>
+  <div class="bottom">
+    <div class="points"><h4>要点</h4><ol>
+      <li>模型<b>看到</b>整段对话，但只在 assistant token 上<b>计算损失、回传梯度</b></li>
+      <li>等于明确告诉模型："别学怎么提问，只学怎么回答"</li>
+      <li>这就是指令微调让 Base 学会当助手的<b>核心机关</b>——本页与 QLoRA 页并自第 6 讲工程章</li>
+    </ol></div>
+    <div class="code"><div class="tag">代码 · labels 掩码</div><code class="py">labels = [-100]*len(prompt_ids) + answer_ids  # -100 = 不算 loss
+loss = model(input_ids, labels=labels).loss   # 只有回答部分产生梯度</code></div>
+  </div>
+  <div class="foot">第 2 章 · SFT 的关键：只在"回答"上算 loss</div>
+</section></div></div><div class="bk-folio"><span>52</span><em>第三章 · 机制</em></div></div>
+<div class="bk-sheet" id="p53" data-ch="3" data-page="53" data-title="想亲手炼一个对话模型，要多少显卡？"><div class="bk-paper ch3"><div class="bk-fit"><section class="slide active" style="--accent:#7c3aed">
+  <header>
+    <span class="chip">第 2 章 · 它凭什么会回答</span>
+    <h2 class="q">想亲手炼一个对话模型，要多少显卡？</h2>
+    <p class="debunk">4GB 显存就够。<b>QLoRA</b>（4-bit 量化底座 + 低秩适配器）只训练约 1% 参数，小显存也能跑通全流程。</p>
+  </header>
+  <pre class="diagram"> 难题          解法
+ -----------  ---------------------------------------------------
+ 显存墙        QLoRA: 4-bit 量化底座 + LoRA 低秩适配器, 只练约 1% 参数
+ 训练慢        Unsloth: 优化 kernel, 省显存又提速
+ 没数据        Belle 等开源指令集; 跑通流程, 几十条 demo 就够
+ 效果如何      Base + 少量 SFT 质量堪忧; Instruct 开箱即用
+               —— 对齐的量变带来质变, 这正是前一页对比的根源</pre>
+  <div class="bottom">
+    <div class="points"><h4>要点</h4><ol>
+      <li>QLoRA = 量化（省显存）+ LoRA（少训参数），微调工程的<b>默认起点</b></li>
+      <li>几十条数据能跑通<b>流程</b>，几千条以上才谈得上<b>效果</b>——数据质量 &gt; 数量</li>
+      <li>配套脚本 <b>train_sft.py</b>（Unsloth + QLoRA + Belle），见菜单页脚本索引第 3 讲区</li>
+    </ol></div>
+    <div class="code"><div class="tag">代码 · train_sft.py 主流程（节选）</div><code class="py">model = load_4bit("Qwen2.5-1.5B")   # 4-bit 量化底座
+model = add_lora(model, r=16)       # 只训练低秩适配器
+train(model, belle_data, labels_mask="prompt")</code></div>
+  </div>
+  <div class="foot">第 2 章 · 实战：4GB 显存炼一个对话模型</div>
+</section></div></div><div class="bk-folio"><span>53</span><em>第三章 · 机制</em></div></div>
+<div class="bk-sheet" id="p54" data-ch="3" data-page="54" data-title="它记得我两分钟前说的话，是不是有记忆？"><div class="bk-paper ch3"><div class="bk-fit"><section class="slide active" style="--accent:#0d9488">
+  <header>
+    <span class="chip">第 3 章 · 它怎么"记得"</span>
+    <h2 class="q">它记得我两分钟前说的话，是不是有记忆？</h2>
+    <p class="debunk">它没有记忆，也不"理解"你。模型本身<b>完全无状态</b>——每次请求都是"第一次见到你"。</p>
+  </header>
+  <pre class="diagram small"> +--------------------------------------------------+
+ | messages 消息列表 (由聊天程序维护, 不在模型里)       |
+ |   system:    "你是简洁的助手"                       |
+ |   user:      "我叫小明"                             |
+ |   assistant: "你好, 小明"                           |
+ |   user:      "我叫什么名字?"                        |
+ +--------------------------+-------------------------+
+                            |
+                            v  (1) 整个列表渲染成一整段文本
+ +--------------------------------------------------+
+ | 模型看到的只有这段纯文本                             |
+ +--------------------------+-------------------------+
+                            |
+                            v  (2) 生成回复: "你叫小明。"
+                            |
+                            v  (3) 新回复追加回列表
+        messages.append(assistant: "你叫小明。") --+
+                                                   |
+        下一轮再把更新后的整个列表重新塞给模型 &lt;------+</pre>
+  <div class="bottom">
+    <div class="points"><h4>要点</h4><ol>
+      <li>"记得"的真相：那句话<b>出现在了这次的输入文本里</b>，仅此而已</li>
+      <li>对话由三种角色组成：<b>system</b>（设定）、<b>user</b>（你）、<b>assistant</b>（它）</li>
+      <li>关掉窗口重开 = 历史列表没了 = 它"失忆"——因为从来就没存在过记忆</li>
+    </ol></div>
+    <pre class="code"><span class="tag">主干代码 · 消息列表</span><code class="py">messages = [
+  {"role": "system",    "content": "你是简洁的助手"},
+  {"role": "user",      "content": "我叫小明"},
+  {"role": "assistant", "content": "你好，小明"},
+]</code></pre>
+  </div>
+  <div class="foot">第 3 章 · 无状态与消息列表</div>
+</section></div></div><div class="bk-folio"><span>54</span><em>第三章 · 机制</em></div></div>
+<div class="bk-sheet" id="p55" data-ch="3" data-page="55" data-title="消息列表怎么变成模型认得的输入？聊太久会怎样？"><div class="bk-paper ch3"><div class="bk-fit"><section class="slide active" style="--accent:#0d9488">
+  <header>
+    <span class="chip">第 3 章 · 它怎么"记得"</span>
+    <h2 class="q">消息列表怎么变成模型认得的输入？聊太久会怎样？</h2>
+    <p class="debunk">程序把消息列表按<b>聊天模板</b>渲染成纯文本；窗口装不下时，丢最老的，系统设定永不丢。</p>
+  </header>
+  <pre class="diagram"> messages --&gt; [聊天模板渲染] --&gt; 模型实际看到的文本:
+ &lt;|im_start|&gt;system 你是简洁的助手&lt;|im_end|&gt;
+ &lt;|im_start|&gt;user 我叫小明&lt;|im_end|&gt; ...
+
+ 上下文窗口有限 (如 4K / 32K token), 聊太久装不下:
+
+ system | u1 | a1 | u2 | a2 | u3 | a3 | u4 | a4 | u5(新)
+   ^                                                ^
+ 永不丢                                      从 u1/a1 开始丢
+
+ 截断后: system | a2 | u3 | a3 | u4 | a4 | u5  --&gt; 塞给模型</pre>
+  <div class="bottom">
+    <div class="points"><h4>要点</h4><ol>
+      <li><b>聊天模板</b>：每个模型有自己的格式约定（角色标记、分隔符），渲染错了效果会明显变差</li>
+      <li><b>上下文窗口</b>：模型一次能看的文本有硬上限，窗口大小是模型的重要指标</li>
+      <li><b>截断策略</b>：优先丢最老的历史（所以会"忘记"开头），system 设定永远保留</li>
+    </ol></div>
+    <pre class="code"><span class="tag">主干代码 · 组装上下文</span><code class="py">text = tok.apply_chat_template(messages, tokenize=False)
+while len(tok(text).input_ids) &gt; MAX_LEN:
+    history.pop(0)   # 丢最老的一条; system 单独保留
+    text = tok.apply_chat_template([sys] + history, tokenize=False)</code></pre>
+  </div>
+  <div class="foot">第 3 章 · 聊天模板与超长截断</div>
+</section></div></div><div class="bk-folio"><span>55</span><em>第三章 · 机制</em></div></div>
+<div class="bk-sheet" id="p56" data-ch="3" data-page="56" data-title="messages 里的 role 字段，模型真的看得到吗？"><div class="bk-paper ch3"><div class="bk-fit"><section class="slide active" style="--accent:#0d9488">
+  <header>
+    <span class="chip">第 3 章 · 它怎么"记得"</span>
+    <h2 class="q">messages 里的 role 字段，模型真的看得到吗？</h2>
+    <p class="debunk">看不到。<b>模型根本没有"角色"字段</b>——apply_chat_template 把消息列表翻译成一段带特殊标记的连续文本，"角色"只是训练时学出来的文本模式。</p>
+  </header>
+  <pre class="diagram"> 程序里维护的 messages:               模型真正看到的连续文本:
+ [                                   &lt;|im_start|&gt;system
+   {"role":"system",                  你是助手&lt;|im_end|&gt;
+    "content":"你是助手"},            &lt;|im_start|&gt;user
+   {"role":"user",                    法国的首都是什么?&lt;|im_end|&gt;
+    "content":"法国的首都是什么?"},     &lt;|im_start|&gt;assistant
+   {"role":"assistant",               巴黎。&lt;|im_end|&gt;
+    "content":"巴黎。"}                ▲
+ ]                                    对模型来说这就是一段普通文本,
+        apply_chat_template()         "角色"是训练时学会的文字规律</pre>
+  <div class="bottom">
+    <div class="points"><h4>要点</h4><ol>
+      <li><b>apply_chat_template()</b> 就是 SFT 时手工拼字符串的自动化——左右两边完全等价</li>
+      <li>"角色"不是模型内置概念，是训练数据里反复出现的<b>文本模式</b></li>
+      <li>推论：模板拼错 = 模型看到的格式与训练时不一致，效果明显变差</li>
+    </ol></div>
+    <div class="code"><div class="tag">代码 · 模板渲染验证</div><code class="py">text = tok.apply_chat_template(messages, tokenize=False)
+print(text)   # 就是右边那段纯文本——模型眼里没有 JSON</code></div>
+  </div>
+  <div class="foot">第 3 章 · 对话格式的本质</div>
+</section></div></div><div class="bk-folio"><span>56</span><em>第三章 · 机制</em></div></div>
+<div class="bk-sheet" id="p57" data-ch="3" data-page="57" data-title="同一个问题隔一分钟再问，答案怎么变了？"><div class="bk-paper ch3"><div class="bk-fit"><section class="slide active" style="--accent:#d97706">
+  <header>
+    <span class="chip">第 4 章 · 答案为何每次不同</span>
+    <h2 class="q">同一个问题隔一分钟再问，答案怎么变了？</h2>
+    <p class="debunk">模型不是"算出唯一答案"，而是<b>按概率抽样</b>——每次都在掷一个加权骰子。</p>
+  </header>
+  <pre class="diagram"> 模型为下一个 token 给出概率分布:
+   的:0.50   是:0.20   很:0.10   真:0.05   ...长尾...
+        |
+        v  [temperature] 温度缩放
+   T -&gt; 0 : 分布变尖, 最大者通吃 -&gt; 几乎总选 "的"  (稳定保守)
+   T = 0.9: 分布拉平, 小概率词也有出头之日         (发散多样)
+        |
+        v  [top_p = 0.9] 截断
+   只保留累计概率前 90% 的候选池: {的, 是, 很}
+        |
+        v  [随机采样] 本轮吐出: "很"
+        |
+        v  [max_new_tokens] 控制这个循环最多再走多少步</pre>
+  <div class="bottom">
+    <div class="points"><h4>要点</h4><ol>
+      <li><b>temperature</b>：低 → 稳定保守（要事实、要格式时调低）；高 → 发散多样（要创意时调高）</li>
+      <li><b>top_p</b>：只在累计概率前 p 的候选池里抽，砍掉长尾烂词，多样但不离谱</li>
+      <li><b>max_new_tokens</b>：生成长度上限，防止无限生成，也控制成本</li>
+    </ol></div>
+    <pre class="code"><span class="tag">主干代码 · 一行 generate</span><code class="py">model.generate(**ids, max_new_tokens=50,
+               do_sample=True, temperature=0.9, top_p=0.9)
+# temperature=0 等价于贪心: 每次都选概率最大的那个</code></pre>
+  </div>
+  <div class="foot">第 4 章 · 采样流水线</div>
+</section></div></div><div class="bk-folio"><span>57</span><em>第三章 · 机制</em></div></div>
+<div class="bk-sheet" id="p58" data-ch="3" data-page="58" data-title="它为什么能面不改色地编出不存在的论文和新闻？"><div class="bk-paper ch3"><div class="bk-fit"><section class="slide active" style="--accent:#dc2626">
+  <header>
+    <span class="chip">第 5 章 · 一本正经地胡说</span>
+    <h2 class="q">它为什么能面不改色地编出不存在的论文和新闻？</h2>
+    <p class="debunk">它不知道自己在胡说——它的本职工作就是<b>"编最像样的话"</b>，像样 ≠ 真实。</p>
+  </header>
+  <pre class="diagram"> 模型的训练目标:               模型没有的东西:
+ +------------------+         +-------------------+
+ | 说得像人话    [√] |         | 事实核查机制   [X] |
+ | 格式像模像样  [√] |         | "我不知道"状态 [X] |
+ | 语气自信流畅  [√] |         | 说谎的"自觉"   [X] |
+ +------------------+         +-------------------+
+
+ "请给我 3 篇关于 XX 的论文" --&gt;
+ 标题像论文、作者像人名、期刊像真的 --&gt; 但可能全是编的 (幻觉)</pre>
+  <div class="bottom">
+    <div class="points"><h4>要点</h4><ol>
+      <li><b>幻觉</b>不是"说谎"，是生成式本质的副产品：第 1 章讲过，它只负责"编得像"</li>
+      <li>越是你不懂的领域，幻觉越难被发现——它编什么都很自信</li>
+      <li>两条主流缓解路线：需要<b>事实</b> → 接 RAG（第 6 章）；需要<b>推理</b> → 思维链（下一页）</li>
+    </ol></div>
+    <pre class="code"><span class="tag">主干代码 · 危险提问示例</span><code class="py">ask("请给出 3 篇关于 XX 的论文及作者")
+# 输出看起来有模有样
+# -- 请逐条核实, 标题/作者/期刊可能全是幻觉</code></pre>
+  </div>
+  <div class="foot">第 5 章 · 幻觉的本质</div>
+</section></div></div><div class="bk-folio"><span>58</span><em>第三章 · 机制</em></div></div>
+<div class="bk-sheet" id="p59" data-ch="3" data-page="59" data-title="为什么加一句&quot;请逐步思考&quot;，它数学题就对了？"><div class="bk-paper ch3"><div class="bk-fit"><section class="slide active" style="--accent:#dc2626">
+  <header>
+    <span class="chip">第 5 章 · 一本正经地胡说</span>
+    <h2 class="q">为什么加一句"请逐步思考"，它数学题就对了？</h2>
+    <p class="debunk">直接答 = 一步跳到结论，没机会"打草稿"；<b>思维链 CoT</b> 让它把中间步骤写出来。</p>
+  </header>
+  <pre class="diagram small"> 直接回答                                先思考再回答 (CoT)
+ ---------                              -------------------
+ Q: 3 人 4 天摘了 72kg 苹果,             Q: 同上 + "请逐步思考"
+    平均每人每天摘多少?
+    |                                     |
+    v                                     v
+ 一步跳到结论:                            先把草稿写出来:
+ "每人每天摘 24 kg"   X                   "4 天共 72kg -&gt; 3 人 1 天摘 18kg
+                                           -&gt; 每人每天 18/3 = 6kg"
+                                          再下结论: "6 kg"   √
+
+ 结论前生成的 token 太少, 等于心算,        中间步骤留在上下文里,
+ 一步错就全错。                            后续生成有"稿纸"可依赖。</pre>
+  <div class="bottom">
+    <div class="points"><h4>要点</h4><ol>
+      <li><b>思维链 CoT</b>：让模型先输出推理过程，再输出结论——复杂推理显著变好</li>
+      <li>原理：生成的每一步都成为上下文的一部分，后面的 token 可以"看着草稿算"</li>
+      <li>实践口诀：数学题、逻辑题、多步推理，加一句"请一步一步思考"</li>
+    </ol></div>
+    <pre class="code"><span class="tag">主干代码 · 两种提示对比</span><code class="py">q = "3个人4天摘了72千克苹果，平均每人每天摘多少？"
+a1 = ask(f"{q}\n直接给出答案。")              # 容易错
+a2 = ask(f"{q}\n请一步一步思考，再给出答案。")  # 明显变好</code></pre>
+  </div>
+  <div class="foot">第 5 章 · 思维链 CoT</div>
+</section></div></div><div class="bk-folio"><span>59</span><em>第三章 · 机制</em></div></div>
+<div class="bk-sheet" id="p60" data-ch="3" data-page="60" data-title="它能读我们公司内部文档、今天的新闻吗？"><div class="bk-paper ch3"><div class="bk-fit"><section class="slide active" style="--accent:#16a34a">
+  <header>
+    <span class="chip">第 6 章 · 知道没学过的东西</span>
+    <h2 class="q">它能读我们公司内部文档、今天的新闻吗？</h2>
+    <p class="debunk">不能。模型知识<b>截止于训练数据</b>；为每份资料重新训练，太贵也不现实。</p>
+  </header>
+  <pre class="diagram"> 思路: 不让模型"背下来", 而是提问时把相关资料"递到它手上"
+
+ 内部文档                切块                 向量化               向量库
+ ----------            ----------            ----------          ----------
+ 报销制度.md   --&gt;    [块1][块2]      --&gt;    [0.12 -0.33...] --&gt;  库存(向量+原文)
+ 考勤规定.md          [块3][块4]             [0.88  0.05...]
+ 产品手册.md          [块5][块6]             [ ... ]
+
+ (每块几百字; 向量化 = 把文本变成一串数字, 语义越近数字距离越近)</pre>
+  <div class="bottom">
+    <div class="points"><h4>要点</h4><ol>
+      <li><b>知识截止</b>：训练完成那天之后的世界，模型完全不知道</li>
+      <li><b>RAG（检索增强生成）</b>：把资料切成小块、转成向量存好，随用随取</li>
+      <li>更新知识 = 往向量库里加文档，不用动模型——便宜且即时生效</li>
+    </ol></div>
+    <pre class="code"><span class="tag">主干代码 · 切块与向量化</span><code class="py">chunks = [doc[i:i+200] for i in range(0, len(doc), 200)]  # 切块
+vecs = encoder.encode(chunks)   # 每块 -&gt; 一个向量, 存起来备用</code></pre>
+  </div>
+  <div class="foot">第 6 章 · RAG 离线准备</div>
+</section></div></div><div class="bk-folio"><span>60</span><em>第三章 · 机制</em></div></div>
+<div class="bk-sheet" id="p61" data-ch="3" data-page="61" data-title="几万段资料里，怎么找到最相关的那几段？"><div class="bk-paper ch3"><div class="bk-fit"><section class="slide active" style="--accent:#16a34a">
+  <header>
+    <span class="chip">第 6 章 · 知道没学过的东西</span>
+    <h2 class="q">几万段资料里，怎么找到最相关的那几段？</h2>
+    <p class="debunk">问题也变成向量，和库中所有块算"距离"，<b>最近的 Top-K</b> 就是答案素材。</p>
+  </header>
+  <pre class="diagram"> "出差住宿报销上限是多少?"
+      |
+      v 同样向量化 -&gt; 与库中所有向量算相似度
+      |
+      v Top-K 检索: 块2("住宿报销: 一线城市 500 元/晚...") 最相关
+      |
+      v 拼进上下文:
+ +----------------------------------------------------+
+ | 资料: 住宿报销标准: 一线城市 500 元/晚, 二线 400...    |
+ | 问题: 出差住宿报销上限是多少?                          |
+ | 请根据资料回答。                                       |
+ +----------------------------------------------------+
+      |
+      v 模型基于资料回答: "一线城市上限 500 元/晚"</pre>
+  <div class="bottom">
+    <div class="points"><h4>要点</h4><ol>
+      <li><b>向量化检索</b>：语义相近 → 向量距离近，不需要关键词完全匹配</li>
+      <li><b>拼上下文</b>：检索结果 + 问题一起塞给模型（用的正是第 3 章的机制）</li>
+      <li>效果：回答有据可依、能答私有知识、幻觉大减——企业知识库的主流做法</li>
+    </ol></div>
+    <pre class="code"><span class="tag">主干代码 · 检索与拼接</span><code class="py">q_vec = encoder.encode([question])
+scores = doc_vecs @ q_vec.T              # 余弦相似度
+top = chunks[scores.argmax()]            # 取最相关的一段
+prompt = f"资料：{top}\n问题：{question}\n请根据资料回答。"</code></pre>
+  </div>
+  <div class="foot">第 6 章 · RAG 在线问答</div>
+</section></div></div><div class="bk-folio"><span>61</span><em>第三章 · 机制</em></div></div>
+<div class="bk-sheet" id="p62" data-ch="3" data-page="62" data-title="让它算个账、查个天气、订张票，它行不行？"><div class="bk-paper ch3"><div class="bk-fit"><section class="slide active" style="--accent:#4f46e5">
+  <header>
+    <span class="chip">第 7 章 · 动手干活</span>
+    <h2 class="q">让它算个账、查个天气、订张票，它行不行？</h2>
+    <p class="debunk">它自己不行——模型只会"说"。但你的程序会"做"，让它<b>"说"出要调什么工具</b>就行。</p>
+  </header>
+  <pre class="diagram"> 工具说明书 (写进提示词):            模型输出 (只是文本!):
+ +------------------------+         { "tool": "calc",
+ | name: calc             |           "args": {"expr": "38*27"} }
+ | desc: 计算器            |                |
+ | params: expr(string)   |                v 程序解析并真正执行
+ +------------------------+           result = 1026
+                                            |
+                                            v 结果以 role=tool 回填
+ 模型再看着结果, 组织成自然语言回答: "38 乘 27 等于 1026"</pre>
+  <div class="bottom">
+    <div class="points"><h4>要点</h4><ol>
+      <li>模型不会算数、不能联网、碰不到你的系统——它只负责<b>决定"调哪个工具、传什么参数"</b></li>
+      <li><b>function calling</b>：模型输出结构化调用请求 → 程序真正执行 → 结果回填</li>
+      <li>分工哲学：<b>模型负责决策，程序负责执行</b>——精确的事交给精确的工具</li>
+    </ol></div>
+    <pre class="code"><span class="tag">主干代码 · 工具说明与回填</span><code class="py">tools = [{"name": "calc", "desc": "计算器", "params": "expr:str"}]
+# 模型输出: {"tool": "calc", "args": {"expr": "38*27"}}
+result = safe_eval(args["expr"])   # 你的程序真正执行
+messages.append({"role": "tool", "content": str(result)})</code></pre>
+  </div>
+  <div class="foot">第 7 章 · function calling</div>
+</section></div></div><div class="bk-folio"><span>62</span><em>第三章 · 机制</em></div></div>
+<div class="bk-sheet" id="p63" data-ch="3" data-page="63" data-title="调一次工具不够用的任务，它能自己分多步操作吗？"><div class="bk-paper ch3"><div class="bk-fit"><section class="slide active" style="--accent:#4f46e5">
+  <header>
+    <span class="chip">第 7 章 · 动手干活</span>
+    <h2 class="q">调一次工具不够用的任务，它能自己分多步操作吗？</h2>
+    <p class="debunk">能——把<b>"思考→行动→观察"</b>循环起来，就是 Agent 的最小内核。</p>
+  <span class="wb-xlink">系列衔接 ｜ ReAct 的代码实现与框架编排，详见第 4 讲《开发 Agent：从 API 到框架编排》</span>
+  </header>
+  <pre class="diagram">        +--------------------------------------------------+
+        |                                                  |
+        v                                                  |
+ [Thought 思考] --&gt; [Action 调工具] --&gt; [Observation 看结果]
+        |                                                  ^
+        |  (认为信息够了)            (结果以 role=tool 回填)
+        v                                                  |
+ [Final 直接回答]         +------- 循环上限保护 (如 5 轮) ------+</pre>
+  <div class="bottom">
+    <div class="points"><h4>要点</h4><ol>
+      <li><b>ReAct 循环</b>：思考 → 行动 → 观察 → 再思考……直到模型决定直接回答</li>
+      <li>每轮工具结果以 <b>role=tool</b> 消息回填进上下文——复用第 3 章的机制</li>
+      <li>Agent = LLM + 工具 + 循环，就这三样；必须加<b>循环上限</b>防止死循环烧钱</li>
+    </ol></div>
+    <pre class="code"><span class="tag">主干代码 · ReAct 主循环</span><code class="py">for _ in range(5):                              # 循环上限
+    out = llm(messages)                         # 思考
+    if "Final:" in out: return out              # 决定回答
+    name, args = parse_action(out)              # 解析 Action
+    result = TOOLS[name](**args)                # 执行
+    messages.append({"role": "tool", "content": result})  # 观察回填</code></pre>
+  </div>
+  <div class="foot">第 7 章 · ReAct 循环</div>
+</section></div></div><div class="bk-folio"><span>63</span><em>第三章 · 机制</em></div></div>
+<div class="bk-sheet" id="p64" data-ch="3" data-page="64" data-title="给 AI 接一个工具，是不是每家工具都得写一套对接代码？"><div class="bk-paper ch3"><div class="bk-fit"><section class="slide active" style="--accent:#0891b2">
+  <header>
+    <span class="chip">第 8 章 · 工具从哪来</span>
+    <h2 class="q">给 AI 接一个工具，是不是每家工具都得写一套对接代码？</h2>
+    <p class="debunk">曾经是。N 个 AI 应用 × M 个工具 = N×M 套胶水代码；现在<b>工具接入正在标准化</b>。</p>
+  <span class="wb-xlink">系列衔接 ｜ MCP / Skills 的四层协议体系与治理视角，详见第 5 讲《Agent 工程化全景》模块 B</span>
+  </header>
+  <pre class="diagram"> 以前: 每个 AI 应用单独对接每个工具          现在: 统一协议
+
+ AI应用A --\                                AI应用A --+
+ AI应用B -----+--&gt; 工具1 2 3 ... M           AI应用B --+--[MCP]--&gt; 工具服务器: 1 2 3 ... M
+ AI应用C --/    (N x M 套胶水代码)           AI应用C --+         (每个工具只封装一次)</pre>
+  <div class="bottom">
+    <div class="points"><h4>要点</h4><ol>
+      <li>标准化之后：工具只封装一次，<b>任何支持协议的 AI 应用都能用</b></li>
+      <li>本章三个概念各管一层：<b>MCP</b> 管"怎么接"，<b>CLI</b> 是最朴素的工具形态，<b>Skills</b> 管"怎么用对流程"</li>
+      <li>理解这三层，就看懂了当前的智能体工具生态</li>
+    </ol></div>
+    <pre class="code"><span class="tag">主干代码 · 客户端发现工具</span><code class="py">async with stdio_client("weather_server.py") as c:
+    tools = await c.list_tools()   # 不问不知道, 一问全知道
+    print([t.name for t in tools]) # ['get_weather', ...]</code></pre>
+  </div>
+  <div class="foot">第 8 章 · 从胶水代码到标准协议</div>
+</section></div></div><div class="bk-folio"><span>64</span><em>第三章 · 机制</em></div></div>
+<div class="bk-sheet" id="p65" data-ch="3" data-page="65" data-title="MCP、CLI、Skills，到底各是什么？"><div class="bk-paper ch3"><div class="bk-fit"><section class="slide active" style="--accent:#0891b2">
+  <header>
+    <span class="chip">第 8 章 · 工具从哪来</span>
+    <h2 class="q">MCP、CLI、Skills，到底各是什么？</h2>
+    <p class="debunk">三者不是竞争关系，是<b>三个不同层次</b>的东西——协议、工具形态、流程封装。</p>
+  </header>
+  <pre class="diagram"> [MCP: 工具接入标准]        [CLI: 最朴素的工具]         [Skills: 流程封装]
+ "工具界的 USB 接口"         "命令本身就是工具"           "可加载的操作手册"
+ -------------------        ----------------------      ----------------------
+ 服务器对外暴露工具列表,     任何命令行命令/脚本          把"怎么做某类任务"的步骤、
+ AI 应用按协议发现和调用,    本身就是工具, AI 像人         提示词、配套脚本打包,
+ 接一次处处可用             一样敲命令, 零封装成本        遇到对应任务按需加载执行</pre>
+  <div class="bottom">
+    <div class="points"><h4>要点</h4><ol>
+      <li><b>MCP（Model Context Protocol）</b>：开放协议，让任何工具/数据源以统一方式接入任何 AI 应用</li>
+      <li><b>CLI</b>：命令行是 AI 最趁手的工具——有文档、可组合、返回纯文本</li>
+      <li><b>Skills（技能包）</b>：封装的是"流程"而不是"命令"，比单个工具高一层复用</li>
+    </ol></div>
+    <pre class="code"><span class="tag">主干代码 · skill 文件结构</span><code>skills/expense_report/
+├── SKILL.md          # 操作手册: 步骤 + 注意事项
+└── scripts/fill.py   # 配套脚本: 手册里会引用它</code></pre>
+  </div>
+  <div class="foot">第 8 章 · 三个概念各管一层</div>
+</section></div></div><div class="bk-folio"><span>65</span><em>第三章 · 机制</em></div></div>
+<div class="bk-sheet" id="p66" data-ch="3" data-page="66" data-title="这三者怎么配合？"><div class="bk-paper ch3"><div class="bk-fit"><section class="slide active" style="--accent:#0891b2">
+  <header>
+    <span class="chip">第 8 章 · 工具从哪来</span>
+    <h2 class="q">这三者怎么配合？</h2>
+    <p class="debunk">分层协作——<b>Skills 在流程层，MCP 在接入层，CLI/API 在执行层</b>。</p>
+  </header>
+  <pre class="diagram"> +-------------------------------------------------------+
+ | Skills    流程层: "报销/发布/写周报"这类任务怎么做        |  按任务触发加载
+ +--------------------------+---------------------------+
+                            v  流程里会用到
+ +-------------------------------------------------------+
+ | MCP       接入层: 统一的工具发现与调用协议                |  工具服务器 A / B / C
+ +--------------------------+---------------------------+
+                            v  协议之下真正干活的
+ +-------------------------------------------------------+
+ | CLI / API 执行层: 命令行、脚本、HTTP 接口                 |  一个个具体工具
+ +-------------------------------------------------------+</pre>
+  <div class="bottom">
+    <div class="points"><h4>要点</h4><ol>
+      <li>一个 Skill 的操作手册里，可以既调 MCP 工具、也跑 CLI 命令——它是<b>"胶水 + 经验"</b></li>
+      <li>工具写成 MCP server：一次开发，所有支持 MCP 的 AI 应用直接可用</li>
+      <li>流程沉淀为 Skill：把"专家怎么做这件事"固化下来，比模型临时发挥稳定得多</li>
+    </ol></div>
+    <pre class="code"><span class="tag">主干代码 · 注册 MCP 工具</span><code class="py">from mcp.server.fastmcp import FastMCP
+mcp = FastMCP("demo")
+
+@mcp.tool()
+def add(a: int, b: int) -&gt; int:      # 一个工具
+    return a + b
+
+mcp.run()   # 任何 MCP 客户端都能发现并调用 add</code></pre>
+  </div>
+  <div class="foot">第 8 章 · 三层关系</div>
+</section></div></div><div class="bk-folio"><span>66</span><em>第三章 · 机制</em></div></div>
+<div class="bk-sheet" id="p67" data-ch="3" data-page="67" data-title="除了对着网页聊天，我自己的程序怎么调用它？"><div class="bk-paper ch3"><div class="bk-fit"><section class="slide active" style="--accent:#475569">
+  <header>
+    <span class="chip">第 9 章 · 给程序用上它</span>
+    <h2 class="q">除了对着网页聊天，我自己的程序怎么调用它？</h2>
+    <p class="debunk">有标准接口——主流服务和本地自建遵循同一套 <b>Chat Completions 契约</b>。</p>
+  </header>
+  <pre class="diagram"> 你的程序                          服务端 (本地 / 云端, 同一契约)
+ --------                          --------------------------
+   |  POST /v1/chat/completions
+   |  { "model": "...",
+   |    "messages": [...],         --&gt;  messages 渲染聊天模板
+   |    "stream": true }           --&gt;  模型逐 token 推理
+   |                               --&gt;  每出一个 token 推一条
+   |  &lt;== data: {"choices":[{"delta":{"content":"你"}}]}
+   |  &lt;== data: {"choices":[{"delta":{"content":"好"}}]}
+   |  &lt;== data: [DONE]
+   v
+ 换本地/换云端 = 只改 base_url + api_key, 业务代码一行不动</pre>
+  <div class="bottom">
+    <div class="points"><h4>要点</h4><ol>
+      <li><b>契约</b>：POST /v1/chat/completions，请求体 {model, messages, stream}，返回 choices 数组</li>
+      <li><b>流式 = SSE</b>：服务器把每个 token 作为一条事件推过来（第 1 章逐 token 生成的直接暴露）</li>
+      <li>自己用本地小模型搭兼容服务，<b>现有客户端代码直接能用</b></li>
+    </ol></div>
+    <pre class="code"><span class="tag">主干代码 · 路由与流式返回</span><code class="py">@app.post("/v1/chat/completions")
+def chat(req: ChatRequest):
+    def stream():
+        for tok in model.stream(req.messages):
+            yield f"data: {json.dumps(chunk(tok))}\n\n"
+        yield "data: [DONE]\n\n"
+    return StreamingResponse(stream(), media_type="text/event-stream")</code></pre>
+  </div>
+  <div class="foot">第 9 章 · Chat Completions 契约</div>
+</section></div></div><div class="bk-folio"><span>67</span><em>第三章 · 机制</em></div></div>
+<div class="bk-sheet" id="p68" data-ch="3" data-page="68" data-title="现在回头看——每一个环节，你都已经知道它是怎么回事了"><div class="bk-paper ch3"><div class="bk-fit"><section class="slide active" style="--accent:#0f766e">
+  <header>
+    <span class="chip">第 10 章 · 总结</span>
+    <h2 class="q" style="font-size:26px">现在回头看——每一个环节，你都已经知道它是怎么回事了</h2>
+  </header>
+  <pre class="diagram small"> [1] 逐 token 生成 .............. 一切的起点: 它只是在"接话"
+   |
+ [2] 预训练 + SFT + 对齐 ........ 接话机器被训成对话助手
+   |
+ [3] 上下文拼装 + 截断 .......... "记忆" = 历史每次重新塞进输入
+   |
+ [4] temperature / top_p ....... 控制答案稳 or 飘
+   |
+ [5] 思维链 CoT ................ 先打草稿再下结论, 少胡说
+   |
+ [6] RAG 检索增强 .............. 把没学过的资料递到它手上
+   |
+ [7] 工具调用 + ReAct .......... 从"会说"到"会干活"
+   |
+ [8] MCP / CLI / Skills ........ 工具接入标准化, 流程可复用
+   |
+ [9] Chat Completions API ...... 服务化: 任何程序都能用
+   v
+ 不是魔法, 是每一层都能在本地复现的工程组合</pre>
+  <div class="final-line">
+    ChatGPT 不是魔法，是"<span style="color:var(--accent)">生成 + 训练 + 上下文 + 工具循环 + 标准接入</span>"的组合——每一层，你都能在本地自己搭出来。
+  </div>
+  <div class="foot">总结 · 附录：9 个可运行脚本随 PPT 交付，把每一章亲手跑一遍</div>
+</section></div></div><div class="bk-folio"><span>68</span><em>第三章 · 机制</em></div></div>
+<div class="bk-sheet" id="p69" data-ch="3" data-page="69" data-title="9 个可运行脚本：把每一章亲手跑一遍"><div class="bk-paper ch3"><div class="bk-fit"><section class="slide active" style="--accent:#0f766e">
+  <header>
+    <span class="chip">附录</span>
+    <h2 class="q" style="font-size:26px">9 个可运行脚本：把每一章亲手跑一遍</h2>
+    <p class="debunk">Python 3.12+ · 纯 CPU · 依赖仅 torch / transformers / sentence-transformers / mcp / fastapi / uvicorn</p>
+  </header>
+  <table class="appx">
+    <tr><th>#</th><th>脚本</th><th>章节</th><th>一句话说明</th></tr>
+    <tr><td>1</td><td class="mono">tokenizer_demo.py</td><td>1</td><td>切 token、数数量、半句续写</td></tr>
+    <tr><td>2</td><td class="mono">training_stages_demo.py</td><td>2</td><td>base vs instruct 同题对比</td></tr>
+    <tr><td>3</td><td class="mono">chat_context_demo.py</td><td>3</td><td>多轮拼接、模板渲染、超长截断</td></tr>
+    <tr><td>4</td><td class="mono">sampling_demo.py</td><td>4</td><td>T=0 与 T=0.9 各生成 3 次对比</td></tr>
+    <tr><td>5</td><td class="mono">cot_demo.py</td><td>5</td><td>直接答 vs 逐步思考</td></tr>
+    <tr><td>6</td><td class="mono">rag_demo.py</td><td>6</td><td>切块→向量→检索→拼上下文→回答</td></tr>
+    <tr><td>7</td><td class="mono">agent_tool_demo.py</td><td>7</td><td>计算器工具 + ReAct 循环</td></tr>
+    <tr><td>8</td><td class="mono">mcp_skills_demo.py</td><td>8</td><td>MCP 服务器 + skill 流程示例</td></tr>
+    <tr><td>9</td><td class="mono">api_server.py</td><td>9</td><td>本地 Chat Completions 兼容服务（SSE）</td></tr>
+  </table>
+  <div class="final-line" style="font-size:16px;font-weight:400">
+    脚本位于 <b>scripts/</b> 目录，每个文件头部注明输入/输出与运行方式；模型首次运行自动下载（约 1.5GB，内置 ModelScope 镜像开关）。
+  </div>
+  <div class="foot">附录 · 脚本清单</div>
+</section></div></div><div class="bk-folio"><span>69</span><em>第三章 · 机制</em></div></div>
+<nav class="bk-pager">
+<a class="prev" href="ch02.html"><small>← 上一章</small><b>第 2 章 前传 — 大模型是怎么一步步长出来的</b></a>
+<a class="next" href="ch04.html"><small>下一章 →</small><b>第 4 章 开发 — 从直接调 API 到用框架编排</b></a>
+</nav>
+</div></main>
+
+<button id="bk-up" onclick="scrollTo({top:0,behavior:'smooth'})" title="回到顶部">↑</button>
+
+<script src="assets/book.js"></script>
+</body>
+</html>
