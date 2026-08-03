@@ -116,7 +116,7 @@ GPT 也一样 —— 它只是把这件事做到了极致。</pre>
   </div>
 </section></div></div><div class="bk-folio"><span>28</span><em>第二章 · 前传</em></div></div>
 <div class="bk-sheet" id="p29" data-ch="2" data-page="29" data-title="机器真的&quot;懂&quot;文字吗？"><div class="bk-paper ch2"><div class="bk-fit"><section class="slide active">
-  <header><span class="tag">第 1 章 · 文字数字化</span><h1>机器真的"懂"文字吗？</h1></header>
+  <header><span class="tag">第 1 节 · 文字数字化</span><h1>机器真的"懂"文字吗？</h1></header>
   <div class="band">
     <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"语音助手都能听懂我说话了，机器不是早就懂文字了吗？"</em></div>
     <div class="pt"><span class="lbl">② 点破卡点</span>机器里只有高低电平，它从没"见过"文字。文字、图片、声音进计算机的第一件事，都是<b>变成数字</b>——后面所有故事都建立在这之上。</div>
@@ -138,7 +138,7 @@ print(list(numbers))         <span class="cm"># [231, 140, 171]</span></pre></di
   </div>
 </section></div></div><div class="bk-folio"><span>29</span><em>第二章 · 前传</em></div></div>
 <div class="bk-sheet" id="p30" data-ch="2" data-page="30" data-title="编号不是意思：one-hot 的死胡同"><div class="bk-paper ch2"><div class="bk-fit"><section class="slide active">
-  <header><span class="tag">第 2 章 · 上</span><h1>编号不是意思：one-hot 的死胡同</h1></header>
+  <header><span class="tag">第 2 节 · 上</span><h1>编号不是意思：one-hot 的死胡同</h1></header>
   <div class="band">
     <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"词变数字还不简单？给每个词编个号不就行了。"</em></div>
     <div class="pt"><span class="lbl">② 点破卡点</span>编号里没有"意思"。"猫"是 3 号、"狗"是 4 号，3 和 4 挨得近，<b>不代表猫和狗像</b>。机器拿到的只有"一样 / 不一样"，永远算不出"有多像"。</div>
@@ -162,7 +162,7 @@ print(onehot[<span class="st">"猫"</span>])  <span class="cm"># [0, 0, 1, 0] �
   </div>
 </section></div></div><div class="bk-folio"><span>30</span><em>第二章 · 前传</em></div></div>
 <div class="bk-sheet" id="p31" data-ch="2" data-page="31" data-title="embedding：词义 = 向量"><div class="bk-paper ch2"><div class="bk-fit"><section class="slide active">
-  <header><span class="tag">第 2 章 · 下</span><h1>embedding：词义 = 向量</h1></header>
+  <header><span class="tag">第 2 节 · 下</span><h1>embedding：词义 = 向量</h1></header>
   <div class="band">
     <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"那怎么让数字带上意思？"</em></div>
     <div class="pt"><span class="lbl">② 点破卡点</span>需要的不是"编号"，而是<b>"坐标"</b>：让意思相近的词，坐标也相近——"像不像"从此变成"距离近不近"，机器就能算了。</div>
@@ -188,7 +188,7 @@ similarity(embeddings[<span class="st">"猫"</span>], embeddings[<span class="st
   </div>
 </section></div></div><div class="bk-folio"><span>31</span><em>第二章 · 前传</em></div></div>
 <div class="bk-sheet" id="p32" data-ch="2" data-page="32" data-title="机器怎么学会&quot;造句&quot;？——从 n-gram 起步"><div class="bk-paper ch2"><div class="bk-fit"><section class="slide active">
-  <header><span class="tag">第 3 章 · 语言模型任务</span><h1>机器怎么学会"造句"？——从 n-gram 起步</h1></header>
+  <header><span class="tag">第 3 节 · 语言模型任务</span><h1>机器怎么学会"造句"？——从 n-gram 起步</h1></header>
   <div class="band">
     <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"词能表示了，可'造句'对机器来说到底是个什么任务？"</em></div>
     <div class="pt"><span class="lbl">② 点破卡点</span>造句不是一口气生成，而是一连串"下一个词该接什么"的小决定。<b>全篇主线任务：给定前文，预测下一个词。</b>最早的解法朴素到可爱：数频次。</div>
@@ -212,7 +212,7 @@ next_word = most_common(counts[(<span class="st">"想"</span>, <span class="st">
   </div>
 </section></div></div><div class="bk-folio"><span>32</span><em>第二章 · 前传</em></div></div>
 <div class="bk-sheet" id="p33" data-ch="2" data-page="33" data-title="神经网络来干什么？——不记死词，学规律"><div class="bk-paper ch2"><div class="bk-fit"><section class="slide active">
-  <header><span class="tag">第 4 章 · 神经网络登场</span><h1>神经网络来干什么？——不记死词，学规律</h1></header>
+  <header><span class="tag">第 4 节 · 神经网络登场</span><h1>神经网络来干什么？——不记死词，学规律</h1></header>
   <div class="band">
     <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"统计表不够用了，加个'神经网络'到底多干了什么？"</em></div>
     <div class="pt"><span class="lbl">② 点破卡点</span>n-gram 是背答案：装不下所有组合，更不会举一反三。要换成<b>"学规律"</b>：相似的前文应该给出相似的预测——前文是向量，"像不像"终于能算了。</div>
@@ -237,7 +237,7 @@ probs = to_vocab_probs(h)     <span class="cm"># -&gt; 每个候选词的概率<
   </div>
 </section></div></div><div class="bk-folio"><span>33</span><em>第二章 · 前传</em></div></div>
 <div class="bk-sheet" id="p34" data-ch="2" data-page="34" data-title="读句子的方式为什么重要？——RNN 的顺序瓶颈"><div class="bk-paper ch2"><div class="bk-fit"><section class="slide active">
-  <header><span class="tag">第 5 章 · 序列问题</span><h1>读句子的方式为什么重要？——RNN 的顺序瓶颈</h1></header>
+  <header><span class="tag">第 5 节 · 序列问题</span><h1>读句子的方式为什么重要？——RNN 的顺序瓶颈</h1></header>
   <div class="band">
     <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"句子有先有后，神经网络怎么'读'一串词？一个个读不就行了？"</em></div>
     <div class="pt"><span class="lbl">② 点破卡点</span>早期标准答案 RNN/LSTM 就是逐词顺序读、滚动更新"记忆"。两个治不好的病：<b>慢</b>——前一个不算完下一个不能开始，GPU 干瞪眼；<b>健忘</b>——读到句尾，句首已被冲刷干净。</div>
@@ -263,7 +263,7 @@ probs = predict(memory)          <span class="cm"># 用最后的记忆预测</sp
   </div>
 </section></div></div><div class="bk-folio"><span>34</span><em>第二章 · 前传</em></div></div>
 <div class="bk-sheet" id="p35" data-ch="2" data-page="35" data-title="注意力：让每个词&quot;看全局&quot;"><div class="bk-paper ch2"><div class="bk-fit"><section class="slide active">
-  <header><span class="tag">第 6 章 · 上</span><h1>注意力：让每个词"看全局"</h1></header>
+  <header><span class="tag">第 6 节 · 上</span><h1>注意力：让每个词"看全局"</h1></header>
   <div class="band">
     <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"不顺序读，机器怎么知道每个词在句子里是什么意思？"</em></div>
     <div class="pt"><span class="lbl">② 点破卡点</span>RNN 的病根是"信息只能排队往前挤"。反过来：<b>每个词确定自己含义时，直接同时看整句话所有词，重点看跟自己相关的</b>。词义不再是死的——由上下文现场决定。</div>
@@ -289,7 +289,7 @@ probs = predict(memory)          <span class="cm"># 用最后的记忆预测</sp
   </div>
 </section></div></div><div class="bk-folio"><span>35</span><em>第二章 · 前传</em></div></div>
 <div class="bk-sheet" id="p36" data-ch="2" data-page="36" data-title="注意力的副产品：顺手治好了&quot;慢&quot;"><div class="bk-paper ch2"><div class="bk-fit"><section class="slide active">
-  <header><span class="tag">第 6 章 · 下</span><h1>注意力的副产品：顺手治好了"慢"</h1></header>
+  <header><span class="tag">第 6 节 · 下</span><h1>注意力的副产品：顺手治好了"慢"</h1></header>
   <div class="band">
     <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"看完上下文之后呢？这跟 RNN 比到底赢在哪？"</em></div>
     <div class="pt"><span class="lbl">② 点破卡点</span>每个词"看全句"这件事互相不用等——"苹果"看它的，"手机"看它的，<b>所有词同时算</b>。RNN 的"慢"被一起治了：GPU 终于火力全开。</div>
@@ -314,14 +314,14 @@ context_vecs = attention(embed(sentence))  <span class="cm"># 并行</span></pre
   </div>
 </section></div></div><div class="bk-folio"><span>36</span><em>第二章 · 前传</em></div></div>
 <div class="bk-sheet" id="p37" data-ch="2" data-page="37" data-title="Transformer 到底是什么？——三件事"><div class="bk-paper ch2"><div class="bk-fit"><section class="slide active">
-  <header><span class="tag">第 7 章 · 上</span><h1>Transformer 到底是什么？——三件事</h1></header>
+  <header><span class="tag">第 7 节 · 上</span><h1>Transformer 到底是什么？——三件事</h1></header>
   <div class="band">
     <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"Transformer 听起来很玄，是不是一个特别复杂的黑盒？"</em></div>
     <div class="pt"><span class="lbl">② 点破卡点</span>不玄，就是三块拼图各治一病——前两块你已经见过了。唯一的真问题：<b>所有词同时看，不就不知道谁先谁后了吗？</b>所以补一块"位置编码"。</div>
   </div>
   <div class="art-wrap">
-<pre class="art"> ① <span class="hl">注意力</span>   → 全局感知（治"看不见全局"，第 6 章）
- ② <span class="hl">并行</span>     → 治 RNN 的慢（第 5 章）
+<pre class="art"> ① <span class="hl">注意力</span>   → 全局感知（治"看不见全局"，第 6 节）
+ ② <span class="hl">并行</span>     → 治 RNN 的慢（第 5 节）
  ③ <span class="hl">位置编码</span> → 治"并行导致的乱序"：把"第几个词"直接加进向量
 
  输入: [词向量 + 位置戳]   ← 每个词自带"我排第几"
@@ -342,7 +342,7 @@ probs = vocab_head(x[-1])              <span class="cm"># -&gt; 下一个词概�
   </div>
 </section></div></div><div class="bk-folio"><span>37</span><em>第二章 · 前传</em></div></div>
 <div class="bk-sheet" id="p38" data-ch="2" data-page="38" data-title="为什么赢的是它"><div class="bk-paper ch2"><div class="bk-fit"><section class="slide active">
-  <header><span class="tag">第 7 章 · 下</span><h1>为什么赢的是它</h1></header>
+  <header><span class="tag">第 7 节 · 下</span><h1>为什么赢的是它</h1></header>
   <div class="band">
     <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"架构之争我看淡了——凭什么 Transformer 统一了江湖？"</em></div>
     <div class="pt"><span class="lbl">② 点破卡点</span>不是它更"聪明"，是它<b>吃得下</b>：并行让它能吃互联网级数据，注意力让它能学长距离规律。两者相加，才撑得起后面的"大力出奇迹"。</div>
@@ -364,7 +364,7 @@ probs = transformer(context_tokens)</pre></div>
   </div>
 </section></div></div><div class="bk-folio"><span>38</span><em>第二章 · 前传</em></div></div>
 <div class="bk-sheet" id="p39" data-ch="2" data-page="39" data-title="预训练：在海量文本上练&quot;续写&quot;"><div class="bk-paper ch2"><div class="bk-fit"><section class="slide active">
-  <header><span class="tag">第 8 章 · 上</span><h1>预训练：在海量文本上练"续写"</h1></header>
+  <header><span class="tag">第 8 节 · 上</span><h1>预训练：在海量文本上练"续写"</h1></header>
   <div class="band">
     <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"架构是骨架，可模型的'知识'到底从哪灌进去的？"</em></div>
     <div class="pt"><span class="lbl">② 点破卡点</span>答案简单得不像话：把互联网文本切成无数道"前文 → 下一个词"练习题，反复做、错了就调权重。<b>不需要人工标注——原文的下一个词就是标准答案。</b></div>
@@ -391,7 +391,7 @@ probs = transformer(context_tokens)</pre></div>
   </div>
 </section></div></div><div class="bk-folio"><span>39</span><em>第二章 · 前传</em></div></div>
 <div class="bk-sheet" id="p40" data-ch="2" data-page="40" data-title="微调：从&quot;会背书&quot;到&quot;会干活&quot;"><div class="bk-paper ch2"><div class="bk-fit"><section class="slide active">
-  <header><span class="tag">第 8 章 · 下</span><h1>微调：从"会背书"到"会干活"</h1></header>
+  <header><span class="tag">第 8 节 · 下</span><h1>微调：从"会背书"到"会干活"</h1></header>
   <div class="band">
     <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"会续写 ≠ 会干活。我要它当客服、写代码，怎么办？"</em></div>
     <div class="pt"><span class="lbl">② 点破卡点</span>不用从头再练。预训练已把"语言本身"学完（贵，但只练一次）；之后用<b>少量任务样本再练一小段</b>——这叫微调。分工：预训练学语言，微调学干活。</div>
@@ -412,7 +412,7 @@ for sample in task_samples:            <span class="cm"># 少量任务样本</sp
   </div>
 </section></div></div><div class="bk-folio"><span>40</span><em>第二章 · 前传</em></div></div>
 <div class="bk-sheet" id="p41" data-ch="2" data-page="41" data-title="为什么模型越大越强？——缩放定律与涌现"><div class="bk-paper ch2"><div class="bk-fit"><section class="slide active">
-  <header><span class="tag">第 9 章 · 规模</span><h1>为什么模型越大越强？——缩放定律与涌现</h1></header>
+  <header><span class="tag">第 9 节 · 规模</span><h1>为什么模型越大越强？——缩放定律与涌现</h1></header>
   <div class="band">
     <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"为什么不'设计'一个更聪明的模型，而是一门心思越堆越大？"</em></div>
     <div class="pt"><span class="lbl">② 点破卡点</span>因为"变大"本身就是可靠的进步路线：参数量、数据量、算力<b>同步</b>放大时，错误率平滑持续下降（缩放定律）。更意外的是<b>涌现</b>——有些能力小模型几乎为零，过了某个规模突然就会了。</div>
@@ -430,13 +430,13 @@ for sample in task_samples:            <span class="cm"># 少量任务样本</sp
   </div>
   <div class="foot">
     <div class="take"><span class="lbl">一句话说清</span>缩放定律解决"怎么稳定变强"——规模同步放大，能力非线性提升，这就是"大力出奇迹"的依据。</div>
-    <div class="code"><span class="lbl">④ 数据流 · Python</span><pre><span class="cm"># 训练流程和第 4 章的小模型一模一样</span>
+    <div class="code"><span class="lbl">④ 数据流 · Python</span><pre><span class="cm"># 训练流程和第 4 节的小模型一模一样</span>
 <span class="cm"># 唯一变化：模型更大、数据更多、算力更足</span>
 train(big_model, big_data)</pre></div>
   </div>
 </section></div></div><div class="bk-folio"><span>41</span><em>第二章 · 前传</em></div></div>
 <div class="bk-sheet" id="p42" data-ch="2" data-page="42" data-title="总结与衔接：一张递进图"><div class="bk-paper ch2"><div class="bk-fit"><section class="slide active">
-  <header><span class="tag">第 10 章 · 收束</span><h1>总结与衔接：一张递进图</h1></header>
+  <header><span class="tag">第 10 节 · 收束</span><h1>总结与衔接：一张递进图</h1></header>
   <div class="art-wrap">
 <pre class="art"> 文字 ─①→ 数字 ─②→ 词向量 ─④→ 神经网络 ─⑥→ 注意力 ─⑦→ Transformer
         机器只懂数字  编号没语义   记词组太笨    顺序读慢且健忘  并行会乱序
@@ -461,8 +461,8 @@ train(big_model, big_data)</pre></div>
   <div class="art-wrap" style="align-items:flex-start; width:100%;">
     <table class="app">
       <tr><th>脚本</th><th>演示什么</th><th>对应章节</th><th>你会看到</th></tr>
-      <tr><td>embedding_demo.py</td><td>词义 = 向量</td><td>第 2 章</td><td>几个词两两的相似度：语义相近的词分数明显更高，"猫-狗"远超"猫-汽车"</td></tr>
-      <tr><td>ngram_demo.py</td><td>统计造句</td><td>第 3 章</td><td>用 n-gram 统计一段文本并生成"模仿腔"——腔调很像，细看全是破绽</td></tr>
+      <tr><td>embedding_demo.py</td><td>词义 = 向量</td><td>第 2 节</td><td>几个词两两的相似度：语义相近的词分数明显更高，"猫-狗"远超"猫-汽车"</td></tr>
+      <tr><td>ngram_demo.py</td><td>统计造句</td><td>第 3 节</td><td>用 n-gram 统计一段文本并生成"模仿腔"——腔调很像，细看全是破绽</td></tr>
       <tr><td>tiny_lm_train_demo.py</td><td>训练 = 压预测错误</td><td>第 3~9 章</td><td>一个几万参数的小模型从头训练：loss 一路下降，续写从乱码长成"有点像"</td></tr>
     </table>
   </div>

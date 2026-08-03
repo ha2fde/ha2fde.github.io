@@ -121,7 +121,7 @@
 <a class="bk-code-link" href="#code17"><b>langgraph_plan_demo.py</b><span>LangGraph：把流程画成图来编排</span></a></div>
     <div class="bk-code-card" id="code1"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">01</span><div class="bk-code-meta"><b>ngram_demo.py</b><span>n-gram 语言模型：统计共现，看它为什么会崩</span></div><span class="bk-code-lines">84 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
 <span class="st">&quot;&quot;&quot;
-ngram_demo.py —— 演示&quot;统计造句&quot;：n-gram 是怎么学说话的（对应 PPT 第 3 章）。
+ngram_demo.py —— 演示&quot;统计造句&quot;：n-gram 是怎么学说话的（对应 PPT 第 3 节）。
 
 做法：
   1. 统计文本里&quot;前 N-1 个字之后，最常接哪个字&quot;（数频次，不做任何理解）
@@ -207,7 +207,7 @@ N = <span class="nu">3</span>  <span class="cm"># 用前 2 个字预测第 3 个
 <span class="st">&quot;&quot;&quot;
 embedding_demo.py —— 演示&quot;词义 = 向量&quot;：语义相近的词，向量也相近。
 
-原理（对应 PPT 第 2 章）：
+原理（对应 PPT 第 2 节）：
   让机器读一堆句子，统计每个词&quot;身边经常出现哪些词&quot;（共现向量）。
   不用人教：上下文相似的词，向量自动就相似了 —— 这就是 embedding 的思想。
 
@@ -457,7 +457,7 @@ n_params = <span class="fn">sum</span>(p.size <span class="kw">for</span> p <spa
 </code></pre></div></div>
 <div class="bk-code-card" id="code4"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">04</span><div class="bk-code-meta"><b>tokenizer_demo.py</b><span>分词：一句中文到底被切成几个 token</span></div><span class="bk-code-lines">39 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
 <span class="st">&quot;&quot;&quot;
-第 1 章: 它是不是在搜答案? —— token 切分 + 逐 token 续写
+第 1 节: 它是不是在搜答案? —— token 切分 + 逐 token 续写
 输入: 一句中文(默认 &quot;今天天气真&quot;, 可用命令行第一个参数覆盖)
 输出: 1) 切分后的 token 列表(id + 文本对照)  2) token 数量  3) 基于前半句的续写结果
 运行: python tokenizer_demo.py [你的句子]
@@ -496,7 +496,7 @@ MODEL = <span class="st">&quot;Qwen/Qwen2.5-0.5B-Instruct&quot;</span>   <span c
 </code></pre></div></div>
 <div class="bk-code-card" id="code5"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">05</span><div class="bk-code-meta"><b>sampling_demo.py</b><span>采样：temperature / top-p 怎么改变输出</span></div><span class="bk-code-lines">40 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
 <span class="st">&quot;&quot;&quot;
-第 4 章: 为什么同样的问题, 答案每次不一样? —— temperature / top_p 采样对比
+第 4 节: 为什么同样的问题, 答案每次不一样? —— temperature / top_p 采样对比
 输入: 内置同一问题(可用命令行参数覆盖)
 输出: temperature=0(贪心) 与 temperature=0.9(top_p=0.9) 各生成 3 次, 共 6 条结果对比
 运行: python sampling_demo.py [你的问题]
@@ -536,7 +536,7 @@ N = <span class="nu">3</span>  <span class="cm"># 每种设置各生成几次</s
 </code></pre></div></div>
 <div class="bk-code-card" id="code6"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">06</span><div class="bk-code-meta"><b>training_stages_demo.py</b><span>训练三阶段：预训练 → SFT → 对齐</span></div><span class="bk-code-lines">41 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
 <span class="st">&quot;&quot;&quot;
-第 2 章: 它凭什么会&quot;回答问题&quot;? —— base 模型 vs chat 模型同题对比
+第 2 节: 它凭什么会&quot;回答问题&quot;? —— base 模型 vs chat 模型同题对比
 输入: 内置同一问题(可用命令行参数覆盖)
 输出: base 模型的&quot;续写&quot;结果 与 instruct 模型的&quot;问答&quot;结果, 并排打印
 运行: python training_stages_demo.py [你的问题]
@@ -679,7 +679,7 @@ tokenizer.<span class="fn">save_pretrained</span>(<span class="st">&#x27;D:\\hug
 </code></pre></div></div>
 <div class="bk-code-card" id="code8"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">08</span><div class="bk-code-meta"><b>chat_context_demo.py</b><span>上下文：多轮对话是怎么拼进 prompt 的</span></div><span class="bk-code-lines">63 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
 <span class="st">&quot;&quot;&quot;
-第 3 章: 它怎么&quot;记得&quot;我们聊过什么? —— 历史拼接 / 模板渲染 / 超长截断
+第 3 节: 它怎么&quot;记得&quot;我们聊过什么? —— 历史拼接 / 模板渲染 / 超长截断
 输入: 内置 6 轮模拟对话(含 system 设定)
 输出: 每轮渲染后的模板文本片段 + token 数; 超过上限时演示截断过程:
       system 永远保留, 最老的消息被逐条丢弃
@@ -742,7 +742,7 @@ ROUNDS = [
 </code></pre></div></div>
 <div class="bk-code-card" id="code9"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">09</span><div class="bk-code-meta"><b>cot_demo.py</b><span>思维链：加一句「逐步思考」的效果对比</span></div><span class="bk-code-lines">43 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
 <span class="st">&quot;&quot;&quot;
-第 5 章: 为什么它会一本正经地胡说八道? —— 思维链 CoT 对比
+第 5 节: 为什么它会一本正经地胡说八道? —— 思维链 CoT 对比
 输入: 内置一道多步算术题(可用命令行参数覆盖)
 输出: &quot;直接给出答案&quot; 与 &quot;请一步一步思考&quot; 两种提示的输出对比
 运行: python cot_demo.py [你的题目]
@@ -785,7 +785,7 @@ MODEL = <span class="st">&quot;Qwen/Qwen2.5-0.5B-Instruct&quot;</span>
 </code></pre></div></div>
 <div class="bk-code-card" id="code10"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">10</span><div class="bk-code-meta"><b>rag_demo.py</b><span>RAG：切分 → 向量化 → 检索 → 拼接</span></div><span class="bk-code-lines">94 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
 <span class="st">&quot;&quot;&quot;
-第 6 章: 怎么让它知道&quot;没学过&quot;的东西? —— 最小 RAG 演示
+第 6 节: 怎么让它知道&quot;没学过&quot;的东西? —— 最小 RAG 演示
 输入: 内置 4 段中文资料(报销/考勤/产品/假期) + 一个相关问题(可用命令行参数覆盖)
 输出: 1) 切块列表  2) Top-2 检索结果(含相似度)  3) 拼接后的完整 prompt
       4) 模型基于资料的回答
@@ -879,7 +879,7 @@ DOCS = {
 </code></pre></div></div>
 <div class="bk-code-card" id="code11"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">11</span><div class="bk-code-meta"><b>agent_tool_demo.py</b><span>工具调用：function calling 完整往返</span></div><span class="bk-code-lines">128 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
 <span class="st">&quot;&quot;&quot;
-第 7 章: 怎么让它&quot;动手干活&quot;? —— 工具调用 + ReAct 循环
+第 7 节: 怎么让它&quot;动手干活&quot;? —— 工具调用 + ReAct 循环
 输入: 需要计算的提问(默认 &quot;38乘27再加100是多少?&quot;, 可用命令行参数覆盖)
 输出: 每轮 Thought / Action / Observation 日志 + 最终回答
 运行: python agent_tool_demo.py [你的问题]
@@ -1007,7 +1007,7 @@ SYSTEM_PROMPT = <span class="st">&quot;&quot;&quot;你是一个会使用工具�
 </code></pre></div></div>
 <div class="bk-code-card" id="code12"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">12</span><div class="bk-code-meta"><b>mcp_server.py</b><span>MCP Server：最小可用实现</span></div><span class="bk-code-lines">44 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
 <span class="st">&quot;&quot;&quot;
-第 8 章配套: 一个最小 MCP 工具服务器(stdio 传输)
+第 8 节配套: 一个最小 MCP 工具服务器(stdio 传输)
 暴露两个工具: add(加法) / calc(四则运算表达式)
 任何支持 MCP 的客户端都能通过协议发现并调用它们, 无需单独写对接代码
 被 mcp_skills_demo.py 以子进程方式启动; 也可独立调试: python mcp_server.py
@@ -1051,7 +1051,7 @@ _OPS = {ast.Add: op.add, ast.Sub: op.sub, ast.Mult: op.mul,
 </code></pre></div></div>
 <div class="bk-code-card" id="code13"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">13</span><div class="bk-code-meta"><b>mcp_skills_demo.py</b><span>MCP + Skills：两者怎么配合</span></div><span class="bk-code-lines">72 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
 <span class="st">&quot;&quot;&quot;
-第 8 章: 工具从哪来, 怎么批量接进来? —— MCP 协议调用 + Skill 流程执行
+第 8 节: 工具从哪来, 怎么批量接进来? —— MCP 协议调用 + Skill 流程执行
 输入: 无(内置演示)
 输出: 1) 通过 MCP 协议发现工具列表  2) 调用 add / calc 的结果
       3) Skill 演示: 读取 SKILL.md 操作手册, 按步骤执行配套脚本
@@ -1123,7 +1123,7 @@ HERE = <span class="fn">Path</span>(__file__).parent
 </code></pre></div></div>
 <div class="bk-code-card" id="code14"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">14</span><div class="bk-code-meta"><b>api_server.py</b><span>OpenAI 兼容 API：自己起一个服务端</span></div><span class="bk-code-lines">112 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
 <span class="st">&quot;&quot;&quot;
-第 9 章: 怎么让别的程序用上它? —— 本地 Chat Completions 兼容服务
+第 9 节: 怎么让别的程序用上它? —— 本地 Chat Completions 兼容服务
 输入: HTTP POST /v1/chat/completions  JSON: {model, messages, stream}
 输出: 非流式 -&gt; choices JSON; 流式 -&gt; SSE 逐 token 推送(delta) + data: [DONE]
 运行: pip install torch transformers fastapi uvicorn
@@ -1235,7 +1235,7 @@ app = <span class="fn">FastAPI</span>(title=<span class="st">&quot;Local Chat Co
 </code></pre></div></div>
 <div class="bk-code-card" id="code15"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">15</span><div class="bk-code-meta"><b>direct_api_demo.py</b><span>裸 API：手拼请求体、手解返回</span></div><span class="bk-code-lines">59 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
 <span class="st">&quot;&quot;&quot;
-direct_api_demo.py —— 第2章配套脚本：最底层，直接调 API
+direct_api_demo.py —— 第2节配套脚本：最底层，直接调 API
 =========================================================
 只用标准 HTTP 库（requests，非 SDK）调一次 Chat Completions 完成问答，
 展示三步：构造 JSON -&gt; POST -&gt; 解析 choices，并打印原始返回。
@@ -1294,7 +1294,7 @@ QUESTION = <span class="st">&quot;用一句话解释：什么是 Agent 的 ReAct
 </code></pre></div></div>
 <div class="bk-code-card" id="code16"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">16</span><div class="bk-code-meta"><b>sdk_react_demo.py</b><span>SDK + 手写 ReAct 主循环</span></div><span class="bk-code-lines">84 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
 <span class="st">&quot;&quot;&quot;
-sdk_react_demo.py —— 第4章配套脚本：用 SDK 手写 ReAct 循环
+sdk_react_demo.py —— 第4节配套脚本：用 SDK 手写 ReAct 循环
 =============================================================
 用官方 SDK 手写一个 Agent 主循环，内置一个计算器工具。
 每轮打印中间过程：模型要调哪个工具 -&gt; 参数是什么 -&gt; 执行结果 -&gt; 回填。
@@ -1378,7 +1378,7 @@ TOOLS_SCHEMA = [{
 </code></pre></div></div>
 <div class="bk-code-card" id="code17"><div class="bk-code-head" onclick="bkToggle(this)"><span class="bk-code-no">17</span><div class="bk-code-meta"><b>langgraph_plan_demo.py</b><span>LangGraph：把流程画成图来编排</span></div><span class="bk-code-lines">89 行</span><span class="bk-code-arrow">▾</span></div><div class="bk-code-body"><pre><code><span class="cm"># -*- coding: utf-8 -*-</span>
 <span class="st">&quot;&quot;&quot;
-langgraph_plan_demo.py —— 第7章配套脚本：用 LangGraph 画一张 Plan-and-Execute 图
+langgraph_plan_demo.py —— 第7节配套脚本：用 LangGraph 画一张 Plan-and-Execute 图
 ===================================================================================
 把流程画成图，而不是写 if/else：
     START -&gt; plan（规划：任务拆成步骤）-&gt; act（逐步执行）-&gt; sum（汇总答案）-&gt; END
