@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent 工程化全景：从"能用"到"能信、能管、能连、能落地"</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: #dfe5ee;
+    font-family: -apple-system, "Microsoft YaHei", "PingFang SC", sans-serif;
+    color: #1e293b;
+    overflow: hidden;
+  }
+  /* ===== 舞台缩放 ===== */
+  #viewport { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+  #stage { width: 1280px; height: 720px; position: relative; transform-origin: center center; }
+  /* ===== 幻灯片 ===== */
+  section.slide {
+    position: absolute; inset: 0;
+    width: 1280px; height: 720px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 12px 40px rgba(15, 23, 42, .18);
+    padding: 48px 56px;
+    display: none;
+    flex-direction: column;
+  }
+  section.slide.active { display: flex; animation: fadein .35s ease; }
+  @keyframes fadein { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  /* ===== 页眉页脚 ===== */
+  .chapter-tag {
+    position: absolute; top: 22px; right: 56px;
+    font-size: 14px; font-weight: 600; letter-spacing: .5px;
+    padding: 5px 14px; border-radius: 999px;
+    background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0;
+  }
+  .page-num { position: absolute; left: 56px; bottom: 20px; font-size: 14px; color: #94a3b8; font-variant-numeric: tabular-nums; }
+  /* ===== 文字 ===== */
+  h1.slide-title { font-size: 30px; color: #0f172a; margin-bottom: 18px; line-height: 1.35; }
+  h1.slide-title .em { color: var(--accent, #2563eb); }
+  p { font-size: 18px; line-height: 1.7; }
+  .q-card {
+    display: flex; gap: 14px; align-items: flex-start;
+    background: #f7f9fc; border: 1px solid #e2e8f0; border-left: 5px solid var(--accent, #2563eb);
+    border-radius: 12px; padding: 14px 20px; margin-bottom: 14px;
+  }
+  .q-card .q { font-size: 18px; font-weight: 700; color: var(--accent, #2563eb); white-space: nowrap; padding-top: 2px; }
+  .q-card .qt { font-size: 18px; line-height: 1.6; color: #334155; }
+  .answer { font-size: 19px; line-height: 1.7; color: #0f172a; margin-bottom: 16px; font-weight: 600; }
+  .answer .hl { color: var(--accent, #2563eb); }
+  .tip {
+    position: absolute; right: 56px; bottom: 44px;
+    max-width: 460px;
+    background: #fffbeb; border: 1px solid #fde68a; border-radius: 12px;
+    padding: 10px 16px; font-size: 15px; line-height: 1.6; color: #78350f;
+  }
+  .tip b { color: #b45309; }
+  /* ===== 字符画卡片 ===== */
+  .diagram {
+    background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;
+    padding: 20px 24px; margin: 4px 0 8px;
+    align-self: center;
+    max-width: 100%;
+  }
+  .diagram pre {
+    font-family: "Cascadia Mono", Consolas, "Courier New", monospace;
+    font-size: 14.5px; line-height: 1.5; color: #334155;
+    white-space: pre;
+  }
+  .diagram-title { font-size: 15px; font-weight: 700; color: #64748b; margin-bottom: 8px; letter-spacing: .5px; }
+  /* ===== 表格 ===== */
+  table.tbl { border-collapse: separate; border-spacing: 0; width: 100%; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; margin: 4px 0 10px; }
+  table.tbl th {
+    background: var(--accent, #2563eb); color: #fff;
+    font-size: 15px; font-weight: 600; padding: 12px 14px; text-align: left; line-height: 1.5;
+  }
+  table.tbl td { font-size: 15px; line-height: 1.6; padding: 12px 14px; background: #fff; border-top: 1px solid #eef2f7; vertical-align: top; color: #334155; }
+  table.tbl tr:nth-child(even) td { background: #f8fafc; }
+  table.tbl td.k { font-weight: 700; color: #0f172a; white-space: nowrap; }
+  .note { font-size: 14px; color: #94a3b8; line-height: 1.6; margin-top: 2px; }
+  /* ===== 封面与金句 ===== */
+  .cover { justify-content: center; align-items: center; text-align: center; }
+  .cover .series { font-size: 16px; color: #64748b; letter-spacing: 2px; margin-bottom: 28px; padding: 6px 18px; border: 1px solid #e2e8f0; border-radius: 999px; }
+  .cover h1 { font-size: 52px; color: #0f172a; line-height: 1.3; margin-bottom: 18px; }
+  .cover h2 { font-size: 26px; font-weight: 500; color: #2563eb; margin-bottom: 42px; }
+  .cover .mainline {
+    font-size: 20px; line-height: 1.9; color: #334155;
+    background: #f7f9fc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 22px 40px;
+  }
+  .cover .mainline b { color: #2563eb; }
+  .quote-slide { justify-content: center; align-items: center; text-align: center; }
+  .quote-slide .big { font-size: 34px; line-height: 2.1; color: #0f172a; font-weight: 700; }
+  .quote-slide .big .c1 { color: #2563eb; } .quote-slide .big .c2 { color: #0d9488; } .quote-slide .big .c3 { color: #d97706; }
+  /* ===== 两栏 ===== */
+  .row { display: flex; gap: 20px; align-items: stretch; }
+  .col { flex: 1; min-width: 0; }
+  .mini-card { background: #f7f9fc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px 20px; }
+  .mini-card h3 { font-size: 17px; color: #0f172a; margin-bottom: 8px; }
+  .mini-card p, .mini-card li { font-size: 15px; line-height: 1.7; color: #334155; }
+  .warn-card { background: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 14px 18px; }
+  .warn-card h3 { font-size: 16px; color: #b91c1c; margin-bottom: 6px; }
+  .warn-card p { font-size: 15px; line-height: 1.7; color: #7f1d1d; }
+  ol.steps { padding-left: 22px; }
+  ol.steps li { font-size: 15px; line-height: 1.75; color: #334155; }
+  /* ===== 控制条 ===== */
+  #controls {
+    position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%);
+    display: flex; gap: 10px; z-index: 99; opacity: .35; transition: opacity .2s;
+  }
+  #controls:hover { opacity: 1; }
+  #controls button {
+    width: 40px; height: 40px; border-radius: 50%; border: none; cursor: pointer;
+    background: #0f172a; color: #fff; font-size: 18px; line-height: 1;
+  }
+  #controls button:hover { background: #2563eb; }
+  #counter { position: fixed; right: 18px; bottom: 22px; z-index: 99; font-size: 14px; color: #64748b; background: rgba(255,255,255,.8); padding: 4px 12px; border-radius: 999px; }
+</style>
+<style id="wb-shell-css">
+/* === wb-shell v1: 系列统一外壳（追加注入，不改动原样式） === */
+body{font-family:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",system-ui,-apple-system,"Segoe UI",sans-serif !important}
+#wb-nav{position:fixed;left:50%;bottom:16px;transform:translateX(-50%) translateY(10px);z-index:99999;display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.94);border:1px solid #E2E8F0;border-radius:999px;padding:6px 12px;box-shadow:0 6px 24px rgba(15,23,42,.14);font:13px/1.4 "PingFang SC","Microsoft YaHei",sans-serif;color:#4B5563;opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;white-space:nowrap}
+#wb-nav.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+#wb-nav a{color:#2563EB;text-decoration:none;font-weight:600;padding:4px 8px;border-radius:8px}
+#wb-nav a:hover{background:#EFF6FF}
+#wb-nav button{width:30px;height:30px;border:1px solid #E2E8F0;background:#fff;border-radius:50%;cursor:pointer;font-size:16px;line-height:1;color:#374151;display:flex;align-items:center;justify-content:center}
+#wb-nav button:hover{background:#F3F4F6}
+#wb-nav .wb-page{font-variant-numeric:tabular-nums;min-width:56px;text-align:center;color:#6B7280;font-size:13px}
+#wb-nav .wb-sep{width:1px;height:16px;background:#E5E7EB}
+#wb-nav .wb-tip{font-size:11px;color:#9CA3AF}
+.wb-xlink{display:inline-block;margin-top:10px;font-size:13px;color:#1D4ED8;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:999px;padding:4px 14px;line-height:1.5}
+.wb-series{font-size:15px;color:#4B5563;background:#EFF6FF;border-left:3px solid #2563EB;padding:10px 16px;border-radius:0 8px 8px 0;margin:0 0 18px;max-width:820px;line-height:1.6}
+@media print{
+  @page{size:1280px 720px;margin:0}
+  html,body{height:auto !important;overflow:visible !important;background:#fff !important}
+  #wb-nav{display:none !important}
+  #stage,.stage,#viewport{position:static !important;inset:auto !important;transform:none !important;width:auto !important;height:auto !important;display:block !important;overflow:visible !important}
+  .slide{display:flex !important;flex-direction:column !important;position:relative !important;inset:auto !important;left:auto !important;top:auto !important;transform:none !important;opacity:1 !important;animation:none !important;transition:none !important;width:1280px !important;height:720px !important;min-height:0 !important;overflow:hidden !important;page-break-after:always !important;break-after:page !important;box-shadow:none !important;border-radius:0 !important;margin:0 !important;visibility:visible !important}
+  .slide:last-of-type{page-break-after:auto !important;break-after:auto !important}
+}
+</style>
+</head>
+<body>
+<div id="viewport"><div id="stage">
+
+<!-- ========== P01 封面 ========== -->
+<section class="slide cover" data-chapter="开场" style="--accent:#2563eb">
+  <div class="series">系列补充篇 · 面向技术人员与技术管理者</div>
+  <h1>Agent 工程化全景</h1>
+  <h2>从"能用"到"能信、能管、能连、能落地"</h2>
+  <div class="mainline">Agent 不能只会"干活"，还得——<br><b>记得住 · 守得住 · 管得了 · 看得见 · 连得上 · 落得地</b></div>
+  <div class="page-num">01/26</div>
+</section>
+
+<!-- ========== P02 开场：本份回答什么问题 ========== -->
+<section class="slide" data-chapter="开场" style="--accent:#475569">
+  <h1 class="slide-title">本份回答什么问题？</h1>
+  <div class="q-card"><span class="q">你可能的疑惑</span><span class="qt">原理懂了、Demo 跑通了，为什么 Agent 还是进不了生产？</span></div>
+  <p class="answer">因为"会干活"只是起点。企业级运行还需要<span class="hl">能力支柱、标准协议、科学的落地路径</span>——这正是本份的三块内容。</p>
+  <div class="diagram"><pre>系列前几份                      本份（补充篇）
+┌─────────────────┐      ┌──────────────────────────┐
+│ Agent 原理       │      │ 一个 Agent 系统要在企业里  │
+│ 怎么开发 Agent   │  →   │ 可靠运行、合规可控、       │
+│ 有哪些现成工具   │      │ 规模化落地，还差什么？     │
+└─────────────────┘      └──────────────────────────┘
+       "会用"                    "能用 → 能信 → 能落地"</pre></div>
+  <div class="tip"><b>落地提示：</b>本份不给协议全量规范、不贴长代码，目标是能说清"每块解决什么问题、怎么协作、大概怎么做"。</div>
+  <div class="page-num">02/26</div>
+</section>
+
+<!-- ========== P03 第1章 三模块总览 ========== -->
+<section class="slide" data-chapter="开场" style="--accent:#475569">
+  <h1 class="slide-title">三模块总览：三条主线</h1>
+  <div class="q-card"><span class="q">你可能的疑惑</span><span class="qt">要补的东西那么多，先抓哪几根线？</span></div>
+  <p class="answer">三条主线——<span class="hl">对内补能力（支柱），对外定标准（协议），对上做路径（成熟度）</span>。</p>
+  <div class="diagram"><pre>                Agent 工程化全景
+                        │
+     ┌──────────────────┼──────────────────┐
+     ▼                  ▼                  ▼
+┌─────────┐       ┌─────────┐        ┌─────────┐
+│ 模块A    │       │ 模块B    │        │ 模块C    │
+│ 能力支柱 │       │ 协议生态 │        │ 落地路径 │
+├─────────┤       ├─────────┤        ├─────────┤
+│ 记忆     │       │ Function│        │ Gartner │
+│ 安全     │       │ Calling │        │ AI 成熟 │
+│ 治理     │       │ MCP     │        │ 度模型  │
+│ 观测     │       │ Skills  │        │ 5 级别  │
+│ 评测     │       │ A2A     │        │ × 7 支柱│
+│ 人机协同 │       │         │        │         │
+└─────────┘       └─────────┘        └─────────┘
+  能信·能管          能连               能落地</pre></div>
+  <div class="tip"><b>落地提示：</b>主线一句话——核心循环让它会干活，支柱让它可信，协议让它可连，成熟度模型让它可落地。</div>
+  <div class="page-num">03/26</div>
+</section>
+
+<!-- ========== P04 第2章·上 能力拼图 ========== -->
+<section class="slide" data-chapter="模块A · 能力支柱" style="--accent:#2563eb">
+  <h1 class="slide-title">Agent 完整能力拼图：<span class="em">核心循环 + 六大支柱</span></h1>
+  <div class="q-card"><span class="q">你可能的疑惑</span><span class="qt">Agent 不就是"思考→行动→观察"的循环吗，还缺什么？</span></div>
+  <p class="answer">核心循环只是发动机。要上路，还需要<span class="hl">六根支柱</span>撑起整个车身。</p>
+  <div class="diagram"><pre>               ┌───────────┐
+               │   记 忆    │ 记得住：跨会话保留知识
+               └───────────┘
+  ┌───────────┐                ┌───────────┐
+  │   安 全    │                │   治 理    │
+  │ 守得住：防攻击越权           │ 管得住：审计审批成本
+  └───────────┘                └───────────┘
+       │      ┌─────────────┐       │
+       │      │  核心循环    │       │
+       │      │ 思考→行动→观察│       │
+       │      └─────────────┘       │
+  ┌───────────┐                ┌───────────┐
+  │   观 测    │                │   评 测    │
+  │ 看得见：每步可追踪           │ 量得出：质量可持续衡量
+  └───────────┘                └───────────┘
+               ┌───────────┐
+               │  人机协同  │ 信得过：关键闸口留给人
+               └───────────┘</pre></div>
+  <div class="tip"><b>落地提示：</b>技术选型时先问"六根支柱各自用什么组件承接"，而不是先选模型。</div>
+  <div class="page-num">04/26</div>
+</section>
+
+<!-- ========== P05 第2章·下 六支柱速览 ========== -->
+<section class="slide" data-chapter="模块A · 能力支柱" style="--accent:#2563eb">
+  <h1 class="slide-title">六大支柱一句话速览</h1>
+  <div class="q-card"><span class="q">你可能的疑惑</span><span class="qt">六根支柱分别解决什么问题？先有个全貌。</span></div>
+  <table class="tbl">
+    <tr><th>支柱</th><th>解决什么问题</th><th>一句话</th><th>常见承接组件</th></tr>
+    <tr><td class="k">记忆</td><td>会话结束就"失忆"</td><td>短期靠上下文，长期靠外部存储</td><td>向量库 / 文件 / 数据库</td></tr>
+    <tr><td class="k">安全</td><td>会干活就可能"被带坏"</td><td>防注入、防越权、防泄露</td><td>沙箱 / 白名单 / 最小权限</td></tr>
+    <tr><td class="k">治理</td><td>出了事说不清、管不住</td><td>可审计、可审批、可算账</td><td>审计日志 / 审批流 / 配额</td></tr>
+    <tr><td class="k">观测</td><td>黑盒运行，无法定位问题</td><td>每一步调用都可追踪</td><td>Trace / 日志 / 成本监控</td></tr>
+    <tr><td class="k">评测</td><td>改了不知变好变坏</td><td>用基准和回放持续衡量</td><td>评测集 / 回放用例 / 指标</td></tr>
+    <tr><td class="k">人机协同</td><td>全自动不放心</td><td>关键决策留"人确认"闸口</td><td>确认节点 / 人工接管通道</td></tr>
+  </table>
+  <div class="tip"><b>落地提示：</b>六支柱不要求一步到位，但上线前每根至少要有"最小可用版本"。</div>
+  <div class="page-num">05/26</div>
+</section>
+
+<!-- ========== P06 第3章 记忆 ========== -->
+<section class="slide" data-chapter="模块A · 能力支柱" style="--accent:#2563eb">
+  <h1 class="slide-title">记忆：让 Agent <span class="em">记得住</span></h1>
+  <div class="q-card"><span class="q">你可能的疑惑</span><span class="qt">上下文窗口越来越大，还需要单独做"记忆"吗？</span></div>
+  <p class="answer">需要。窗口再大也是<span class="hl">短期记忆</span>；跨会话、跨任务的知识必须外置，并按需取回。</p>
+  <div class="diagram"><pre>┌──────────────────────────────────────────┐
+│ 短期记忆 = 上下文窗口                      │
+│ · 随请求携带，会话结束即消失                │
+│ · 容量有限、贵（按 token 计费）            │
+└──────────────────────────────────────────┘
+              ▲ 检索相关内容，拼进上下文
+              │ （RAG 思路：先查后写）
+┌──────────────────────────────────────────┐
+│ 长期记忆 = 外部存储，跨会话持久化           │
+│ · 向量库：语义检索"相似的过往经验"         │
+│ · 文件/文档：工作笔记、用户档案            │
+│ · 数据库：事实型记录、业务数据             │
+└──────────────────────────────────────────┘</pre></div>
+  <p style="font-size:16px;color:#475569;line-height:1.7">分层意义：窗口放"当前任务的 working set"，长期存储放"所有历史"，靠检索在两者之间搬运。基本实现：写入端沉淀值得记的内容，读取端按任务检索片段拼进上下文。</p>
+  <div class="tip"><b>落地提示：</b>先想清楚"什么值得记、记到哪、谁来删"，比选哪个向量库更重要；记忆也意味着合规责任。</div>
+  <div class="page-num">06/26</div>
+</section>
+
+<!-- ========== P07 第4章·上 攻击面 ========== -->
+<section class="slide" data-chapter="模块A · 能力支柱" style="--accent:#2563eb">
+  <h1 class="slide-title">安全：Agent <span class="em">特有的攻击面</span></h1>
+  <div class="q-card"><span class="q">你可能的疑惑</span><span class="qt">传统应用安全做得很多了，Agent 有什么新风险？</span></div>
+  <p class="answer">Agent 会"读指令、做决策、动手执行"——恶意内容只要能<span class="hl">影响它的判断</span>，就能让它替你犯错。</p>
+  <div class="diagram"><pre>攻击面 1：提示注入（Prompt Injection）
+  恶意指令藏在用户输入 / 网页 / 文档 / 邮件里
+  ┌─────────┐  读取  ┌───────────────────┐
+  │ 恶意网页 │ ─────► │ Agent 把隐藏指令    │
+  │"忽略之前指令…"│    │ 当成任务执行       │
+  └─────────┘        └───────────────────┘
+
+攻击面 2：越权执行
+  Agent 拿着过大的权限，一个误判 = 一次生产事故
+  （能删库的工具，就别怪它真删）
+
+攻击面 3：数据泄露
+  敏感数据被读进上下文 → 随工具调用 / 外部 API 传出去</pre></div>
+  <div class="tip"><b>落地提示：</b>把 Agent 当成"一个会被骗、但手很快的新员工"来设计权限，而不是当成一段确定性的代码。</div>
+  <div class="page-num">07/26</div>
+</section>
+
+<!-- ========== P08 第4章·下 四道防线 ========== -->
+<section class="slide" data-chapter="模块A · 能力支柱" style="--accent:#2563eb">
+  <h1 class="slide-title">安全：四道防线（纵深防御）</h1>
+  <div class="q-card"><span class="q">你可能的疑惑</span><span class="qt">攻击面防不完，从哪几件事做起？</span></div>
+  <p class="answer">纵深防御——任何单点被突破，<span class="hl">还有下一道</span>。</p>
+  <table class="tbl">
+    <tr><th>防线</th><th>做什么</th><th>防什么</th></tr>
+    <tr><td class="k">最小权限</td><td>每个工具只授予完成任务必需的最小权限（只读优先，写操作收窄到具体对象）</td><td>越权执行</td></tr>
+    <tr><td class="k">沙箱隔离</td><td>代码执行、文件操作放在隔离环境（容器 / 受限目录），与生产环境隔开</td><td>注入后的破坏扩散</td></tr>
+    <tr><td class="k">工具白名单</td><td>只能调用登记过的工具与参数范围，未登记一律拒绝</td><td>注入诱导的任意调用</td></tr>
+    <tr><td class="k">执行前确认</td><td>高危 / 不可逆操作（删、改、发、付）必须经确认后才执行</td><td>一切"手快"事故</td></tr>
+  </table>
+  <p style="font-size:16px;color:#475569"><b style="color:#b91c1c">兜底原则：</b>敏感数据不传出——进上下文的敏感字段脱敏，出 Agent 的调用做内容检查。</p>
+  <div class="tip"><b>落地提示：</b>四道防线中"执行前确认"成本最低、收益最大，第一天就该有。</div>
+  <div class="page-num">08/26</div>
+</section>
+
+<!-- ========== P09 第5章 治理 ========== -->
+<section class="slide" data-chapter="模块A · 能力支柱" style="--accent:#2563eb">
+  <h1 class="slide-title">治理：让 Agent <span class="em">合规可控</span></h1>
+  <div class="q-card"><span class="q">你可能的疑惑</span><span class="qt">安全和治理听起来都像"管 Agent"，分工是什么？</span></div>
+  <p class="answer">安全管<span class="hl">"防住"</span>（不让坏事发生），治理管<span class="hl">"管住"</span>（发生的事可回查、可审批、可算账）。</p>
+  <div class="row">
+    <div class="col">
+      <table class="tbl">
+        <tr><th>治理四件事</th><th>内容</th></tr>
+        <tr><td class="k">审计日志</td><td>谁触发、调了什么工具、输入输出、结果如何——全量留痕可回查</td></tr>
+        <tr><td class="k">审批流</td><td>高危操作需人批准，分级审批、与工单系统打通</td></tr>
+        <tr><td class="k">合规要求</td><td>数据处理符合监管与内部制度（GDPR 类法规一句话：涉及个人数据即受约束）</td></tr>
+        <tr><td class="k">成本治理</td><td>token 用量监控、消费上限、异常告警</td></tr>
+      </table>
+    </div>
+    <div class="col">
+      <table class="tbl">
+        <tr><th>维度</th><th>安全</th><th>治理</th></tr>
+        <tr><td class="k">目标</td><td>防住：阻止坏事发生</td><td>管住：发生的事可控可溯</td></tr>
+        <tr><td class="k">视角</td><td>攻击者视角</td><td>管理者视角</td></tr>
+        <tr><td class="k">手段</td><td>沙箱、白名单、最小权限</td><td>审计、审批、配额</td></tr>
+        <tr><td class="k">失效后果</td><td>被注入、越权、泄露</td><td>说不清、算不清、停不下</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="tip"><b>落地提示：</b>审计日志是治理的地基——没有留痕，审批、合规、成本全是空中楼阁。</div>
+  <div class="page-num">09/26</div>
+</section>
+
+<!-- ========== P10 第6章·上 观测 ========== -->
+<section class="slide" data-chapter="模块A · 能力支柱" style="--accent:#2563eb">
+  <h1 class="slide-title">观测：每一步都<span class="em">看得见</span></h1>
+  <div class="q-card"><span class="q">你可能的疑惑</span><span class="qt">Agent 说"任务失败了"，怎么知道它卡在哪一步？</span></div>
+  <p class="answer">把 ReAct 循环的每一步都落成 <span class="hl">trace</span>：调了哪个工具、输入什么、输出什么、花了多少 token。</p>
+  <div class="diagram"><pre>一次任务执行 = 一条 Trace
+┌────────────────────────────────────────────────┐
+│ Step 1  思考:需要先查订单  → 工具: query_order    │
+│         输入:{order_id} 输出:{...}  12ms  320tok │
+│ Step 2  思考:需要退款审批  → 工具: request_appr   │
+│         输入:{...}  输出:{待审批}   8ms   210tok  │
+│ Step 3  思考:等待人工确认  → 状态: PAUSED         │
+└────────────────────────────────────────────────┘
+        三条监控线：Trace(步骤) · 日志(事件) · 成本(token/费用)</pre></div>
+  <p style="font-size:17px;color:#475569"><b style="color:#0f172a">观测三件套：</b>Trace 看"过程"、日志看"事件"、成本监控看"账单"。</p>
+  <div class="tip"><b>落地提示：</b>观测是"评测"的数据来源——没有 trace 积累，评测集和回放用例都无从谈起。</div>
+  <div class="page-num">10/26</div>
+</section>
+
+<!-- ========== P11 第6章·下 评测 ========== -->
+<section class="slide" data-chapter="模块A · 能力支柱" style="--accent:#2563eb">
+  <h1 class="slide-title">评测：<span class="em">没有评测就谈不上上线</span></h1>
+  <div class="q-card"><span class="q">你可能的疑惑</span><span class="qt">改了 prompt 或换了模型，怎么证明 Agent 变好了而不是变坏了？</span></div>
+  <p class="answer">靠持续评测：<span class="hl">基准测试定水平，回放用例防回归</span>，用指标说话。</p>
+  <div class="diagram"><pre>┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐
+│ 建评测集  │ → │ 基准测试  │ → │ 回放用例  │ → │ 指标看板  │
+│ 真实任务+ │   │ 新版本跑一 │   │ 历史trace │   │ 任务完成率│
+│ 期望结果  │   │ 遍,比基线  │   │ 重放防回归│   │ 错误率/成本│
+└──────────┘   └──────────┘   └──────────┘   └──────────┘
+      ▲                                            │
+      └────────── 不达标 → 改 prompt/模型 → 重新评测 ──┘</pre></div>
+  <p style="font-size:17px;color:#475569"><b style="color:#0f172a">核心指标：</b>任务完成率、错误率（幻觉 / 误调用）、平均步数、单任务成本。没有评测，"迭代"就是掷骰子；有评测，每次改动才敢上线。</p>
+  <div class="tip"><b>落地提示：</b>评测集不必大，从 20~50 个真实高频任务开始，比追求覆盖面更重要。</div>
+  <div class="page-num">11/26</div>
+</section>
+
+<!-- ========== P12 第7章 为什么需要协议 ========== -->
+<section class="slide" data-chapter="模块B · 协议生态" style="--accent:#0d9488">
+  <h1 class="slide-title">为什么需要协议：<span class="em">接一次，处处可用</span></h1>
+  <div class="q-card"><span class="q">你可能的疑惑</span><span class="qt">工具对接写点适配代码不就行了，为什么要"协议"？</span></div>
+  <p class="answer">N 个 Agent × M 个工具 = <span class="hl">N×M 套专用代码</span>；标准化后变成 N+M——接一次，处处可用。</p>
+  <div class="diagram"><pre>没有协议：N×M 灾难                  有了协议：N+M
+┌─────┐ ╲  ┌────┐                ┌─────┐   ┌────────┐   ┌────┐
+│Agent1│ ╲ ╲│工具A│               │Agent1│──┐│        │┌──│工具A│
+│Agent2│──╲─│工具B│               │Agent2│──┤│ 标准协议 │├──│工具B│
+│Agent3│─╲ ╲│工具C│               │Agent3│──┘│        │└──│工具C│
+└─────┘  ╲ ╲└────┘                └─────┘   └────────┘   └────┘
+ 每对组合一套专用代码                各自只实现一次标准接口</pre></div>
+  <div class="tip"><b>落地提示：</b>MCP / Skills / A2A 不是新概念发明，是工程量倒逼出来的标准。</div>
+  <div class="page-num">12/26</div>
+</section>
+
+<!-- ========== P13 第8章·上 四层协议全景 ========== -->
+<section class="slide" data-chapter="模块B · 协议生态" style="--accent:#0d9488">
+  <h1 class="slide-title">四层协议全景：<span class="em">各管一层，互不重叠</span></h1>
+  <div class="q-card"><span class="q">你可能的疑惑</span><span class="qt">MCP、Skills、A2A、Function Calling 满天飞，它们谁管哪层？</span></div>
+  <p class="answer">从"模型怎么调工具"到"Agent 怎么够 Agent"，<span class="hl">一层一个标准</span>。</p>
+  <div class="diagram"><pre>┌──────────────────────────────────────────────┐
+│ 互连层  A2A（Agent2Agent）                     │
+│         Agent 之间互相发现、通信、协作          │
+├──────────────────────────────────────────────┤
+│ 流程层  Agent Skills                           │
+│         把"怎么完成一类任务"打包成可复用技能     │
+├──────────────────────────────────────────────┤
+│ 工具层  MCP（Model Context Protocol）          │
+│         Agent 与外部工具/数据源的统一接入协议    │
+│         类比："工具的 USB 接口"                 │
+├──────────────────────────────────────────────┤
+│ 模型层  Function Calling / Tool Use            │
+│         各家 API 原生的"模型请求调工具"机制     │
+└──────────────────────────────────────────────┘
+          越往下越靠近模型，越往上越靠近生态</pre></div>
+  <div class="tip"><b>落地提示：</b>一句话——Function Calling 是机制，MCP 标准化"够工具"，Skills 封装"怎么干"，A2A 解决"够 Agent"。</div>
+  <div class="page-num">13/26</div>
+</section>
+
+<!-- ========== P14 第8章·下 四层对比表 ========== -->
+<section class="slide" data-chapter="模块B · 协议生态" style="--accent:#0d9488">
+  <h1 class="slide-title">四层协议对比</h1>
+  <div class="q-card"><span class="q">你可能的疑惑</span><span class="qt">四层分别标准化了什么"东西"？</span></div>
+  <p class="answer">模型层标准化<span class="hl">调用格式</span>，工具层标准化<span class="hl">工具接入</span>，流程层标准化<span class="hl">任务做法</span>，互连层标准化<span class="hl">Agent 间协作</span>。</p>
+  <table class="tbl">
+    <tr><th>层</th><th>协议</th><th>标准化的对象</th><th>谁提出 / 推动</th><th>一句话定位</th></tr>
+    <tr><td class="k">模型层</td><td>Function Calling / Tool Use</td><td>模型请求调工具的格式</td><td>各家模型厂商原生</td><td>"模型想调工具"的原生机制</td></tr>
+    <tr><td class="k">工具层</td><td>MCP</td><td>Agent ↔ 工具 / 数据源的接入</td><td>Anthropic 提出并开源，主要厂商跟进</td><td>工具的 USB 接口</td></tr>
+    <tr><td class="k">流程层</td><td>Agent Skills</td><td>完成一类任务的步骤 + 提示词 + 脚本</td><td>Anthropic 等推动的开放标准</td><td>把"怎么干"打包复用</td></tr>
+    <tr><td class="k">互连层</td><td>A2A</td><td>Agent ↔ Agent 的发现与通信</td><td>Google 提出</td><td>Agent 够 Agent</td></tr>
+  </table>
+  <p class="note">注：各协议归属与进展变化快，一律以官方 / 标准组织最新公告为准。</p>
+  <div class="tip"><b>落地提示：</b>四层是互补不是竞争——一个成熟系统通常会同时用到其中三层以上。</div>
+  <div class="page-num">14/26</div>
+</section>
+
+<!-- ========== P15 第9章·上 MCP 来龙去脉 ========== -->
+<section class="slide" data-chapter="模块B · 协议生态" style="--accent:#0d9488">
+  <h1 class="slide-title">MCP 来龙去脉：<span class="em">为什么是它</span></h1>
+  <div class="q-card"><span class="q">你可能的疑惑</span><span class="qt">工具接入方案那么多，为什么行业共识落在 MCP 上？</span></div>
+  <p class="answer">它踩中了三个点：<span class="hl">开放开源、厂商中立</span>，且恰好出现在 Agent 爆发、所有人都被 N×M 问题折磨的时间窗口。</p>
+  <div class="diagram"><pre>Function Calling（单点工具调用）
+      │  各家格式不一，接工具要写专用代码
+      ▼
+MCP（工具接入标准化）
+      │  Anthropic 提出并开源 → OpenAI / Google / Microsoft
+      │  等主要厂商相继采纳 → 进入标准化托管
+      ▼
+Skills（流程封装）→ A2A（Agent 互联）
+      一层层从"一个工具"走向"整个生态"
+
+（具体归属与最新进展以官方 / Linux 基金会消息为准）</pre></div>
+  <div class="tip"><b>落地提示：</b>MCP 基本结构与可运行演示详见第 3 讲第 8 章；本讲记住结论——它是当前工具接入的事实标准方向，投入适配不亏。</div>
+  <div class="page-num">15/26</div>
+</section>
+
+<!-- ========== P16 第9章·下 MCP 结构 ========== -->
+<section class="slide" data-chapter="模块B · 协议生态" style="--accent:#0d9488">
+  <h1 class="slide-title">MCP 基本结构：<span class="em">Server + Client</span></h1>
+  <div class="q-card"><span class="q">你可能的疑惑</span><span class="qt">接入 MCP，系统里到底多了哪些角色？</span></div>
+  <p class="answer">两个角色一种语言——<span class="hl">Server 提供能力，Client（Agent 侧）消费能力，之间用 JSON-RPC 通信</span>。</p>
+  <div class="diagram"><pre>┌──────────────────┐          ┌──────────────────┐
+│   MCP Client     │          │   MCP Server A   │
+│   （Agent 侧）   │─JSON-RPC─►│ 工具/资源/提示词  │
+│                  │          └──────────────────┘
+│  · 发现可用工具    │          ┌──────────────────┐
+│  · 发起调用       │─JSON-RPC─►│   MCP Server B   │
+│  · 结果进上下文   │          │ 另一个工具/数据源  │
+└──────────────────┘          └──────────────────┘
+ Server 提供三类能力：
+ · 工具(Tools)：可执行的动作   · 资源(Resources)：可读的数据
+ · 提示词(Prompts)：预置的交互模板</pre></div>
+  <div class="tip"><b>落地提示：</b>接新工具优先找现成 MCP Server；自己封装时工具粒度宁细勿粗——描述写得越清楚，Agent 调得越准。</div>
+  <div class="page-num">16/26</div>
+</section>
+
+<!-- ========== P17 第10章 Agent Skills ========== -->
+<section class="slide" data-chapter="模块B · 协议生态" style="--accent:#0d9488">
+  <h1 class="slide-title">Agent Skills：封装<span class="em">"怎么干一件事"</span></h1>
+  <div class="q-card"><span class="q">你可能的疑惑</span><span class="qt">工具都能调了，为什么还需要"技能包"？</span></div>
+  <p class="answer">MCP 回答"能调什么工具"，Skills 回答<span class="hl">"这件事怎么干"</span>——步骤、提示词、配套脚本打包，Agent 按任务加载。</p>
+  <div class="row">
+    <div class="col">
+      <div class="diagram" style="align-self:stretch"><pre>一个 Skill = 一个带元数据的目录
+┌───────────────────────────┐
+│ 元数据：名称/说明/触发条件  │← Agent 据此判断何时用
+│ 步骤文档：完成任务的流程指引 │← 告诉 Agent 怎么干
+│ 配套脚本：确定性环节直接执行 │← 能写死的别让模型猜
+└───────────────────────────┘</pre></div>
+    </div>
+    <div class="col">
+      <table class="tbl">
+        <tr><th>维度</th><th>MCP</th><th>Agent Skills</th></tr>
+        <tr><td class="k">封装对象</td><td>工具与数据</td><td>流程与方法</td></tr>
+        <tr><td class="k">形态</td><td>在线服务，C/S 通信</td><td>目录+文档+脚本，按需加载</td></tr>
+        <tr><td class="k">复用粒度</td><td>单个能力</td><td>一整类任务</td></tr>
+        <tr><td class="k">关系</td><td colspan="2">互补：Skill 的步骤里可以调 MCP 工具</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="tip"><b>落地提示：</b>团队里"老师傅的经验"最适合沉淀成 Skill——流程写进文档、确定性环节写成脚本，模型只处理真正需要判断的部分。</div>
+  <div class="page-num">17/26</div>
+</section>
+
+<!-- ========== P18 第11章 A2A ========== -->
+<section class="slide" data-chapter="模块B · 协议生态" style="--accent:#0d9488">
+  <h1 class="slide-title">A2A 与多 Agent 协作</h1>
+  <div class="q-card"><span class="q">你可能的疑惑</span><span class="qt">公司有客服 Agent、财务 Agent、IT Agent，它们怎么互相派活？</span></div>
+  <p class="answer">靠 A2A——Agent 之间互相发现、发任务、交换结果。与 MCP 的区别一句话：<span class="hl">MCP 是"Agent 够工具"，A2A 是"Agent 够 Agent"</span>。</p>
+  <div class="row">
+    <div class="col">
+      <div class="diagram" style="align-self:stretch"><pre>┌──────────┐  发现/委派任务  ┌──────────┐
+│ 客服 Agent │────A2A─────►│ 财务 Agent │
+│(团队A/厂商X)│◄───返回结果───│(团队B/厂商Y)│
+└──────────┘              └──────────┘
+ 跨团队、跨厂商协作，
+ 不必共享内部实现</pre></div>
+    </div>
+    <div class="col">
+      <table class="tbl">
+        <tr><th>其他标准</th><th>一句话定位</th></tr>
+        <tr><td class="k">OpenAPI</td><td>传统 API 描述规范，工具接口的"老路子"</td></tr>
+        <tr><td class="k">AGNTCY</td><td>Cisco 主导的 Agent 互操作协议，与 A2A 并存竞争</td></tr>
+        <tr><td class="k">OAuth</td><td>Agent 代表用户访问资源时的授权依据</td></tr>
+      </table>
+      <p class="note">A2A 已进入标准托管流程，具体以官方为准；本份不对比协议优劣，只讲清定位与关系。</p>
+    </div>
+  </div>
+  <div class="tip"><b>落地提示：</b>多 Agent 协作前先想清"任务边界和结果契约"——协议解决通信，解决不了职责划分不清。</div>
+  <div class="page-num">18/26</div>
+</section>
+
+<!-- ========== P19 第12章·上 Gartner 模型 ========== -->
+<section class="slide" data-chapter="模块C · 企业落地" style="--accent:#d97706">
+  <h1 class="slide-title">落地评估权威框架：<span class="em">Gartner AI 成熟度模型</span></h1>
+  <div class="q-card"><span class="q">你可能的疑惑</span><span class="qt">公司该从哪开始搞 Agent？凭感觉上，还是有个章法？</span></div>
+  <p class="answer">用业界公认的 Gartner AI 成熟度模型给自己<span class="hl">"量体温"</span>——Gartner 是独立第三方分析师机构，该模型是全球企业 IT 规划的行业标准参考，不绑定任何厂商生态。</p>
+  <div class="diagram"><pre>      Gartner AI 成熟度模型 = 5 个级别 × 7 个支柱
+┌───────────────────────────────────────┐
+│ 7 个评估支柱（每支柱按 1~5 级分别评估）： │
+│  1 AI战略与愿景    2 数据基础           │
+│  3 治理与合规      4 技术架构与平台      │
+│  5 人才与技能      6 业务流程整合        │
+│  7 文化与组织                           │
+├───────────────────────────────────────┤
+│ 5 个成熟度级别：                         │
+│  L1 认知 → L2 活跃 → L3 运营 → L4 系统化 → L5 变革 │
+└───────────────────────────────────────┘
+  每个组织得到一张"7 支柱 × 级别"的体检单</pre></div>
+  <div class="tip"><b>落地提示：</b>不要只问"我们在第几级"，要按支柱分别问——数据基础在 L2、战略喊到 L4，是最常见的错位。</div>
+  <div class="page-num">19/26</div>
+</section>
+
+<!-- ========== P20 第12章·下 五级别阶梯 ========== -->
+<section class="slide" data-chapter="模块C · 企业落地" style="--accent:#d97706">
+  <h1 class="slide-title">五级别阶梯：<span class="em">每一级都是下一级的地基</span></h1>
+  <div class="q-card"><span class="q">你可能的疑惑</span><span class="qt">五个级别各自长什么样？</span></div>
+  <p class="answer">从"零散实验"到"AI 即业务"，<span class="hl">逐级演进</span>。</p>
+  <div class="diagram"><pre>                                          ┌──── L5 变革 ────┐
+                                          │ AI 深植企业 DNA  │
+                                ┌──── L4 系统化 ────┐         │
+                                │ AI 驱动多数工作流   │         │
+                      ┌── L3 运营 ──┐                 │         │
+                      │ AI 进特定流程 │                 │         │
+            ┌─ L2 活跃 ─┐           │                 │         │
+            │ 孤岛式试点 │           │                 │         │
+  ┌─ L1 认知 ─┐         │           │                 │         │
+  │ 零散实验   │         │           │                 │         │
+  └───────────┴─────────┴───────────┴─────────────────┴─────────┘
+   无战略·靠热情  爱好者驱动   有用例有标准   AI 是运营根基   创新驱动转型</pre></div>
+  <div class="tip"><b>落地提示：</b>阶梯只能逐级爬——每级缺失的地基，都会在上一级连本带利讨回来。</div>
+  <div class="page-num">20/26</div>
+</section>
+
+<!-- ========== P21 第13章·上 五级别详解 ========== -->
+<section class="slide" data-chapter="模块C · 企业落地" style="--accent:#d97706">
+  <h1 class="slide-title">五级别详解：特征 · 状态 · 晋级动作</h1>
+  <div class="q-card"><span class="q">你可能的疑惑</span><span class="qt">每级的"典型状态"和"晋级动作"是什么？</span></div>
+  <table class="tbl">
+    <tr><th>级别</th><th>一句话特征</th><th>典型状态</th><th>晋级动作</th></tr>
+    <tr><td class="k">L1 认知</td><td>认识到潜力但无正式战略</td><td>实验零散、依赖个别热情员工、无数据治理基础</td><td>建立高层共识，选定 1~2 个候选场景</td></tr>
+    <tr><td class="k">L2 活跃</td><td>孤岛式试点</td><td>爱好者驱动、缺乏统一战略与共享治理</td><td>收编试点经验，立统一战略与最小治理</td></tr>
+    <tr><td class="k">L3 运营</td><td>AI 整合进特定业务工作流</td><td>有明确用例与初步标准，数据实践开始规范化</td><td>扩展用例面，补齐平台与可观测性</td></tr>
+    <tr><td class="k">L4 系统化</td><td>AI 驱动多数工作流</td><td>催生新数字化业务模式，AI 是运营根基而非工具</td><td>流程级重设计，组织与人才体系化</td></tr>
+    <tr><td class="k">L5 变革</td><td>AI 深植企业 DNA</td><td>持续驱动创新、新商业模式与文化转型</td><td>持续进化，保持组织敏捷</td></tr>
+  </table>
+  <div class="tip"><b>落地提示：</b>自评时找"最拖后腿的支柱"定级别，而不是找"做得最好的"——木桶效应在成熟度上格外灵验。</div>
+  <div class="page-num">21/26</div>
+</section>
+
+<!-- ========== P22 第13章·中 七支柱快照 ========== -->
+<section class="slide" data-chapter="模块C · 企业落地" style="--accent:#d97706">
+  <h1 class="slide-title">七支柱快照：1 / 3 / 5 级三档</h1>
+  <div class="q-card"><span class="q">你可能的疑惑</span><span class="qt">七个支柱各自从 L1 到 L5 是怎么演进的？</span></div>
+  <p class="answer">抓住 <span class="hl">1 / 3 / 5 级三档快照</span>，中间状态自行内插。</p>
+  <table class="tbl">
+    <tr><th>支柱</th><th>L1 快照</th><th>L3 快照</th><th>L5 快照</th></tr>
+    <tr><td class="k">AI 战略与愿景</td><td>无战略，零散想法</td><td>有用例路线图，高层支持</td><td>AI 即业务战略核心，投资持续</td></tr>
+    <tr><td class="k">数据基础</td><td>数据散乱不可用</td><td>重点场景数据规范化</td><td>数据资产化，质量与治理体系化</td></tr>
+    <tr><td class="k">治理与合规</td><td>无护栏</td><td>初步标准与审批</td><td>全生命周期治理，护栏自动化</td></tr>
+    <tr><td class="k">技术架构与平台</td><td>各自为战</td><td>统一平台雏形，初步可观测</td><td>可扩展架构，全面可观测</td></tr>
+    <tr><td class="k">人才与技能</td><td>靠个别爱好者</td><td>关键角色就位，培训启动</td><td>人才梯队完整，技能全员化</td></tr>
+    <tr><td class="k">业务流程整合</td><td>流程照旧</td><td>单点流程嵌入 AI</td><td>端到端流程重设计，价值可度量</td></tr>
+    <tr><td class="k">文化与组织</td><td>观望怀疑</td><td>先锋团队示范</td><td>激励与社区成熟，组织敏捷</td></tr>
+  </table>
+  <div class="tip"><b>落地提示：</b>评估可按部门分别打——各部门成熟度不同是常态，不必强求"全公司一个级"。</div>
+  <div class="page-num">22/26</div>
+</section>
+
+<!-- ========== P23 第13章·下 怎么用 ========== -->
+<section class="slide" data-chapter="模块C · 企业落地" style="--accent:#d97706">
+  <h1 class="slide-title">怎么用 + 风险警示 + 切入点</h1>
+  <div class="q-card"><span class="q">你可能的疑惑</span><span class="qt">评完级之后呢？从哪些场景切入最稳？</span></div>
+  <div class="row">
+    <div class="col" style="flex:0.92">
+      <div class="mini-card" style="margin-bottom:14px">
+        <h3>使用四步</h3>
+        <ol class="steps">
+          <li>按支柱对组织现状打分</li>
+          <li>定位当前级别（可按部门分别评）</li>
+          <li>找到与"下一个级别"的差距</li>
+          <li>制定针对性投资</li>
+        </ol>
+      </div>
+      <div class="warn-card">
+        <h3>⚠ 跳级是失败主因</h3>
+        <p>跳过治理直接上自动化 = 同时踩中所有跳过的级别的坑。Gartner 警示：相当比例（约 40%）的 agentic AI 项目可能因治理 / 观测 / ROI 不清晰而被终止（数据以 Gartner 原文为准）。</p>
+      </div>
+    </div>
+    <div class="col">
+      <table class="tbl">
+        <tr><th>五个典型切入点</th><th>为什么适合先切</th></tr>
+        <tr><td class="k">智能客服与工单</td><td>高频、流程标准、效果易量化</td></tr>
+        <tr><td class="k">财务对账与报表</td><td>规则明确、数据现成、人力消耗大</td></tr>
+        <tr><td class="k">知识管理与 RAG 研究</td><td>数据已沉淀、试错成本低</td></tr>
+        <tr><td class="k">IT 告警分诊</td><td>高频重复、有历史工单可训练评测</td></tr>
+        <tr><td class="k">编码 Agent</td><td>工具链成熟、团队接受度高</td></tr>
+      </table>
+      <p class="note">筛选原则：高频 + 数据已有 + 流程标准。</p>
+    </div>
+  </div>
+  <div class="tip"><b>落地提示：</b>第一个场景的成功标准是"跑通全流程 + 建立评测"，而不是"做得多惊艳"。</div>
+  <div class="page-num">23/26</div>
+</section>
+
+<!-- ========== P24 总结大图 ========== -->
+<section class="slide" data-chapter="总结" style="--accent:#7c3aed">
+  <h1 class="slide-title">总结：三张拼图合成一张大图</h1>
+  <div class="diagram" style="margin-top:6px"><pre>┌─────────────────────── Agent 工程化全景 ───────────────────────┐
+│                                                                │
+│  对内：六大支柱（能信·能管）       对外：四层协议（能连）          │
+│  ┌──────────────────┐          ┌──────────────────┐            │
+│  │ 记忆  安全  治理   │          │ Function Calling │            │
+│  │ 观测  评测  人机协同│          │ MCP / Skills / A2A│           │
+│  └──────────────────┘          └──────────────────┘            │
+│             ▲                            ▲                     │
+│             └────────────┬───────────────┘                     │
+│                          ▼                                     │
+│                ┌──────────────────┐                            │
+│                │ 核心循环：思考→行动→观察│                       │
+│                └──────────────────┘                            │
+│                          ▲                                     │
+│             对上：Gartner 成熟度（能落地）                        │
+│             5 级别 × 7 支柱，逐级推进不跳级                       │
+└────────────────────────────────────────────────────────────────┘</pre></div>
+  <div class="tip"><b>落地提示：</b>三块拼图任何一块缺失，都会在规模化时变成天花板。</div>
+  <div class="page-num">24/26</div>
+</section>
+
+<!-- ========== P25 结语 ========== -->
+<section class="slide quote-slide" data-chapter="总结" style="--accent:#7c3aed">
+  <p class="big">核心循环让它<span class="c1">会干活</span>，<br>支柱让它<span class="c1">可信</span>，协议让它<span class="c2">可连</span>，<br>成熟度模型让它<span class="c3">可落地</span>。</p>
+  <div class="page-num">25/26</div>
+</section>
+
+<!-- ========== P26 附录导览 ========== -->
+<section class="slide" data-chapter="附录" style="--accent:#475569">
+  <h1 class="slide-title">附录：《落地评估速查表》</h1>
+  <p class="answer">速查表随 PPT 一并交付（独立单页 HTML，可直接打印），包含四块内容：</p>
+  <table class="tbl">
+    <tr><th>板块</th><th>内容</th></tr>
+    <tr><td class="k">1. Gartner 简表</td><td>五级别 × 七支柱，每格一句特征</td></tr>
+    <tr><td class="k">2. 三句自评</td><td>当前组织在哪级？下一级差距是什么？首要投资是什么？</td></tr>
+    <tr><td class="k">3. 四层协议文字版</td><td>各协议一句话定位（进展类信息标注"以官方为准"）</td></tr>
+    <tr><td class="k">4. 六大支柱</td><td>各自"一句话 + 落地第一步"</td></tr>
+  </table>
+  <p style="font-size:16px;color:#64748b">文件：<b>agent-cheatsheet.html</b>（与本 PPT 同目录）</p>
+  <div class="tip"><b>使用建议：</b>评估工作坊时人手一张，先各自打分再对齐分歧——分歧本身就是最有价值的讨论素材。</div>
+  <div class="page-num">26/26</div>
+</section>
+
+</div></div>
+
+<div id="controls">
+  <button id="btnPrev" title="上一页（←）">‹</button>
+  <button id="btnFs" title="全屏放映">⛶</button>
+  <button id="btnNext" title="下一页（→）">›</button>
+</div>
+<div id="counter">01 / 26</div>
+
+<script>
+(function () {
+  var slides = Array.prototype.slice.call(document.querySelectorAll('section.slide'));
+  var total = slides.length;
+  var idx = 0;
+  // 依据 data-chapter 为每页注入右上角章节标签
+  slides.forEach(function (s) {
+    var c = s.getAttribute('data-chapter');
+    if (c && !s.classList.contains('cover')) {
+      var tag = document.createElement('div');
+      tag.className = 'chapter-tag';
+      tag.textContent = c;
+      s.appendChild(tag);
+    }
+  });
+  var counter = document.getElementById('counter');
+  function pad(n) { return (n < 9 ? '0' : '') + (n + 1); }
+  function show(i) {
+    if (i < 0) i = 0;
+    if (i >= total) i = total - 1;
+    slides[idx].classList.remove('active');
+    idx = i;
+    slides[idx].classList.add('active');
+    counter.textContent = pad(idx) + ' / ' + total;
+  }
+  function next() { show(idx + 1); }
+  function prev() { show(idx - 1); }
+  document.getElementById('btnNext').addEventListener('click', function (e) { e.stopPropagation(); next(); });
+  document.getElementById('btnPrev').addEventListener('click', function (e) { e.stopPropagation(); prev(); });
+  document.getElementById('btnFs').addEventListener('click', function (e) {
+    e.stopPropagation();
+    if (!document.fullscreenElement) { document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); }
+    else { document.exitFullscreen && document.exitFullscreen(); }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); next(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prev(); }
+    else if (e.key === 'Home') { show(0); }
+    else if (e.key === 'End') { show(total - 1); }
+    else if (e.key === 'f' || e.key === 'F') { document.getElementById('btnFs').click(); }
+  });
+  // 点击左右边缘翻页
+  document.getElementById('viewport').addEventListener('click', function (e) {
+    var x = e.clientX / window.innerWidth;
+    if (x > 0.82) { next(); } else if (x < 0.12) { prev(); }
+  });
+  // 舞台缩放适配
+  var stage = document.getElementById('stage');
+  function fit() {
+    var s = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+    stage.style.transform = 'scale(' + s + ')';
+  }
+  window.addEventListener('resize', fit);
+  fit();
+  show(0);
+})();
+</script>
+<script id="wb-shell-js">
+/* === wb-shell v1: 统一导航条（自动隐藏，不遮挡内容；键盘事件复用各deck原生翻页） === */
+(function(){
+  if(window.__wbShell) return; window.__wbShell = true;
+  var nav = document.createElement('div');
+  nav.id = 'wb-nav';
+  nav.innerHTML = '<a href="../index.html" title="返回目录">☰ 目录</a><span class="wb-sep"></span>'
+    + '<button id="wb-prev" title="上一页（←）">&#8249;</button>'
+    + '<span class="wb-page" id="wb-page">–</span>'
+    + '<button id="wb-next" title="下一页（→）">&#8250;</button>'
+    + '<span class="wb-sep"></span><span class="wb-tip">P 打印PDF</span>';
+  document.body.appendChild(nav);
+  var timer = null;
+  function poke(){
+    nav.classList.add('show');
+    if(timer) clearTimeout(timer);
+    timer = setTimeout(function(){ nav.classList.remove('show'); }, 2400);
+  }
+  ['mousemove','keydown','touchstart'].forEach(function(ev){ window.addEventListener(ev, poke, {passive:true}); });
+  function sendKey(k){
+    document.dispatchEvent(new KeyboardEvent('keydown',{key:k,bubbles:true,cancelable:true}));
+  }
+  document.getElementById('wb-prev').addEventListener('click',function(e){e.stopPropagation();sendKey('ArrowLeft');poke();});
+  document.getElementById('wb-next').addEventListener('click',function(e){e.stopPropagation();sendKey('ArrowRight');poke();});
+  nav.addEventListener('click',function(e){ e.stopPropagation(); });
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var pageEl = document.getElementById('wb-page');
+  function update(){
+    var i = -1, k;
+    for(k=0;k<slides.length;k++){ if(slides[k].classList.contains('active')){ i=k; break; } }
+    if(i<0){ for(k=0;k<slides.length;k++){ var cs=getComputedStyle(slides[k]); if(cs.display!=='none'&&cs.visibility!=='hidden'){ i=k; break; } } }
+    pageEl.textContent = (i>=0? i+1 : 1) + ' / ' + slides.length;
+  }
+  if('MutationObserver' in window){
+    var mo = new MutationObserver(function(){ update(); });
+    slides.forEach(function(s){ mo.observe(s,{attributes:true,attributeFilter:['class','style']}); });
+  }
+  window.addEventListener('load',update);
+  setTimeout(update,300);
+  window.addEventListener('keydown',function(e){
+    if(e.key==='p'||e.key==='P'){ e.preventDefault(); window.print(); }
+  });
+})();
+</script>
+</body>
+</html>

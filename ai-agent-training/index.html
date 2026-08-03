@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Agent 系列培训 · 整合版</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "PingFang SC", sans-serif;
+    background: #f5f7fa; color: #1f2933; line-height: 1.7;
+  }
+  a { color: #2563eb; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 1.2rem 3rem; }
+  header.hero {
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 60%, #0ea5e9 100%);
+    color: #fff; padding: 3rem 1.2rem 2.4rem; text-align: center;
+  }
+  header.hero h1 { font-size: 2.1rem; font-weight: 700; letter-spacing: .5px; }
+  header.hero p { margin-top: .7rem; opacity: .92; font-size: 1.02rem; }
+  .cta { margin-top: 1.6rem; display: flex; gap: .8rem; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-block; padding: .7rem 1.4rem; border-radius: 8px; font-weight: 600;
+    background: #fff; color: #1e3a8a; transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.18); text-decoration: none; }
+  .btn.ghost { background: rgba(255,255,255,.15); color: #fff; border: 1px solid rgba(255,255,255,.5); }
+  section { background: #fff; border-radius: 12px; padding: 1.6rem 1.8rem; margin-top: 1.4rem; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  section h2 { font-size: 1.35rem; color: #1e3a8a; border-left: 4px solid #2563eb; padding-left: .7rem; margin-bottom: .9rem; }
+  section p.lead { color: #52606d; margin-bottom: .8rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: .9rem; }
+  .card { border: 1px solid #e4e7eb; border-radius: 10px; padding: 1rem 1.1rem; background: #fbfcfe; }
+  .card h3 { font-size: 1.02rem; color: #102a43; margin-bottom: .35rem; }
+  .card .meta { font-size: .82rem; color: #7b8794; }
+  table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  th, td { text-align: left; padding: .55rem .6rem; border-bottom: 1px solid #e4e7eb; }
+  th { color: #334e68; background: #f0f4f8; }
+  td a { font-weight: 500; }
+  .tag { display: inline-block; font-size: .72rem; padding: .1rem .45rem; border-radius: 4px; background: #eef6ff; color: #2563eb; margin-right: .3rem; }
+  .note { font-size: .85rem; color: #7b8794; margin-top: .6rem; }
+  code { background: #eef2f7; padding: .12rem .4rem; border-radius: 4px; font-size: .86rem; color: #b91c1c; }
+  footer { text-align: center; color: #9aa5b1; font-size: .85rem; margin-top: 2rem; }
+  ul.tight { margin: .4rem 0 0 1.2rem; }
+  ul.tight li { margin: .25rem 0; }
+</style>
+</head>
+<body>
+<header class="hero">
+  <h1>AI Agent 系列培训 · 整合版</h1>
+  <p>七讲一条主线：用起来 → 懂原理 → 会开发 → 能落地 → 看远方。一份资料，三种形态：单文件书、分讲幻灯片、可运行脚本。</p>
+  <div class="cta">
+    <a class="btn" href="book.html">📖 阅读单文件书（book.html）</a>
+    <a class="btn ghost" href="downloads.html">⬇️ 一键下载中心</a>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section>
+    <h2>① 单文件书（HTML）</h2>
+    <p class="lead"><strong>推荐从这里开始。</strong> 七讲整合进<strong>一个 HTML 文件</strong> <code>book.html</code>（约 0.49 MB，离线可读），像一本书一样：封面 → 目录（章节 + 嵌套小节）→ 7 章扉页 → 149 内容页连续排版 → 附录（17 个配套脚本内联代码 + 语法高亮）。</p>
+    <ul class="tight">
+      <li>左侧书本章节树导航（滚动自动高亮当前章）；<code>Ctrl+F</code> 全书搜索；<code>←</code> <code>→</code> 逐页、<code>Home</code>/<code>End</code> 跳首尾、<code>P</code> 打印；顶部汉堡菜单。</li>
+      <li>点目录 / 附录里的脚本条目即可展开代码，不用再跳出去找文件。</li>
+      <li>双击 <code>book.html</code> 即可打开（<code>file://</code> 正常）；<code>P</code> 或 <code>Ctrl+P</code> 一键导出 16:9 PDF（见下方「PDF 导出」）。</li>
+    </ul>
+    <p class="note">👉 <a href="book.html">打开 book.html</a></p>
+  </section>
+
+  <section>
+    <h2>② 七讲幻灯片（HTML / PDF / PPTX）</h2>
+    <p class="lead">每讲独立成页，含统一外壳（字体栈、自动隐藏导航条、打印样式）。下表给出每讲的三种形态入口：</p>
+    <table>
+      <thead><tr><th>讲次</th><th>主题 / 受众</th><th>HTML 幻灯片</th><th>PDF</th><th>放映版 PPTX</th></tr></thead>
+      <tbody>
+        <tr><td><span class="tag">第1讲</span>全员</td><td>破冰指南</td><td><a href="slides/01-破冰指南.html">01-破冰指南.html</a></td><td><a href="exports/01-破冰指南.pdf">PDF</a></td><td><a href="pptx/01-破冰指南（放映版）.pptx">PPTX</a></td></tr>
+        <tr><td><span class="tag">第2讲</span>懂技术</td><td>从计算机到 GPT</td><td><a href="slides/02-从计算机到GPT.html">02-从计算机到GPT.html</a></td><td><a href="exports/02-从计算机到GPT.pdf">PDF</a></td><td><a href="pptx/02-从计算机到GPT（放映版）.pptx">PPTX</a></td></tr>
+        <tr><td><span class="tag">第3讲</span>懂技术</td><td>ChatGPT 是怎么工作的</td><td><a href="slides/03-ChatGPT是怎么工作的.html">03-ChatGPT是怎么工作的.html</a></td><td><a href="exports/03-ChatGPT是怎么工作的.pdf">PDF</a></td><td><a href="pptx/03-ChatGPT是怎么工作的（放映版）.pptx">PPTX</a></td></tr>
+        <tr><td><span class="tag">第4讲</span>开发者</td><td>开发 Agent（API → SDK → 框架编排）</td><td><a href="slides/04-开发Agent.html">04-开发Agent.html</a></td><td><a href="exports/04-开发Agent.pdf">PDF</a></td><td><a href="pptx/04-开发Agent（放映版）.pptx">PPTX</a> / <a href="pptx/开发Agent-从API到框架编排.pptx">原生可编辑</a></td></tr>
+        <tr><td><span class="tag">第5讲</span>技术+管理</td><td>Agent 工程化全景</td><td><a href="slides/05-Agent工程化全景.html">05-Agent工程化全景.html</a></td><td><a href="exports/05-Agent工程化全景.pdf">PDF</a></td><td><a href="pptx/05-Agent工程化全景（放映版）.pptx">PPTX</a></td></tr>
+        <tr><td><span class="tag">第6讲</span>收束篇</td><td>通往 AGI 之路</td><td><a href="slides/06-通往AGI之路.html">06-通往AGI之路.html</a></td><td><a href="exports/06-通往AGI之路.pdf">PDF</a></td><td><a href="pptx/06-通往AGI之路（放映版）.pptx">PPTX</a></td></tr>
+        <tr><td><span class="tag">第7讲</span>全员</td><td>资料索引</td><td><a href="slides/07-资料索引.html">07-资料索引.html</a></td><td><a href="exports/07-资料索引.pdf">PDF</a></td><td><a href="pptx/07-资料索引（放映版）.pptx">PPTX</a></td></tr>
+      </tbody>
+    </table>
+    <p class="note">合并全集：<a href="exports/00-全书合订本.pdf">00-全书合订本.pdf</a>（158 页，含封面与目录，16:9）。</p>
+  </section>
+
+  <section>
+    <h2>③ 配套脚本（Scripts）</h2>
+    <p class="lead">共 <strong>17 个可运行脚本</strong> + 1 个 Skill 示例，按讲次组织，覆盖训练 / 推理 / 评测 / 编排等实操。脚本索引页带说明与一键复制：</p>
+    <p><a href="scripts/index.html">👉 打开脚本索引 scripts/index.html</a></p>
+    <div class="grid">
+      <div class="card"><h3>第2讲 ×3</h3><div class="meta">lecture2/ — 提示词与基础调用示例</div></div>
+      <div class="card"><h3>第3讲 ×10 + Skill</h3><div class="meta">lecture3/ — 训练 / 微调 / 评测流水线</div></div>
+      <div class="card"><h3>第4讲 ×3</h3><div class="meta">lecture4/ — Agent API / SDK / 框架编排</div></div>
+    </div>
+    <p class="note">所有脚本源码在 <code>scripts/</code> 目录，纯文本可读、可直接运行。</p>
+  </section>
+
+  <section>
+    <h2>④ PDF 导出</h2>
+    <p class="lead">已批量导出 16:9（960×540）PDF，可直接分发或打印：</p>
+    <ul class="tight">
+      <li><a href="exports/00-全书合订本.pdf">00-全书合订本.pdf</a> — 单文件书一键打印版（158 页）</li>
+      <li>七讲分讲 PDF：<a href="exports/01-破冰指南.pdf">01</a> · <a href="exports/02-从计算机到GPT.pdf">02</a> · <a href="exports/03-ChatGPT是怎么工作的.pdf">03</a> · <a href="exports/04-开发Agent.pdf">04</a> · <a href="exports/05-Agent工程化全景.pdf">05</a> · <a href="exports/06-通往AGI之路.pdf">06</a> · <a href="exports/07-资料索引.pdf">07</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>⑤ PPTX（放映版 / 原生可编辑）</h2>
+    <p class="lead">每讲提供「放映版」PPTX（整页 1920px 高清图，PowerPoint / WPS 全屏不掉版式）；第 1、4 讲另附<strong>原生可编辑</strong> PPTX（文字可改）。</p>
+    <ul class="tight">
+      <li>放映版：<a href="pptx/01-破冰指南（放映版）.pptx">01</a> · <a href="pptx/02-从计算机到GPT（放映版）.pptx">02</a> · <a href="pptx/03-ChatGPT是怎么工作的（放映版）.pptx">03</a> · <a href="pptx/04-开发Agent（放映版）.pptx">04</a> · <a href="pptx/05-Agent工程化全景（放映版）.pptx">05</a> · <a href="pptx/06-通往AGI之路（放映版）.pptx">06</a> · <a href="pptx/07-资料索引（放映版）.pptx">07</a></li>
+      <li>原生可编辑：<a href="pptx/AI_Agent破冰指南.pptx">第1讲</a> · <a href="pptx/开发Agent-从API到框架编排.pptx">第4讲</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>⑥ 构建与导出脚本（Python）</h2>
+    <p class="lead">仓库根附三个脚本，便于自行重新生成：</p>
+    <ul class="tight">
+      <li><code>build_book.py</code> — 从 <code>slides/</code> 七讲抽样/正文，作用域隔离（<code>.ch1</code>…<code>.ch7</code>），内联 17 个脚本并做 Python 语法高亮，组装成单文件 <code>book.html</code>。</li>
+      <li><code>export_pdf.py</code> — Headless Chrome 把各讲 HTML 打印为 16:9 PDF。</li>
+      <li><code>pdf_to_pptx.py</code> — PyMuPDF + python-pptx，把 PDF 封装为整页高清 PPTX（自带页数 / MediaBox 一致性校验）。</li>
+    </ul>
+    <p class="note">依赖：<code>pymupdf</code> + <code>python-pptx</code> + 本地 Chrome（Headless）。</p>
+  </section>
+
+  <section>
+    <h2>⑦ 版本管理</h2>
+    <p class="lead">每次改动都记录在 <a href="VERSIONS.md">VERSIONS.md</a>（大版本增讲次/顺序，小版本改措辞/版式），并保留历史快照。当前为 <strong>v2.1</strong>。</p>
+  </section>
+
+  <footer>
+    本页为 GitHub Pages 静态站点 · 资料与 <code>ha2fde.github.io</code> 主站相互独立，互不影响。
+  </footer>
+</div>
+</body>
+</html>

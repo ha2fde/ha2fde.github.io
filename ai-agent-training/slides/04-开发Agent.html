@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>开发 Agent：从直接调 API 到用框架编排</title>
+<style>
+:root{--ink:#1F2937;--sub:#64748B;--accent:#2563EB;--key:#1D4ED8;--tag:#DBEAFE;
+--panel:#F8FAFC;--border:#E2E8F0;--codebg:#0F172A;--codefg:#E2E8F0;--cm:#7DD3A8;
+--takebg:#ECFDF5;--takefg:#065F46;--warn:#B45309;--zebra:#F1F5F9;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;}
+body{background:#DEE5EE;overflow:hidden;
+font-family:"Microsoft YaHei","PingFang SC","Hiragino Sans GB","Noto Sans SC","Source Han Sans SC",sans-serif;
+color:var(--ink);}
+#stage{position:fixed;inset:0;}
+.slide{position:absolute;left:50%;top:50%;width:1280px;height:720px;background:#fff;
+border-radius:12px;box-shadow:0 24px 70px rgba(15,23,42,.28);display:none;overflow:hidden;
+transform:translate(-50%,-50%) scale(var(--s,1));transform-origin:center center;}
+.slide.active{display:block;}
+.slide>div,.slide>pre,.slide>table,.slide>ul{position:absolute;}
+.topbar{left:0;top:0;width:1280px;height:11px;background:var(--accent);}
+.tag{background:var(--tag);color:var(--key);border-radius:999px;font-weight:700;font-size:15px;
+display:flex;align-items:center;justify-content:center;letter-spacing:1px;}
+.title{font-size:28px;font-weight:800;color:var(--ink);letter-spacing:.5px;}
+.bar{background:var(--accent);border-radius:2px;}
+.foot{font-size:11px;color:var(--sub);}
+.pageno{font-size:11px;color:var(--sub);text-align:right;}
+.doubt{font-size:16.5px;} .doubt b{color:var(--warn);} .doubt i{color:var(--sub);font-style:italic;}
+.key{font-size:16.5px;} .key b{color:var(--key);} .key strong{color:var(--ink);}
+.takeaway{background:var(--takebg);border-radius:10px;color:var(--takefg);font-size:16px;
+display:flex;align-items:center;padding:0 22px;}
+.takeaway b{margin-right:2px;}
+.ascii{font-family:"Sarasa Mono SC","Sarasa Term SC","更纱黑体 Mono SC","NSimSun","SimSun-ExtB","SimSun",monospace;
+line-height:1.32;white-space:pre;letter-spacing:0;}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:6px;
+padding:10px 14px;display:flex;flex-direction:column;justify-content:center;}
+.code{background:var(--codebg);color:var(--codefg);border-radius:10px;padding:12px 16px;
+font-family:"Cascadia Code","Cascadia Mono",Consolas,"Courier New",monospace;
+line-height:1.42;white-space:pre;display:flex;flex-direction:column;justify-content:center;}
+.code span{display:block;} .code .cm{color:var(--cm);}
+.tbl{border-collapse:collapse;font-size:14px;}
+.tbl th{background:var(--accent);color:#fff;font-weight:700;padding:8px 10px;text-align:center;}
+.tbl td{padding:7px 10px;border-bottom:1px solid var(--border);}
+.tbl tr:nth-child(odd) td{background:var(--zebra);}
+.tbl td:first-child{font-weight:700;}
+.bullets{list-style:none;} .bullets b{color:var(--key);}
+.koujue{background:var(--tag);border-radius:12px;display:flex;flex-direction:column;
+justify-content:center;padding:0 26px;font-size:18.5px;}
+.koujue b{color:var(--key);} .koujue strong{color:var(--ink);}
+.cover-title{font-size:45px;font-weight:800;color:var(--ink);letter-spacing:1px;}
+.cover-sub{font-size:22.5px;font-weight:700;color:var(--accent);}
+.cover-desc{font-size:17px;color:var(--sub);}
+.cover-foot{font-size:14.5px;color:var(--sub);}
+.vstrip{background:var(--accent);border-radius:3px;}
+.qa{font-size:58px;font-weight:800;color:var(--accent);}
+.qa-sub{font-size:20px;color:var(--ink);}
+#hud{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:50;
+display:flex;align-items:center;gap:14px;background:rgba(15,23,42,.82);color:#CBD5E1;
+border-radius:999px;padding:7px 18px;font-size:13px;user-select:none;backdrop-filter:blur(4px);}
+#hud button{background:none;border:none;color:#E2E8F0;font-size:17px;cursor:pointer;padding:0 6px;}
+#hud button:hover{color:#fff;}
+#progress{position:fixed;left:0;top:0;height:3px;background:var(--accent);z-index:60;
+transition:width .25s;}
+#index{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:80;display:none;
+align-items:center;justify-content:center;}
+#index.open{display:flex;}
+#index .card{background:#fff;border-radius:14px;max-width:900px;max-height:80vh;overflow:auto;
+padding:26px 30px;box-shadow:0 24px 70px rgba(15,23,42,.4);}
+#index .card h3{font-size:16px;color:var(--sub);margin-bottom:12px;}
+#index .card ol{list-style:none;}
+#index .card li{padding:7px 10px;border-radius:8px;cursor:pointer;font-size:15px;}
+#index .card li:hover{background:var(--zebra);}
+#index .card li b{color:var(--key);margin-right:8px;}
+#index .card li.cur{background:var(--tag);}
+.tips{position:fixed;right:16px;bottom:16px;color:#8A97A8;font-size:12px;z-index:40;}
+</style>
+<style id="wb-shell-css">
+/* === wb-shell v1: 系列统一外壳（追加注入，不改动原样式） === */
+body{font-family:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",system-ui,-apple-system,"Segoe UI",sans-serif !important}
+#wb-nav{position:fixed;left:50%;bottom:16px;transform:translateX(-50%) translateY(10px);z-index:99999;display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.94);border:1px solid #E2E8F0;border-radius:999px;padding:6px 12px;box-shadow:0 6px 24px rgba(15,23,42,.14);font:13px/1.4 "PingFang SC","Microsoft YaHei",sans-serif;color:#4B5563;opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;white-space:nowrap}
+#wb-nav.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+#wb-nav a{color:#2563EB;text-decoration:none;font-weight:600;padding:4px 8px;border-radius:8px}
+#wb-nav a:hover{background:#EFF6FF}
+#wb-nav button{width:30px;height:30px;border:1px solid #E2E8F0;background:#fff;border-radius:50%;cursor:pointer;font-size:16px;line-height:1;color:#374151;display:flex;align-items:center;justify-content:center}
+#wb-nav button:hover{background:#F3F4F6}
+#wb-nav .wb-page{font-variant-numeric:tabular-nums;min-width:56px;text-align:center;color:#6B7280;font-size:13px}
+#wb-nav .wb-sep{width:1px;height:16px;background:#E5E7EB}
+#wb-nav .wb-tip{font-size:11px;color:#9CA3AF}
+.wb-xlink{display:inline-block;margin-top:10px;font-size:13px;color:#1D4ED8;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:999px;padding:4px 14px;line-height:1.5}
+.wb-series{font-size:15px;color:#4B5563;background:#EFF6FF;border-left:3px solid #2563EB;padding:10px 16px;border-radius:0 8px 8px 0;margin:0 0 18px;max-width:820px;line-height:1.6}
+@media print{
+  @page{size:1280px 720px;margin:0}
+  html,body{height:auto !important;overflow:visible !important;background:#fff !important}
+  #wb-nav{display:none !important}
+  #stage,.stage,#viewport{position:static !important;inset:auto !important;transform:none !important;width:auto !important;height:auto !important;display:block !important;overflow:visible !important}
+  .slide{display:flex !important;flex-direction:column !important;position:relative !important;inset:auto !important;left:auto !important;top:auto !important;transform:none !important;opacity:1 !important;animation:none !important;transition:none !important;width:1280px !important;height:720px !important;min-height:0 !important;overflow:hidden !important;page-break-after:always !important;break-after:page !important;box-shadow:none !important;border-radius:0 !important;margin:0 !important;visibility:visible !important}
+  .slide:last-of-type{page-break-after:auto !important;break-after:auto !important}
+}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="stage"><section class="slide" data-n="1">
+<div class="topbar"></div>
+<div class="vstrip" style="left:82px;top:197px;width:7px;height:192px;"></div>
+<div class="cover-title" style="left:110px;top:192px;width:1114px;height:106px;">开发 Agent：从直接调 API 到用框架编排</div>
+<div class="cover-sub" style="left:110px;top:293px;width:1104px;height:48px;">三条路线 · 两种范式 · 一张选型地图</div>
+<div class="cover-desc" style="left:110px;top:348px;width:1104px;height:48px;">你已经懂 Agent 原理了 —— 这一篇只解决「代码怎么写、框架怎么选」。</div>
+<pre class="ascii panel" style="left:60px;top:437px;width:1162px;height:130px;font-size:13.3px">┌───────────┐        ┌────────────┐        ┌──────────┐        ┌────────────┐        ┌────────────┐
+│ 手拼 HTTP │                   │ 官方 SDK   │                    │ 手写循环 │                  │ 框架执行器 │                    │ 图编排     │
+│ 完全掌控  │            ──→ │ 省通信样板 │             ──→ │ 流程我定 │           ──→ │ 循环现成   │             ──→ │ 流程即资产 │
+└───────────┘        └────────────┘        └──────────┘        └────────────┘        └────────────┘</pre>
+<div class="cover-foot" style="left:110px;top:605px;width:1104px;height:38px;">附录含 3 个可运行脚本 ｜ 同一能力 · 三层写法</div></section>
+<section class="slide" data-n="2"><div class="tag" style="left:53px;top:29px;width:192px;height:35px;">导 读</div><div class="title" style="left:53px;top:65px;width:1171px;height:58px;">整篇只有一条主线：抽象降级</div><div class="bar" style="left:55px;top:127px;width:96px;height:3px;"></div><div class="foot" style="left:53px;top:685px;width:768px;height:29px;">开发 Agent：从直接调 API 到用框架编排</div><div class="pageno" style="left:1152px;top:685px;width:77px;height:29px;">2/19</div><div class="doubt" style="left:53px;top:142px;width:1171px;height:38px;"><b>你可能的疑惑 ｜ </b><i>原理我都懂，一搜「怎么开发 Agent」出来几十个框架，从哪下手？</i></div><div class="key" style="left:53px;top:182px;width:1171px;height:48px;"><b>关键差异 ｜ </b><strong>选型的本质不是「哪个框架好」，而是「我愿把多少控制权交给框架换多少省力」。</strong></div><pre class="ascii panel" style="left:53px;top:245px;width:1174px;height:168px;font-size:13.3px">┌───────────┐        ┌────────────┐        ┌──────────┐        ┌────────────┐        ┌────────────┐
+│ 手拼 HTTP │                   │ 官方 SDK   │                    │ 手写循环 │                  │ 框架执行器 │                    │ 图编排     │
+│ 完全掌控  │            ──→ │ 省通信样板 │             ──→ │ 流程我定 │           ──→ │ 循环现成   │             ──→ │ 流程即资产 │
+└───────────┘        └────────────┘        └──────────┘        └────────────┘        └────────────┘
+◄────────── 控制力递减 ｜ 省力递增 ｜ 框架依赖递增 ──────────►</pre><ul class="bullets" style="left:53px;top:442px;width:1171px;"><li style="margin-bottom:8px;font-size:16.7px"><b>本篇地图</b>　路线（API / SDK / 框架）→ 范式（ReAct / Plan-and-Execute）→ 选型（四组框架 + 决策树）→ 实战步骤</li><li style="margin-bottom:8px;font-size:16.7px"><b>附录交付</b>　3 个可运行脚本：同一能力，分别用裸 API、SDK 手写循环、LangGraph 图实现</li><li style="margin-bottom:8px;font-size:16.7px"><b>阅读方式</b>　每章四块：你可能的疑惑 → 关键差异 → 架构字符画 → 右下角主干代码（≤8 行）</li></ul><div class="takeaway" style="left:53px;top:636px;width:1174px;height:42px;"><b>一句话 ｜ </b><strong>没有「该用哪个」，只有「这个任务值得我交出多少控制权」。</strong></div></section>
+<section class="slide" data-n="3"><div class="tag" style="left:53px;top:29px;width:192px;height:35px;">第 1 章 · 1/2</div><div class="title" style="left:53px;top:65px;width:1171px;height:58px;">懂原理了，代码怎么写？三条路线总览</div><div class="bar" style="left:55px;top:127px;width:96px;height:3px;"></div><div class="foot" style="left:53px;top:685px;width:768px;height:29px;">开发 Agent：从直接调 API 到用框架编排</div><div class="pageno" style="left:1152px;top:685px;width:77px;height:29px;">3/19</div><div class="doubt" style="left:53px;top:142px;width:1171px;height:38px;"><b>你可能的疑惑 ｜ </b><i>调个大模型而已，为什么有「裸调 API / 用 SDK / 上框架」三种写法？</i></div><div class="key" style="left:53px;top:182px;width:1171px;height:48px;"><b>关键差异 ｜ </b><strong>三条路线不是替代关系，是光谱——差别只在「样板代码谁写、循环谁管、状态谁存」。</strong></div><table class="tbl" style="left:53px;top:250px;width:1174px;"><colgroup><col style="width:21.3%"><col style="width:39.2%"><col style="width:39.5%"></colgroup><tr><th style="font-size:15.3px">路线</th><th style="font-size:15.3px">帮你解决</th><th style="font-size:15.3px">你要付出的代价</th></tr><tr><td style="font-size:15.3px">直接调 API</td><td style="font-size:15.3px">零依赖、完全掌控、任何语言都能写</td><td style="font-size:15.3px">请求体、tool_calls 解析、循环、重试全自己写</td></tr><tr><td style="font-size:15.3px">官方 SDK</td><td style="font-size:15.3px">流式 / 重试 / 类型 / 鉴权开箱即用</td><td style="font-size:15.3px">「流程」（循环 + 结果回填）仍要自己写</td></tr><tr><td style="font-size:15.3px">Agent 框架</td><td style="font-size:15.3px">循环执行器、工具管理、记忆、人审现成</td><td style="font-size:15.3px">要学框架的世界观，被它的抽象绑定</td></tr></table><div class="takeaway" style="left:53px;top:636px;width:1174px;height:42px;"><b>一句话 ｜ </b><strong>先想清楚任务复杂度，再决定站在光谱的哪一格——下一页把光谱画出来。</strong></div></section>
+<section class="slide" data-n="4"><div class="tag" style="left:53px;top:29px;width:192px;height:35px;">第 1 章 · 2/2</div><div class="title" style="left:53px;top:65px;width:1171px;height:58px;">抽象光谱：省力的每一步，都在交出一点控制权</div><div class="bar" style="left:55px;top:127px;width:96px;height:3px;"></div><div class="foot" style="left:53px;top:685px;width:768px;height:29px;">开发 Agent：从直接调 API 到用框架编排</div><div class="pageno" style="left:1152px;top:685px;width:77px;height:29px;">4/19</div><div class="doubt" style="left:53px;top:142px;width:1171px;height:38px;"><b>你可能的疑惑 ｜ </b><i>三条路线的取舍，能不能一张图记住？</i></div><div class="key" style="left:53px;top:182px;width:1171px;height:48px;"><b>关键差异 ｜ </b><strong>控制力与省力不可兼得：往右每走一步，样板代码更少，框架依赖更重。</strong></div><pre class="ascii panel" style="left:53px;top:250px;width:1174px;height:355px;font-size:14.7px">抽象程度 低 ──────────────────────────────────────────────► 高
+直接调 HTTP API                               官方 SDK                                                    Agent 框架
+┌──────────────────┐      ┌─────────────────────────┐      ┌────────────────────┐
+│ 手拼 JSON 请求体 │                        │ client.chat.completions │                               │ 声明工具 + 画图    │
+│ 手解 tool_calls  │                        │ .create(...) 一把梭     │                               │ 循环执行器现成     │
+│ 手写 while 循环  │                        │ 循环仍要自己写          │                               │ 断点 / 人审 / 回放 │
+└──────────────────┘      └─────────────────────────┘      └────────────────────┘
+掌控力 ★★★★★                             掌控力 ★★★★                                             掌控力 ★★★
+样板：全自己写                                样板：省一半                                                样板：≈ 0
+依赖：一个 HTTP 库                            依赖：官方 SDK                                              依赖：框架世界观</pre><div class="takeaway" style="left:53px;top:636px;width:1174px;height:42px;"><b>一句话 ｜ </b><strong>本篇第 2~5 章从左走到右，第 6~8 章告诉你怎么选。</strong></div></section>
+<section class="slide" data-n="5"><div class="tag" style="left:53px;top:29px;width:192px;height:35px;">第 2 章</div><div class="title" style="left:53px;top:65px;width:1171px;height:58px;">最底层：直接调 API —— 手拼请求体 + 手解返回</div><div class="bar" style="left:55px;top:127px;width:96px;height:3px;"></div><div class="foot" style="left:53px;top:685px;width:768px;height:29px;">开发 Agent：从直接调 API 到用框架编排</div><div class="pageno" style="left:1152px;top:685px;width:77px;height:29px;">5/19</div><div class="doubt" style="left:53px;top:142px;width:1171px;height:38px;"><b>你可能的疑惑 ｜ </b><i>框架里神秘的 Agent，底层到底在干嘛？</i></div><div class="key" style="left:53px;top:182px;width:1171px;height:48px;"><b>关键差异 ｜ </b><strong>底层只有一次普通 POST：把 messages + tools 塞进请求体，从返回里找 tool_calls。</strong></div><pre class="ascii panel" style="left:53px;top:240px;width:1174px;height:226px;font-size:14.0px">┌────────────────────────┐          ┌───────────────────────────────────┐
+│ POST /chat/completions │                                  │ choices[0].message                │
+│ messages: [...历史...] │                          ──→  │ ├ 有 tool_calls → 执行工具      │
+│ tools: [...工具...]    │                                  │ │   结果回填 messages → 再 POST │
+└────────────────────────┘          │ └ 无 tool_calls → 即答案        │
+                                                              └───────────────────────────────────┘
+一次普通 HTTPS 请求 —— Agent 的一切魔法，都是围绕这次 POST 的封装</pre><pre class="code" style="left:53px;top:480px;width:605px;height:144px;font-size:13.3px"><span>import requests</span>
+<span>resp = requests.post(</span>
+<span>    f&quot;{BASE_URL}/chat/completions&quot;,</span>
+<span>    headers={&quot;Authorization&quot;: f&quot;Bearer {API_KEY}&quot;},</span>
+<span>    json={&quot;model&quot;: MODEL, &quot;messages&quot;: messages,</span>
+<span>          &quot;tools&quot;: tools})</span>
+<span>msg = resp.json()[&quot;choices&quot;][0][&quot;message&quot;]</span>
+<span class="cm">if msg.get(&quot;tool_calls&quot;): ...  # 全靠自己</span></pre><ul class="bullets" style="left:682px;top:485px;width:547px;"><li style="margin-bottom:4px;font-size:14.7px"><b>优点</b>　完全掌控、零抽象、所见即所得</li><li style="margin-bottom:4px;font-size:14.7px"><b>缺点</b>　循环 / 重试 / 流式全自己写</li><li style="margin-bottom:4px;font-size:14.7px"><b>何时用</b>　一次调用、学原理、框架不适配的边缘场景</li></ul><div class="takeaway" style="left:53px;top:636px;width:1174px;height:42px;"><b>一句话 ｜ </b><strong>所有框架底层都是这一个 POST——记住它，后面所有封装都不再神秘。</strong></div></section>
+<section class="slide" data-n="6"><div class="tag" style="left:53px;top:29px;width:192px;height:35px;">第 3 章</div><div class="title" style="left:53px;top:65px;width:1171px;height:58px;">SDK 帮你省什么：通信杂务收走，流程仍归你</div><div class="bar" style="left:55px;top:127px;width:96px;height:3px;"></div><div class="foot" style="left:53px;top:685px;width:768px;height:29px;">开发 Agent：从直接调 API 到用框架编排</div><div class="pageno" style="left:1152px;top:685px;width:77px;height:29px;">6/19</div><div class="doubt" style="left:53px;top:142px;width:1171px;height:38px;"><b>你可能的疑惑 ｜ </b><i>SDK 和裸调 API 相比到底省了什么？是不是用了 SDK 就算会跑 Agent 了？</i></div><div class="key" style="left:53px;top:182px;width:1171px;height:48px;"><b>关键差异 ｜ </b><strong>SDK 只封装「怎么跟模型说话」（请求/流式/重试/类型），不封装「怎么思考」（循环与回填）。</strong></div><pre class="ascii panel" style="left:53px;top:245px;width:797px;height:288px;font-size:14.0px">裸调 API 你要管的                                   SDK 帮你管掉的
+┌────────────────────┐        ┌─────────────────────────┐
+│ 拼 JSON / header   │                            │ client.chat.completions │
+│ 鉴权 / 超时 / 重试 │                            │ .create() 一把梭        │
+│ SSE 流式解析       │                     ──→ │ 内置重试与超时          │
+│ 解析返回 JSON      │                            │ stream=True 迭代器      │
+│ 手写 Agent 循环    │                            │ 类型化 msg.tool_calls   │
+└────────────────────┘        └─────────────────────────┘
+✖ SDK 不管「流程」—— 循环与回填仍是你的代码 → 下一章</pre><pre class="code" style="left:869px;top:245px;width:358px;height:288px;font-size:13.3px"><span>from openai import OpenAI</span>
+<span>client = OpenAI(base_url=BASE_URL,</span>
+<span>                api_key=API_KEY)</span>
+<span>resp = client.chat.completions.create(</span>
+<span>    model=MODEL, messages=messages,</span>
+<span>    tools=tools)</span>
+<span>msg = resp.choices[0].message</span>
+<span class="cm">if msg.tool_calls: ...  # 流程仍自己写</span></pre><div class="takeaway" style="left:53px;top:636px;width:1174px;height:42px;"><b>一句话 ｜ </b><strong>SDK 省的是「通信样板」，不是「Agent 流程」——从 SDK 到 Agent，只差一个你亲手写的循环。</strong></div></section>
+<section class="slide" data-n="7"><div class="tag" style="left:53px;top:29px;width:192px;height:35px;">第 4 章</div><div class="title" style="left:53px;top:65px;width:1171px;height:58px;">手写一个 Agent：ReAct 主循环核心结构</div><div class="bar" style="left:55px;top:127px;width:96px;height:3px;"></div><div class="foot" style="left:53px;top:685px;width:768px;height:29px;">开发 Agent：从直接调 API 到用框架编排</div><div class="pageno" style="left:1152px;top:685px;width:77px;height:29px;">7/19</div><div class="doubt" style="left:53px;top:142px;width:1171px;height:38px;"><b>你可能的疑惑 ｜ </b><i>ReAct 听懂了，写成代码长什么样？</i></div><div class="key" style="left:53px;top:182px;width:1171px;height:48px;"><b>关键差异 ｜ </b><strong>所谓 Agent =「发消息+工具描述 → 有工具调用就执行回填，没有就输出」的 while 循环。</strong></div><pre class="ascii panel" style="left:53px;top:245px;width:518px;height:317px;font-size:14.0px">[messages] ──→ [LLM 推理] ──→ 要调工具吗?
+   ▲              ├ 是 → [执行工具] → 结果回填 → 再推理
+   │              └ 否 → [输出最终回答，结束]
+   └────────── 循环继续
+
+调试：每轮打印「调哪个工具 → 参数 → 回填」</pre><pre class="code" style="left:590px;top:245px;width:636px;height:317px;font-size:12.7px"><span>messages = [{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: task}]</span>
+<span>llm = client.chat.completions.create</span>
+<span>while True:</span>
+<span>    msg = llm(model=MODEL, messages=messages, tools=tools).choices[0].message</span>
+<span>    messages.append(msg)</span>
+<span>    if not msg.tool_calls: return msg.content</span>
+<span>    for c in msg.tool_calls:</span>
+<span>        messages.append({&quot;role&quot;: &quot;tool&quot;, &quot;tool_call_id&quot;: c.id, &quot;content&quot;: run_tool(c)})</span></pre><div class="takeaway" style="left:53px;top:636px;width:1174px;height:42px;"><b>一句话 ｜ </b><strong>全部秘密在 messages 的追加方式 —— 完整可跑版（含计算器工具）见附录脚本 sdk_react_demo.py。</strong></div><div class="wb-xlink" style="position:absolute;left:830px;top:686px;font-size:12px;padding:3px 12px">衔接 ｜ ReAct 原理详见第 3 讲第 7 章</div></section>
+<section class="slide" data-n="8"><div class="tag" style="left:53px;top:29px;width:192px;height:35px;">第 5 章</div><div class="title" style="left:53px;top:65px;width:1171px;height:58px;">框架化的通用 ReAct：声明工具即可，20 行 → 5 行</div><div class="bar" style="left:55px;top:127px;width:96px;height:3px;"></div><div class="foot" style="left:53px;top:685px;width:768px;height:29px;">开发 Agent：从直接调 API 到用框架编排</div><div class="pageno" style="left:1152px;top:685px;width:77px;height:29px;">8/19</div><div class="doubt" style="left:53px;top:142px;width:1171px;height:38px;"><b>你可能的疑惑 ｜ </b><i>既然循环是固定的，为什么每个项目都要重抄一遍？</i></div><div class="key" style="left:53px;top:182px;width:1171px;height:48px;"><b>关键差异 ｜ </b><strong>框架把「谁都一样」的循环收走了：你只声明模型和工具，循环、回填、异常处理全由执行器包办。</strong></div><pre class="ascii panel" style="left:53px;top:245px;width:758px;height:317px;font-size:14.0px">第 4 章：手写（~20 行）                               第 5 章：框架执行器（~5 行）
+┌────────────────────┐          ┌─────────────────────┐
+│ while True:        │                              │ create_react_agent( │
+│   请求 LLM         │                      ──→  │   model, tools)     │
+│   解析 tool_calls  │                              │ agent.invoke(task)  │
+│   查表执行工具     │                              │                     │
+│   回填 role=&#x27;tool&#x27; │                              │ 循环 / 回填 / 异常  │
+│   判断结束条件     │                              │ 框架全包            │
+└────────────────────┘          └─────────────────────┘</pre><pre class="code" style="left:830px;top:245px;width:396px;height:317px;font-size:13.3px"><span>from langgraph.prebuilt import (</span>
+<span>    create_react_agent)</span>
+<span class="cm"># 声明工具即可，循环框架全包</span>
+<span>agent = create_react_agent(</span>
+<span>    model, tools=[calc])</span>
+<span>result = agent.invoke({</span>
+<span>    &quot;messages&quot;: [(&quot;user&quot;, &quot;12*(3+4)=?&quot;)]})</span></pre><div class="takeaway" style="left:53px;top:636px;width:1174px;height:42px;"><b>一句话 ｜ </b><strong>框架第一层价值 = 通用 ReAct 执行器；代价：行为细节藏进框架，调试要学会看它的日志。</strong></div></section>
+<section class="slide" data-n="9"><div class="tag" style="left:53px;top:29px;width:192px;height:35px;">第 6 章 · 1/2</div><div class="title" style="left:53px;top:65px;width:1171px;height:58px;">更复杂的任务：ReAct vs Plan-and-Execute</div><div class="bar" style="left:55px;top:127px;width:96px;height:3px;"></div><div class="foot" style="left:53px;top:685px;width:768px;height:29px;">开发 Agent：从直接调 API 到用框架编排</div><div class="pageno" style="left:1152px;top:685px;width:77px;height:29px;">9/19</div><div class="doubt" style="left:53px;top:142px;width:1171px;height:38px;"><b>你可能的疑惑 ｜ </b><i>任务一复杂，ReAct「走一步看一步」走到迷路，怎么办？</i></div><div class="key" style="left:53px;top:182px;width:1171px;height:48px;"><b>关键差异 ｜ </b><strong>ReAct 把计划藏在模型脑子里（边想边做）；Plan-and-Execute 把计划变成显式对象（先规划、再执行、偏了可重规划）。</strong></div><pre class="ascii panel" style="left:53px;top:250px;width:1174px;height:336px;font-size:14.7px">ReAct（边想边做）                                                   Plan-and-Execute（先谋后动）
+┌────────────────────────────┐        ┌─────────────────────────────────┐
+│ 想→做→看→想→做→看→答 │                                    │ ①规划：任务 → [步1, 步2, 步3] │
+│ 每一步由最新观察决定       │                                    │ ②执行：步1✓ → 步2✓ → 偏离? │
+│ 计划不可见，随时可变       │                                    │ ③重规划：改计划 → 继续执行    │
+│ 适合：探索型、路径未知     │                                    │ ④汇总：各步结果 → 最终答案    │
+│ 例：排查故障、开放式调研   │                                    │ 适合：可预分解的多步任务        │
+└────────────────────────────┘        └─────────────────────────────────┘</pre><div class="takeaway" style="left:53px;top:636px;width:1174px;height:42px;"><b>一句话 ｜ </b><strong>先问「任务的步骤在出发前能不能列出来」——能列用 Plan，列不出用 ReAct，真实系统常混用。</strong></div></section>
+<section class="slide" data-n="10"><div class="tag" style="left:53px;top:29px;width:192px;height:35px;">第 6 章 · 2/2</div><div class="title" style="left:53px;top:65px;width:1171px;height:58px;">两种范式场景对照：该选哪个</div><div class="bar" style="left:55px;top:127px;width:96px;height:3px;"></div><div class="foot" style="left:53px;top:685px;width:768px;height:29px;">开发 Agent：从直接调 API 到用框架编排</div><div class="pageno" style="left:1152px;top:685px;width:77px;height:29px;">10/19</div><div class="doubt" style="left:53px;top:142px;width:1171px;height:38px;"><b>你可能的疑惑 ｜ </b><i>两种范式各有什么代价？怎么按任务特征选？</i></div><div class="key" style="left:53px;top:182px;width:1171px;height:48px;"><b>关键差异 ｜ </b><strong>范式没有优劣，只有适配：看任务是否可预分解、能否容忍计划隐式。</strong></div><table class="tbl" style="left:53px;top:245px;width:1174px;"><colgroup><col style="width:18.0%"><col style="width:40.1%"><col style="width:41.9%"></colgroup><tr><th style="font-size:14.7px">维度</th><th style="font-size:14.7px">ReAct</th><th style="font-size:14.7px">Plan-and-Execute</th></tr><tr><td style="font-size:14.7px">思考方式</td><td style="font-size:14.7px">边想边做，计划隐式</td><td style="font-size:14.7px">先谋后动，计划显式</td></tr><tr><td style="font-size:14.7px">计划修正</td><td style="font-size:14.7px">每步天然可变</td><td style="font-size:14.7px">通过「重规划」节点显式修正</td></tr><tr><td style="font-size:14.7px">Token 消耗</td><td style="font-size:14.7px">每轮带全历史，较高</td><td style="font-size:14.7px">规划一次，执行步骤间可精简</td></tr><tr><td style="font-size:14.7px">适合任务</td><td style="font-size:14.7px">探索型、步骤不可预知</td><td style="font-size:14.7px">可预分解、步骤间有依赖</td></tr><tr><td style="font-size:14.7px">典型风险</td><td style="font-size:14.7px">绕圈、跑偏不自知</td><td style="font-size:14.7px">计划错了执行全错（需重规划兜底）</td></tr><tr><td style="font-size:14.7px">一句话</td><td style="font-size:14.7px">走一步看一步</td><td style="font-size:14.7px">先画地图再上路</td></tr></table><div class="takeaway" style="left:53px;top:636px;width:1174px;height:42px;"><b>一句话 ｜ </b><strong>选错范式的代价比选错框架大 —— 先定范式，再选实现。</strong></div></section>
+<section class="slide" data-n="11"><div class="tag" style="left:53px;top:29px;width:192px;height:35px;">第 7 章</div><div class="title" style="left:53px;top:65px;width:1171px;height:58px;">LangGraph：把流程画成图 —— Node / Edge / State</div><div class="bar" style="left:55px;top:127px;width:96px;height:3px;"></div><div class="foot" style="left:53px;top:685px;width:768px;height:29px;">开发 Agent：从直接调 API 到用框架编排</div><div class="pageno" style="left:1152px;top:685px;width:77px;height:29px;">11/19</div><div class="doubt" style="left:53px;top:142px;width:1171px;height:38px;"><b>你可能的疑惑 ｜ </b><i>范式一多、分支一多，while 里全是 if/else，怎么管？</i></div><div class="key" style="left:53px;top:182px;width:1171px;height:48px;"><b>关键差异 ｜ </b><strong>不再用 if/else 描述流程，而是声明成图：节点是函数、边是流转规则、State 是共享数据。</strong></div><pre class="ascii panel" style="left:53px;top:240px;width:1174px;height:250px;font-size:13.3px">if/else 写法（流程埋在代码里）                                LangGraph 写法（流程是显式的图）
+┌──────────────────────────┐      ┌──────────────────────────────────────────────────┐
+│ while True:              │                                │ START → plan → act → sum → END               │
+│   if 该规划: ...         │                                │          ▲       │                             │
+│   elif 该执行: ...       │                                │          └───────┘ 偏离? 回 plan 重规划 │
+│   elif 该问人: interrupt │                                │ State={task, plan[], results[]}                  │
+│   else: break            │                                │ 流程 = 画出来的，可断可回放                      │
+│ 流程 = 脑补出来的        │                                └──────────────────────────────────────────────────┘
+└──────────────────────────┘</pre><pre class="code" style="left:53px;top:509px;width:624px;height:115px;font-size:13.3px"><span>g = StateGraph(AgentState)</span>
+<span>g.add_node(&quot;plan&quot;, plan); g.add_node(&quot;act&quot;, act)</span>
+<span>g.add_node(&quot;sum&quot;, summary)</span>
+<span>g.add_edge(START, &quot;plan&quot;); g.add_edge(&quot;plan&quot;, &quot;act&quot;)</span>
+<span>g.add_edge(&quot;act&quot;, &quot;sum&quot;)</span>
+<span>app = g.compile(checkpointer=MemorySaver())</span>
+<span>app.invoke({&quot;task&quot;: task})  # 传 thread_id 即可断点续跑</span></pre><ul class="bullets" style="left:701px;top:514px;width:528px;"><li style="margin-bottom:4px;font-size:14.7px"><b>图的收益</b>　断点恢复（checkpointer）、执行可回放</li><li style="margin-bottom:4px;font-size:14.7px"><b></b>　人审（interrupt）、可视化排错</li><li style="margin-bottom:4px;font-size:14.7px"><b>对比</b>　if/else 把流程埋在代码里，图把流程变成资产</li></ul><div class="takeaway" style="left:53px;top:636px;width:1174px;height:42px;"><b>一句话 ｜ </b><strong>图一旦显式化，断点恢复、回放、人审（interrupt）就是免费的 —— 完整示例见附录脚本 langgraph_plan_demo.py。</strong></div></section>
+<section class="slide" data-n="12"><div class="tag" style="left:53px;top:29px;width:192px;height:35px;">第 8 章 · 1/3</div><div class="title" style="left:53px;top:65px;width:1171px;height:58px;">框架全景：先按定位分四组，再比较</div><div class="bar" style="left:55px;top:127px;width:96px;height:3px;"></div><div class="foot" style="left:53px;top:685px;width:768px;height:29px;">开发 Agent：从直接调 API 到用框架编排</div><div class="pageno" style="left:1152px;top:685px;width:77px;height:29px;">12/19</div><div class="doubt" style="left:53px;top:142px;width:1171px;height:38px;"><b>你可能的疑惑 ｜ </b><i>框架这么多，难道要一个个学？</i></div><div class="key" style="left:53px;top:182px;width:1171px;height:48px;"><b>关键差异 ｜ </b><strong>组内差异小、组间差异大 —— 选型先选组，再选个。</strong></div><pre class="ascii panel" style="left:53px;top:245px;width:1174px;height:365px;font-size:12.0px">① 图编排组（灵活可控）                                                        ② 工具箱组（上手快）
+┌───────────────────────────────────┐     ┌───────────────────────────────────┐
+│ LangGraph   状态图，复杂流程+人审 │                                        │ LangChain   工具链+执行器，生态大 │
+│ PydanticAI  类型安全，输出结构化  │                                        │ LlamaIndex  以数据 / RAG 为主     │
+└───────────────────────────────────┘     │ CrewAI      多智能体，角色分工    │
+                                                                               │ AutoGen     多智能体，对话协作    │
+                                                                               └───────────────────────────────────┘
+
+③ 官方轻量组（快速验证）                                                                      ④ 低代码/生态组（给人用/跟栈走）
+┌───────────────────────────────────────────┐     ┌─────────────────────────────────────┐
+│ OpenAI Agents SDK  官方，function calling │                                                │ Dify             可视化拖拽编排     │
+│ smolagents  HuggingFace 出品，轻量        │                                                │ Semantic Kernel  微软系，.NET 集成  │
+└───────────────────────────────────────────┘     │ Vercel AI SDK    JS/TS，前端 Web UI │
+                                                                                               └─────────────────────────────────────┘</pre><div class="takeaway" style="left:53px;top:636px;width:1174px;height:42px;"><b>一句话 ｜ </b><strong>横向是「控制力 → 省力」，纵向是「通用 → 专用/生态」——下一页一张表看全。</strong></div></section>
+<section class="slide" data-n="13"><div class="tag" style="left:53px;top:29px;width:192px;height:35px;">第 8 章 · 2/3</div><div class="title" style="left:53px;top:65px;width:1171px;height:58px;">总对比表：11 个框架，一张表</div><div class="bar" style="left:55px;top:127px;width:96px;height:3px;"></div><div class="foot" style="left:53px;top:685px;width:768px;height:29px;">开发 Agent：从直接调 API 到用框架编排</div><div class="pageno" style="left:1152px;top:685px;width:77px;height:29px;">13/19</div><div class="doubt" style="left:53px;top:142px;width:1171px;height:38px;"><b>你可能的疑惑 ｜ </b><i>组内几个框架到底差在哪？</i></div><div class="key" style="left:53px;top:182px;width:1171px;height:48px;"><b>关键差异 ｜ </b><strong>只看六列：定位 / 语言 / 核心抽象 / 上手难度 / 最擅长场景 / 何时不建议用。</strong></div><table class="tbl" style="left:53px;top:240px;width:1174px;"><colgroup><col style="width:12.7%"><col style="width:10.2%"><col style="width:7.0%"><col style="width:19.2%"><col style="width:5.7%"><col style="width:23.3%"><col style="width:21.9%"></colgroup><tr><th style="font-size:12.7px">框架</th><th style="font-size:12.7px">定位</th><th style="font-size:12.7px">语言</th><th style="font-size:12.7px">核心抽象</th><th style="font-size:12.7px">上手</th><th style="font-size:12.7px">最擅长场景</th><th style="font-size:12.7px">何时不建议用</th></tr><tr><td style="font-size:12.0px">LangGraph</td><td style="font-size:12.0px">图编排</td><td style="font-size:12.0px">Python</td><td style="font-size:12.0px">状态图 Node/Edge/State</td><td style="font-size:12.0px">中</td><td style="font-size:12.0px">复杂流程、人审、断点恢复</td><td style="font-size:12.0px">一次调用的简单任务</td></tr><tr><td style="font-size:12.0px">PydanticAI</td><td style="font-size:12.0px">图编排·类型</td><td style="font-size:12.0px">Python</td><td style="font-size:12.0px">类型化 Agent+依赖注入</td><td style="font-size:12.0px">中低</td><td style="font-size:12.0px">结构化输出、生产级单 Agent</td><td style="font-size:12.0px">需要复杂多步图编排</td></tr><tr><td style="font-size:12.0px">LangChain</td><td style="font-size:12.0px">工具箱</td><td style="font-size:12.0px">Py/JS</td><td style="font-size:12.0px">Chain+预置执行器</td><td style="font-size:12.0px">低→中</td><td style="font-size:12.0px">快速拼装、生态集成</td><td style="font-size:12.0px">厌恶抽象、要精细控制</td></tr><tr><td style="font-size:12.0px">LlamaIndex</td><td style="font-size:12.0px">数据/RAG</td><td style="font-size:12.0px">Python</td><td style="font-size:12.0px">索引+检索器</td><td style="font-size:12.0px">低</td><td style="font-size:12.0px">知识库问答、RAG 占比高</td><td style="font-size:12.0px">工具调用为主的通用 Agent</td></tr><tr><td style="font-size:12.0px">CrewAI</td><td style="font-size:12.0px">多智能体</td><td style="font-size:12.0px">Python</td><td style="font-size:12.0px">角色+任务+Crew</td><td style="font-size:12.0px">低</td><td style="font-size:12.0px">角色分工明确的协作</td><td style="font-size:12.0px">单 Agent 就够的任务</td></tr><tr><td style="font-size:12.0px">AutoGen</td><td style="font-size:12.0px">多智能体</td><td style="font-size:12.0px">Python</td><td style="font-size:12.0px">对话驱动的 Agent 群</td><td style="font-size:12.0px">中</td><td style="font-size:12.0px">研究型多 Agent 讨论</td><td style="font-size:12.0px">要确定性流程的生产环境</td></tr><tr><td style="font-size:12.0px">OpenAI Agents</td><td style="font-size:12.0px">官方轻量</td><td style="font-size:12.0px">Python</td><td style="font-size:12.0px">Agent+Handoff</td><td style="font-size:12.0px">低</td><td style="font-size:12.0px">function calling 快速验证</td><td style="font-size:12.0px">以非 OpenAI 模型为主</td></tr><tr><td style="font-size:12.0px">smolagents</td><td style="font-size:12.0px">官方轻量</td><td style="font-size:12.0px">Python</td><td style="font-size:12.0px">CodeAgent 代码即动作</td><td style="font-size:12.0px">低</td><td style="font-size:12.0px">轻量实验、HF 生态</td><td style="font-size:12.0px">企业级复杂编排</td></tr><tr><td style="font-size:12.0px">Dify</td><td style="font-size:12.0px">低代码</td><td style="font-size:12.0px">Web</td><td style="font-size:12.0px">画布+节点</td><td style="font-size:12.0px">极低</td><td style="font-size:12.0px">非开发者、快速上线产品</td><td style="font-size:12.0px">需要深度定制逻辑</td></tr><tr><td style="font-size:12.0px">Semantic K.</td><td style="font-size:12.0px">企业/微软</td><td style="font-size:12.0px">.NET/Py</td><td style="font-size:12.0px">Planner+Plugin</td><td style="font-size:12.0px">中</td><td style="font-size:12.0px">企业集成、.NET 技术栈</td><td style="font-size:12.0px">轻量快速原型</td></tr><tr><td style="font-size:12.0px">Vercel AI</td><td style="font-size:12.0px">前端生态</td><td style="font-size:12.0px">JS/TS</td><td style="font-size:12.0px">Hooks+流式 UI</td><td style="font-size:12.0px">低</td><td style="font-size:12.0px">Web 聊天界面、全栈 JS</td><td style="font-size:12.0px">后端重型流程编排</td></tr></table><div class="takeaway" style="left:53px;top:636px;width:1174px;height:42px;"><b>一句话 ｜ </b><strong>背表没用 —— 下一页把表压缩成一棵能直接走的决策树。</strong></div></section>
+<section class="slide" data-n="14"><div class="tag" style="left:53px;top:29px;width:192px;height:35px;">第 8 章 · 3/3</div><div class="title" style="left:53px;top:65px;width:1171px;height:58px;">选型决策树：按维度逐层分流</div><div class="bar" style="left:55px;top:127px;width:96px;height:3px;"></div><div class="foot" style="left:53px;top:685px;width:768px;height:29px;">开发 Agent：从直接调 API 到用框架编排</div><div class="pageno" style="left:1152px;top:685px;width:77px;height:29px;">14/19</div><div class="doubt" style="left:53px;top:142px;width:1171px;height:38px;"><b>你可能的疑惑 ｜ </b><i>轮到我的任务了，第一步该问什么？</i></div><div class="key" style="left:53px;top:182px;width:1171px;height:48px;"><b>关键差异 ｜ </b><strong>四个问题分流：一次调用？→ 要人审？→ 多智能体？→ 技术栈/场景？</strong></div><div style="position:absolute;left:53px;top:248px;width:1174px;height:372px;font-family:var(--font);font-size:14px;line-height:1.42;color:#1F2937">
+  <div style="margin-bottom:4px"><span style="background:#1D4ED8;color:#fff;padding:5px 12px;border-radius:8px;font-weight:700;white-space:nowrap">Q0　一次调用就能搞定？</span></div>
+  <div style="margin-left:16px;border-left:2px solid #CBD5E1;padding-left:18px">
+    <div style="margin:4px 0"><span style="background:#16A34A;color:#fff;padding:2px 9px;border-radius:6px;font-weight:700">是</span> → <b>直接调 API / SDK 就够了，别上框架</b></div>
+    <div style="margin:4px 0"><span style="background:#DC2626;color:#fff;padding:2px 9px;border-radius:6px;font-weight:700">否</span> → <span style="background:#1D4ED8;color:#fff;padding:5px 12px;border-radius:8px;font-weight:700">Q1　需要人审 / 断点恢复 / 可回放？</span></div>
+    <div style="margin-left:16px;border-left:2px solid #CBD5E1;padding-left:18px">
+      <div style="margin:4px 0"><span style="background:#16A34A;color:#fff;padding:2px 9px;border-radius:6px;font-weight:700">需要</span> → <b style="color:#1D4ED8">LangGraph</b>（图编排，控制最强）</div>
+      <div style="margin:4px 0"><span style="background:#DC2626;color:#fff;padding:2px 9px;border-radius:6px;font-weight:700">不需要</span> → <span style="background:#1D4ED8;color:#fff;padding:5px 12px;border-radius:8px;font-weight:700">Q2　多智能体协作？</span></div>
+      <div style="margin-left:16px;border-left:2px solid #CBD5E1;padding-left:18px">
+        <div style="margin:4px 0"><span style="background:#16A34A;color:#fff;padding:2px 9px;border-radius:6px;font-weight:700">是</span> → <b style="color:#1D4ED8">CrewAI</b>（角色分工明确）｜ <b style="color:#1D4ED8">AutoGen</b>（自由讨论）</div>
+        <div style="margin:4px 0"><span style="background:#DC2626;color:#fff;padding:2px 9px;border-radius:6px;font-weight:700">否</span> → <span style="background:#1D4ED8;color:#fff;padding:5px 12px;border-radius:8px;font-weight:700">Q3　技术栈 / 场景？</span></div>
+        <div style="margin-left:16px;border-left:2px solid #CBD5E1;padding-left:18px">
+          <div style="margin:3px 0">· <b>.NET / 企业集成</b> → Semantic Kernel</div>
+          <div style="margin:3px 0">· <b>JS/TS / 前端 Web</b> → Vercel AI SDK</div>
+          <div style="margin:3px 0">· <b>数据 / RAG 占比高</b> → LlamaIndex</div>
+          <div style="margin:3px 0">· <b>要类型安全 / 结构化输出</b> → PydanticAI</div>
+          <div style="margin:3px 0">· <b>只想快速验证</b> → OpenAI Agents SDK / smolagents</div>
+          <div style="margin:3px 0">· <b>要给非开发者用</b> → <b style="color:#1D4ED8">Dify</b>（可视化编排）</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><div class="takeaway" style="left:53px;top:636px;width:1174px;height:42px;"><b>一句话 ｜ </b><strong>口诀预告：简单用 API，多步用图，要给人用选 Dify。</strong></div></section>
+<section class="slide" data-n="15"><div class="tag" style="left:53px;top:29px;width:192px;height:35px;">第 9 章 · 1/2</div><div class="title" style="left:53px;top:65px;width:1171px;height:58px;">同一个任务，两种写法：算数 + 查词义</div><div class="bar" style="left:55px;top:127px;width:96px;height:3px;"></div><div class="foot" style="left:53px;top:685px;width:768px;height:29px;">开发 Agent：从直接调 API 到用框架编排</div><div class="pageno" style="left:1152px;top:685px;width:77px;height:29px;">15/19</div><div class="doubt" style="left:53px;top:142px;width:1171px;height:38px;"><b>你可能的疑惑 ｜ </b><i>同一个任务，SDK 手写和 LangGraph 图编排的代码结构到底差在哪？</i></div><div class="key" style="left:53px;top:182px;width:1171px;height:48px;"><b>关键差异 ｜ </b><strong>SDK 手写 = 流程控制在你手里（循环+if/else）；LangGraph = 只写节点函数，流转由图接管。</strong></div><pre class="ascii panel" style="left:53px;top:240px;width:1174px;height:240px;font-size:13.3px">SDK 手写（流程在你代码里）                                               LangGraph（流程在图里）
+┌─────────────────────────────────┐   ┌────────────────────────────────────────┐
+│ while 循环                      │                                    │ START → router(LLM 决定去哪)          │
+│   ├ LLM 决定下一步             │                                    │                 ├→ calc_node ─┐    │
+│   ├ if 要算数 → calc()        │                                    │                 └→ dict_node ─┤    │
+│   ├ if 要查词 → dict_lookup() │                                    │                                  ▼    │
+│   └ 结果回填，继续循环         │                                    │                      merge_node → END │
+│ 结束条件：自己判断              │                                    │ State={expr, calc, word, answer}       │
+└─────────────────────────────────┘   └────────────────────────────────────────┘</pre><pre class="code" style="left:53px;top:494px;width:576px;height:125px;font-size:13.3px"><span class="cm"># 写法A：SDK 手写（节选）</span>
+<span>while True:</span>
+<span>    msg = call_llm(msgs, tools)</span>
+<span>    if not msg.tool_calls: break</span>
+<span>    msgs += run_tools(msg)</span>
+<span>print(msg.content)</span></pre><pre class="code" style="left:651px;top:494px;width:576px;height:125px;font-size:13.3px"><span class="cm"># 写法B：LangGraph（节选）</span>
+<span>g = StateGraph(S)</span>
+<span>g.add_node(&quot;calc&quot;, calc); g.add_node(&quot;dict&quot;, lookup)</span>
+<span>g.add_node(&quot;merge&quot;, merge)</span>
+<span>g.compile().invoke({&quot;expr&quot;: &quot;23*47&quot;})</span></pre><div class="takeaway" style="left:53px;top:636px;width:1174px;height:42px;"><b>一句话 ｜ </b><strong>A 的每一行你都能改，B 的每个节点你都能换 —— A 赢在小任务，B 赢在任务会长大。</strong></div></section>
+<section class="slide" data-n="16"><div class="tag" style="left:53px;top:29px;width:192px;height:35px;">第 9 章 · 2/2</div><div class="title" style="left:53px;top:65px;width:1171px;height:58px;">开发 Agent 的通用步骤（带走的 checklist）</div><div class="bar" style="left:55px;top:127px;width:96px;height:3px;"></div><div class="foot" style="left:53px;top:685px;width:768px;height:29px;">开发 Agent：从直接调 API 到用框架编排</div><div class="pageno" style="left:1152px;top:685px;width:77px;height:29px;">16/19</div><div class="doubt" style="left:53px;top:142px;width:1171px;height:38px;"><b>你可能的疑惑 ｜ </b><i>从想法到能跑的 Agent，一步步该做什么？</i></div><div class="key" style="left:53px;top:182px;width:1171px;height:48px;"><b>关键差异 ｜ </b><strong>七步通吃所有路线 —— 先跑通，再护栏，最后才谈优化。</strong></div><table class="tbl" style="left:53px;top:245px;width:1174px;"><colgroup><col style="width:21.3%"><col style="width:44.2%"><col style="width:34.6%"></colgroup><tr><th style="font-size:14.0px">步骤</th><th style="font-size:14.0px">做什么</th><th style="font-size:14.0px">要点</th></tr><tr><td style="font-size:14.0px">① 定义任务与边界</td><td style="font-size:14.0px">明确输入/输出，什么坚决不做</td><td style="font-size:14.0px">边界比能力更重要</td></tr><tr><td style="font-size:14.0px">② 列出所需工具</td><td style="font-size:14.0px">每个工具一句话：名字、参数、返回</td><td style="font-size:14.0px">工具描述质量决定一半效果</td></tr><tr><td style="font-size:14.0px">③ 选流程范式</td><td style="font-size:14.0px">可预分解 → Plan；探索型 → ReAct</td><td style="font-size:14.0px">见第 6 章对照表</td></tr><tr><td style="font-size:14.0px">④ 选实现层级</td><td style="font-size:14.0px">API / SDK / 框架</td><td style="font-size:14.0px">按第 8 章决策树走</td></tr><tr><td style="font-size:14.0px">⑤ 实现 + 打印中间步骤</td><td style="font-size:14.0px">每轮「调了什么、参数、结果」必须可见</td><td style="font-size:14.0px">看不见中间步骤 = 无法调试</td></tr><tr><td style="font-size:14.0px">⑥ 加安全护栏</td><td style="font-size:14.0px">工具白名单、参数校验、轮次/成本上限</td><td style="font-size:14.0px">护栏先于上线</td></tr><tr><td style="font-size:14.0px">⑦ 观测与迭代</td><td style="font-size:14.0px">记录轨迹，按失败案例反哺提示词与工具</td><td style="font-size:14.0px">90% 问题出在工具描述和任务边界</td></tr></table><div class="takeaway" style="left:53px;top:636px;width:1174px;height:42px;"><b>一句话 ｜ </b><strong>90% 的问题出在工具描述和任务边界，不在框架 —— 别急着换框架，先看轨迹。</strong></div></section>
+<section class="slide" data-n="17"><div class="tag" style="left:53px;top:29px;width:192px;height:35px;">第 10 章</div><div class="title" style="left:53px;top:65px;width:1171px;height:58px;">总结：演进主线 + 选型口诀</div><div class="bar" style="left:55px;top:127px;width:96px;height:3px;"></div><div class="foot" style="left:53px;top:685px;width:768px;height:29px;">开发 Agent：从直接调 API 到用框架编排</div><div class="pageno" style="left:1152px;top:685px;width:77px;height:29px;">17/19</div><div class="doubt" style="left:53px;top:142px;width:1171px;height:38px;"><b>你可能的疑惑 ｜ </b><i>19 页看完，应该记住什么？</i></div><div class="key" style="left:53px;top:182px;width:1171px;height:48px;"><b>关键差异 ｜ </b><strong>一条主线、一句口诀、三句话。</strong></div><pre class="ascii panel" style="left:53px;top:240px;width:1174px;height:130px;font-size:13.3px">┌───────────┐        ┌──────────┐        ┌──────────┐        ┌────────────┐        ┌────────────┐
+│ 手拼 HTTP │                   │ SDK      │                  │ 手写循环 │                  │ 框架执行器 │                    │ 图编排     │
+│ 原理全见  │            ──→ │ 通信省事 │           ──→ │ 流程我定 │           ──→ │ 循环现成   │             ──→ │ 流程即资产 │
+└───────────┘        └──────────┘        └──────────┘        └────────────┘        └────────────┘</pre><div class="koujue" style="left:53px;top:389px;width:1174px;height:91px;">
+        <div><b>选型口诀 ｜ </b><strong>简单用 API，多步用图，要给人用选 Dify；</strong></div>
+        <div style="margin-top:6px"><b>　　　　　 </b><strong>RAG 找 LlamaIndex，微软栈用 SK，前端选 Vercel。</strong></div>
+      </div><ul class="bullets" style="left:53px;top:509px;width:1171px;"><li style="margin-bottom:4px;font-size:16.0px"><b>①</b>　所有框架底层都是同一个 POST —— 别怕，你已经在第 2 章见过它了。</li><li style="margin-bottom:4px;font-size:16.0px"><b>②</b>　选型先选「组」再选「个」，按任务维度走决策树，不按热度。</li><li style="margin-bottom:4px;font-size:16.0px"><b>③</b>　抽象降级不可逆：享受省力的同时，留出「能看中间步骤」的调试口。</li></ul><div class="takeaway" style="left:53px;top:636px;width:1174px;height:42px;"><b>一句话 ｜ </b><strong>简单用 API，多步用图，要给人用选 Dify。</strong></div></section>
+<section class="slide" data-n="18"><div class="tag" style="left:53px;top:29px;width:192px;height:35px;">附 录</div><div class="title" style="left:53px;top:65px;width:1171px;height:58px;">三个可运行脚本：同一能力，三层写法</div><div class="bar" style="left:55px;top:127px;width:96px;height:3px;"></div><div class="foot" style="left:53px;top:685px;width:768px;height:29px;">开发 Agent：从直接调 API 到用框架编排</div><div class="pageno" style="left:1152px;top:685px;width:77px;height:29px;">18/19</div><div class="doubt" style="left:53px;top:142px;width:1171px;height:38px;"><b>你可能的疑惑 ｜ </b><i>看完想动手，从哪个脚本开始？</i></div><div class="key" style="left:53px;top:182px;width:1171px;height:48px;"><b>关键差异 ｜ </b><strong>三个脚本共用同一份接口配置 —— 改脚本顶部 CONFIG 区（BASE_URL / API_KEY / MODEL）即可。</strong></div><table class="tbl" style="left:53px;top:245px;width:1174px;"><colgroup><col style="width:21.3%"><col style="width:11.4%"><col style="width:49.1%"><col style="width:18.2%"></colgroup><tr><th style="font-size:14.0px">脚本</th><th style="font-size:14.0px">对应章节</th><th style="font-size:14.0px">演示什么</th><th style="font-size:14.0px">依赖</th></tr><tr><td style="font-size:14.0px">direct_api_demo.py</td><td style="font-size:14.0px">第 2 章</td><td style="font-size:14.0px">只用 requests 调 Chat Completions，打印原始返回</td><td style="font-size:14.0px">requests</td></tr><tr><td style="font-size:14.0px">sdk_react_demo.py</td><td style="font-size:14.0px">第 4 章</td><td style="font-size:14.0px">SDK 手写 ReAct 循环 + 计算器工具，逐轮打印中间过程</td><td style="font-size:14.0px">openai</td></tr><tr><td style="font-size:14.0px">langgraph_plan_demo.py</td><td style="font-size:14.0px">第 7 章</td><td style="font-size:14.0px">LangGraph 3 节点 Plan-and-Execute 图，打印节点流转</td><td style="font-size:14.0px">langgraph / langchain-openai</td></tr></table><ul class="bullets" style="left:53px;top:466px;width:1171px;"><li style="margin-bottom:4px;font-size:15.3px"><b>接口配置</b>　云端填官方/代理 BASE_URL + Key；本地填如 http://localhost:11434/v1，Key 任意非空</li><li style="margin-bottom:4px;font-size:15.3px"><b>运行方式</b>　pip install 对应依赖 → 修改顶部 CONFIG → python 脚本名.py</li><li style="margin-bottom:4px;font-size:15.3px"><b>脚本 3 提示</b>　compile() 时传 checkpointer，即可把打印流转升级为断点恢复 + 人审</li></ul><div class="takeaway" style="left:53px;top:636px;width:1174px;height:42px;"><b>一句话 ｜ </b><strong>先跑通脚本 1 看清 POST，再跑脚本 2 看清循环，最后跑脚本 3 看清图 —— 三层就都长在手上了。</strong></div></section>
+<section class="slide" data-n="19">
+<div class="topbar"></div>
+<div class="qa" style="left:82px;top:187px;width:1114px;height:106px;">Q &amp; A</div>
+<div class="qa-sub" style="left:82px;top:298px;width:1114px;height:48px;">谢谢观看 —— 动手跑一遍附录脚本，比再看十页都有用。</div>
+<ul class="bullets" style="left:82px;top:374px;width:1114px;"><li style="margin-bottom:10px;font-size:17.3px"><b>官方文档</b>　OpenAI Platform ｜ LangGraph ｜ Dify —— 从决策树的终点出发去读</li><li style="margin-bottom:10px;font-size:17.3px"><b>三个脚本</b>　direct_api_demo.py ｜ sdk_react_demo.py ｜ langgraph_plan_demo.py</li><li style="margin-bottom:10px;font-size:17.3px"><b>下篇预告</b>　《让 Agent 可靠：护栏、评测与观测》</li></ul>
+<div class="foot" style="left:82px;top:662px;width:1114px;height:38px;">开发 Agent：从直接调 API 到用框架编排</div></section></div>
+<div id="hud">
+  <button id="btn-prev" title="上一页 (←)">‹</button>
+  <span id="pg">1 / 19</span>
+  <button id="btn-next" title="下一页 (→)">›</button>
+  <button id="btn-idx" title="目录 (I)">☰</button>
+</div>
+<div class="tips">←/→ 翻页 · F 全屏 · I 目录</div>
+<div id="index"><div class="card"><h3>目录 · 点击跳转（按 I 或 Esc 关闭）</h3>
+<ol><li data-i="0"><b>01</b>封面：开发 Agent —— 从直接调 API 到用框架编排</li>
+<li data-i="1"><b>02</b>导读：整篇只有一条主线——抽象降级</li>
+<li data-i="2"><b>03</b>第1章 三条路线总览</li>
+<li data-i="3"><b>04</b>第1章 抽象光谱图</li>
+<li data-i="4"><b>05</b>第2章 最底层：直接调 API</li>
+<li data-i="5"><b>06</b>第3章 SDK 帮你省什么</li>
+<li data-i="6"><b>07</b>第4章 手写一个 Agent：ReAct 主循环</li>
+<li data-i="7"><b>08</b>第5章 框架化的通用 ReAct：20 行 → 5 行</li>
+<li data-i="8"><b>09</b>第6章 ReAct vs Plan-and-Execute</li>
+<li data-i="9"><b>10</b>第6章 两种范式场景对照表</li>
+<li data-i="10"><b>11</b>第7章 LangGraph：Node / Edge / State</li>
+<li data-i="11"><b>12</b>第8章 四组框架分组图</li>
+<li data-i="12"><b>13</b>第8章 总对比表（11 框架）</li>
+<li data-i="13"><b>14</b>第8章 选型决策树</li>
+<li data-i="14"><b>15</b>第9章 同一任务，两种写法</li>
+<li data-i="15"><b>16</b>第9章 开发 Agent 的通用步骤</li>
+<li data-i="16"><b>17</b>第10章 总结：演进主线 + 选型口诀</li>
+<li data-i="17"><b>18</b>附录：三个可运行脚本</li>
+<li data-i="18"><b>19</b>Q &amp; A / 结束</li></ol></div></div>
+<script>
+const slides=[...document.querySelectorAll('.slide')];
+const N=slides.length;let cur=0;
+const idx=document.getElementById('index');
+function fit(){const s=Math.min(innerWidth/1320,innerHeight/780);
+document.documentElement.style.setProperty('--s',s.toFixed(4));}
+function show(i){cur=Math.max(0,Math.min(N-1,i));
+slides.forEach((el,j)=>el.classList.toggle('active',j===cur));
+document.getElementById('pg').textContent=(cur+1)+' / '+N;
+document.getElementById('progress').style.width=((cur+1)/N*100)+'%';
+history.replaceState(null,'','#'+(cur+1));
+[...idx.querySelectorAll('li')].forEach((li,j)=>li.classList.toggle('cur',j===cur));}
+function next(){show(cur+1);} function prev(){show(cur-1);}
+addEventListener('resize',fit);
+addEventListener('keydown',e=>{
+if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' '||e.key==='PageDown'){e.preventDefault();next();}
+else if(e.key==='ArrowLeft'||e.key==='ArrowUp'||e.key==='PageUp'){e.preventDefault();prev();}
+else if(e.key==='Home')show(0);else if(e.key==='End')show(N-1);
+else if(e.key==='f'||e.key==='F'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();}
+else if(e.key==='i'||e.key==='I'||e.key==='Escape')idx.classList.toggle('open');});
+document.getElementById('btn-prev').onclick=prev;
+document.getElementById('btn-next').onclick=next;
+document.getElementById('btn-idx').onclick=()=>idx.classList.toggle('open');
+idx.onclick=e=>{if(e.target===idx)idx.classList.remove('open');};
+document.querySelectorAll('#index li').forEach(li=>li.onclick=()=>{show(+li.dataset.i);idx.classList.remove('open');});
+let sx=null;
+addEventListener('pointerdown',e=>sx=e.clientX);
+addEventListener('pointerup',e=>{if(sx===null)return;const dx=e.clientX-sx;
+if(dx<-60)next();else if(dx>60)prev();sx=null;});
+const h=parseInt((location.hash||'').slice(1));fit();show(isNaN(h)?0:h-1);
+</script>
+<script id="wb-shell-js">
+/* === wb-shell v1: 统一导航条（自动隐藏，不遮挡内容；键盘事件复用各deck原生翻页） === */
+(function(){
+  if(window.__wbShell) return; window.__wbShell = true;
+  var nav = document.createElement('div');
+  nav.id = 'wb-nav';
+  nav.innerHTML = '<a href="../index.html" title="返回目录">☰ 目录</a><span class="wb-sep"></span>'
+    + '<button id="wb-prev" title="上一页（←）">&#8249;</button>'
+    + '<span class="wb-page" id="wb-page">–</span>'
+    + '<button id="wb-next" title="下一页（→）">&#8250;</button>'
+    + '<span class="wb-sep"></span><span class="wb-tip">P 打印PDF</span>';
+  document.body.appendChild(nav);
+  var timer = null;
+  function poke(){
+    nav.classList.add('show');
+    if(timer) clearTimeout(timer);
+    timer = setTimeout(function(){ nav.classList.remove('show'); }, 2400);
+  }
+  ['mousemove','keydown','touchstart'].forEach(function(ev){ window.addEventListener(ev, poke, {passive:true}); });
+  function sendKey(k){
+    document.dispatchEvent(new KeyboardEvent('keydown',{key:k,bubbles:true,cancelable:true}));
+  }
+  document.getElementById('wb-prev').addEventListener('click',function(e){e.stopPropagation();sendKey('ArrowLeft');poke();});
+  document.getElementById('wb-next').addEventListener('click',function(e){e.stopPropagation();sendKey('ArrowRight');poke();});
+  nav.addEventListener('click',function(e){ e.stopPropagation(); });
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var pageEl = document.getElementById('wb-page');
+  function update(){
+    var i = -1, k;
+    for(k=0;k<slides.length;k++){ if(slides[k].classList.contains('active')){ i=k; break; } }
+    if(i<0){ for(k=0;k<slides.length;k++){ var cs=getComputedStyle(slides[k]); if(cs.display!=='none'&&cs.visibility!=='hidden'){ i=k; break; } } }
+    pageEl.textContent = (i>=0? i+1 : 1) + ' / ' + slides.length;
+  }
+  if('MutationObserver' in window){
+    var mo = new MutationObserver(function(){ update(); });
+    slides.forEach(function(s){ mo.observe(s,{attributes:true,attributeFilter:['class','style']}); });
+  }
+  window.addEventListener('load',update);
+  setTimeout(update,300);
+  window.addEventListener('keydown',function(e){
+    if(e.key==='p'||e.key==='P'){ e.preventDefault(); window.print(); }
+  });
+})();
+</script>
+</body>
+</html>

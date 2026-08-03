@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>落地评估速查表 · Agent 工程化全景附录</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #eef1f6;
+    font-family: -apple-system, "Microsoft YaHei", "PingFang SC", sans-serif;
+    color: #1e293b;
+    padding: 40px 24px 64px;
+  }
+  .sheet { max-width: 1100px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 28px; }
+  header h1 { font-size: 30px; color: #0f172a; margin-bottom: 8px; }
+  header p { font-size: 15px; color: #64748b; line-height: 1.6; }
+  .block {
+    background: #fff; border: 1px solid #e2e8f0; border-radius: 14px;
+    padding: 24px 28px; margin-bottom: 22px;
+  }
+  .block h2 { font-size: 20px; color: #0f172a; margin-bottom: 12px; padding-left: 12px; border-left: 5px solid #2563eb; }
+  .block h2 .sub { font-size: 14px; color: #94a3b8; font-weight: 400; margin-left: 8px; }
+  table { border-collapse: separate; border-spacing: 0; width: 100%; border-radius: 10px; overflow: hidden; border: 1px solid #e2e8f0; }
+  th { background: #1e3a5f; color: #fff; font-size: 14px; font-weight: 600; padding: 10px 12px; text-align: left; line-height: 1.5; }
+  td { font-size: 14px; line-height: 1.6; padding: 10px 12px; background: #fff; border-top: 1px solid #eef2f7; vertical-align: top; color: #334155; }
+  tr:nth-child(even) td { background: #f8fafc; }
+  td.k { font-weight: 700; color: #0f172a; white-space: nowrap; }
+  .self-check { display: flex; gap: 14px; flex-wrap: wrap; }
+  .self-check .q {
+    flex: 1; min-width: 260px; background: #f7f9fc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px 18px;
+  }
+  .self-check .q b { display: block; font-size: 16px; color: #2563eb; margin-bottom: 6px; }
+  .self-check .q span { font-size: 14px; line-height: 1.7; color: #475569; }
+  .layers { font-family: "Cascadia Mono", Consolas, monospace; font-size: 13.5px; line-height: 1.55; color: #334155; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px 20px; white-space: pre; overflow-x: auto; margin-bottom: 14px; }
+  .note { font-size: 13px; color: #94a3b8; line-height: 1.6; margin-top: 10px; }
+  footer { text-align: center; font-size: 13px; color: #94a3b8; margin-top: 8px; line-height: 1.8; }
+  @media print {
+    body { background: #fff; padding: 0; }
+    .block { break-inside: avoid; box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <header>
+    <h1>落地评估速查表</h1>
+    <p>《Agent 工程化全景：从"能用"到"能信、能管、能连、能落地"》附录 · 打印即用 · 协议进展类信息以官方 / 标准组织最新公告为准</p>
+  </header>
+
+  <!-- 1. Gartner 简表 -->
+  <div class="block">
+    <h2>1 · Gartner AI 成熟度模型：五级别 × 七支柱简表<span class="sub">每格一句特征</span></h2>
+    <table>
+      <tr><th>支柱＼级别</th><th>L1 认知</th><th>L2 活跃</th><th>L3 运营</th><th>L4 系统化</th><th>L5 变革</th></tr>
+      <tr><td class="k">AI 战略与愿景</td><td>无正式战略</td><td>试点各自为战</td><td>用例路线图 + 高层支持</td><td>AI 纳入业务战略</td><td>AI 即战略核心</td></tr>
+      <tr><td class="k">数据基础</td><td>散乱不可用</td><td>局部整理</td><td>重点场景规范化</td><td>数据资产化</td><td>质量体系化运营</td></tr>
+      <tr><td class="k">治理与合规</td><td>无护栏</td><td>口头约定</td><td>初步标准 + 审批</td><td>全生命周期治理</td><td>护栏自动化内嵌</td></tr>
+      <tr><td class="k">技术架构与平台</td><td>各自为战</td><td>工具拼凑</td><td>统一平台雏形</td><td>可扩展架构</td><td>平台化 + 全面可观测</td></tr>
+      <tr><td class="k">人才与技能</td><td>靠个别爱好者</td><td>小圈子</td><td>关键角色就位</td><td>体系化培养</td><td>人才梯队 + 全员技能</td></tr>
+      <tr><td class="k">业务流程整合</td><td>流程照旧</td><td>单点试验</td><td>单点流程嵌入</td><td>端到端重设计</td><td>流程持续自优化</td></tr>
+      <tr><td class="k">文化与组织</td><td>观望</td><td>先锋示范</td><td>局部接受</td><td>激励与社区成熟</td><td>AI 融入组织文化</td></tr>
+    </table>
+    <p class="note">提醒：跳级是失败主因。Gartner 警示相当比例（约 40%）的 agentic AI 项目可能因治理 / 观测 / ROI 不清晰而被终止（数据以 Gartner 原文为准）。</p>
+  </div>
+
+  <!-- 2. 三句自评 -->
+  <div class="block">
+    <h2>2 · 三句自评<span class="sub">评完级，回答这三句</span></h2>
+    <div class="self-check">
+      <div class="q"><b>① 当前组织在哪一级？</b><span>按最弱支柱定级（木桶效应）；可按部门分别评，成熟度不同是常态。</span></div>
+      <div class="q"><b>② 下一级差距是什么？</b><span>对照七支柱简表，逐支柱找出当前级与下一级之间的具体缺口。</span></div>
+      <div class="q"><b>③ 首要投资是什么？</b><span>未来 6~12 个月优先补最弱支柱，而不是继续加强最强支柱。</span></div>
+    </div>
+  </div>
+
+  <!-- 3. 四层协议 -->
+  <div class="block">
+    <h2>3 · 四层协议图（文字版）<span class="sub">各协议一句话定位</span></h2>
+    <div class="layers">┌────────────────────────────────────────────┐
+│ 互连层  A2A        Agent 够 Agent：互相发现、通信、协作 │
+├────────────────────────────────────────────┤
+│ 流程层  Agent Skills  封装"怎么干"：步骤+提示词+脚本   │
+├────────────────────────────────────────────┤
+│ 工具层  MCP        Agent 够工具：统一接入，"工具的 USB"│
+├────────────────────────────────────────────┤
+│ 模型层  Function Calling  各家 API 原生调工具机制      │
+└────────────────────────────────────────────┘</div>
+    <table>
+      <tr><th>协议</th><th>一句话定位</th></tr>
+      <tr><td class="k">Function Calling / Tool Use</td><td>各家模型 API 原生的"模型请求调工具"机制</td></tr>
+      <tr><td class="k">MCP</td><td>Agent 与工具 / 数据源的统一接入协议；Anthropic 提出并开源，主要厂商跟进，已进入标准化托管</td></tr>
+      <tr><td class="k">Agent Skills</td><td>把"怎么完成一类任务"打包成可复用技能包，与 MCP 互补</td></tr>
+      <tr><td class="k">A2A</td><td>Agent 之间互相发现、通信、协作；Google 提出，已进入标准托管流程</td></tr>
+      <tr><td class="k">其他</td><td>OpenAPI＝传统 API 描述老路子；AGNTCY＝Cisco 主导的互操作协议，与 A2A 并存；OAuth＝Agent 代表用户访问资源的授权依据</td></tr>
+    </table>
+    <p class="note">注：各协议归属、版本与标准化进展变化快，一律以官方 / 标准组织最新公告为准。</p>
+  </div>
+
+  <!-- 4. 六大支柱 -->
+  <div class="block">
+    <h2>4 · 六大能力支柱：一句话 + 落地第一步</h2>
+    <table>
+      <tr><th>支柱</th><th>一句话</th><th>落地第一步</th></tr>
+      <tr><td class="k">记忆</td><td>短期靠上下文，长期靠外部存储 + 检索</td><td>列出"值得记住的内容清单"并选定存储</td></tr>
+      <tr><td class="k">安全</td><td>防注入、防越权、防泄露</td><td>给高危工具加"执行前确认"</td></tr>
+      <tr><td class="k">治理</td><td>可审计、可审批、可算账</td><td>打开全量调用留痕（审计日志）</td></tr>
+      <tr><td class="k">观测</td><td>每一步调用都可追踪</td><td>接入 trace，记录工具输入输出</td></tr>
+      <tr><td class="k">评测</td><td>没有评测就谈不上上线</td><td>攒 20~50 个真实任务评测集</td></tr>
+      <tr><td class="k">人机协同</td><td>关键闸口留给人</td><td>定义"必须人工确认"的操作清单</td></tr>
+    </table>
+  </div>
+
+  <footer>
+    主线一句话：Agent 不能只会"干活"，还得——记得住 · 守得住 · 管得了 · 看得见 · 连得上 · 落得地<br>
+    核心循环让它会干活，支柱让它可信，协议让它可连，成熟度模型让它可落地
+  </footer>
+</div>
+</body>
+</html>
