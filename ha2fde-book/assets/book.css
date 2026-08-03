@@ -132,8 +132,25 @@ body.wide #bk-bar{left:0}
   font-variant-numeric:tabular-nums}
 .bk-folio em{font-style:normal;font-size:10.5px;opacity:.75}
 .bk-folio span{font-weight:600}
-/* 隐藏各讲自带的分页脚注，避免与书本统一页码（.bk-folio）重复/冲突 */
+/* 隐藏各讲自带的分页脚注，避免与书本统一页码（.bk-folio）重复/冲突。
+   原来只写了 .pagenum，那只盖住第 1 讲；另外四讲各叫各的类名，于是
+   第 90 页纸面上印着「01/26」、第 145 页印着「01 / 11」，跟全书页码打架，
+   也就是「有的章有页脚、有的没有」的由来。这里按讲补齐：
+
+     .ch3 .foot      逐页小节名 —— 顶栏面包屑已实时显示同一信息，去掉不丢东西
+     .ch4 .foot      18 页重复同一句「开发 Agent：…」
+     .ch4 .pageno    讲内页码 2/19
+     .ch5 .page-num  讲内页码 01/26
+     .ch7 .pageno    讲内页码 01 / 11
+     .ch7 .brand     11 页重复同一句书名
+
+   注意：不要写成不分讲的 .foot —— 第 2 讲的 .foot 是内容块（包着 .take
+   那个"一句话"总结框），一刀切会把第 2 讲 16 页的正文一起删掉。 */
 .bk-paper .pagenum{display:none !important}
+.ch3 .foot,
+.ch4 .foot,.ch4 .pageno,
+.ch5 .page-num,
+.ch7 .pageno,.ch7 .brand{display:none !important}
 
 /* 章扉页内容 */
 .bk-opener{width:100%;height:100%;display:flex;background:#fff;position:relative}
