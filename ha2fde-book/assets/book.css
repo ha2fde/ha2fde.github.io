@@ -589,7 +589,7 @@ body.wide #bk-bar{left:0}
   }
 /* ===== 第四章 开发 ===== */
 .ch4{--ink:#1F2937;--sub:#64748B;--accent:#2563EB;--key:#1D4ED8;--tag:#DBEAFE;
---panel:#F8FAFC;--border:#E2E8F0;--codebg:#0F172A;--codefg:#E2E8F0;--cm:#7DD3A8;
+--panel:#F8FAFC;--border:#E2E8F0;--codebg:#1E293B;--codefg:#CBD5E1;--cm:#8FA3BF;
 --takebg:#ECFDF5;--takefg:#065F46;--warn:#B45309;--zebra:#F1F5F9;}
 .ch4 *{margin:0;padding:0;box-sizing:border-box;}
 .ch4,.ch4{height:100%;}
@@ -620,11 +620,20 @@ display:flex;align-items:center;padding:0 22px;}
 .ch4 .takeaway b{margin-right:2px;}
 .ch4 .panel{background:var(--panel);border:1px solid var(--border);border-radius:6px;
 padding:10px 14px;display:flex;flex-direction:column;justify-content:center;}
-.ch4 .code{background:var(--codebg);color:var(--codefg);border-radius:10px;padding:12px 16px;
+/* 内边距和行高比原稿各收了一点：这几块的高度是内联写死的，原来就有
+   4~10px 的内容被 overflow:hidden 裁掉，加了 1px 边框后更紧。 */
+.ch4 .code{background:var(--codebg);color:var(--codefg);border-radius:10px;padding:9px 13px;
 font-family:"Cascadia Code","Cascadia Mono",Consolas,"Courier New",monospace;
-line-height:1.42;white-space:pre;display:flex;flex-direction:column;justify-content:center;}
-.ch4 .code span{display:block;}
-.ch4 .code .cm{color:var(--cm);}
+line-height:1.38;white-space:pre;display:flex;flex-direction:column;justify-content:center;
+border:1px solid rgba(148,163,184,.22);}
+/* 只能选直接子元素：外层 span 是「一行」，里面还嵌着词法着色的 span，
+   写成后代选择器会把每个 token 也拆成独立一行、整块文字溢出卡片。 */
+.ch4 .code>span{display:block;}
+.ch4 .code .cm{color:var(--cm);font-style:italic;}
+.ch4 .code .kw{color:#C4B5FD;font-weight:600;}
+.ch4 .code .st{color:#7DD3FC;}
+.ch4 .code .fn{color:#93C5FD;}
+.ch4 .code .nu{color:#FCD34D;}
 .ch4 .tbl{border-collapse:collapse;font-size:14px;}
 .ch4 .tbl th{background:var(--accent);color:#fff;font-weight:700;padding:8px 10px;text-align:center;}
 .ch4 .tbl td{padding:7px 10px;border-bottom:1px solid var(--border);}
