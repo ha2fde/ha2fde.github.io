@@ -234,13 +234,19 @@
   <div class="chip">第 6 节 · 自己搭大脑：本地运行大模型（重点）</div>
   <h1 class="title">把大脑装在自己电脑上：为什么有人要这么干</h1>
   <div class="question">💬 入门者原话：<em>"模型还能装在我自己电脑上？图什么？"</em></div>
-  <div class="answer"><b>直接回答：</b>本地跑模型 = 把大脑下载到自己电脑上运行——免费、离线、数据不出本机；代价是吃硬件，能力一般弱于云端旗舰。</div>
-  <table class="t">
+  <div class="answer" style="margin-bottom:11px"><b>直接回答：</b>本地跑模型 = 把大脑下载到自己电脑上运行——免费、离线、数据不出本机；代价是吃硬件，能力一般弱于云端旗舰。</div>
+  <table class="t sm">
     <tr><th style="width:50%">本地跑的好处</th><th>要付的代价</th></tr>
     <tr><td><b>隐私</b>：数据不出本机</td><td>要硬件：内存 / 显存决定能跑多大的模型</td></tr>
     <tr><td><b>免费</b>：没有按量计费，随便用</td><td>能力一般弱于云端旗舰模型</td></tr>
     <tr><td><b>离线</b>：断网也能用</td><td>模型文件占硬盘（几个 GB 起）</td></tr>
-    <tr><td><b>完全可控</b>：想换就换、想删就删</td><td>第一次要下载模型，要等</td></tr>
+  </table>
+  <div class="col-title" style="margin-top:8px">代价里说的"吃硬件"，就是这三个数</div>
+  <table class="t xs">
+    <tr><th style="width:15%">这个数</th><th style="width:43%">是什么</th><th>决定什么</th></tr>
+    <tr><td><b>多少 B</b></td><td>参数量。B = billion，8B 就是 80 亿个"旋钮"，越多越聪明也越占地方</td><td>模型的<b>聪明程度</b>，以及<b>体积多大</b></td></tr>
+    <tr><td><b>显存 / 内存</b></td><td>模型跑起来时住的地方。Mac 的"统一内存"是 CPU/GPU 共用，买多大就有多大显存</td><td><b>能不能跑</b>——必须整个装进去，装不下就报错或慢十倍</td></tr>
+    <tr><td><b>带宽</b></td><td>每秒能从内存搬多少 GB。模型每吐一个字都要把全部参数读一遍，所以带宽就是速度本身</td><td><b>跑得多快</b>——10 字/秒勉强跟得上阅读，20 以上才舒服</td></tr>
   </table>
   <span class="pagenum">11 / 28</span>
 </section></div></div><div class="bk-folio"><span>12</span><em>第一章 · 破冰</em></div></div>
@@ -260,7 +266,7 @@
         <tr><td><b>Mac 统一内存</b></td><td>64GB 跑 27B~32B 舒服；128GB 才够 llama3.3:70b（43GB）</td></tr>
         <tr><td><b>8GB 内存纯 CPU</b>（不推荐）</td><td>只能 1B~4B，很慢，尝鲜可以，别当主力</td></tr>
       </table>
-      <p class="note" style="margin-top:8px">上面的体积都是"量化版"（Q4）的——牺牲一点精度换体积大幅缩小，本地跑基本都用它。另外还要给上下文留 2~3GB 余量。</p>
+      <p class="note" style="margin-top:8px">两条心算公式：<b>体积(GB) ≈ 参数量 × 0.6</b>——这是"量化版"（Q4）的算法，牺牲一点精度换体积砍到四分之一，本地跑基本都用它；实际需要的显存还要再加 2~3GB 留给上下文。<b>速度(字/秒) ≈ 带宽(GB/s) ÷ 体积(GB) × 0.8</b>——4090 带宽 1008GB/s，跑 20GB 的模型约 40 字/秒；纯 CPU 内存只有 70GB/s 左右，同样的模型约 2 字/秒，不是装不下，是慢到没法用。</p>
     </div>
     <div>
       <div class="col-title">② 下载渠道与安装方式</div>
@@ -285,12 +291,12 @@
     <table class="t xs">
       <tr><th style="width:23%">模型</th><th style="width:12%">出身</th><th>一句话</th><th style="width:27%">本地常见规模</th></tr>
       <tr><td><b>Qwen3 系列</b> ★</td><td>阿里</td><td>中文最强之一，本地首选</td><td>4B / 8B / 14B / 32B</td></tr>
-      <tr><td><b>Qwen3-Coder</b></td><td>阿里</td><td>专做写代码，MoE 架构省显存</td><td>30B（只激活 3B）</td></tr>
+      <tr><td><b>Qwen3-Coder</b></td><td>阿里</td><td>专做写代码，MoE 架构省显存</td><td>30B，但只激活 3B</td></tr>
       <tr><td><b>DeepSeek-R1 蒸馏版</b></td><td>DeepSeek</td><td>推理强；原版太大，蒸馏后才能本地跑</td><td>8B / 14B / 32B / 70B</td></tr>
       <tr><td><b>Llama 3.3</b></td><td>Meta</td><td>全球生态最全，英文场景稳</td><td>70B（要 Mac 128GB）</td></tr>
       <tr><td><b>Gemma 3</b></td><td>谷歌</td><td>带看图能力，多语言</td><td>27B</td></tr>
     </table>
-    <p class="note" style="margin-top:8px">注意：新闻里的国产旗舰——DeepSeek V4 Pro（1.6T）、Kimi K2.6（1T）、GLM-5.1（200B+）——都是巨无霸，个人电脑一台都跑不动。本地能跑的是它们的小尺寸版和蒸馏版，别照着新闻里的名字去下载。</p>
+    <p class="note" style="margin-top:8px">MoE（混合专家）架构，比如上面的 Qwen3-Coder：模型拆成很多"专家"，每次只叫醒一小撮干活，于是<b>容量按 30B 算</b>（19GB 得全装进去，因为不知道下次叫谁）、<b>速度按 3B 算</b>——同样占 20GB，比普通 32B 快好几倍。<br>注意：新闻里的国产旗舰——DeepSeek V4 Pro（1.6T）、Kimi K2.6（1T）、GLM-5.1（200B+）——都是巨无霸，个人电脑一台都跑不动。本地能跑的是它们的小尺寸版和蒸馏版，别照着新闻里的名字去下载。</p>
     </div>
     <div class="flow">
       <div class="fbox" style="width:100%"><h4 style="font-size:14px">工具壳（OpenCode / Cline 等）</h4><p>配置指向 localhost（本机地址）</p></div>
