@@ -163,18 +163,22 @@
   <p class="note" style="margin-top:12px"><b>术语对照：</b><b>CLI</b>（命令行）＝在终端里敲命令；<b>TUI</b>＝在终端里画出来的图形界面；<b>IDE 扩展</b>＝装进 VS Code、JetBrains 这类编辑器的插件；<b>桌面应用</b>＝独立安装的图形程序。<b>"开源"看的是许可证</b>：Apache-2.0、MIT 都允许自由查看、修改、商用，闭源则只给你装好的程序。<b>常见误传</b>：Codex 不是整个闭源——开源的是命令行，桌面应用没开源。</p>
   <span class="pagenum">07 / 28</span>
 </section></div></div><div class="bk-folio"><span>7</span><em>第一章 · 破冰</em></div></div>
-<div class="bk-sheet" id="p8" data-ch="1" data-page="8" data-title="不想碰命令行？Agent 也能住在编辑器里（Cline）"><div class="bk-paper ch1"><div class="bk-fit"><section class="slide active">
+<div class="bk-sheet" id="p8" data-ch="1" data-page="8" data-title="怕命令行？把 Agent 装进编辑器：Cline"><div class="bk-paper ch1"><div class="bk-fit"><section class="slide active">
   <div class="chip">第 4 节 · 编辑器里的 Agent</div>
-  <h1 class="title">不想碰命令行？Agent 也能住在编辑器里（Cline）</h1>
+  <h1 class="title">怕命令行？把 Agent 装进编辑器：Cline</h1>
   <div class="question">💬 入门者原话：<em>"我看到黑窗口就发怵，有不打命令的吗？"</em></div>
-  <div class="answer"><b>直接回答：</b>有。Cline 是 VS Code 编辑器里的插件，点鼠标就能用——它先列计划（plan），你点头它才动手（act）。</div>
-  <table class="t">
-    <tr><th style="width:16%"></th><th style="width:41%">终端形态（Claude Code 等）</th><th>编辑器形态（Cline）</th></tr>
-    <tr><td><b>长什么样</b></td><td>命令行黑窗口，打字交流</td><td>VS Code 侧边栏，有按钮有界面</td></tr>
-    <tr><td><b>适合谁</b></td><td>习惯命令行的人</td><td>喜欢图形界面、想看着代码被改的人</td></tr>
-    <tr><td><b>干活方式</b></td><td>边说边干</td><td>plan 模式出方案 → 你批准 → act 模式执行</td></tr>
-    <tr><td><b>共同点</b></td><td colspan="2">都是"壳 + 大脑"，都能读写文件、跑命令</td></tr>
+  <div class="answer"><b>直接回答：</b>有。<b>Cline</b> 装进 VS Code 或 JetBrains，全程点鼠标——它先出方案（<b>Plan</b>），你点头它才动手（<b>Act</b>）。Apache-2.0 开源免费，大脑自己接。</div>
+  <table class="t xs" style="margin-top:10px">
+    <tr><th style="width:14%"></th><th style="width:40%">命令行原生（Claude Code / Codex / opencode）</th><th>编辑器原生（Cline / Kilo Code / Continue）</th></tr>
+    <tr><td><b>主场在哪</b></td><td>终端里打字对话；也有 IDE 扩展，但扩展里装的还是那个终端</td><td>编辑器侧边栏的图形面板，按钮、文件树、diff 都在眼前</td></tr>
+    <tr><td><b>改动怎么看</b></td><td>终端里滚过去的文本，整批接受居多</td><td>直接在代码上高亮，<b>一块一块点接受 / 拒绝</b></td></tr>
+    <tr><td><b>干活方式</b></td><td>边说边干（也有各自的计划模式）</td><td>Plan 出方案 → 你批准 → Act 执行；<b>两个模式可以配不同的大脑</b></td></tr>
+    <tr><td><b>共同点</b></td><td colspan="2">都是"壳 + 大脑"，都能读写文件、跑命令、装 MCP；<b>两边正在互相长成对方</b>——Cline 也出了命令行版和 SDK</td></tr>
   </table>
+  <div class="grid2" style="margin-top:10px">
+    <div class="card"><h3>省钱技巧：两个模式配两个大脑</h3><p>Plan 只读不写，最吃脑子，用贵的旗舰档；Act 是照方案敲键盘，用平价档就够。设置里打开"Plan 和 Act 用不同模型"即可，<b>账单能差好几倍</b>（回看第 6 页的价目表）。</p></div>
+    <div class="card gray"><h3>别被老教程带偏</h3><p>"Cline＝只能在 VS Code 用"已经过时：现在还有 <b>JetBrains 全家</b>（IntelliJ / PyCharm / WebStorm / GoLand）、命令行版、网页看板（Kanban）、给程序调用的 SDK；Cursor、Windsurf、Zed 里也能装。<span class="sub">同类开源货：Kilo Code（MIT）、Continue（Apache-2.0）。老教程里的 Roo Code 已于 2026 年 5 月停止维护，别再入坑。</span></p></div>
+  </div>
   <span class="pagenum">08 / 28</span>
 </section></div></div><div class="bk-folio"><span>8</span><em>第一章 · 破冰</em></div></div>
 <div class="bk-sheet" id="p9" data-ch="1" data-page="9" data-title="云端的三种&quot;买脑&quot;方式：专卖店 / 超市 / 全球代购"><div class="bk-paper ch1"><div class="bk-fit"><section class="slide active">
@@ -376,7 +380,7 @@
     <tr><td><b>Claude Code</b></td><td>命令行编程</td><td>闭源</td><td>终端·桌面·IDE·网页</td><td>编程生态最成熟</td><td>开发者</td></tr>
     <tr><td><b>Codex</b></td><td>命令行编程</td><td><b style="color:var(--green)">命令行开源</b></td><td>终端·桌面·IDE·云端</td><td>长任务、云端跑</td><td>OpenAI 用户</td></tr>
     <tr><td><b>opencode</b></td><td>命令行编程</td><td><b style="color:var(--green)">开源</b></td><td>终端·桌面·IDE</td><td>自由换模型</td><td>想折腾的开发者</td></tr>
-    <tr><td><b>Cline</b></td><td>编辑器内嵌</td><td><b style="color:var(--green)">开源</b></td><td>VS Code</td><td>图形化编程助手</td><td>怕命令行的人</td></tr>
+    <tr><td><b>Cline</b></td><td>编辑器内嵌</td><td><b style="color:var(--green)">开源</b></td><td>VS Code·JetBrains·终端</td><td>图形化编程助手</td><td>怕命令行的人</td></tr>
     <tr><td><b>Hermes</b></td><td>个人助理</td><td><b style="color:var(--green)">开源</b></td><td>本地 / 服务器</td><td>记忆 / 技能 / 定时</td><td>折腾型玩家</td></tr>
     <tr><td><b>OpenClaw</b></td><td>个人助理</td><td><b style="color:var(--green)">开源</b></td><td>本地 / 服务器</td><td>多渠道常驻助理</td><td>想要生活助理的人</td></tr>
     <tr><td><b>WorkBuddy</b></td><td>办公</td><td>闭源</td><td>全平台</td><td>多专家办公协作</td><td>办公人群</td></tr>
