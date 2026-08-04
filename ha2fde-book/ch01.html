@@ -104,13 +104,13 @@
 <div class="bk-sheet" id="p5" data-ch="1" data-page="5" data-title="通用架构：所有 Agent 工具都是同一张图"><div class="bk-paper ch1"><div class="bk-fit"><section class="slide active">
   <div class="chip">第 2 节 · 一个壳 + 一个大脑（全篇主线）</div>
   <h1 class="title">通用架构：所有 Agent 工具都是同一张图</h1>
-  <div class="question">💬 入门者原话：<em>"Claude Code、OpenCode、WorkBuddy……这么多工具，要一个个学吗？"</em></div>
+  <div class="question">💬 入门者原话：<em>"Claude Code、opencode、WorkBuddy……这么多工具，要一个个学吗？"</em></div>
   <div class="answer"><b>直接回答：</b>不用。结构一模一样：一个"壳"（装在电脑上的工具）+ 一个"大脑"（大模型）。学会这张图就懂了全部。</div>
   <div style="display:grid; grid-template-columns:1.4fr 1fr; gap:24px; align-items:center">
     <div class="flow">
       <div class="fbox gray" style="width:80%"><h4 style="color:var(--ink); font-size:15px">你（说人话：我要什么）</h4></div>
       <div class="farrow">↓</div>
-      <div class="fbox" style="width:80%"><h4>工具壳</h4><p>Claude Code / OpenCode / Cline / WorkBuddy …<br>装在电脑上，大多是开源工具</p></div>
+      <div class="fbox" style="width:80%"><h4>工具壳</h4><p>Claude Code / opencode / Cline / WorkBuddy …<br>装在电脑上，大多是开源工具</p></div>
       <div class="farrow">↓</div>
       <div class="fbox amber" style="width:80%"><h4>大脑（大模型）</h4><p>云端 API（按量计费）或 本地模型（自己跑）</p></div>
       <div class="farrow">↓</div>
@@ -149,18 +149,18 @@
   <p class="note">还有这些加减项：批量/异步接口普遍<b>五折</b>；智谱同一型号还按输入长度再分档（GLM-4.7 超 3.2 万 token 涨到 ¥4/16）；OpenAI 超 27 万 token 的长请求输入 ×2、输出 ×1.5；DeepSeek 已公告高峰时段（9–12 点、14–18 点）加价、尚未生效；模型"思考"的字也算输出。<b>以上为 2026 年 8 月各家官网公开价</b>，调价频繁，请以官方页面为准。</p>
   <span class="pagenum">06 / 28</span>
 </section></div></div><div class="bk-folio"><span>6</span><em>第一章 · 破冰</em></div></div>
-<div class="bk-sheet" id="p7" data-ch="1" data-page="7" data-title="在黑窗口里干活的 Agent：Claude Code / Codex / OpenCode"><div class="bk-paper ch1"><div class="bk-fit"><section class="slide active">
+<div class="bk-sheet" id="p7" data-ch="1" data-page="7" data-title="命令行编程 Agent：Claude Code / Codex / opencode"><div class="bk-paper ch1"><div class="bk-fit"><section class="slide active">
   <div class="chip">第 3 节 · 终端编程 Agent</div>
-  <h1 class="title">在黑窗口里干活的 Agent：Claude Code / Codex / OpenCode</h1>
+  <h1 class="title">命令行编程 Agent：Claude Code / Codex / opencode</h1>
   <div class="question">💬 入门者原话：<em>"程序员朋友圈里刷屏的 Claude Code 到底是个啥？"</em></div>
-  <div class="answer"><b>直接回答：</b>一类"住在终端（命令行黑窗口）里的编程 Agent"——你说要做什么，它直接改代码、跑命令、看报错、再修，循环到搞定。</div>
-  <table class="t">
-    <tr><th style="width:15%">工具</th><th style="width:27%">一句话定位</th><th style="width:17%">开源？</th><th style="width:15%">在哪跑</th><th>最擅长啥</th></tr>
-    <tr><td><b>Claude Code</b></td><td>终端编程 Agent 的标杆，生态最成熟</td><td>闭源（Anthropic）</td><td>本地终端</td><td>复杂编程任务，工具生态丰富</td></tr>
-    <tr><td><b>Codex</b></td><td>OpenAI 的编程 Agent，有云端版</td><td>闭源（OpenAI）</td><td>本地终端 + 云端</td><td>与 ChatGPT 生态联动，云端跑长任务</td></tr>
-    <tr><td><b>OpenCode</b></td><td>开源平替，配置灵活，社区活跃</td><td><b style="color:var(--green)">开源</b></td><td>本地终端</td><td>想自由换模型、不想绑死一家的人</td></tr>
+  <div class="answer"><b>直接回答：</b>一类<b>自己动手干活</b>的编程 Agent——你说要做什么，它直接改代码、跑命令、看报错、再修，循环到搞定。三家都从<b>终端（命令行，CLI）</b>起家，但今天都不止终端了：<b>桌面应用、编辑器（IDE）扩展、网页版</b>各家齐备，同一个账号、同一套配置，换界面不换工具。</div>
+  <table class="t sm" style="margin-top:14px">
+    <tr><th style="width:16%">工具</th><th style="width:24%">开源情况（看许可证）</th><th style="width:37%">今天有哪些界面</th><th>最擅长啥</th></tr>
+    <tr><td><b>Claude Code</b><br><span style="font-size:11px">Anthropic</span></td><td>闭源（专有软件）</td><td>命令行 · 桌面应用（macOS / Windows）· VS Code 与 JetBrains 扩展 · 网页版 claude.ai/code · 手机 App</td><td>复杂工程任务，配套生态最成熟</td></tr>
+    <tr><td><b>Codex</b><br><span style="font-size:11px">OpenAI</span></td><td><b style="color:var(--green)">命令行部分开源</b>（Apache-2.0，仓库 openai/codex）；<b>桌面应用不开源</b></td><td>命令行 · 桌面应用（macOS / Windows）· VS Code 扩展 · ChatGPT 里的云端 Codex</td><td>和 ChatGPT 生态联动，云端跑长任务</td></tr>
+    <tr><td><b>opencode</b><br><span style="font-size:11px">Anomaly（原 SST）</span></td><td><b style="color:var(--green)">全部开源</b>（MIT，仓库 anomalyco/opencode）</td><td>命令行 TUI · 桌面应用（macOS / Windows / Linux）· IDE 扩展 · <span class="kbd">opencode web</span> 本机网页</td><td>自由换大脑，不绑定任何一家</td></tr>
   </table>
-  <p class="note" style="margin-top:12px">它怎么干活：你在终端里打字提需求，它在终端里回话 + 动手。</p>
+  <p class="note" style="margin-top:12px"><b>术语对照：</b><b>CLI</b>（命令行）＝在终端里敲命令；<b>TUI</b>＝在终端里画出来的图形界面；<b>IDE 扩展</b>＝装进 VS Code、JetBrains 这类编辑器的插件；<b>桌面应用</b>＝独立安装的图形程序。<b>"开源"看的是许可证</b>：Apache-2.0、MIT 都允许自由查看、修改、商用，闭源则只给你装好的程序。<b>常见误传</b>：Codex 不是整个闭源——开源的是命令行，桌面应用没开源。</p>
   <span class="pagenum">07 / 28</span>
 </section></div></div><div class="bk-folio"><span>7</span><em>第一章 · 破冰</em></div></div>
 <div class="bk-sheet" id="p8" data-ch="1" data-page="8" data-title="不想碰命令行？Agent 也能住在编辑器里（Cline）"><div class="bk-paper ch1"><div class="bk-fit"><section class="slide active">
@@ -286,7 +286,7 @@
     <p class="note" style="margin-top:8px"><b>MoE（混合专家）</b>：Qwen3.6 的 35B、Gemma 4 的 26B 都是这种——模型拆成很多"专家"，每次只叫醒一小撮干活，于是<b>容量按 35B 算</b>（得全装进显存，因为不知道下次叫谁），<b>速度却按 3B 算</b>，比同体积的稠密模型快好几倍。<br><b>旗舰只有云端</b>：新闻里的 GLM-5.2（744B）、Kimi K3（2.8 万亿）、DeepSeek V4 Pro（1.6 万亿），在 Ollama 上都只挂着 cloud 标签，压根没有本地权重可下——不是你机器不行，是它们本来就不给你在本机跑。</p>
     </div>
     <div class="flow">
-      <div class="fbox" style="width:100%"><h4 style="font-size:14px">工具壳（OpenCode / Cline 等）</h4><p>配置指向 localhost（本机地址）</p></div>
+      <div class="fbox" style="width:100%"><h4 style="font-size:14px">工具壳（opencode / Cline 等）</h4><p>配置指向 localhost（本机地址）</p></div>
       <div class="farrow">↓</div>
       <div class="fbox amber" style="width:100%"><h4 style="font-size:14px">Ollama（本机运行）</h4><p>本地模型：qwen3.5:9b / qwen3.6:27b 等</p></div>
       <div class="fbox green" style="width:100%"><h4 style="font-size:13px">全程离线 · 数据不出本机 · 0 费用</h4><p>换模型只要改一行配置</p></div>
@@ -373,9 +373,9 @@
   <div class="answer"><b>直接回答：</b>有，就是这页。</div>
   <table class="t xs">
     <tr><th>工具</th><th>类型</th><th>开源？</th><th>在哪跑</th><th>擅长</th><th>适合谁</th></tr>
-    <tr><td><b>Claude Code</b></td><td>终端编程</td><td>闭源</td><td>本地终端</td><td>编程生态最成熟</td><td>开发者</td></tr>
-    <tr><td><b>Codex</b></td><td>终端编程</td><td>闭源</td><td>终端 + 云端</td><td>长任务、云端跑</td><td>OpenAI 用户</td></tr>
-    <tr><td><b>OpenCode</b></td><td>终端编程</td><td><b style="color:var(--green)">开源</b></td><td>本地终端</td><td>自由换模型</td><td>想折腾的开发者</td></tr>
+    <tr><td><b>Claude Code</b></td><td>命令行编程</td><td>闭源</td><td>终端·桌面·IDE·网页</td><td>编程生态最成熟</td><td>开发者</td></tr>
+    <tr><td><b>Codex</b></td><td>命令行编程</td><td><b style="color:var(--green)">命令行开源</b></td><td>终端·桌面·IDE·云端</td><td>长任务、云端跑</td><td>OpenAI 用户</td></tr>
+    <tr><td><b>opencode</b></td><td>命令行编程</td><td><b style="color:var(--green)">开源</b></td><td>终端·桌面·IDE</td><td>自由换模型</td><td>想折腾的开发者</td></tr>
     <tr><td><b>Cline</b></td><td>编辑器内嵌</td><td><b style="color:var(--green)">开源</b></td><td>VS Code</td><td>图形化编程助手</td><td>怕命令行的人</td></tr>
     <tr><td><b>Hermes</b></td><td>个人助理</td><td><b style="color:var(--green)">开源</b></td><td>本地 / 服务器</td><td>记忆 / 技能 / 定时</td><td>折腾型玩家</td></tr>
     <tr><td><b>OpenClaw</b></td><td>个人助理</td><td><b style="color:var(--green)">开源</b></td><td>本地 / 服务器</td><td>多渠道常驻助理</td><td>想要生活助理的人</td></tr>
@@ -393,7 +393,7 @@
   <div class="answer"><b>直接回答：</b>看你是哪种人，对号入座。</div>
   <table class="t" style="margin-bottom:14px">
     <tr><th style="width:26%">如果你是</th><th style="width:36%">第一个装</th><th>配什么大脑</th></tr>
-    <tr><td>写代码、爱折腾</td><td><b>OpenCode</b></td><td>免费额度 / 本地 Ollama</td></tr>
+    <tr><td>写代码、爱折腾</td><td><b>opencode</b></td><td>免费额度 / 本地 Ollama</td></tr>
     <tr><td>写代码、怕命令行</td><td><b>Cline</b>（VS Code 插件）</td><td>同上</td></tr>
     <tr><td>不碰代码的办公族</td><td><b>WorkBuddy</b>（或你生态对应款）</td><td>公测赠送 / 试用，或本地模型</td></tr>
     <tr><td>想要生活小助理</td><td><b>OpenClaw</b></td><td>本地 Ollama，隐私拉满</td></tr>
@@ -408,7 +408,7 @@
   <div class="question">💬 入门者原话：<em>"说了一堆免费，到底哪些真免费？"</em></div>
   <div class="answer"><b>直接回答：</b>四类拼起来就是完整 0 成本方案：免费的壳 + 免费的云端大脑 + 本地自跑 + 办公试用。</div>
   <div class="grid2">
-    <div class="card"><h3>🧰 免费的壳（开源随便装）</h3><ul><li>OpenCode：终端编程 Agent</li><li>Cline：VS Code 插件</li><li>Hermes / OpenClaw：私人助理</li><li>CC Switch：换大脑面板</li></ul></div>
+    <div class="card"><h3>🧰 免费的壳（开源随便装）</h3><ul><li>opencode：命令行编程 Agent</li><li>Cline：VS Code 插件</li><li>Hermes / OpenClaw：私人助理</li><li>CC Switch：换大脑面板</li></ul></div>
     <div class="card"><h3>☁️ 免费的云端大脑</h3><ul><li>厂商 / 云平台：注册赠送、新客福利</li><li>OpenRouter：常年有免费模型</li><li>赠送额度会变化，以官方为准</li></ul></div>
     <div class="card"><h3>💻 免费的本地大脑</h3><ul><li>Ollama 自跑：一次下载永久免费</li><li>离线可用、数据不出本机</li><li>Qwen3.5 / Gemma 4 / DeepSeek 蒸馏版全免费</li></ul></div>
     <div class="card"><h3>🏢 办公 Agent 试用</h3><ul><li>WorkBuddy：公测期有赠送</li><li>千问办公：公测中，注册送积分</li><li>其余各家也多有大促 / 试用，以官方为准</li></ul></div>
@@ -422,7 +422,7 @@
   <div class="question" style="margin-bottom:6px">💬 入门者原话：<em>"装好之后，第一句话跟它说什么？"</em></div>
   <div class="answer" style="margin-bottom:8px"><b>直接回答：</b>派一件"搞砸了也无所谓"的真小活。下面三条按你的工具挑一条，直接复制。</div>
   <div class="banner gray" style="margin-bottom:10px; font-size:14px">五步照做：① 挑一个→ ② 装好它 → ③ 配大脑（先走免费额度）→ ④ 干件小活（下面挑一条）→ ⑤ 守住底线（见文末）</div>
-  <div class="card" style="margin-bottom:6px"><h3 style="font-size:14px">编程类 · OpenCode / Claude Code / Cline</h3><p style="font-size:14px">"在当前文件夹写一个 Python 脚本：统计这个文件夹里每种后缀名的文件各有多少个，结果存成 report.txt。"</p></div>
+  <div class="card" style="margin-bottom:6px"><h3 style="font-size:14px">编程类 · opencode / Claude Code / Cline</h3><p style="font-size:14px">"在当前文件夹写一个 Python 脚本：统计这个文件夹里每种后缀名的文件各有多少个，结果存成 report.txt。"</p></div>
   <div class="card" style="margin-bottom:6px"><h3 style="font-size:14px">办公类 · WorkBuddy 等</h3><p style="font-size:14px">"帮我把这段会议纪要整理成三条待办，每条一行，标出负责人和截止时间：（贴一段你的纪要）"</p></div>
   <div class="card" style="margin-bottom:8px"><h3 style="font-size:14px">助理类 · OpenClaw / Hermes</h3><p style="font-size:14px">"每天早上 8 点提醒我喝水，并给我一句今日天气提示。"</p></div>
   <table class="t xs">
