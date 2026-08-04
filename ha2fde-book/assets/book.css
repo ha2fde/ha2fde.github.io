@@ -295,9 +295,7 @@ body.wide #bk-bar{left:0}
     display:none; width:min(1280px,1280px); height:min(720px,720px);
     background:#fff; position:relative; overflow:hidden;
     box-shadow:0 12px 48px rgba(15,23,42,.18); border-radius:4px;
-    /* 页脚原留 64px，但下沿只有一行 12px 的页码；绿框改成随流之后这段留白
-       白白吃掉正文高度，收到 32px 刚好托住页码。 */
-    padding:44px 56px 32px;
+    padding:44px 56px 64px;
   }
 .ch1 .slide.active{display:block; animation:a1_fade .28s ease}
 
@@ -326,15 +324,6 @@ body.wide #bk-bar{left:0}
     margin-bottom:20px; background:#fff;
   }
 .ch1 .answer b{font-weight:700}
-/* 原本是 position:absolute + bottom:20px 钉在页脚，内容少的页（p3/p11/p15/p22/p23…）
-   正文和绿框之间会豁开 130～370px 的空洞。改成跟着正文流走、margin-left:auto 保持右对齐，
-   空洞消失；页脚 64px 的留白仍归页码用。 */
-.ch1 .action{
-    margin:12px 0 0 auto; max-width:640px;
-    background:var(--green-bg); border:1px solid var(--green);
-    border-radius:10px; padding:9px 16px; font-size:14.5px; line-height:1.55;
-  }
-.ch1 .action b{color:var(--green); font-weight:700; margin-right:2px}
 .ch1 .note{font-size:13.5px; color:var(--gray); line-height:1.6}
 .ch1 .kbd{font-family:var(--mono); background:var(--light); border:1px solid var(--line); border-radius:4px; padding:0 5px; font-size:.92em}
 .ch1 /* ===== 表格 ===== */
