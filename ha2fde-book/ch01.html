@@ -124,20 +124,29 @@
   </div>
   <span class="pagenum">05 / 28</span>
 </section></div></div><div class="bk-folio"><span>5</span><em>第一章 · 破冰</em></div></div>
-<div class="bk-sheet" id="p6" data-ch="1" data-page="6" data-title="为什么能装一堆：壳自己装，大脑另外接"><div class="bk-paper ch1"><div class="bk-fit"><section class="slide active">
+<div class="bk-sheet" id="p6" data-ch="1" data-page="6" data-title="钱花在哪：大脑按字数收费，今天的真实价目表"><div class="bk-paper ch1"><div class="bk-fit"><section class="slide active">
   <div class="chip">第 2 节 · 一个壳 + 一个大脑（全篇主线）</div>
-  <h1 class="title">钱花在哪：壳基本不要钱，大脑有四条路线</h1>
-  <div class="question">💬 入门者原话：<em>"这些东西要花多少钱？"</em></div>
-  <div class="answer" style="margin-bottom:12px"><b>直接回答：</b>壳几乎不花钱——多是开源项目，装多少个都行。钱全花在大脑上，而大脑有四条路线，从 0 元起步。</div>
-  <table class="t sm" style="margin-bottom:12px">
-    <tr><th style="width:20%">大脑走哪条路</th><th style="width:34%">怎么收钱</th><th style="width:24%">大概量级</th><th>适合谁</th></tr>
-    <tr><td><b>免费额度</b>　<span style="font-size:11px">先走这条</span></td><td>注册赠送、平台常年的免费档</td><td><b>0 元</b>，但有速率和用量上限</td><td>所有新手，先把第一件小活跑通</td></tr>
-    <tr><td><b>云端 API 按量计费</b></td><td>按处理的字数扣钱，用多少扣多少</td><td>轻度问答一个月<b>几块到几十块</b>；天天用它写代码可能<b>上百</b></td><td>要最强的大脑，又不想买硬件</td></tr>
-    <tr><td><b>包月订阅</b></td><td>固定月费，额度内随便用</td><td>各家常见档位<b>每月几十到几百元</b></td><td>每天重度使用、怕账单忽高忽低</td></tr>
-    <tr><td><b>装在自己电脑上</b></td><td>不按次收费，只吃硬件和电</td><td>用起来 <b>0 元</b>；代价是一次性买设备（第 6 节细讲）</td><td>隐私优先、要离线、用量特别大</td></tr>
+  <h1 class="title">钱花在哪：壳不要钱，大脑按字数收 —— 今天的真实价目表</h1>
+  <div class="answer" style="margin-bottom:12px"><b>先记住计价单位：</b>大脑按 <b>token</b> 收费，报价都写成"每 100 万 token 多少钱"（≈ 60~70 万汉字）。<b>输入和输出分开算，输出普遍贵 2~5 倍</b>；同一家还分平价档和旗舰档，价差十几倍。壳本身几乎都是开源免费的。</div>
+  <table class="t xs" style="margin-bottom:10px">
+    <tr><th style="width:12%">厂商</th><th style="width:28%">平价档 · 输入 / 输出</th><th style="width:28%">旗舰档 · 输入 / 输出</th><th>缓存命中后的输入价</th></tr>
+    <tr><td><b>DeepSeek</b></td><td>V4-Flash　¥1.0 / ¥2.0</td><td>V4-Pro　¥3.1 / ¥6.3</td><td><b>¥0.02 / ¥0.03</b>，约未命中的 1/50</td></tr>
+    <tr><td><b>智谱 GLM</b></td><td>GLM-4.7-Flash　<b>长期免费</b></td><td>GLM-5.2　¥8 / ¥28</td><td>¥2，约输入价的 1/4</td></tr>
+    <tr><td><b>Kimi</b></td><td>只有一档</td><td>K3　¥20 / ¥100</td><td>¥2，约 1/10</td></tr>
+    <tr><td><b>OpenAI</b></td><td>GPT-5.6 Luna　¥1.4 / ¥8.6</td><td>GPT-5.6 Sol　¥36 / ¥216</td><td>输入价的 1/10；写入另收 1.25 倍</td></tr>
+    <tr><td><b>Claude</b></td><td>Haiku 4.5　¥7 / ¥36</td><td>Opus 5　¥36 / ¥180</td><td>输入价的 1/10；需手动标，写入 1.25~2 倍</td></tr>
   </table>
-  <div class="banner green">壳自己装、大脑另外接 —— 后面所有工具都是这个结构；换大脑只是改一行配置，不用换工具</div>
-  <p class="note" style="margin-top:10px">价格各家不同且经常调整，上面只给量级，具体以官方页面为准。新手路径：<b>先用免费额度跑通 → 不够用再按量或包月 → 隐私和用量上来了再上本地。</b></p>
+  <div class="grid2" style="margin-bottom:10px">
+    <div class="card gray">
+      <h3>"缓存命中"是什么？为什么每家都有</h3>
+      <p>多轮对话每问一次，都要把系统提示和全部历史<b>原样重发一遍</b>，开头那一大段永远相同。服务器把算过的开头存着直接复用，省下的是真算力，所以敢便宜卖。<span class="sub">国内叫上下文缓存，OpenAI 叫 cached input，Claude 叫 prompt caching；国产三家和 OpenAI 自动命中，Claude 要在请求里手动标。本地跑的模型不按字数收钱，没这回事。</span></p>
+    </div>
+    <div class="card">
+      <h3>同一个 Claude，两种账单</h3>
+      <p><b>填 API Key</b>：按 token 扣钱，用多少扣多少，无上限、可并行开好几个。<b>用订阅号登录</b>（Pro $20、Max $100 / $200 每月）：交固定月费，按"每 5 小时一个窗口 + 每周额度"限量，<b>不按 token 算</b>。<span class="sub">坑：机器上若留着 ANTHROPIC_API_KEY，会优先走按量计费，订阅白买。国产同款：智谱 GLM Coding Plan ¥49/月起。</span></p>
+    </div>
+  </div>
+  <p class="note">还有这些加减项：批量/异步接口普遍<b>五折</b>；OpenAI 超 27 万 token 的长请求输入 ×2、输出 ×1.5；DeepSeek 已公告高峰时段（9–12 点、14–18 点）加价、尚未生效；模型"思考"的字也算输出。<b>以上为 2026-08-04 查到的公开价，美元按 1:7.2 折算</b>，各家调价频繁，请以官方页面为准。</p>
   <span class="pagenum">06 / 28</span>
 </section></div></div><div class="bk-folio"><span>6</span><em>第一章 · 破冰</em></div></div>
 <div class="bk-sheet" id="p7" data-ch="1" data-page="7" data-title="在黑窗口里干活的 Agent：Claude Code / Codex / OpenCode"><div class="bk-paper ch1"><div class="bk-fit"><section class="slide active">
