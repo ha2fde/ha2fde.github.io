@@ -254,19 +254,19 @@
   <div class="chip">第 6 节 · 自己搭大脑：本地运行大模型（重点）</div>
   <h1 class="title">配置对号入座 + 在哪下、怎么装</h1>
   <div class="question">💬 入门者原话：<em>"我这台电脑跑得动吗？要去哪下模型？"</em></div>
-  <div class="answer" style="margin-bottom:9px"><b>直接回答：</b>只看一个数——显存（Mac 是统一内存），它决定你能跑多大的模型。8GB 跑得动 8B，24GB 跑得动 32B，70B 要 Mac 128GB；纯 CPU 只适合尝鲜。</div>
+  <div class="answer" style="margin-bottom:9px"><b>直接回答：</b>看两个数：<b>容量</b>决定能不能跑，<b>带宽</b>决定跑得快不快。型号只是容量的代号，所以下面按容量对号入座。</div>
   <div class="grid2">
     <div>
-      <div class="col-title">① 配置对号入座（按显存 / 内存）</div>
+      <div class="col-title">① 配置对号入座（模型为 2026 年 8 月在售版本）</div>
       <table class="t xs">
-        <tr><th style="width:34%">你的硬件</th><th>跑得动什么（括号是下载后的实际体积）</th></tr>
-        <tr><td><b>8–12GB 显存</b></td><td>qwen3:8b（5.2GB）——日常问答、简单代码</td></tr>
-        <tr><td><b>16GB 显存</b></td><td>qwen3:14b（9.3GB）——明显更聪明，够当主力</td></tr>
-        <tr><td><b>24GB（3090/4090）<br>32GB（5090）</b></td><td>qwen3:32b（20GB）或 qwen3-coder:30b（19GB）——写代码流畅</td></tr>
-        <tr><td><b>Mac 统一内存</b></td><td>64GB 跑 27B~32B 舒服；128GB 才够 llama3.3:70b（43GB）</td></tr>
-        <tr><td><b>8GB 内存纯 CPU</b>（不推荐）</td><td>只能 1B~4B，很慢，尝鲜可以，别当主力</td></tr>
+        <tr><th style="width:26%">容量（代表型号）</th><th style="width:50%">跑得动什么（括号是下载体积）</th><th>大概速度</th></tr>
+        <tr><td><b>8~16GB 显存</b><br><span style="font-size:11px">3060 12G / 4060Ti 16G</span></td><td>qwen3.5:9b（6.6GB）、gemma4:12b（7.6GB）</td><td>20~35 字/秒</td></tr>
+        <tr><td><b>24GB 显存</b><br><span style="font-size:11px">3090 / 4090</span></td><td>qwen3.6:27b（17GB）★ 单卡最优；要更快选 gemma4:26b（18GB）</td><td>约 35 字/秒</td></tr>
+        <tr><td><b>32GB 显存</b><br><span style="font-size:11px">5090</span></td><td>qwen3.6:35b（24GB）——个人单卡能跑的最强一档</td><td>100+ 字/秒</td></tr>
+        <tr><td><b>Mac 统一内存</b><br><span style="font-size:11px">32 / 64 / 128GB</span></td><td>32G 跑 27b；64G 跑 35b；128G 才够 qwen3.5:122b（81GB）</td><td>10~40 字/秒</td></tr>
+        <tr><td><b>8GB 内存纯 CPU</b></td><td>只有 qwen3.5:2b / 4b（2.7 / 3.4GB），能力有限</td><td>约 15 字/秒</td></tr>
       </table>
-      <p class="note" style="margin-top:8px">两条心算公式：<b>体积(GB) ≈ 参数量 × 0.6</b>——这是"量化版"（Q4）的算法，牺牲一点精度换体积砍到四分之一，本地跑基本都用它；实际需要的显存还要再加 2~3GB 留给上下文。<b>速度(字/秒) ≈ 带宽(GB/s) ÷ 体积(GB) × 0.8</b>——4090 带宽 1008GB/s，跑 20GB 的模型约 40 字/秒；纯 CPU 内存只有 70GB/s 左右，同样的模型约 2 字/秒，不是装不下，是慢到没法用。</p>
+      <p class="note" style="margin-top:8px">两条心算公式：<b>体积(GB) ≈ 参数量 × 0.6</b>（Q4 量化版，精度掉一点、体积砍掉四分之三），实际占用再加 2~3GB 给上下文；<b>速度(字/秒) ≈ 带宽(GB/s) ÷ 体积(GB) × 0.6</b>。</p>
     </div>
     <div>
       <div class="col-title">② 下载渠道与安装方式</div>
@@ -276,7 +276,9 @@
         <tr><td><b>LM Studio</b></td><td>图形化界面，点鼠标选模型</td><td>官网下载安装包</td></tr>
         <tr><td><b>ModelScope 魔搭</b></td><td>国内仓库，下载快</td><td>网页下载配合工具用</td></tr>
       </table>
-      <p class="note" style="margin-top:10px">通用原则：Windows/Mac 下载安装包，Linux 用命令装；以各官网为准。</p>
+      <p class="note" style="margin-top:10px"><b>怎么查自己有多少：</b>Windows 按 Ctrl+Shift+Esc 开任务管理器 → 性能 → GPU → 看"专用 GPU 内存"；Mac 点左上角苹果标 → 关于本机 → 看"内存"。</p>
+      <p class="note" style="margin-top:8px">带宽算速度举例：4090 带宽 1008GB/s，跑 17GB 的模型约 35 字/秒；纯 CPU 内存只有 70GB/s，同样的模型不到 3 字/秒——不是装不下，是慢到没法用。</p>
+      <p class="note" style="margin-top:8px">通用原则：Windows/Mac 下载安装包，Linux 用命令装；以各官网为准。</p>
     </div>
   </div>
   <span class="pagenum">12 / 28</span>
@@ -285,23 +287,23 @@
   <div class="chip">第 6 节 · 自己搭大脑：本地运行大模型（重点）</div>
   <h1 class="title">个人可选模型清单 + 本地大脑接进壳里</h1>
   <div class="question">💬 入门者原话：<em>"模型名字一大堆，我下哪个？本地大脑能给那些 Agent 工具用吗？"</em></div>
-  <div class="answer" style="margin-bottom:8px"><b>直接回答：</b>中文日常和写代码都先选 Qwen3，要推理选 DeepSeek-R1 蒸馏版，要全球生态选 Llama。本地模型可以直接当壳的大脑，完全离线。</div>
+  <div class="answer" style="margin-bottom:8px"><b>直接回答：</b>中文和写代码都先选通义千问（Qwen3.5/3.6），要看图或机器小就选 Gemma 4。本地模型能直接当壳的大脑，完全离线。</div>
   <div style="display:grid; grid-template-columns:1.5fr 1fr; gap:24px; align-items:start">
     <div>
     <table class="t xs">
-      <tr><th style="width:23%">模型</th><th style="width:12%">出身</th><th>一句话</th><th style="width:27%">本地常见规模</th></tr>
-      <tr><td><b>Qwen3 系列</b> ★</td><td>阿里</td><td>中文最强之一，本地首选</td><td>4B / 8B / 14B / 32B</td></tr>
-      <tr><td><b>Qwen3-Coder</b></td><td>阿里</td><td>专做写代码，MoE 架构省显存</td><td>30B，但只激活 3B</td></tr>
-      <tr><td><b>DeepSeek-R1 蒸馏版</b></td><td>DeepSeek</td><td>推理强；原版太大，蒸馏后才能本地跑</td><td>8B / 14B / 32B / 70B</td></tr>
-      <tr><td><b>Llama 3.3</b></td><td>Meta</td><td>全球生态最全，英文场景稳</td><td>70B（要 Mac 128GB）</td></tr>
-      <tr><td><b>Gemma 3</b></td><td>谷歌</td><td>带看图能力，多语言</td><td>27B</td></tr>
+      <tr><th style="width:22%">模型</th><th style="width:11%">出身</th><th>一句话</th><th style="width:29%">本地能下到的规模</th></tr>
+      <tr><td><b>Qwen3.5</b> ★</td><td>阿里</td><td>中文最强之一，尺寸最全，手机到工作站都覆盖</td><td>0.8B / 2B / 4B / 9B / 27B / 35B / 122B</td></tr>
+      <tr><td><b>Qwen3.6</b> ★</td><td>阿里</td><td>3.5 的升级版，主攻写代码和跑 Agent</td><td>27B（稠密）/ 35B（MoE）</td></tr>
+      <tr><td><b>Gemma 4</b></td><td>谷歌</td><td>Ollama 上下载量第一，带看图，多语言</td><td>E2B / E4B / 12B / 26B / 31B</td></tr>
+      <tr><td><b>DeepSeek-R1 蒸馏版</b></td><td>DeepSeek</td><td>推理强；但已是 2025 年的模型，正被上面两家追上</td><td>1.5B ~ 70B</td></tr>
+      <tr><td><b>Llama</b>（了解即可）</td><td>Meta</td><td>曾经的开源标杆，一年多没出新的本地版本了</td><td>llama3.3:70b / llama4</td></tr>
     </table>
-    <p class="note" style="margin-top:8px">MoE（混合专家）架构，比如上面的 Qwen3-Coder：模型拆成很多"专家"，每次只叫醒一小撮干活，于是<b>容量按 30B 算</b>（19GB 得全装进去，因为不知道下次叫谁）、<b>速度按 3B 算</b>——同样占 20GB，比普通 32B 快好几倍。<br>注意：新闻里的国产旗舰——DeepSeek V4 Pro（1.6T）、Kimi K2.6（1T）、GLM-5.1（200B+）——都是巨无霸，个人电脑一台都跑不动。本地能跑的是它们的小尺寸版和蒸馏版，别照着新闻里的名字去下载。</p>
+    <p class="note" style="margin-top:8px"><b>MoE（混合专家）</b>：Qwen3.6 的 35B、Gemma 4 的 26B 都是这种——模型拆成很多"专家"，每次只叫醒一小撮干活，于是<b>容量按 35B 算</b>（得全装进显存，因为不知道下次叫谁），<b>速度却按 3B 算</b>，比同体积的稠密模型快好几倍。<br><b>旗舰只有云端</b>：新闻里的 GLM-5.2（744B）、Kimi K3（2.8 万亿）、DeepSeek V4 Pro（1.6 万亿），在 Ollama 上都只挂着 cloud 标签，压根没有本地权重可下——不是你机器不行，是它们本来就不给你在本机跑。</p>
     </div>
     <div class="flow">
       <div class="fbox" style="width:100%"><h4 style="font-size:14px">工具壳（OpenCode / Cline 等）</h4><p>配置指向 localhost（本机地址）</p></div>
       <div class="farrow">↓</div>
-      <div class="fbox amber" style="width:100%"><h4 style="font-size:14px">Ollama（本机运行）</h4><p>本地模型：qwen3:14b / deepseek-r1:14b 等</p></div>
+      <div class="fbox amber" style="width:100%"><h4 style="font-size:14px">Ollama（本机运行）</h4><p>本地模型：qwen3.5:9b / qwen3.6:27b 等</p></div>
       <div class="fbox green" style="width:100%"><h4 style="font-size:13px">全程离线 · 数据不出本机 · 0 费用</h4><p>换模型只要改一行配置</p></div>
     </div>
   </div>
