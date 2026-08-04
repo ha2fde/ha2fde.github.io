@@ -174,6 +174,10 @@ body.wide #bk-bar{left:0}
 .bk-op-secs{list-style:none;margin:auto 0 0;padding:20px 0 0;border-top:1px solid var(--bk-line)}
 .bk-op-secs li{display:flex;align-items:baseline;gap:10px;padding:5.5px 0;font-size:13.5px;
   color:#4B5563}
+/* 扉页目录列满 12 条以上（第 1～4 章）时，5.5px 的行距会顶破 720px 的纸面，
+   收到 3px；第 5～7 章只有 5～7 条，留着宽松的行距。 */
+.bk-op-secs li:nth-last-child(n+12),
+.bk-op-secs li:nth-last-child(n+12)~li{padding:3px 0}
 .bk-op-secs li i{flex:1;border-bottom:1px dotted #D1D8E0;transform:translateY(-3px)}
 .bk-op-secs li em{font-style:normal;font-size:12px;color:var(--bk-faint);
   font-variant-numeric:tabular-nums}
