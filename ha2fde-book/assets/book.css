@@ -1249,7 +1249,7 @@ body.bk-debug .bk-sheet[data-fitted] .bk-paper{outline:2px solid #DC2626;outline
 .bk-diag .dg-core>b{color:var(--accent,#2563EB)}
 /* 第 5 章的 .diagram 本身是一张浅灰卡片，里面再放淡色方框就成了框套框，
    托管 .bk-diag 时把卡片自己的底色和描边让出来。 */
-.ch5 .diagram.bk-diag,.ch2 .diagram.bk-diag,.ch3 .diagram.bk-diag{
+.ch5 .diagram.bk-diag,.ch2 .diagram.bk-diag{
   background:none;border:0;padding:2px 0;
   /* 原来的 <pre> 是宽块，卡片 align-self:center 会让盒子布局收缩成一条，
      页面中段空出一大片，所以这里改成占满内容宽 */
@@ -1272,3 +1272,20 @@ body.bk-debug .bk-sheet[data-fitted] .bk-paper{outline:2px solid #DC2626;outline
 /* 第 2 章的 art-wrap 会把内容居中收缩，同第 5 章处理 */
 .ch2 .art-wrap>.bk-diag{width:100%;font-size:14.5px}
 .ch2 .bk-diag{--accent:#4338CA;--sub:#667085;--key:#1C2333;--border:#E5E7EE;--warn:#B45309}
+/* 第 3 章不同于第 2、5 章：它的 .diagram 是压在浅灰纸面上的白卡片，卡片本身
+   就是版式的一部分，去掉底色反而塌了。所以这里只还原 <pre> 那套等宽 + 不折行，
+   卡片的底色 / 描边 / 阴影原样留着。 */
+.ch3 .diagram.bk-diag{white-space:normal;font-family:inherit;
+  font-size:14.6px;line-height:1.5;justify-content:center}
+.ch3 .diagram.small.bk-diag{font-size:13.2px;line-height:1.45;gap:7px}
+/* 第 3 章定义的是 --ink/--ink2/--ink3/--line/--card，跟组件的变量名对不上 */
+.ch3 .bk-diag{--key:#111827;--sub:#4b5563;--border:#e5e7eb;--panel:#f8fafc;--warn:#b45309}
+/* 「问 → 答」清单：右列统一加箭头，不必每条手写 */
+.bk-diag .dg-q dd::before{content:"→ ";color:var(--accent,#2563EB);font-weight:700}
+.bk-diag .dg-ul>li b{color:var(--key,#0F172A);margin-right:5px}
+.bk-diag .dg-ul.dg-ok>li::before{content:"✓";color:#059669}
+.bk-diag .dg-ul.dg-no>li::before{content:"✗";color:#dc2626}
+.bk-diag .dg-on{color:var(--accent,#2563EB);font-weight:700;font-style:normal}
+.bk-diag .dg-warn{color:var(--warn,#B45309);font-weight:700;font-style:normal}
+/* 被截断丢弃的历史轮次 */
+.bk-diag .dg-cut{opacity:.45;text-decoration:line-through}
