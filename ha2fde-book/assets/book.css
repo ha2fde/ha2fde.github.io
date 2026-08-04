@@ -314,10 +314,10 @@ body.wide #bk-bar{left:0}
     margin-bottom:18px; color:var(--ink);
   }
 .ch1 .question{
-    background:var(--light); border-radius:10px; padding:12px 18px;
-    font-size:17px; color:var(--gray); line-height:1.6; margin-bottom:12px;
+    background:#1E293B; border-radius:10px; padding:12px 18px;
+    font-size:17px; color:#94A3B8; line-height:1.6; margin-bottom:12px;
   }
-.ch1 .question em{font-style:italic}
+.ch1 .question em{font-style:italic; color:#F1F5F9}
 .ch1 .answer{
     border:1px solid var(--line); border-left:4px solid var(--blue);
     border-radius:8px; padding:12px 18px; font-size:17.5px; line-height:1.65;
