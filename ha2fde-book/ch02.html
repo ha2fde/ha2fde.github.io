@@ -150,7 +150,7 @@ print(list(numbers))         <span class="cm"># [231, 140, 171]</span></pre></di
   </div>
 </section></div></div><div class="bk-folio"><span>29</span><em>第二章 · 前传</em></div></div>
 <div class="bk-sheet" id="p30" data-ch="2" data-page="30" data-title="编号不是意思：one-hot 的死胡同"><div class="bk-paper ch2"><div class="bk-fit"><section class="slide active">
-  <header><span class="tag">第 2 节 · 上</span><h1>编号不是意思：one-hot 的死胡同</h1></header>
+  <header><span class="tag">第 2 节 · 词的表示（上）</span><h1>编号不是意思：one-hot 的死胡同</h1></header>
   <div class="band">
     <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"词变数字还不简单？给每个词编个号不就行了。"</em></div>
     <div class="pt"><span class="lbl">② 点破卡点</span>编号里没有"意思"。"猫"是 3 号、"狗"是 4 号，3 和 4 挨得近，<b>不代表猫和狗像</b>。机器拿到的只有"一样 / 不一样"，永远算不出"有多像"。</div>
@@ -175,7 +175,7 @@ print(onehot[<span class="st">"猫"</span>])  <span class="cm"># [0, 0, 1, 0] �
   </div>
 </section></div></div><div class="bk-folio"><span>30</span><em>第二章 · 前传</em></div></div>
 <div class="bk-sheet" id="p31" data-ch="2" data-page="31" data-title="embedding：词义 = 向量"><div class="bk-paper ch2"><div class="bk-fit"><section class="slide active">
-  <header><span class="tag">第 2 节 · 下</span><h1>embedding：词义 = 向量</h1></header>
+  <header><span class="tag">第 2 节 · 词的表示（下）</span><h1>embedding：词义 = 向量</h1></header>
   <div class="band">
     <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"那怎么让数字带上意思？"</em></div>
     <div class="pt"><span class="lbl">② 点破卡点</span>需要的不是"编号"，而是<b>"坐标"</b>：让意思相近的词，坐标也相近——"像不像"从此变成"距离近不近"，机器就能算了。</div>
@@ -281,7 +281,7 @@ probs = predict(memory)          <span class="cm"># 用最后的记忆预测</sp
   </div>
 </section></div></div><div class="bk-folio"><span>34</span><em>第二章 · 前传</em></div></div>
 <div class="bk-sheet" id="p35" data-ch="2" data-page="35" data-title="注意力：让每个词&quot;看全局&quot;"><div class="bk-paper ch2"><div class="bk-fit"><section class="slide active">
-  <header><span class="tag">第 6 节 · 上</span><h1>注意力：让每个词"看全局"</h1></header>
+  <header><span class="tag">第 6 节 · 注意力机制（上）</span><h1>注意力：让每个词"看全局"</h1></header>
   <div class="band">
     <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"不顺序读，机器怎么知道每个词在句子里是什么意思？"</em></div>
     <div class="pt"><span class="lbl">② 点破卡点</span>RNN 的病根是"信息只能排队往前挤"。反过来：<b>每个词确定自己含义时，直接同时看整句话所有词，重点看跟自己相关的</b>。词义不再是死的——由上下文现场决定。</div>
@@ -307,7 +307,7 @@ probs = predict(memory)          <span class="cm"># 用最后的记忆预测</sp
   </div>
 </section></div></div><div class="bk-folio"><span>35</span><em>第二章 · 前传</em></div></div>
 <div class="bk-sheet" id="p36" data-ch="2" data-page="36" data-title="注意力的副产品：顺手治好了&quot;慢&quot;"><div class="bk-paper ch2"><div class="bk-fit"><section class="slide active">
-  <header><span class="tag">第 6 节 · 下</span><h1>注意力的副产品：顺手治好了"慢"</h1></header>
+  <header><span class="tag">第 6 节 · 注意力机制（下）</span><h1>注意力的副产品：顺手治好了"慢"</h1></header>
   <div class="band">
     <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"看完上下文之后呢？这跟 RNN 比到底赢在哪？"</em></div>
     <div class="pt"><span class="lbl">② 点破卡点</span>每个词"看全句"这件事互相不用等——"苹果"看它的，"手机"看它的，<b>所有词同时算</b>。RNN 的"慢"被一起治了：GPU 终于火力全开。</div>
@@ -336,7 +336,7 @@ context_vecs = attention(embed(sentence))  <span class="cm"># 并行</span></pre
   </div>
 </section></div></div><div class="bk-folio"><span>36</span><em>第二章 · 前传</em></div></div>
 <div class="bk-sheet" id="p37" data-ch="2" data-page="37" data-title="Transformer 到底是什么？——三件事"><div class="bk-paper ch2"><div class="bk-fit"><section class="slide active">
-  <header><span class="tag">第 7 节 · 上</span><h1>Transformer 到底是什么？——三件事</h1></header>
+  <header><span class="tag">第 7 节 · Transformer（上）</span><h1>Transformer 到底是什么？——三件事</h1></header>
   <div class="band">
     <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"Transformer 听起来很玄，是不是一个特别复杂的黑盒？"</em></div>
     <div class="pt"><span class="lbl">② 点破卡点</span>不玄，就是三块拼图各治一病——前两块你已经见过了。唯一的真问题：<b>所有词同时看，不就不知道谁先谁后了吗？</b>所以补一块"位置编码"。</div>
@@ -362,7 +362,7 @@ probs = vocab_head(x[-1])              <span class="cm"># -&gt; 下一个词概�
   </div>
 </section></div></div><div class="bk-folio"><span>37</span><em>第二章 · 前传</em></div></div>
 <div class="bk-sheet" id="p38" data-ch="2" data-page="38" data-title="为什么赢的是它"><div class="bk-paper ch2"><div class="bk-fit"><section class="slide active">
-  <header><span class="tag">第 7 节 · 下</span><h1>为什么赢的是它</h1></header>
+  <header><span class="tag">第 7 节 · Transformer（下）</span><h1>为什么赢的是它</h1></header>
   <div class="band">
     <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"架构之争我看淡了——凭什么 Transformer 统一了江湖？"</em></div>
     <div class="pt"><span class="lbl">② 点破卡点</span>不是它更"聪明"，是它<b>吃得下</b>：并行让它能吃互联网级数据，注意力让它能学长距离规律。两者相加，才撑得起后面的"大力出奇迹"。</div>
@@ -387,7 +387,7 @@ probs = transformer(context_tokens)</pre></div>
   </div>
 </section></div></div><div class="bk-folio"><span>38</span><em>第二章 · 前传</em></div></div>
 <div class="bk-sheet" id="p39" data-ch="2" data-page="39" data-title="预训练：在海量文本上练&quot;续写&quot;"><div class="bk-paper ch2"><div class="bk-fit"><section class="slide active">
-  <header><span class="tag">第 8 节 · 上</span><h1>预训练：在海量文本上练"续写"</h1></header>
+  <header><span class="tag">第 8 节 · 预训练与微调（上）</span><h1>预训练：在海量文本上练"续写"</h1></header>
   <div class="band">
     <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"架构是骨架，可模型的'知识'到底从哪灌进去的？"</em></div>
     <div class="pt"><span class="lbl">② 点破卡点</span>答案简单得不像话：把互联网文本切成无数道"前文 → 下一个词"练习题，反复做、错了就调权重。<b>不需要人工标注——原文的下一个词就是标准答案。</b></div>
@@ -414,7 +414,7 @@ probs = transformer(context_tokens)</pre></div>
   </div>
 </section></div></div><div class="bk-folio"><span>39</span><em>第二章 · 前传</em></div></div>
 <div class="bk-sheet" id="p40" data-ch="2" data-page="40" data-title="微调：从&quot;会背书&quot;到&quot;会干活&quot;"><div class="bk-paper ch2"><div class="bk-fit"><section class="slide active">
-  <header><span class="tag">第 8 节 · 下</span><h1>微调：从"会背书"到"会干活"</h1></header>
+  <header><span class="tag">第 8 节 · 预训练与微调（下）</span><h1>微调：从"会背书"到"会干活"</h1></header>
   <div class="band">
     <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"会续写 ≠ 会干活。我要它当客服、写代码，怎么办？"</em></div>
     <div class="pt"><span class="lbl">② 点破卡点</span>不用从头再练。预训练已把"语言本身"学完（贵，但只练一次）；之后用<b>少量任务样本再练一小段</b>——这叫微调。分工：预训练学语言，微调学干活。</div>
