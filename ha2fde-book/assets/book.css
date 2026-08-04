@@ -1056,6 +1056,10 @@ padding:26px 30px;box-shadow:0 24px 70px rgba(15,23,42,.4);}
 .ch7 /* ---------- 引用条目 ---------- */
   .refs{ display:flex; flex-direction:column; }
 .ch7 .ref{ display:flex; gap:20px; padding:20px 4px; border-bottom:1px solid #edf0ee; }
+/* 第 152 页比同类页多一条参考文献，按默认间距会超出 720px 的纸面、
+   被 bkFitPages 整页缩到 95%——那样这一页会比全书别的页明显窄一圈。
+   宁可把这一页的条目间距收紧，也不要让页面宽度不一致。 */
+.ch7 .refs.tight .ref{ padding:13px 4px; }
 .ch7 .ref:last-child{ border-bottom:none; }
 .ch7 .ref-badge{ flex:0 0 46px; width:46px; height:46px; border-radius:12px;
     background:#0e6b5c; color:#fff; font-size:18px; font-weight:800;

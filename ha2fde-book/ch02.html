@@ -342,7 +342,7 @@ context_vecs = attention(embed(sentence))  <span class="cm"># 并行</span></pre
     <div class="pt"><span class="lbl">② 点破卡点</span>不玄，就是三块拼图各治一病——前两块你已经见过了。唯一的真问题：<b>所有词同时看，不就不知道谁先谁后了吗？</b>所以补一块"位置编码"。</div>
   </div>
   <div class="art-wrap">
-<div class="art bk-diag">
+<div class="art bk-diag" style="gap:4px">
 <ul class="dg-br"><li><em>① 注意力</em>　→ 全局感知（治“看不见全局”，第 6 节）</li>
 <li><em>② 并行</em>　　→ 治 RNN 的慢（第 5 节）</li>
 <li><em>③ 位置编码</em>→ 治“并行导致的乱序”：把“第几个词”直接加进向量</li></ul>
