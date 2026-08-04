@@ -245,8 +245,8 @@
   <table class="t xs">
     <tr><th style="width:15%">这个数</th><th style="width:43%">是什么</th><th>决定什么</th></tr>
     <tr><td><b>多少 B</b></td><td>参数量。B = billion，8B 就是 80 亿个"旋钮"，越多越聪明也越占地方</td><td>模型的<b>聪明程度</b>，以及<b>体积多大</b></td></tr>
-    <tr><td><b>显存 / 内存</b></td><td>模型跑起来时住的地方。Mac 的"统一内存"是 CPU/GPU 共用，买多大就有多大显存</td><td><b>能不能跑</b>——必须整个装进去，装不下就报错或慢十倍</td></tr>
-    <tr><td><b>带宽</b></td><td>每秒能从内存搬多少 GB。模型每吐一个字都要把全部参数读一遍，所以带宽就是速度本身</td><td><b>跑得多快</b>——10 字/秒勉强跟得上阅读，20 以上才舒服</td></tr>
+    <tr><td><b>显存 / 内存</b></td><td>模型跑起来时住的地方。Mac 的"统一内存"是 CPU/GPU 共用，买多大就有多大显存，但系统自己要吃掉几 GB</td><td><b>能不能跑</b>——必须整个装进去，装不下就报错或慢十倍</td></tr>
+    <tr><td><b>带宽</b></td><td>每秒能从内存搬多少 GB。模型每吐一个字都要把参数完整读一遍（MoE 只读被叫醒的那部分），所以带宽就是速度本身</td><td><b>跑得多快</b>——10 字/秒勉强跟得上阅读，20 以上才舒服</td></tr>
   </table>
   <span class="pagenum">11 / 28</span>
 </section></div></div><div class="bk-folio"><span>12</span><em>第一章 · 破冰</em></div></div>
@@ -254,19 +254,19 @@
   <div class="chip">第 6 节 · 自己搭大脑：本地运行大模型（重点）</div>
   <h1 class="title">配置对号入座 + 在哪下、怎么装</h1>
   <div class="question">💬 入门者原话：<em>"我这台电脑跑得动吗？要去哪下模型？"</em></div>
-  <div class="answer" style="margin-bottom:9px"><b>直接回答：</b>看两个数：<b>容量</b>决定能不能跑，<b>带宽</b>决定跑得快不快。型号只是容量的代号，所以下面按容量对号入座。</div>
+  <div class="answer" style="margin-bottom:9px"><b>直接回答：</b>看两个数：<b>容量</b>决定能不能跑，<b>带宽</b>决定跑得快不快。下面按容量分档；同一档里型号越新、带宽越高，速度也越快。</div>
   <div class="grid2">
     <div>
       <div class="col-title">① 对号入座（2026 年 8 月的模型，换代快，用前上 ollama.com 热门榜核一眼）</div>
       <table class="t xs">
         <tr><th style="width:26%">容量（代表型号）</th><th style="width:50%">跑得动什么（括号是下载体积）</th><th>大概速度</th></tr>
-        <tr><td><b>8~16GB 显存</b><br><span style="font-size:11px">3060 12G / 4060Ti 16G</span></td><td>qwen3.5:9b（6.6GB）、gemma4:12b（7.6GB）</td><td>20~35 字/秒</td></tr>
+        <tr><td><b>12~16GB 显存</b><br><span style="font-size:11px">3060 12G / 4060Ti 16G</span></td><td>qwen3.5:9b（6.6GB）、gemma4:12b（7.6GB）</td><td>20~35 字/秒</td></tr>
         <tr><td><b>24GB 显存</b><br><span style="font-size:11px">3090 / 4090</span></td><td>qwen3.6:27b（17GB）★ 单卡最优；要更快选 gemma4:26b（18GB）</td><td>约 35 字/秒</td></tr>
         <tr><td><b>32GB 显存</b><br><span style="font-size:11px">5090</span></td><td>qwen3.6:35b（24GB）——个人单卡能跑的最强一档</td><td>100+ 字/秒</td></tr>
-        <tr><td><b>Mac 统一内存</b><br><span style="font-size:11px">32 / 64 / 128GB</span></td><td>32G 跑 27b；64G 跑 35b；128G 才够 qwen3.5:122b（81GB）</td><td>10~40 字/秒</td></tr>
-        <tr><td><b>8GB 内存纯 CPU</b></td><td>只有 qwen3.5:2b / 4b（2.7 / 3.4GB），能力有限</td><td>约 15 字/秒</td></tr>
+        <tr><td><b>Mac 统一内存</b><br><span style="font-size:11px">32 / 64 / 128GB</span></td><td>32G 跑 27b；64G 跑 35b；128G 才够 qwen3.5:122b（81GB）</td><td>5~40 字/秒</td></tr>
+        <tr><td><b>8GB 显存 或纯 CPU</b></td><td>只有 qwen3.5:2b / 4b（2.7 / 3.4GB），能力有限</td><td>15~40 字/秒</td></tr>
       </table>
-      <p class="note" style="margin-top:8px">两条心算公式：<b>体积(GB) ≈ 参数量 × 0.6</b>（Q4 量化版，精度掉一点、体积砍掉四分之三），实际占用再加 2~3GB 给上下文；<b>速度(字/秒) ≈ 带宽(GB/s) ÷ 体积(GB) × 0.6</b>。</p>
+      <p class="note" style="margin-top:8px">两条心算公式：<b>体积(GB) ≈ 参数量的三分之二</b>（Q4 量化版，精度掉一点、体积砍到三分之一），实际占用再加 2~3GB 给上下文；<b>速度(字/秒) ≈ 带宽(GB/s) ÷ 体积(GB) × 0.6</b>。</p>
     </div>
     <div>
       <div class="col-title">② 下载渠道与安装方式</div>
@@ -287,14 +287,14 @@
   <div class="chip">第 6 节 · 自己搭大脑：本地运行大模型（重点）</div>
   <h1 class="title">个人可选模型清单 + 本地大脑接进壳里</h1>
   <div class="question">💬 入门者原话：<em>"模型名字一大堆，我下哪个？本地大脑能给那些 Agent 工具用吗？"</em></div>
-  <div class="answer" style="margin-bottom:8px"><b>直接回答：</b>中文和写代码都先选通义千问（Qwen3.5/3.6），要看图或机器小就选 Gemma 4。本地模型能直接当壳的大脑，完全离线。</div>
+  <div class="answer" style="margin-bottom:8px"><b>直接回答：</b>中文和写代码都先选通义千问（Qwen3.5/3.6），机器特别小或想要多语言再看 Gemma 4。本地模型能直接当壳的大脑，完全离线。</div>
   <div style="display:grid; grid-template-columns:1.5fr 1fr; gap:24px; align-items:start">
     <div>
     <table class="t xs">
       <tr><th style="width:22%">模型</th><th style="width:11%">出身</th><th>一句话</th><th style="width:29%">本地能下到的规模</th></tr>
-      <tr><td><b>Qwen3.5</b> ★</td><td>阿里</td><td>中文最强之一，尺寸最全，手机到工作站都覆盖</td><td>0.8B / 2B / 4B / 9B / 27B / 35B / 122B</td></tr>
+      <tr><td><b>Qwen3.5</b> ★</td><td>阿里</td><td>中文最强之一，尺寸最全且都带看图，手机到工作站都覆盖</td><td>0.8B / 2B / 4B / 9B / 27B / 35B / 122B</td></tr>
       <tr><td><b>Qwen3.6</b> ★</td><td>阿里</td><td>3.5 的升级版，主攻写代码和跑 Agent</td><td>27B（稠密）/ 35B（MoE）</td></tr>
-      <tr><td><b>Gemma 4</b></td><td>谷歌</td><td>Ollama 上下载量第一，带看图，多语言</td><td>E2B / E4B / 12B / 26B / 31B</td></tr>
+      <tr><td><b>Gemma 4</b></td><td>谷歌</td><td>Ollama 上下载量第一，多语言，E 系列小到能上手机</td><td>E2B / E4B / 12B / 26B / 31B</td></tr>
       <tr><td><b>DeepSeek-R1 蒸馏版</b></td><td>DeepSeek</td><td>推理强；但已是 2025 年的模型，正被上面两家追上</td><td>1.5B ~ 70B</td></tr>
       <tr><td><b>Llama</b>（了解即可）</td><td>Meta</td><td>曾经的开源标杆，一年多没出新的本地版本了</td><td>llama3.3:70b / llama4</td></tr>
     </table>
