@@ -257,7 +257,7 @@
   <div class="answer" style="margin-bottom:9px"><b>直接回答：</b>看两个数：<b>容量</b>决定能不能跑，<b>带宽</b>决定跑得快不快。型号只是容量的代号，所以下面按容量对号入座。</div>
   <div class="grid2">
     <div>
-      <div class="col-title">① 配置对号入座（模型为 2026 年 8 月在售版本）</div>
+      <div class="col-title">① 对号入座（2026 年 8 月的模型，换代快，用前上 ollama.com 热门榜核一眼）</div>
       <table class="t xs">
         <tr><th style="width:26%">容量（代表型号）</th><th style="width:50%">跑得动什么（括号是下载体积）</th><th>大概速度</th></tr>
         <tr><td><b>8~16GB 显存</b><br><span style="font-size:11px">3060 12G / 4060Ti 16G</span></td><td>qwen3.5:9b（6.6GB）、gemma4:12b（7.6GB）</td><td>20~35 字/秒</td></tr>
@@ -271,14 +271,14 @@
     <div>
       <div class="col-title">② 下载渠道与安装方式</div>
       <table class="t xs">
-        <tr><th style="width:27%">渠道</th><th style="width:38%">一句话</th><th>怎么装</th></tr>
-        <tr><td><b>Ollama</b> ★新手推荐</td><td><span class="kbd">ollama run 模型名</span> 自动下载运行</td><td>Win/Mac 装安装包，Linux 一条命令</td></tr>
-        <tr><td><b>LM Studio</b></td><td>图形化界面，点鼠标选模型</td><td>官网下载安装包</td></tr>
-        <tr><td><b>ModelScope 魔搭</b></td><td>国内仓库，下载快</td><td>网页下载配合工具用</td></tr>
+        <tr><th style="width:24%">用什么</th><th>一句话 / 怎么用</th></tr>
+        <tr><td><b>Ollama</b><br><span style="font-size:11px">★ 新手就用它</span></td><td>装完在终端敲 <span class="kbd">ollama run 模型名</span>，自动下载并跑起来。Win/Mac 下安装包，Linux 一条命令</td></tr>
+        <tr><td><b>LM Studio</b></td><td>不想碰终端就用它：图形界面 + 内置模型商店，点鼠标搜、点鼠标下、点鼠标聊。官网下安装包</td></tr>
+        <tr><td><b>魔搭 ModelScope</b></td><td>阿里的国内模型仓库。Ollama 拉不动时不用换工具，把地址换成它即可：<span class="kbd">ollama run modelscope.cn/仓库名</span></td></tr>
+        <tr><td><b>Mac 加一步</b></td><td>选带 <b>-mlx</b> 后缀的版本，如 <span class="kbd">qwen3.5:27b-mlx</span>。MLX 是苹果自家的推理框架，直吃统一内存和 Metal，比通用版快三成左右</td></tr>
       </table>
-      <p class="note" style="margin-top:10px"><b>怎么查自己有多少：</b>Windows 按 Ctrl+Shift+Esc 开任务管理器 → 性能 → GPU → 看"专用 GPU 内存"；Mac 点左上角苹果标 → 关于本机 → 看"内存"。</p>
+      <p class="note" style="margin-top:9px"><b>怎么查自己有多少：</b>Windows 按 Ctrl+Shift+Esc 开任务管理器 → 性能 → GPU → 看"专用 GPU 内存"；Mac 点左上角苹果标 → 关于本机 → 看"内存"。</p>
       <p class="note" style="margin-top:8px">带宽算速度举例：4090 带宽 1008GB/s，跑 17GB 的模型约 35 字/秒；纯 CPU 内存只有 70GB/s，同样的模型不到 3 字/秒——不是装不下，是慢到没法用。</p>
-      <p class="note" style="margin-top:8px">通用原则：Windows/Mac 下载安装包，Linux 用命令装；以各官网为准。</p>
     </div>
   </div>
   <span class="pagenum">12 / 28</span>
