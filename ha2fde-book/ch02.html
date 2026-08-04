@@ -313,8 +313,8 @@ context_vecs = attention(embed(sentence))  <span class="cm"># 并行</span></pre
   </div>
   <div class="art-wrap">
 <div class="art bk-diag" style="gap:4px">
-<ul class="dg-br"><li><em>① 注意力</em>　→ 全局感知（治“看不见全局”，第 6 节）</li>
-<li><em>② 并行</em>　　→ 治 RNN 的慢（第 5 节）</li>
+<ul class="dg-br"><li><em>① 注意力</em>　→ 全局感知（治“看不见全局”）</li>
+<li><em>② 并行</em>　　→ 治 RNN 的慢</li>
 <li><em>③ 位置编码</em>→ 治“并行导致的乱序”：把“第几个词”直接加进向量</li></ul>
 <div class="dg-box"><b>输入：[词向量 + 位置戳]</b><i>每个词自带“我排第几”</i></div>
 <div class="dg-vt">↓</div>
@@ -438,7 +438,7 @@ for sample in task_samples:            <span class="cm"># 少量任务样本</sp
   </div>
   <div class="foot">
     <div class="take"><span class="lbl">一句话说清</span>缩放定律解决"怎么稳定变强"——规模同步放大，能力非线性提升，这就是"大力出奇迹"的依据。</div>
-    <div class="code"><span class="lbl">④ 数据流 · Python</span><pre><span class="cm"># 训练流程和第 4 节的小模型一模一样</span>
+    <div class="code"><span class="lbl">④ 数据流 · Python</span><pre><span class="cm"># 训练流程和前面那个小模型一模一样</span>
 <span class="cm"># 唯一变化：模型更大、数据更多、算力更足</span>
 train(big_model, big_data)</pre></div>
   </div>
@@ -471,10 +471,10 @@ train(big_model, big_data)</pre></div>
   <header><span class="tag green">附录</span><h1>三个能跑的小实验<span class="sub">全部本地 CPU 可跑 · Python 3.10+ · 几分钟出结果</span></h1></header>
   <div class="art-wrap" style="align-items:flex-start; width:100%;">
     <table class="app">
-      <tr><th>脚本</th><th>演示什么</th><th>对应章节</th><th>你会看到</th></tr>
-      <tr><td>embedding_demo.py</td><td>词义 = 向量</td><td>第 2 节</td><td>几个词两两的相似度：语义相近的词分数明显更高，"猫-狗"远超"猫-汽车"</td></tr>
-      <tr><td>ngram_demo.py</td><td>统计造句</td><td>第 3 节</td><td>用 n-gram 统计一段文本并生成"模仿腔"——腔调很像，细看全是破绽</td></tr>
-      <tr><td>tiny_lm_train_demo.py</td><td>训练 = 压预测错误</td><td>第 3~9 节</td><td>一个几万参数的小模型从头训练：loss 一路下降，续写从乱码长成"有点像"</td></tr>
+      <tr><th>脚本</th><th>演示什么</th><th>对应内容</th><th>你会看到</th></tr>
+      <tr><td>embedding_demo.py</td><td>词义 = 向量</td><td>词的表示</td><td>几个词两两的相似度：语义相近的词分数明显更高，"猫-狗"远超"猫-汽车"</td></tr>
+      <tr><td>ngram_demo.py</td><td>统计造句</td><td>语言模型任务</td><td>用 n-gram 统计一段文本并生成"模仿腔"——腔调很像，细看全是破绽</td></tr>
+      <tr><td>tiny_lm_train_demo.py</td><td>训练 = 压预测错误</td><td>语言模型任务～规模</td><td>一个几万参数的小模型从头训练：loss 一路下降，续写从乱码长成"有点像"</td></tr>
     </table>
   </div>
   <div class="foot">

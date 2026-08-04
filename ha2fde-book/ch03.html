@@ -391,9 +391,9 @@ print(text)   # 就是右边那段纯文本——模型眼里没有 JSON</code><
 </div>
   <div class="bottom">
     <div class="points"><h4>要点</h4><ol>
-      <li><b>幻觉</b>不是"说谎"，是生成式本质的副产品：第 1 节讲过，它只负责"编得像"</li>
+      <li><b>幻觉</b>不是"说谎"，是生成式本质的副产品：前面讲过，它只负责"编得像"</li>
       <li>越是你不懂的领域，幻觉越难被发现——它编什么都很自信</li>
-      <li>两条主流缓解路线：需要<b>事实</b> → 接 RAG（第 6 节）；需要<b>推理</b> → 思维链（下一页）</li>
+      <li>两条主流缓解路线：需要<b>事实</b> → 接 RAG（下一节）；需要<b>推理</b> → 思维链（下一页）</li>
     </ol></div>
     <pre class="code"><span class="tag">主干代码 · 危险提问示例</span><code class="py">ask("请给出 3 篇关于 XX 的论文及作者")
 # 输出看起来有模有样
@@ -470,7 +470,7 @@ vecs = encoder.encode(chunks)   # 每块 -&gt; 一个向量, 存起来备用</co
   <div class="bottom">
     <div class="points"><h4>要点</h4><ol>
       <li><b>向量化检索</b>：语义相近 → 向量距离近，不需要关键词完全匹配</li>
-      <li><b>拼上下文</b>：检索结果 + 问题一起塞给模型（用的正是第 3 节的机制）</li>
+      <li><b>拼上下文</b>：检索结果 + 问题一起塞给模型（用的正是前面那套上下文机制）</li>
       <li>效果：回答有据可依、能答私有知识、幻觉大减——企业知识库的主流做法</li>
     </ol></div>
     <pre class="code"><span class="tag">主干代码 · 检索与拼接</span><code class="py">q_vec = encoder.encode([question])
@@ -528,7 +528,7 @@ messages.append({"role": "tool", "content": str(result)})</code></pre>
   <div class="bottom">
     <div class="points"><h4>要点</h4><ol>
       <li><b>ReAct 循环</b>：思考 → 行动 → 观察 → 再思考……直到模型决定直接回答</li>
-      <li>每轮工具结果以 <b>role=tool</b> 消息回填进上下文——复用第 3 节的机制</li>
+      <li>每轮工具结果以 <b>role=tool</b> 消息回填进上下文——复用前面那套上下文机制</li>
       <li>Agent = LLM + 工具 + 循环，就这三样；必须加<b>循环上限</b>防止死循环烧钱</li>
     </ol></div>
     <pre class="code"><span class="tag">主干代码 · ReAct 主循环</span><code class="py">for _ in range(5):                              # 循环上限
@@ -640,7 +640,7 @@ mcp.run()   # 任何 MCP 客户端都能发现并调用 add</code></pre>
   <div class="bottom">
     <div class="points"><h4>要点</h4><ol>
       <li><b>契约</b>：POST /v1/chat/completions，请求体 {model, messages, stream}，返回 choices 数组</li>
-      <li><b>流式 = SSE</b>：服务器把每个 token 作为一条事件推过来（第 1 节逐 token 生成的直接暴露）</li>
+      <li><b>流式 = SSE</b>：服务器把每个 token 作为一条事件推过来（前面讲的逐 token 生成的直接暴露）</li>
       <li>自己用本地小模型搭兼容服务，<b>现有客户端代码直接能用</b></li>
     </ol></div>
     <pre class="code"><span class="tag">主干代码 · 路由与流式返回</span><code class="py">@app.post("/v1/chat/completions")
