@@ -1,0 +1,718 @@
+<section class="slide cover" data-act="开场" data-title="封面">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">开场</span></div>
+  </div>
+  <div class="body">
+    <div class="note" style="letter-spacing:.22em">AGENT 原理与实践 · 第二章</div>
+    <h1 class="h1">从图灵到 Transformer</h1>
+    <p class="p sec" style="max-width:840px">每一代技术都在解决上一代的瓶颈。三大流派交替主导、两次寒冬、最后 Transformer 把架构定型。</p>
+    <div class="row" style="justify-content:center;gap:12px">
+      <span class="tag">不需要 AI 前置知识</span><span class="tag">能徒手画出 Transformer 的一个 block</span>
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="开场" data-title="主线与边界">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">开场</span><span class="t">主线与边界</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2">
+      <div class="card col">
+        <span class="tag">一条主线</span>
+        <p class="small">看历史，别只看"谁发明了什么"，要看<b>每一代在解决上一代的什么瓶颈</b>。</p>
+        <ul class="ul">
+          <li><b>坐标系</b>：三大流派——符号主义 / 连接主义 / 行为主义</li>
+          <li><b>主体叙事</b>：符号与连接交替主导，中间夹着两次寒冬</li>
+          <li><b>终点</b>：Transformer 把架构定型</li>
+        </ul>
+      </div>
+      <div class="card col">
+        <span class="tag">本讲边界（讲到哪为止）</span>
+        <ul class="ul">
+          <li>止于<b>"架构定型，但通用能力还没长出来"</b></li>
+          <li>预训练语料怎么来、模型怎么对齐，不是本讲内容</li>
+          <li>GPT-3 之后的事，不是本讲内容</li>
+          <li>结尾"三派合流"只作一页收束</li>
+        </ul>
+      </div>
+    </div>
+    <div class="call" style="margin-top:16px">
+      读完你该能做到两件事：讲清<b>两次寒冬分别是被什么问题打死的</b>；照本讲图<b>徒手画出 Transformer 一个 block 的组成</b>。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="三大流派" data-title="起点：图灵测试">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">三大流派</span><span class="t">起点：图灵与图灵测试</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px">
+      <div class="card col">
+        <span class="tag">图灵测试（Turing Test, 1950）</span>
+        <p class="small">艾伦·图灵在《Computing Machinery and Intelligence》里提出：如果一台机器在对话中<b>骗过人类评判者</b>，让人分不清它是人还是机器，那么就可以说它"能思考"。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">关键：它是个"行为"判据</span>
+        <p class="small">图灵不讨论"机器内部到底有没有意识"，只问<b>外部行为</b>像不像。它不要求你说清内部机制——</p>
+        <p class="small">这一点，其实暗合后来的<b>行为主义 Behaviorism</b>：看行为，不看内里。</p>
+      </div>
+    </div>
+    <div class="call purple" style="margin-top:16px">
+      注意这个思路的转向：在讨论"机器能否思考"之前，先把"思考"变成了一个<b>可操作、可检验</b>的问题。后面每一次进展，都是把问题变得更可检验。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="三大流派" data-title="计算的底座：图灵机">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">三大流派</span><span class="t">计算的底座：图灵机</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px">
+      <div class="card col">
+        <span class="tag">图灵机（Turing Machine, 1936）</span>
+        <p class="small">一个抽象的"计算器"：<b>一条纸带 + 一个读写头 + 一组规则</b>。规则决定看到什么符号、写什么、往哪走。</p>
+        <p class="small">图灵证明：只要遵循规则，它能算任何"可计算"的东西。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">为什么 AI 需要它</span>
+        <p class="small">图灵机给出三样底料：</p>
+        <ul class="ul">
+          <li><b>输入与输出</b>——问题进去，答案出来</li>
+          <li><b>状态</b>——程序"进行到哪一步"可以被记下来</li>
+          <li><b>存储程序</b>——规则和数据分开存放，程序本身也是可读写的东西</li>
+        </ul>
+      </div>
+    </div>
+    <div class="call" style="margin-top:16px">
+      还有一面：图灵也证明了<b>不可判定性</b>——有些问题任何图灵机都答不了。AI 后来的很多挫折，根源就是低估了"规则算得完吗"这个问题。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="三大流派" data-title="三大流派登场">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">三大流派</span><span class="t">三大流派登场：坐标与立场</span></div>
+  </div>
+  <div class="body">
+    <div class="grid3" style="margin-top:8px">
+      <div class="card col">
+        <span class="tag">符号主义 Symbolicism</span>
+        <p class="small">智能 = 用<b>符号</b>和<b>逻辑规则</b>做推理。知识写成规则，推理就是规则的推导。</p>
+        <p class="small mut">信条：把智慧写进程序。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">连接主义 Connectionism</span>
+        <p class="small">智能 = 大量<b>简单单元（神经元）</b>连成网络，靠<b>调节连接权重</b>学会模式。</p>
+        <p class="small mut">信条：从数据里"长"出来。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">行为主义 Behaviorism</span>
+        <p class="small">智能 = <b>感知—行动—反馈</b>的回路。与环境不断交互、根据后果调整行为。</p>
+        <p class="small mut">信条：世界就是最好的模型。</p>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:16px">
+      <p class="small"><b>理解全章的一句话：</b>这部历史，主要是<b>符号主义</b>与<b>连接主义</b>交替主导——一方上台把另一方打到寒冬，然后带着新工具回来。行为主义一直当"第三股"，偶尔走上前台。</p>
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="三大流派" data-title="符号主义黄金期">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">三大流派</span><span class="t">符号主义黄金期（1956–1970s）</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px">
+      <div class="card col">
+        <span class="tag">AI 学科诞生</span>
+        <p class="small"><b>1956 达特茅斯会议（Dartmouth Workshop）</b>正式把"人工智能 Artificial Intelligence"定名。<b>1958</b> 约翰·麦卡锡发明 <b>LISP</b>——专为符号处理而生的语言。</p>
+        <p class="small">当时的口号很乐观：把推理交给逻辑。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">代表作</span>
+        <ul class="ul">
+          <li><b>定理证明</b>：把公理写成规则，程序自己推结论</li>
+          <li><b>通用问题求解器 GPS</b>（1959）：把任何问题转成"目标—手段"推导</li>
+          <li><b>逻辑编程</b>（Prolog）："声明事实 + 询问目标"，由机器做推理</li>
+        </ul>
+      </div>
+    </div>
+    <div class="call green" style="margin-top:14px">
+      <b>它解决的是什么：</b>把"思考"这件事<b>形式化</b>——假设智能 = 符号运算，那么写出规则就等于装进智能。这是第一次给"机器有智慧"一个工程路线图。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="寒冬" data-title="第一次寒冬：被什么打死">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">寒冬</span><span class="t">第一次寒冬（约 1974–1980）：被什么打死</span></div>
+  </div>
+  <div class="body">
+    <div class="col" style="margin-top:4px">
+      <div class="card row"><span class="tag red">组合爆炸</span><p class="small grow">规则一多，推理路径<b>指数级增长</b>。例子：十来个事实的简单问题，穷举组合就远超当时机器能力。规则写法看着优雅，跑起来是天文数字。</p></div>
+      <div class="card row"><span class="tag red">知识获取瓶颈</span><p class="small grow">"常识"没法手工编码。写规则的人可以写"鸟会飞"，写不出"企鹅不会飞但也是鸟""飞≠起飞"……常识是无穷无尽的，靠人一条条写不完。</p></div>
+      <div class="card row"><span class="tag red">两个报告</span><p class="small grow"><b>ALPAC 报告</b>（1966）：判定机器翻译失败，拨款转走；<b>Lighthill 报告</b>（1973）：英国政府据此大幅削减 AI 经费。</p></div>
+    </div>
+    <div class="pit" style="margin-top:14px">
+      <b>一句话死因：</b>符号主义假设"世界能写成有限条规则"——而真实世界是开放的、充满例外的。写死规则，处理不了常识。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="寒冬" data-title="连接主义回归">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">寒冬</span><span class="t">连接主义回归（1980s）</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px">
+      <div class="card col">
+        <span class="tag">前史：感知机</span>
+        <p class="small">1958 年 <b>Perceptron（感知机）</b>用一层神经元学模式，轰动一时；随后被证明<b>单层网络算不了异或这类问题</b>（Minsky &amp; Papert, 1969），连接主义随之沉寂。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">复活的节点</span>
+        <ul class="ul">
+          <li><b>Hopfield 网络</b>（1982）：把记忆建模成能量最小化</li>
+          <li><b>反向传播 Backpropagation</b>（Rumelhart et al., 1986）：让<b>多层</b>网络也能训练，一举突破感知机的天花板</li>
+        </ul>
+      </div>
+    </div>
+    <div class="call green" style="margin-top:14px">
+      <b>它解决的是什么：</b>不再手工写规则，而是<b>从数据里学</b>——给大量例子，网络自己调权重。<b>代价：</b>从此离不开数据和算力。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="寒冬" data-title="行为主义插曲">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">寒冬</span><span class="t">行为主义插曲：智能从行动里长出来</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px">
+      <div class="card col">
+        <span class="tag">强化学习（Reinforcement Learning）</span>
+        <p class="small">不给定答案，只给<b>奖励/惩罚</b>。智能体靠"试错 + 最大化长期奖励"学策略。</p>
+        <p class="small mut">它今天已长成主角——但这一讲先点到为止。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">机器人与包容架构</span>
+        <p class="small"><b>Shakey the Robot</b>（1966）：第一个能感知、推理、规划的移动机器人。</p>
+        <p class="small"><b>Brooks 包容架构</b>（1986）：反对"先建完整世界模型再行动"，主张<b>"世界就是自己的模型"</b>——用一层层感知—行动回路堆出行为。</p>
+      </div>
+    </div>
+    <div class="call" style="margin-top:14px">
+      行为主义给全章的提醒：智能不一定要先在脑子里建一个"完整世界"，<b>在真实环境里不断试错</b>，也可能是条正路。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="寒冬" data-title="第二次寒冬：被什么打死">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">寒冬</span><span class="t">第二次寒冬（约 1987–1993）：被什么打死</span></div>
+  </div>
+  <div class="body">
+    <div class="col" style="margin-top:4px">
+      <div class="card row"><span class="tag red">专用硬件崩塌</span><p class="small grow">符号时代带动了一整片 <b>Lisp 机</b>（专用 AI 工作站）市场；PC 崛起后这个市场一夜崩塌，靠它吃饭的实验室与公司成批倒下。</p></div>
+      <div class="card row"><span class="tag red">可扩展性之墙</span><p class="small grow">连接主义回来时，<b>网络太浅、数据量级太小</b>——一层层加宽收益有限，数据不到规模，学不出像样的东西。</p></div>
+      <div class="card row"><span class="tag red">梯度消失</span><p class="small grow"><b>Vanishing Gradient（梯度消失）</b>：层一深，误差信号反向传播到浅层就衰减到零，<b>深层网络训不动</b>。当时没有解决办法。</p></div>
+      <div class="card row"><span class="tag red">难复现</span><p class="small grow">实验依赖玄学式调参，结果经常复现不了，学术声誉受损，"AI 已死"的论调一度占上风。</p></div>
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="寒冬" data-title="专家系统的短命繁荣">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">寒冬</span><span class="t">专家系统：写规则这条路的两连败</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px">
+      <div class="card col">
+        <span class="tag">它的繁荣</span>
+        <p class="small"><b>专家系统 Expert Systems</b>（1980s）是符号主义最后一次商业化高峰：<b>规则引擎 + 知识库</b>，把领域专家的话变成 if-then 规则，用于诊断、配置、审核。</p>
+        <p class="small">像 <b>XCON</b>（DEC 的电脑配置系统）真赚了钱，企业争相上马。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">它的死法</span>
+        <ul class="ul">
+          <li><b>规则维护成本失控</b>：规则涨到几千上万条，改一条牵一发动全身</li>
+          <li><b>边界脆弱</b>：没写进规则的情况一来就崩</li>
+          <li><b>知识转述失真</b>：专家嘴上说的和写进规则的不是一回事</li>
+        </ul>
+      </div>
+    </div>
+    <div class="pit" style="margin-top:14px">
+      <b>同一句话第二次出现：</b>写规则这条路，走一次死在"常识编不完"，走一次死在"规则维护不起"。这给后面的连接主义让出了位置。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="转折与引爆" data-title="转折：机器学习登场">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">转折与引爆</span><span class="t">转折（1990s–2000s）：机器学习登场</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px">
+      <div class="card col">
+        <span class="tag">换个目标</span>
+        <p class="small">研究者们不再追求"让机器像人一样推理"，而是追求<b>"让机器预测得准"</b>。名字也从"人工智能"悄悄换成 <b>机器学习 Machine Learning</b>。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">新工具</span>
+        <ul class="ul">
+          <li><b>支持向量机 SVM</b>（1990s）：数学漂亮、能泛化的分类器</li>
+          <li><b>概率图模型</b>（贝叶斯网络、隐马尔可夫）：把不确定性和概率放回模型</li>
+          <li>核心转向：<b>用统计、用数据，而不是用规则</b></li>
+        </ul>
+      </div>
+    </div>
+    <div class="call" style="margin-top:14px">
+      这十年是"退一步海阔天空"：目标从"证明它像人"降到"让它在数据上更准"，<b>工程的容错空间反而变大</b>。它攒下了后一场革命的群众基础。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="转折与引爆" data-title="解锁的钥匙">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">转折与引爆</span><span class="t">解锁的钥匙：算力 · 数据 · 算法</span></div>
+  </div>
+  <div class="body">
+    <div class="grid3" style="margin-top:8px">
+      <div class="card col">
+        <span class="tag">算力</span>
+        <p class="small"><b>摩尔定律</b>让硬件持续变快；真正改变局面的是 <b>GPU</b>——原本为图形设计的并行处理器，恰好多层网络每层可以并行算。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">数据</span>
+        <p class="small">互联网带来海量文本与图片。<b>ImageNet</b>（2009，约 1400 万张标注图片）把"大规模标注数据集"变成标准动作。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">算法</span>
+        <p class="small">反向传播早就有了，缺的是把它用到足够大的网络与数据上。三样齐了，<b>深度学习 Deep Learning</b>才真正起飞。</p>
+      </div>
+    </div>
+    <div class="call orange" style="margin-top:16px">
+      <b>这一页是整个转折的钥匙：</b>连接主义不是第一次赢——它只是第一次同时拿到"够快的算力 + 够多的数据 + 成熟的训练算法"这三样。上一轮缺的不是理念，是<b>条件</b>。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="转折与引爆" data-title="引爆点：AlexNet">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">转折与引爆</span><span class="t">引爆点：AlexNet（2012）</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px">
+      <div class="card col">
+        <span class="tag">发生了什么</span>
+        <p class="small">2012 年 <b>ImageNet 竞赛</b>，Krizhevsky 等人的 <b>AlexNet</b>（深度卷积神经网络，跑在 GPU 上）把图像分类错误率<b>断崖式拉低</b>，碾压所有手工特征方案。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">为什么是分水岭</span>
+        <ul class="ul">
+          <li>第一次证明：<b>端到端学习 End-to-End Learning</b>——原始像素进去，类别出来，中间特征全是网络自己学的</li>
+          <li>学术界连夜转向深度学习，"机器学习"变成了"深度学习"</li>
+          <li>连接主义正式回归并成为绝对主角</li>
+        </ul>
+      </div>
+    </div>
+    <div class="call green" style="margin-top:14px">
+      <b>它解决的是什么：</b>"特征靠人设计"的瓶颈。<b>特征 = 数据 + 算力学出来的</b>，不再靠专家手挑。代价同样清晰：没有大算力和大数据就无从谈起。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="序列与注意力" data-title="语言带来的新瓶颈">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">序列与注意力</span><span class="t">语言带来的新瓶颈：序列</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px">
+      <div class="card col">
+        <span class="tag">语言是序列</span>
+        <p class="small">图片是一大块像素，<b>语言是一个接一个的词</b>，顺序本身就携带意义。"我打你"和"你打我"完全是两件事。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">此前的解法</span>
+        <ul class="ul">
+          <li><b>n-gram 统计语言模型</b>：只看前 n-1 个词，靠马尔可夫假设取巧</li>
+          <li><b>RNN / LSTM</b>（LSTM, 1997）：把"已读过的内容"压进一个隐藏状态，逐词推进</li>
+        </ul>
+      </div>
+    </div>
+    <div class="dia" style="margin-top:12px">
+      <svg viewBox="0 0 800 150" role="img" aria-label="RNN 逐词串行处理">
+        <defs><marker id="seq-a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker></defs>
+        <rect x="0" y="44" width="150" height="62" rx="10" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="75" y="70" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2937">读 t₁</text>
+        <text x="75" y="92" text-anchor="middle" font-size="12" fill="#5b6675">等它出结果</text>
+        <rect x="215" y="44" width="150" height="62" rx="10" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="290" y="70" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2937">读 t₂</text>
+        <text x="290" y="92" text-anchor="middle" font-size="12" fill="#5b6675">依赖 t₁ 的状态</text>
+        <rect x="430" y="44" width="150" height="62" rx="10" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="505" y="70" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2937">读 t₃</text>
+        <rect x="645" y="44" width="150" height="62" rx="10" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="720" y="70" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2937">读 t₄</text>
+        <line x1="150" y1="75" x2="211" y2="75" stroke="#94a3b8" stroke-width="2" marker-end="url(#seq-a2)"/>
+        <line x1="365" y1="75" x2="426" y2="75" stroke="#94a3b8" stroke-width="2" marker-end="url(#seq-a2)"/>
+        <line x1="580" y1="75" x2="641" y2="75" stroke="#94a3b8" stroke-width="2" marker-end="url(#seq-a2)"/>
+      </svg>
+    </div>
+    <div class="call red" style="margin-top:10px">
+      <b>三个死结：</b>① <b>必须串行</b>——读完一个词才能读下一个，慢、没法并行；② <b>长距离依赖衰减</b>——隔得远的词之间的关联会"稀释"；③ 全部信息被压进<b>一个向量</b>，内存有上限。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="序列与注意力" data-title="注意力机制">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">序列与注意力</span><span class="t">注意力：不再只靠一个压缩向量</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px">
+      <div class="card col">
+        <span class="tag">Attention（Bahdanau et al., 2015）</span>
+        <p class="small">机器翻译里，生成每个输出词时<b>"回看"输入序列的全部位置</b>，给每个位置一个权重，加权拼出当下要用的信息。</p>
+        <p class="small">不再是"把整句压成一个向量再展开"，而是<b>按需取用</b>。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">解决了什么</span>
+        <ul class="ul">
+          <li><b>长距离信息</b>：隔再远也能直接"看到"</li>
+          <li><b>信息瓶颈</b>：不用把一切塞进固定大小向量</li>
+          <li>翻译质量立竿见影，成为标配</li>
+        </ul>
+        <p class="small"><b>代价/局限：</b>它仍寄生在 RNN 上——循环的串行瓶颈还在。</p>
+      </div>
+    </div>
+    <div class="dia" style="margin-top:12px">
+      <svg viewBox="0 0 800 190" role="img" aria-label="输出词回看输入全部位置">
+        <defs><marker id="att-a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker></defs>
+        <rect x="40" y="20" width="150" height="52" rx="10" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="115" y="51" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2937">输入 词₁</text>
+        <rect x="240" y="20" width="150" height="52" rx="10" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="315" y="51" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2937">输入 词₂</text>
+        <rect x="440" y="20" width="150" height="52" rx="10" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="515" y="51" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2937">输入 词₃</text>
+        <rect x="40" y="128" width="150" height="52" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="115" y="159" text-anchor="middle" font-size="14" font-weight="600" fill="#2563eb">输出 词₁</text>
+        <line x1="115" y1="72" x2="115" y2="124" stroke="#2563eb" stroke-width="2" marker-end="url(#att-a2)"/>
+        <line x1="315" y1="72" x2="150" y2="124" stroke="#94a3b8" stroke-width="2" marker-end="url(#att-a2)"/>
+        <line x1="515" y1="72" x2="170" y2="124" stroke="#94a3b8" stroke-width="2" marker-end="url(#att-a2)"/>
+        <text x="680" y="150" font-size="13" fill="#5b6675">权重 = 当前词与</text>
+        <text x="680" y="170" font-size="13" fill="#5b6675">各输入的相似度</text>
+      </svg>
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="Transformer" data-title="Transformer 横空出世">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">Transformer</span><span class="t">Transformer（2017）：去掉循环，全靠注意力</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px">
+      <div class="card col">
+        <span class="tag">出生证明</span>
+        <p class="small"><b>"Attention Is All You Need"</b>（Vaswani et al., 2017）——不再用循环，直接用注意力搭起整个网络，因此得名 <b>Transformer（变换器）</b>。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">三个核心设计</span>
+        <ul class="ul">
+          <li><b>自注意力 Self-Attention</b>：序列里每个词同时看所有词，一次算完</li>
+          <li><b>位置编码 Positional Encoding</b>：没有循环了，得把"位置信息"显式注入</li>
+          <li><b>残差连接 + 层归一化</b>（Residual + LayerNorm）：让深层网络训得动</li>
+        </ul>
+      </div>
+    </div>
+    <div class="call orange" style="margin-top:14px">
+      <b>它一次性解决了上一页的三个死结：</b>不再串行（可并行）、长距离天然直达（注意力直接连任意两个位置）、不再有"压缩向量"瓶颈。代价：注意力要算"每两两词"的关系，<b>复杂度 O(n²)</b>，越长越贵。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="Transformer" data-title="徒手画一个 Transformer block">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">Transformer</span><span class="t">徒手画一个 Transformer block</span></div>
+  </div>
+  <div class="body">
+    <div class="dia">
+      <svg viewBox="0 0 1160 508" role="img" aria-label="Transformer 编码器 block 结构图">
+        <defs>
+          <marker id="tf-a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker>
+        </defs>
+        <rect x="380" y="8" width="400" height="44" rx="10" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="580" y="35" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2937">输入序列 x₁ … xₙ</text>
+        <line x1="580" y1="52" x2="580" y2="58" stroke="#94a3b8" stroke-width="2" marker-end="url(#tf-a2)"/>
+        <rect x="380" y="62" width="400" height="56" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="580" y="90" text-anchor="middle" font-size="15" font-weight="600" fill="#7c3aed">Embedding + 位置编码</text>
+        <text x="580" y="109" text-anchor="middle" font-size="12" fill="#5b6675">token 变成向量，并注入位置信息</text>
+        <line x1="580" y1="118" x2="580" y2="138" stroke="#94a3b8" stroke-width="2" marker-end="url(#tf-a2)"/>
+        <rect x="380" y="142" width="400" height="88" rx="10" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="580" y="176" text-anchor="middle" font-size="15" font-weight="600" fill="#1f2937">多头自注意力 Multi-Head Self-Attention</text>
+        <text x="580" y="198" text-anchor="middle" font-size="12" fill="#5b6675">每个 token 与所有 token 交互 · 无循环 · 可并行</text>
+        <text x="580" y="216" text-anchor="middle" font-size="12" fill="#5b6675">复杂度 O(n²)</text>
+        <line x1="580" y1="230" x2="580" y2="250" stroke="#94a3b8" stroke-width="2" marker-end="url(#tf-a2)"/>
+        <rect x="380" y="254" width="400" height="48" rx="10" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/>
+        <text x="580" y="282" text-anchor="middle" font-size="14" font-weight="600" fill="#c2410c">残差连接 + 层归一化 Add &amp; Norm</text>
+        <line x1="580" y1="302" x2="580" y2="322" stroke="#94a3b8" stroke-width="2" marker-end="url(#tf-a2)"/>
+        <rect x="380" y="326" width="400" height="88" rx="10" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="580" y="360" text-anchor="middle" font-size="15" font-weight="600" fill="#1f2937">前馈网络 Feed-Forward</text>
+        <text x="580" y="382" text-anchor="middle" font-size="12" fill="#5b6675">每个位置各自过一遍全连接 + 激活</text>
+        <text x="580" y="400" text-anchor="middle" font-size="12" fill="#5b6675">给注意力结果做"二次加工"</text>
+        <line x1="580" y1="414" x2="580" y2="434" stroke="#94a3b8" stroke-width="2" marker-end="url(#tf-a2)"/>
+        <rect x="380" y="438" width="400" height="48" rx="10" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/>
+        <text x="580" y="466" text-anchor="middle" font-size="14" font-weight="600" fill="#c2410c">残差连接 + 层归一化 Add &amp; Norm</text>
+        <line x1="580" y1="486" x2="580" y2="492" stroke="#94a3b8" stroke-width="2" marker-end="url(#tf-a2)"/>
+        <text x="580" y="505" text-anchor="middle" font-size="13" fill="#5b6675">输出 → 下一个 block（整体可以堆叠 N 层）</text>
+        <polyline points="780,90 944,90 944,278 784,278" fill="none" stroke="#c2410c" stroke-width="2" marker-end="url(#tf-a2)"/>
+        <polyline points="780,278 1012,278 1012,462 784,462" fill="none" stroke="#c2410c" stroke-width="2" marker-end="url(#tf-a2)"/>
+        <text x="958" y="120" font-size="12" fill="#c2410c">残差：跳过子层，</text>
+        <text x="958" y="138" font-size="12" fill="#c2410c">与子层输出相加</text>
+      </svg>
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="Transformer" data-title="Self-Attention 怎么算">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">Transformer</span><span class="t">Self-Attention 怎么算</span></div>
+  </div>
+  <div class="body">
+    <div class="dia">
+      <svg viewBox="0 0 1160 300" role="img" aria-label="自注意力计算流水线">
+        <defs><marker id="sa-a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker></defs>
+        <rect x="20" y="120" width="150" height="64" rx="10" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="95" y="148" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2937">输入 X</text>
+        <text x="95" y="168" text-anchor="middle" font-size="12" fill="#5b6675">每个 token 的向量</text>
+        <line x1="170" y1="152" x2="208" y2="152" stroke="#94a3b8" stroke-width="2" marker-end="url(#sa-a2)"/>
+        <rect x="212" y="40" width="150" height="56" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="287" y="74" text-anchor="middle" font-size="15" font-weight="600" fill="#7c3aed">Q Query</text>
+        <rect x="212" y="120" width="150" height="56" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="287" y="154" text-anchor="middle" font-size="15" font-weight="600" fill="#7c3aed">K Key</text>
+        <rect x="212" y="200" width="150" height="56" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="287" y="234" text-anchor="middle" font-size="15" font-weight="600" fill="#7c3aed">V Value</text>
+        <text x="287" y="286" text-anchor="middle" font-size="12" fill="#5b6675">三个矩阵 = 输入 × 三个可学习权重</text>
+        <line x1="362" y1="148" x2="410" y2="148" stroke="#94a3b8" stroke-width="2" marker-end="url(#sa-a2)"/>
+        <rect x="414" y="120" width="160" height="56" rx="10" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="494" y="147" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2937">打分 Q·Kᵀ</text>
+        <text x="494" y="167" text-anchor="middle" font-size="12" fill="#5b6675">词与词的相似度</text>
+        <line x1="574" y1="148" x2="612" y2="148" stroke="#94a3b8" stroke-width="2" marker-end="url(#sa-a2)"/>
+        <rect x="616" y="120" width="160" height="56" rx="10" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+        <text x="696" y="147" text-anchor="middle" font-size="14" font-weight="600" fill="#0e9f6e">softmax 归一</text>
+        <text x="696" y="167" text-anchor="middle" font-size="12" fill="#5b6675">权重和为 1</text>
+        <line x1="776" y1="148" x2="814" y2="148" stroke="#94a3b8" stroke-width="2" marker-end="url(#sa-a2)"/>
+        <rect x="818" y="120" width="160" height="56" rx="10" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+        <text x="898" y="147" text-anchor="middle" font-size="14" font-weight="600" fill="#0e9f6e">加权求和 ·V</text>
+        <text x="898" y="167" text-anchor="middle" font-size="12" fill="#5b6675">按权重拼出新向量</text>
+        <line x1="978" y1="148" x2="1016" y2="148" stroke="#94a3b8" stroke-width="2" marker-end="url(#sa-a2)"/>
+        <rect x="1020" y="120" width="120" height="56" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="1080" y="154" text-anchor="middle" font-size="15" font-weight="600" fill="#2563eb">输出</text>
+        <line x1="287" y1="96" x2="287" y2="120" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <line x1="287" y1="176" x2="287" y2="200" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <text x="262" y="30" font-size="12" fill="#5b6675">同一个 X 乘不同权重 → Q/K/V</text>
+      </svg>
+    </div>
+    <div class="row" style="margin-top:12px;align-items:stretch">
+      <div class="card grow">
+        <p class="small"><b>直觉：</b>一个词要"看"全句——它用自己（Q）去问每个位置"你和我像不像"（K），像就给高分，再按分数（softmax）加权取走每个位置的信息（V）。</p>
+      </div>
+      <div class="call red grow">
+        <b>代价：</b>每个词要跟每个词打分，<b>复杂度 O(n²)</b>。句子越长，计算涨得越凶——这是长文本昂贵的根源。
+      </div>
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="Transformer" data-title="多头注意力">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">Transformer</span><span class="t">多头注意力 Multi-Head Attention</span></div>
+  </div>
+  <div class="body">
+    <div class="dia">
+      <svg viewBox="0 0 1160 240" role="img" aria-label="多头注意力并行后拼接">
+        <defs><marker id="mh-a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker></defs>
+        <rect x="40" y="92" width="180" height="56" rx="10" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="130" y="122" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2937">X</text>
+        <text x="130" y="140" text-anchor="middle" font-size="12" fill="#5b6675">输入</text>
+        <line x1="220" y1="120" x2="252" y2="120" stroke="#94a3b8" stroke-width="2" marker-end="url(#mh-a2)"/>
+        <line x1="220" y1="120" x2="252" y2="60" stroke="#94a3b8" stroke-width="2" marker-end="url(#mh-a2)"/>
+        <line x1="220" y1="120" x2="252" y2="180" stroke="#94a3b8" stroke-width="2" marker-end="url(#mh-a2)"/>
+        <rect x="256" y="32" width="180" height="56" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="346" y="62" text-anchor="middle" font-size="14" font-weight="600" fill="#7c3aed">头₁ · 关注语法</text>
+        <rect x="256" y="92" width="180" height="56" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="346" y="122" text-anchor="middle" font-size="14" font-weight="600" fill="#7c3aed">头₂ · 关注指代</text>
+        <rect x="256" y="152" width="180" height="56" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="346" y="182" text-anchor="middle" font-size="14" font-weight="600" fill="#7c3aed">头₃ · 关注词义关系</text>
+        <line x1="436" y1="60" x2="508" y2="120" stroke="#94a3b8" stroke-width="2" marker-end="url(#mh-a2)"/>
+        <line x1="436" y1="120" x2="508" y2="120" stroke="#94a3b8" stroke-width="2" marker-end="url(#mh-a2)"/>
+        <line x1="436" y1="180" x2="508" y2="120" stroke="#94a3b8" stroke-width="2" marker-end="url(#mh-a2)"/>
+        <rect x="512" y="92" width="150" height="56" rx="10" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="587" y="122" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2937">拼接 Concat</text>
+        <line x1="662" y1="120" x2="694" y2="120" stroke="#94a3b8" stroke-width="2" marker-end="url(#mh-a2)"/>
+        <rect x="698" y="92" width="180" height="56" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="788" y="122" text-anchor="middle" font-size="14" font-weight="600" fill="#2563eb">线性变换</text>
+        <text x="788" y="140" text-anchor="middle" font-size="12" fill="#5b6675">投影回原维度</text>
+        <text x="960" y="126" font-size="13" fill="#5b6675">多组头并行，每组看一个子空间，</text>
+        <text x="960" y="148" font-size="13" fill="#5b6675">再合并成一份输出。</text>
+      </svg>
+    </div>
+    <div class="call" style="margin-top:10px">
+      <b>为什么多组头：</b>单一"相似度"不够用。有的头抓句法结构、有的头抓指代关系、有的头抓语义相似——<b>并行分工，模型就同时看到多个角度</b>。这是它的表达力来源。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="Transformer" data-title="并行与规模">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">Transformer</span><span class="t">并行与规模：它赢在"能变大"</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px">
+      <div class="card col">
+        <span class="tag">为什么比 RNN 快</span>
+        <p class="small">RNN 必须读完词₁才能读词₂——<b>串行</b>。Transformer 一次把所有词同时送进注意力——<b>无顺序依赖，可并行</b>。同一块 GPU 上，Transformer 对同样长度的序列能利用的算力多得多。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">由此带来的规模</span>
+        <p class="small">训练效率上去了，才养得起更大的模型、更多的数据。</p>
+        <p class="small">于是"<b>规模</b>"第一次成为主角——这也是后面一切（大模型、预训练）的起点。至于"大"怎么变成"强"、怎么训练、怎么用——那是后续阶段的事，本讲讲到架构定型为止。</p>
+      </div>
+    </div>
+    <div class="call orange" style="margin-top:14px">
+      <b>一句话记住这个转折：</b>注意力让模型"看得更全"（O(n²) 也认了），可并行让模型"练得动"——<b>架构的定型，本质是让"大"成为可能</b>。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="Transformer" data-title="架构定型">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">Transformer</span><span class="t">架构定型：Encoder–Decoder</span></div>
+  </div>
+  <div class="body">
+    <div class="dia">
+      <svg viewBox="0 0 1160 240" role="img" aria-label="编码器-解码器结构">
+        <defs><marker id="ed-a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker></defs>
+        <rect x="60" y="60" width="260" height="120" rx="10" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
+        <text x="190" y="106" text-anchor="middle" font-size="16" font-weight="600" fill="#1f2937">编码器 Encoder</text>
+        <text x="190" y="132" text-anchor="middle" font-size="13" fill="#5b6675">读完整输入</text>
+        <text x="190" y="152" text-anchor="middle" font-size="13" fill="#5b6675">Self-Attention 对输入</text>
+        <line x1="320" y1="120" x2="398" y2="120" stroke="#94a3b8" stroke-width="2" marker-end="url(#ed-a2)"/>
+        <rect x="402" y="60" width="280" height="120" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="542" y="100" text-anchor="middle" font-size="16" font-weight="600" fill="#7c3aed">解码器 Decoder</text>
+        <text x="542" y="124" text-anchor="middle" font-size="13" fill="#5b6675">逐词生成输出</text>
+        <text x="542" y="144" text-anchor="middle" font-size="13" fill="#5b6675">Self-Attention + 对编码器结果</text>
+        <text x="542" y="162" text-anchor="middle" font-size="13" fill="#5b6675">做 Cross-Attention（交叉注意力）</text>
+        <line x1="682" y1="120" x2="756" y2="120" stroke="#94a3b8" stroke-width="2" marker-end="url(#ed-a2)"/>
+        <rect x="760" y="60" width="200" height="120" rx="10" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+        <text x="860" y="106" text-anchor="middle" font-size="16" font-weight="600" fill="#0e9f6e">输出</text>
+        <text x="860" y="132" text-anchor="middle" font-size="13" fill="#5b6675">翻译 / 生成</text>
+        <text x="1040" y="80" font-size="13" fill="#5b6675">原始论文用它做翻译，</text>
+        <text x="1040" y="100" font-size="13" fill="#5b6675">但真正成名的用法</text>
+        <text x="1040" y="120" font-size="13" fill="#5b6675">是后来的"只留解码器"</text>
+      </svg>
+    </div>
+    <div class="row" style="margin-top:12px;align-items:stretch">
+      <div class="card grow">
+        <p class="small"><b>之后的走向（一句话）：</b>翻译要"读全句再写"，所以是 Encoder–Decoder；后来的大模型发现<b>只要"一直往下写"</b>，只用解码器（Decoder-only）就够——这是下一阶段的事，本讲不展开。</p>
+      </div>
+      <div class="call green grow">
+        <b>这一页的意义：</b>从图灵到 2017，架构之争在这一刻<b>定型</b>——之后不是换架构，而是把 Transformer 越做越大。
+      </div>
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="收尾" data-title="三派合流">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">收尾</span><span class="t">三派合流（一页收束）</span></div>
+  </div>
+  <div class="body">
+    <div class="grid3" style="margin-top:8px">
+      <div class="card col">
+        <span class="tag">符号的影子</span>
+        <p class="small">结构、推理、知识表示的想法还在——今天的很多系统里仍能看见"把知识显式组织起来"的意图。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">连接的胜利</span>
+        <p class="small">主角是它：可学习的网络、数据驱动、端到端——从 AlexNet 到 Transformer 一脉相承。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">行为的复归</span>
+        <p class="small">"目标 + 反馈 + 不断调整"的强化学习思想，会在后面的阶段重新走上前台。</p>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:16px">
+      <p class="small"><b>合流的含义：</b>历史不是"谁取代谁"，而是三股思路在今天的系统里<b>各占一格、互相配合</b>。记住这一点，比记住任何单个年份都重要。</p>
+    </div>
+    <p class="cap mut">（本页到此为止——展开就不是"一页收束"了。）</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide cover" data-act="收尾" data-title="收尾">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">收尾</span></div>
+  </div>
+  <div class="body">
+    <h1 class="h1">架构定型，能力未满</h1>
+    <p class="p sec" style="max-width:820px">你记住这条线：图灵把问题变成可检验的 → 符号主义把智能当规则写 → 两度被常识与维护成本打死 → 连接主义拿数据与算力复活 → 注意力与可并行让 Transformer 定型。</p>
+    <div class="card" style="max-width:880px">
+      <p class="small"><b>本讲讲到这里为止：</b></p>
+      <ul class="ul">
+        <li>能徒手画出 Transformer 一个 block：Embedding+位置编码 → 多头注意力 → Add&amp;Norm → 前馈 → Add&amp;Norm</li>
+        <li>能讲清两次寒冬分别死于什么（组合爆炸与常识编码；专用硬件崩塌、浅网络与梯度消失）</li>
+        <li>预训练语料、对齐、GPT-3 之后——那不是本讲的地盘</li>
+      </ul>
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>

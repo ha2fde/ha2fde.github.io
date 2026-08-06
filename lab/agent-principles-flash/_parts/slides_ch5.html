@@ -1,0 +1,679 @@
+<section class="slide cover" data-act="开场" data-title="封面">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">开场</span></div>
+  </div>
+  <div class="body">
+    <div class="note" style="letter-spacing:.22em">AGENT 原理与实践 · 第五章</div>
+    <h1 class="h1">从 demo 到生产</h1>
+    <p class="p sec" style="max-width:860px">Demo 问「能不能做到」，生产问「每单多少钱、出错谁负责、停了怎么办」。这一讲教你用一张<b>控制权连续谱</b>定位自己的项目，再据此决定要不要上框架，并给你一份能直接抄的上线前清单。</p>
+    <div class="row" style="justify-content:center;gap:12px">
+      <span class="tag">决策型 · 会被反复回查</span><span class="tag">先定位、后工具</span><span class="tag">评估先行</span>
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="开场" data-title="主线与顺序：先控制权、后工具">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">开场</span><span class="t">主线与顺序：先控制权、后工具</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px">
+      <div class="card col">
+        <span class="tag">为什么顺序不能反</span>
+        <p class="small"><b>编排（orchestration）方式，决定了你需要什么工具。</b>先想清楚「谁来决定下一步」，再谈 API / SDK / 框架。</p>
+        <p class="small">顺序反了会怎样：还没定位就选框架 → 框架替你做了你没想过的决定，项目被框架牵着走。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">本讲边界（讲到哪为止）</span>
+        <p class="small">只讲<b>下周就要做的决定</b>：在谱上定位、上不上框架、上线前清单。</p>
+        <p class="small">不讲趋势判断、协议细节、长期路线。出现的术语一律就地交代清楚。</p>
+      </div>
+    </div>
+    <div class="call orange" style="margin-top:16px">
+      <b>一句话主线：</b>先在<b>控制权连续谱（agency continuum）</b>上找到自己的位置 → 据此决定工具 → 再按「谁在问」逐项备齐上线条件。
+    </div>
+    <p class="note" style="margin-top:12px">本讲自足，不引用其它章节；只讲正面做法与自限边界。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="卡在哪" data-title="数据页：试点多、生产少">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">卡在哪</span><span class="t">数据页：试点多、生产少</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:6px;align-items:stretch">
+      <div class="card col">
+        <span class="tag">已发生（实测调查，各自口径）</span>
+        <ul class="ul" style="margin-top:2px">
+          <li><b>78%</b> 有 agent 试点，仅 <b>14%</b> 到达生产规模 —— 2026-03 调研 · 650 位技术决策者（<a href="https://www.digitalapplied.com/blog/ai-agent-scaling-gap-march-2026-pilot-to-production" target="_blank" rel="noopener">Digital Applied</a>）</li>
+          <li><b>62%</b> 在试验，仅 <b>23%</b> 在某业务功能规模化 —— McKinsey State of AI 2025（2025-11-05）（<a href="https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai" target="_blank" rel="noopener">McKinsey</a>）</li>
+          <li><b>17%</b> 已部署 AI agent —— Gartner 2026 CIO 调查（<a href="https://www.gartner.com/en/articles/hype-cycle-for-agentic-ai" target="_blank" rel="noopener">Gartner</a>）</li>
+          <li><b>11%</b> 有「生产级」agentic 系统 —— Deloitte Tech Trends 2026（2025-12）（<a href="https://www.deloitte.com/us/en/insights/topics/technology-management/tech-trends/2026/agentic-ai-strategy.html" target="_blank" rel="noopener">Deloitte</a>）</li>
+        </ul>
+        <p class="cap mut">另：IDC/AWS 2025-11 调研（900+ 组织）62% 在试验、仅 3% 跨部门规模化（<a href="https://aws.amazon.com/isv/resources/agentic-ai-idc-study/" target="_blank" rel="noopener">IDC/AWS</a>）。口径各异，看趋势不看绝对值。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">预测（明确标注，非现状）</span>
+        <div class="pit">
+          <p class="small"><b>到 2027 年底，超过 40% 的 agentic AI 项目会被取消</b> —— 原因：成本失控 · 业务价值不清 · 风控不足。</p>
+        </div>
+        <p class="small">来源：<a href="https://www.gartner.com/en/newsroom/press-releases/2025-06-25-gartner-predicts-over-40-percent-of-agentic-ai-projects-will-be-canceled-by-end-of-2027" target="_blank" rel="noopener">Gartner 新闻稿</a>（2025-06-25）。这是<b>预测</b>，不是今天的现实——但它是给「要不要投入生产」敲的警钟。</p>
+        <div class="call red" style="margin-top:10px">
+          <b>先记住：</b>试点几乎普及，能过生产关的很少。卡点不在模型能力，在运营条件。
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="卡在哪" data-title="死因三件套与失败模式">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">卡在哪</span><span class="t">死因三件套与失败模式</span></div>
+  </div>
+  <div class="body">
+    <div class="grid3" style="margin-top:8px">
+      <div class="card"><span class="tag">成本失控</span><p class="small">每次调用都在花钱，任务越多越收不住。</p></div>
+      <div class="card"><span class="tag">业务价值不清</span><p class="small">做了，但没人说得清省了什么、赚了什么。</p></div>
+      <div class="card"><span class="tag">风控不足</span><p class="small">出事没人管、没有止损与退出机制。</p></div>
+    </div>
+    <p class="cap mut" style="margin-top:8px">三件套口径：Gartner 预测（2025-06-25）对「>40% 项目被取消」的原因归类（<a href="https://www.gartner.com/en/newsroom/press-releases/2025-06-25-gartner-predicts-over-40-percent-of-agentic-ai-projects-will-be-canceled-by-end-of-2027" target="_blank" rel="noopener">Gartner</a>）。</p>
+    <table class="tbl" style="margin-top:10px">
+      <tr><th>生产环境事故占比（方向性）</th><th>约占比</th><th>一句话</th></tr>
+      <tr><td><b>工具错误 Tool errors</b>：调错工具、参数错、下游 API 报错</td><td>~28%</td><td>接口层的事</td></tr>
+      <tr><td><b>记忆与状态 Memory &amp; state</b>：忘上下文、状态过期</td><td>~22%</td><td>状态层的事</td></tr>
+      <tr><td><b>未覆盖边界 Unhandled edge cases</b>：输入在预期之外</td><td>~18%</td><td>边界层的事</td></tr>
+      <tr><td>幻觉 Hallucination</td><td>~12%</td><td>最常被提，却不是主因</td></tr>
+    </table>
+    <p class="cap mut" style="margin-top:6px">口径：Presenc AI 2026 厂商观测 + 公开复盘（<a href="https://presenc.ai/research/ai-agent-failure-mode-statistics-2026" target="_blank" rel="noopener">Presenc AI</a>），方向性信号。工具、状态、边界都不是「模型笨」，全是工程问题。</p>
+    <div class="call red" style="margin-top:12px">
+      <b>结论：</b>多数项目不是「模型不行」，是<b>运营模型缺失</b>——没有评估、没有止损、没有状态管理、没有可观测性。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="卡在哪" data-title="为什么难：提问的人换了">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">卡在哪</span><span class="t">为什么难：提问的人换了</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px">
+      <div class="card col bg-blue">
+        <span class="tag">Demo 阶段</span>
+        <p class="small"><b>提问人：开发者</b></p>
+        <p class="h2" style="color:var(--blue)">「能不能做到？」</p>
+        <p class="small">验收标准：演示顺、能跑通、<b>看着对</b>。输入自己挑，错了重来就好。</p>
+      </div>
+      <div class="card col bg-orange">
+        <span class="tag">生产阶段</span>
+        <p class="small"><b>提问人：业务方</b></p>
+        <p class="h2" style="color:var(--orange)">「每单多少钱？出错谁负责？停了怎么办？」</p>
+        <p class="small">验收标准：<b>单位经济、责任边界、可用性与恢复</b>。输入是真实的，错一次就有成本。</p>
+      </div>
+    </div>
+    <div class="dia" style="margin-top:14px">
+      <svg viewBox="0 0 1160 150" role="img" aria-label="提问人不同，验收标准不同">
+        <rect x="40" y="18" width="500" height="112" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="290" y="50" text-anchor="middle" font-size="15" font-weight="600" fill="#2563eb">Demo：开发者问「能不能做到」</text>
+        <text x="290" y="76" text-anchor="middle" font-size="14" fill="#1f2937">验收 = 演示顺、能跑通、看着对</text>
+        <text x="290" y="102" text-anchor="middle" font-size="13" fill="#5b6675">错了重来，没有代价</text>
+        <rect x="620" y="18" width="500" height="112" rx="10" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/>
+        <text x="870" y="50" text-anchor="middle" font-size="15" font-weight="600" fill="#c2410c">生产：业务方问「能担得起吗」</text>
+        <text x="870" y="76" text-anchor="middle" font-size="14" fill="#1f2937">验收 = 每单多少钱 · 出错谁负责 · 停了怎么办</text>
+        <text x="870" y="102" text-anchor="middle" font-size="13" fill="#5b6675">错一次就有真实成本</text>
+        <line x1="540" y1="74" x2="616" y2="74" stroke="#94a3b8" stroke-width="2"/>
+        <polyline points="610,68 620,74 610,80" fill="none" stroke="#94a3b8" stroke-width="2"/>
+      </svg>
+    </div>
+    <p class="p" style="margin-top:12px">换提问人，就是<b>换验收标准</b>。demo 里通过的「能跑」，到生产里要重新过一遍：<b class="orange">每一道题都要有数据、有责任人、有兜底</b>。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="控制权" data-title="控制权连续谱（大图）">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">控制权</span><span class="t">控制权连续谱：先定位，再谈别的</span></div>
+  </div>
+  <div class="body">
+    <div class="dia" style="margin-top:6px">
+      <svg viewBox="0 0 1160 300" role="img" aria-label="控制权连续谱：左端流程全写死，右端模型全权决定">
+        <defs><marker id="spec-c6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker></defs>
+        <rect x="40" y="20" width="260" height="62" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="170" y="50" text-anchor="middle" font-size="18" font-weight="600" fill="#2563eb">流程全写死</text>
+        <text x="170" y="70" text-anchor="middle" font-size="13" fill="#5b6675">Workflow · 代码决定一切</text>
+        <rect x="860" y="20" width="260" height="62" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="990" y="50" text-anchor="middle" font-size="18" font-weight="600" fill="#7c3aed">模型全权决定</text>
+        <text x="990" y="70" text-anchor="middle" font-size="13" fill="#5b6675">Agent · 模型决定每步</text>
+        <line x1="300" y1="140" x2="860" y2="140" stroke="#94a3b8" stroke-width="2" marker-end="url(#spec-c6)"/>
+        <line x1="300" y1="130" x2="300" y2="150" stroke="#94a3b8" stroke-width="2"/>
+        <line x1="860" y1="130" x2="860" y2="150" stroke="#94a3b8" stroke-width="2"/>
+        <text x="580" y="163" text-anchor="middle" font-size="13" fill="#94a3b8">← 代码决定多　　　　模型决定多 →　·　控制权连续谱（agency continuum）</text>
+        <rect x="40" y="180" width="520" height="104" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="60" y="210" font-size="15" font-weight="600" fill="#2563eb">换来什么：确定性 · 可预测 · 便宜</text>
+        <text x="60" y="238" font-size="15" fill="#1f2937">付出什么：不灵活 · 不能应变</text>
+        <text x="60" y="262" font-size="13" fill="#5b6675">死路径外的输入处理不了，一改流程就要改代码。</text>
+        <rect x="600" y="180" width="520" height="104" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="620" y="210" font-size="15" font-weight="600" fill="#7c3aed">换来什么：灵活 · 能应变</text>
+        <text x="620" y="238" font-size="15" fill="#1f2937">付出什么：贵 · 不确定 · 难预测</text>
+        <text x="620" y="262" font-size="13" fill="#5b6675">每步都花钱花时间，结果不可复现，出事不好定位。</text>
+      </svg>
+    </div>
+    <p class="cap mut" style="margin-top:10px">谱上每个位置都是一种「交换」：你买的是左端的确定性，还是右端的灵活性？先认账，再落位。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="控制权" data-title="谱上的三种编排">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">控制权</span><span class="t">谱上的三种编排：谁决定下一步</span></div>
+  </div>
+  <div class="body">
+    <div class="dia" style="margin-top:6px">
+      <svg viewBox="0 0 1160 152" role="img" aria-label="三种编排在连续谱上的位置">
+        <defs><marker id="spec-c7" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker></defs>
+        <text x="180" y="30" text-anchor="middle" font-size="13" fill="#5b6675">确定性优先</text>
+        <text x="580" y="30" text-anchor="middle" font-size="13" fill="#5b6675">可控 + 应变</text>
+        <text x="980" y="30" text-anchor="middle" font-size="13" fill="#5b6675">应变优先</text>
+        <line x1="60" y1="50" x2="1100" y2="50" stroke="#94a3b8" stroke-width="2" marker-end="url(#spec-c7)"/>
+        <line x1="180" y1="50" x2="180" y2="62" stroke="#2563eb" stroke-width="2.5"/>
+        <line x1="580" y1="50" x2="580" y2="62" stroke="#c2410c" stroke-width="2.5"/>
+        <line x1="980" y1="50" x2="980" y2="62" stroke="#7c3aed" stroke-width="2.5"/>
+        <rect x="60" y="66" width="240" height="64" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="180" y="92" text-anchor="middle" font-size="14" font-weight="600" fill="#2563eb">① 代码全决定</text>
+        <text x="180" y="114" text-anchor="middle" font-size="12" fill="#5b6675">workflow / 规则编排</text>
+        <rect x="460" y="66" width="240" height="64" rx="8" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/>
+        <text x="580" y="92" text-anchor="middle" font-size="14" font-weight="600" fill="#c2410c">② 代码定骨架 · 模型定局部</text>
+        <text x="580" y="114" text-anchor="middle" font-size="12" fill="#5b6675">混合编排（hybrid）</text>
+        <rect x="860" y="66" width="240" height="64" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="980" y="92" text-anchor="middle" font-size="14" font-weight="600" fill="#7c3aed">③ 模型每步自己决定</text>
+        <text x="980" y="114" text-anchor="middle" font-size="12" fill="#5b6675">ReAct 式全自主</text>
+      </svg>
+    </div>
+    <div class="grid3" style="margin-top:12px">
+      <div class="card col">
+        <span class="tag">① 代码全决定</span>
+        <p class="small">流程写死在代码里，模型只在指定位置填空。<b>下一步是谁，代码说了算。</b></p>
+        <p class="small mut">谱位：左端。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">② 代码定骨架 · 模型定局部</span>
+        <p class="small">代码定<b>步骤顺序</b>，每步内的动作与内容由模型决定。<b>两边分权。</b></p>
+        <p class="small mut">谱位：中段。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">③ 模型每步自己决定</span>
+        <p class="small">模型自己规划、自己选工具、自己看结果定下一步（<b>ReAct：Reason + Act</b>）。<b>决定权几乎全给模型。</b></p>
+        <p class="small mut">谱位：右端。</p>
+      </div>
+    </div>
+    <p class="cap mut" style="margin-top:10px">分类标准只有一个：<b>「下一步由谁决定」</b>。规则、骨架、自主，对应谱上的左、中、右。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="控制权" data-title="真实产品几乎都是混合的">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">控制权</span><span class="t">真实产品几乎都是混合的</span></div>
+  </div>
+  <div class="body">
+    <div class="dia" style="margin-top:6px">
+      <svg viewBox="0 0 1160 210" role="img" aria-label="混合编排示例：步骤骨架固定，局部由模型决定，发送前人工审批">
+        <defs><marker id="spec-c8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker></defs>
+        <g font-size="14" font-weight="600" fill="#1f2937" text-anchor="middle">
+          <rect x="40" y="30" width="150" height="64" rx="8" fill="#f6f8fa" stroke="#94a3b8" stroke-width="1.5"/><text x="115" y="56">接收工单</text><text x="115" y="78" font-size="12" fill="#5b6675" font-weight="400">代码固定</text>
+          <rect x="210" y="30" width="150" height="64" rx="8" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/><text x="285" y="56">自动分类</text><text x="285" y="78" font-size="12" fill="#0e9f6e" font-weight="400">模型定类目</text>
+          <rect x="380" y="30" width="150" height="64" rx="8" fill="#f6f8fa" stroke="#94a3b8" stroke-width="1.5"/><text x="455" y="56">检索知识</text><text x="455" y="78" font-size="12" fill="#5b6675" font-weight="400">代码调用 RAG</text>
+          <rect x="550" y="30" width="150" height="64" rx="8" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/><text x="625" y="56">生成草稿</text><text x="625" y="78" font-size="12" fill="#0e9f6e" font-weight="400">模型写内容</text>
+          <rect x="720" y="30" width="150" height="64" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/><text x="795" y="56">人工审批</text><text x="795" y="78" font-size="12" fill="#dc2626" font-weight="400">强制审批点</text>
+          <rect x="890" y="30" width="150" height="64" rx="8" fill="#f6f8fa" stroke="#94a3b8" stroke-width="1.5"/><text x="965" y="56">发送回执</text><text x="965" y="78" font-size="12" fill="#5b6675" font-weight="400">代码固定</text>
+        </g>
+        <line x1="190" y1="62" x2="206" y2="62" stroke="#94a3b8" stroke-width="2" marker-end="url(#spec-c8)"/>
+        <line x1="360" y1="62" x2="376" y2="62" stroke="#94a3b8" stroke-width="2" marker-end="url(#spec-c8)"/>
+        <line x1="530" y1="62" x2="546" y2="62" stroke="#94a3b8" stroke-width="2" marker-end="url(#spec-c8)"/>
+        <line x1="700" y1="62" x2="716" y2="62" stroke="#94a3b8" stroke-width="2" marker-end="url(#spec-c8)"/>
+        <line x1="870" y1="62" x2="886" y2="62" stroke="#94a3b8" stroke-width="2" marker-end="url(#spec-c8)"/>
+        <text x="580" y="140" text-anchor="middle" font-size="13" fill="#5b6675">步骤骨架由代码固定（灰），步骤内的内容由模型决定（绿），高风险动作前有人点头（红）。</text>
+        <text x="580" y="168" text-anchor="middle" font-size="13" fill="#5b6675">流程可预测、内容可应变、责任有人接——这就是混合编排的样子。</text>
+      </svg>
+    </div>
+    <div class="grid2" style="margin-top:12px">
+      <div class="card bg-green">
+        <p class="small"><b>正面：</b>先定<b>步骤骨架</b>，每步细节交给模型——流程可预测，细节能应变。</p>
+      </div>
+      <div class="card bg-red">
+        <p class="small"><b>反面：</b>全自主 demo 好看但<b>不可控</b>，出错难定位；全写死跟传统软件没区别，AI 的灵活性白买。</p>
+      </div>
+    </div>
+    <p class="cap mut" style="margin-top:10px">所以真实产品几乎都落在中段：<b>把步骤写死、把内容放开</b>。全自主是演示用的，全写死是传统软件。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="控制权" data-title="在谱上找自己的位置">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">控制权</span><span class="t">在谱上找自己的位置：决策三问</span></div>
+  </div>
+  <div class="body">
+    <div class="grid3" style="margin-top:8px">
+      <div class="card"><span class="tag">问 1 · 确定性</span><p class="small"><b>任务确定性高不高？</b>流程是否基本固定、输入是否规整？</p></div>
+      <div class="card"><span class="tag">问 2 · 代价</span><p class="small"><b>错误代价大不大？</b>错了是小麻烦，还是事故级？</p></div>
+      <div class="card"><span class="tag">问 3 · 响应</span><p class="small"><b>需要多快应变？</b>要不要随输入随机应变？</p></div>
+    </div>
+    <table class="tbl" style="margin-top:14px">
+      <tr><th>三问的结果</th><th>谱上位置</th><th>做法</th></tr>
+      <tr><td>高确定 · 低代价 · 要快</td><td><b>靠左</b>（流程全写死）</td><td>规则 + 少量模型填空</td></tr>
+      <tr><td>中确定 · 中代价 · 可控</td><td><b>中段</b>（混合）</td><td>代码定骨架、模型定局部</td></tr>
+      <tr><td>低确定 · 高代价 · 要应变</td><td><b>靠右</b>（模型多决定）</td><td>必须配评估 + 人在环兜底</td></tr>
+    </table>
+    <div class="call orange" style="margin-top:14px">
+      <b>位置不是天赋，是逐点定出来的：</b>任务里的每个决策点，先问「这一步能不能写死」——能写死就靠左，不能就靠右，剩下的自然落在中间。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="工具" data-title="用不用框架是另一个维度">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">工具</span><span class="t">用不用框架，是另一个维度</span></div>
+  </div>
+  <div class="body">
+    <div class="grid3" style="margin-top:8px">
+      <div class="card col">
+        <span class="tag">API · 原始请求</span>
+        <p class="small">你直接发请求、处理返回，<b>控制一切</b>。适合简单、线性、靠左的任务。</p>
+        <p class="small mut">代价：状态、重试、记忆全自己写。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">SDK</span>
+        <p class="small">软件开发工具包（<b>Software Development Kit</b>），封装模型调用与常见参数，<b>省样板代码</b>，流程仍由你定。</p>
+        <p class="small mut">适合中等复杂度。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">框架 framework</span>
+        <p class="small"><b>编排 + 脚手架</b>：状态、工具、记忆、评估、重试一整套。</p>
+        <p class="small mut">适配中段到右段、多工具、要长期迭代。</p>
+      </div>
+    </div>
+    <table class="tbl" style="margin-top:12px">
+      <tr><th>工具层</th><th>替你做主的部分</th><th>你在谱上偏哪一段用得上</th></tr>
+      <tr><td>API</td><td>无——一切自己写</td><td>左端 / 简单线性任务</td></tr>
+      <tr><td>SDK</td><td>调用与序列化</td><td>中段偏左</td></tr>
+      <tr><td>框架</td><td>状态、工具、记忆、评估、重试、恢复</td><td>中段到右段 / 复杂多步任务</td></tr>
+    </table>
+    <div class="call orange" style="margin-top:12px">
+      <b>别把两个问题混成一个：</b>「谱上放哪」是决定，<b>「用什么工具」是执行</b>。先定位，再选 API / SDK / 框架；三者可叠加，不是互斥。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="工具" data-title="什么时候该上框架">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">工具</span><span class="t">什么时候该上框架：判断清单</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px;align-items:stretch">
+      <div class="card col bg-green">
+        <span class="tag">该上框架</span>
+        <ul class="ul">
+          <li><b>谱位靠右</b>：模型参与决策多</li>
+          <li><b>任务复杂</b>：多步骤、多工具</li>
+          <li><b>需要记忆 / 重试 / 评估</b>：状态与恢复是刚需</li>
+        </ul>
+        <p class="small">例：客服工单多步 + 调工具 + 要审计——框架把状态与重试现成给你。</p>
+      </div>
+      <div class="card col bg-orange">
+        <span class="tag">裸代码就够</span>
+        <ul class="ul">
+          <li><b>谱位靠左</b>：线性流程</li>
+          <li><b>简单一问一答一存</b>：无状态、无重试需求</li>
+          <li><b>改造老系统</b>：不想引入新依赖</li>
+        </ul>
+        <p class="small">例：把一份文档翻译成三条要点——一个 API 调用就够，上框架是负担。</p>
+      </div>
+    </div>
+    <p class="cap mut" style="margin-top:12px">方向性信号（MIT NANDA / Deloitte 口径，2026，generative AI pilots 广义口径）：外购或与厂商合作（<b>~67%</b> 成功）比自建（<b>~33%</b>）更易落地——买来的框架也算「外购」（<a href="https://fortune.com/2025/08/18/mit-report-95-percent-generative-ai-pilots-at-companies-failing-cfo/" target="_blank" rel="noopener">MIT NANDA</a>）。</p>
+    <div class="call red" style="margin-top:12px">
+      <b>判断标准不是「酷不酷」，是「要自己维护的东西有多少」。</b>维护成本由你自己扛的部分越大，框架越值。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+<section class="slide" data-act="凭什么上线" data-title="凭什么能上线：「谁在问」">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">凭什么上线</span><span class="t">凭什么能上线：一道题一道题答完</span></div>
+  </div>
+  <div class="body">
+    <div class="dia" style="margin-top:4px">
+      <svg viewBox="0 0 1160 270" role="img" aria-label="七个上线问题序列：评估、记忆、安全、治理、成本与延迟、可观测性、人在环">
+        <defs><marker id="who-c12" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker></defs>
+        <g>
+          <rect x="30" y="40" width="140" height="176" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+          <rect x="30" y="40" width="140" height="6" rx="3" fill="#0e9f6e"/>
+          <text x="100" y="74" text-anchor="middle" font-size="13" font-weight="600" fill="#0e9f6e">评估 Evaluation</text>
+          <text x="100" y="100" text-anchor="middle" font-size="12" fill="#5b6675">提问人：数据 / 测试者</text>
+          <text x="100" y="126" text-anchor="middle" font-size="13" fill="#1f2937">「做对了吗？」</text>
+          <text x="100" y="158" text-anchor="middle" font-size="12" fill="#94a3b8">先立标尺</text>
+          <rect x="190" y="40" width="140" height="176" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+          <rect x="190" y="40" width="140" height="6" rx="3" fill="#c2410c"/>
+          <text x="260" y="74" text-anchor="middle" font-size="13" font-weight="600" fill="#c2410c">记忆 Memory · RAG</text>
+          <text x="260" y="100" text-anchor="middle" font-size="12" fill="#5b6675">提问人：状态</text>
+          <text x="260" y="126" text-anchor="middle" font-size="13" fill="#1f2937">「还记得昨天吗？」</text>
+          <text x="260" y="158" text-anchor="middle" font-size="12" fill="#94a3b8">别让它忘</text>
+          <rect x="350" y="40" width="140" height="176" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+          <rect x="350" y="40" width="140" height="6" rx="3" fill="#c2410c"/>
+          <text x="420" y="74" text-anchor="middle" font-size="13" font-weight="600" fill="#c2410c">安全 Security</text>
+          <text x="420" y="100" text-anchor="middle" font-size="12" fill="#5b6675">提问人：攻击者 / 安全</text>
+          <text x="420" y="126" text-anchor="middle" font-size="13" fill="#1f2937">「会不会被恶意利用？」</text>
+          <text x="420" y="158" text-anchor="middle" font-size="12" fill="#94a3b8">别越权</text>
+          <rect x="510" y="40" width="140" height="176" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+          <rect x="510" y="40" width="140" height="6" rx="3" fill="#c2410c"/>
+          <text x="580" y="74" text-anchor="middle" font-size="13" font-weight="600" fill="#c2410c">治理 Governance</text>
+          <text x="580" y="100" text-anchor="middle" font-size="12" fill="#5b6675">提问人：业务负责人</text>
+          <text x="580" y="126" text-anchor="middle" font-size="13" fill="#1f2937">「出事谁负责？」</text>
+          <text x="580" y="158" text-anchor="middle" font-size="12" fill="#94a3b8">有负责人</text>
+          <rect x="670" y="40" width="140" height="176" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+          <rect x="670" y="40" width="140" height="6" rx="3" fill="#c2410c"/>
+          <text x="740" y="74" text-anchor="middle" font-size="13" font-weight="600" fill="#c2410c">成本与延迟</text>
+          <text x="740" y="92" text-anchor="middle" font-size="13" font-weight="600" fill="#c2410c">Cost &amp; Latency</text>
+          <text x="740" y="116" text-anchor="middle" font-size="12" fill="#5b6675">提问人：财务</text>
+          <text x="740" y="140" text-anchor="middle" font-size="13" fill="#1f2937">「每单多少钱？」</text>
+          <text x="740" y="170" text-anchor="middle" font-size="12" fill="#94a3b8">算得清</text>
+          <rect x="830" y="40" width="140" height="176" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+          <rect x="830" y="40" width="140" height="6" rx="3" fill="#c2410c"/>
+          <text x="900" y="74" text-anchor="middle" font-size="13" font-weight="600" fill="#c2410c">可观测性 Observability</text>
+          <text x="900" y="100" text-anchor="middle" font-size="12" fill="#5b6675">提问人：运维</text>
+          <text x="900" y="126" text-anchor="middle" font-size="13" fill="#1f2937">「到底发生了什么？」</text>
+          <text x="900" y="158" text-anchor="middle" font-size="12" fill="#94a3b8">能复盘</text>
+          <rect x="990" y="40" width="140" height="176" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+          <rect x="990" y="40" width="140" height="6" rx="3" fill="#c2410c"/>
+          <text x="1060" y="74" text-anchor="middle" font-size="13" font-weight="600" fill="#c2410c">人在环</text>
+          <text x="1060" y="92" text-anchor="middle" font-size="13" font-weight="600" fill="#c2410c">Human-in-the-loop</text>
+          <text x="1060" y="116" text-anchor="middle" font-size="12" fill="#5b6675">提问人：业务方</text>
+          <text x="1060" y="140" text-anchor="middle" font-size="13" fill="#1f2937">「高风险动作谁点头？」</text>
+          <text x="1060" y="170" text-anchor="middle" font-size="12" fill="#94a3b8">有人兜底</text>
+        </g>
+        <line x1="170" y1="128" x2="186" y2="128" stroke="#94a3b8" stroke-width="2" marker-end="url(#who-c12)"/>
+        <line x1="330" y1="128" x2="346" y2="128" stroke="#94a3b8" stroke-width="2" marker-end="url(#who-c12)"/>
+        <line x1="490" y1="128" x2="506" y2="128" stroke="#94a3b8" stroke-width="2" marker-end="url(#who-c12)"/>
+        <line x1="650" y1="128" x2="666" y2="128" stroke="#94a3b8" stroke-width="2" marker-end="url(#who-c12)"/>
+        <line x1="810" y1="128" x2="826" y2="128" stroke="#94a3b8" stroke-width="2" marker-end="url(#who-c12)"/>
+        <line x1="970" y1="128" x2="986" y2="128" stroke="#94a3b8" stroke-width="2" marker-end="url(#who-c12)"/>
+        <text x="580" y="246" text-anchor="middle" font-size="13" fill="#5b6675">每个格子都是一道「谁在问」——提问人不同，验收标准就不同；评估第一个做，其它改进才有依据。</text>
+      </svg>
+    </div>
+    <p class="cap mut" style="margin-top:10px">后面七页按这个顺序展开。每页解决一道题：一句话定义、什么时候需要、代价是什么。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="凭什么上线" data-title="评估 Evaluation：放最前">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">凭什么上线</span><span class="t">评估 Evaluation：放最前</span></div>
+  </div>
+  <div class="body">
+    <div class="call red" style="margin-top:8px">
+      <b>元问题：</b>没有评估（evaluation），其它一切改进都无法验证——换模型、调提示词、加记忆，怎么知道<b>变好了</b>？demo 里「看着对」≠ 生产里「可度量」。
+    </div>
+    <div class="card bg-green" style="margin-top:14px">
+      <span class="tag">可落地的起步法（一周内就能建）</span>
+      <div class="grid3" style="margin-top:10px">
+        <div class="card"><p class="h2" style="color:var(--green)">30</p><p class="small">个<b>真实任务</b>——从生产环境挑，不是编的。</p></div>
+        <div class="card"><p class="h2" style="color:var(--green)">三档</p><p class="small">打分：<b>对 / 部分对 / 错</b>，别用 100 分制造错觉。</p></div>
+        <div class="card"><p class="h2" style="color:var(--green)">1 个</p><p class="small">核心指标：<b>任务完成率</b>（如 ≥90% 才算可上线）。</p></div>
+      </div>
+    </div>
+    <ul class="ul" style="margin-top:14px">
+      <li><b>先立基准，再谈优化。</b>没有基准的「调优」都是碰运气。</li>
+      <li><b>评估集随生产一起长：</b>每次真实翻车，就把那条任务补进评估集。</li>
+      <li>评估指标要<b>贴着任务定义</b>：完成率、正确率、达标比例，选一个能对业务说的。</li>
+    </ul>
+    <div class="call orange" style="margin-top:12px">
+      <b>一句话：</b>先回答「什么叫做好了」，生产才有入场券。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="凭什么上线" data-title="记忆 Memory：含 RAG">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">凭什么上线</span><span class="t">记忆 Memory：模型会「忘」，你要替它记住</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px;align-items:stretch">
+      <div class="card col">
+        <span class="tag">为什么需要记忆</span>
+        <p class="small">模型的知识有<b>截止时间</b>，对话一长还会「忘」早先的上下文。记忆（memory）= 把<b>状态与知识</b>存起来、需要时取回。</p>
+        <p class="small">参数里的知识是「记」出来的，会过期；记忆系统是「查」出来的，随取随新。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">RAG：一句话</span>
+        <p class="small"><b>检索增强生成（Retrieval-Augmented Generation，RAG）</b>：<b>先检索、再生成</b>——先从你的知识库里取相关片段，再让模型基于它作答。</p>
+        <p class="small">给模型「看资料再答题」，而不是让它背题库。</p>
+      </div>
+    </div>
+    <div class="grid2" style="margin-top:14px">
+      <div class="card bg-green">
+        <p class="small"><b>什么时候该上：</b>知识要<b>新</b>（今天的内容）、<b>私有</b>（外部查不到）、<b>变化</b>（会改）——三条中一条，就要考虑记忆 / RAG。</p>
+      </div>
+      <div class="card bg-red">
+        <p class="small"><b>代价：</b><b>检索质量决定上限</b>——检索不到对的片段，模型再强也没用。烂库 + 好模型 &lt; 好库 + 一般模型。</p>
+      </div>
+    </div>
+    <div class="call orange" style="margin-top:14px">
+      <b>上线前问一句：</b>它需要的知识，是「背下来的」还是「查得到的」？查得到的先做检索，别指望模型记。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="凭什么上线" data-title="安全 Security">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">凭什么上线</span><span class="t">安全 Security：三个坑、四个对策</span></div>
+  </div>
+  <div class="body">
+    <div class="grid3" style="margin-top:8px">
+      <div class="card bg-red"><span class="tag">坑 1 · 提示注入</span><p class="small"><b>提示注入（prompt injection）</b>：恶意指令混进用户输入或工具返回，诱导 agent 越权行动。</p></div>
+      <div class="card bg-red"><span class="tag">坑 2 · 工具权限放大</span><p class="small">agent 能访问的工具，比任务需要的<b>多</b>——权限越大，出事面越大。</p></div>
+      <div class="card bg-red"><span class="tag">坑 3 · 敏感数据外泄</span><p class="small">上下文里带出密钥、PII，或写进外部工具、日志、提示词。</p></div>
+    </div>
+    <div class="card bg-green" style="margin-top:14px">
+      <span class="tag">四个对策（照着做）</span>
+      <ul class="ul" style="margin-top:6px">
+        <li><b>最小权限（least privilege）</b>：只给任务必需的工具与数据。</li>
+        <li><b>沙箱（sandbox）</b>：agent 在隔离环境里跑，影响不了外面的系统。</li>
+        <li><b>输入输出过滤</b>：进系统前过滤指令，出系统前过滤敏感内容。</li>
+        <li><b>禁止回显密钥</b>：API Key、密码一律不回显、不进提示词、不写日志。</li>
+      </ul>
+    </div>
+    <div class="call red" style="margin-top:12px">
+      <b>假设：</b>攻击者已经看过你的系统提示词。所有安全设计都要按「提示词可以被注入」来写。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="凭什么上线" data-title="治理 Governance">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">凭什么上线</span><span class="t">治理 Governance：有行为的系统要有负责人</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px;align-items:stretch">
+      <div class="card col">
+        <span class="tag">治理（governance）四件事</span>
+        <ul class="ul">
+          <li><b>谁负责</b>：有明确的负责人与责任边界</li>
+          <li><b>留记录</b>：行为日志，出事后查得到</li>
+          <li><b>可撤销</b>：一键停用，随时下线</li>
+          <li><b>审批流</b>：高风险动作走审批</li>
+        </ul>
+      </div>
+      <div class="card col bg-red">
+        <span class="tag">为什么要管</span>
+        <p class="small">agent 是<b>有行为的系统</b>——会发消息、写数据、花钱。没有负责人与日志，出事没人接、事后查不了。</p>
+        <p class="small">demo 不用管，因为错了可以重来；生产管的是「<b>出错了怎么办</b>」。</p>
+      </div>
+    </div>
+    <div class="call orange" style="margin-top:16px">
+      <b>三个必须：</b>一个负责人 · 一份行为日志 · 一个一键停用按钮。三者齐了，才谈得上「治理」。
+    </div>
+    <p class="note" style="margin-top:12px">审批流的细节（谁来批、批几次）不在本讲展开；先保证「有」这套机制。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="凭什么上线" data-title="成本与延迟 Cost & Latency">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">凭什么上线</span><span class="t">成本与延迟 Cost & Latency：先算每单多少钱</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px;align-items:stretch">
+      <div class="card col">
+        <span class="tag">成本估算公式</span>
+        <pre style="font-size:14px">每任务成本 ≈（输入token×输入单价
+  + 输出token×输出单价）× (1 + 重试率)</pre>
+        <p class="small"><b>数字例子：</b>平均 20k 输入 + 2k 输出；单价参考 Claude Sonnet 5（核对 2026-08）$2 / $10 每百万（<a href="https://platform.claude.com" target="_blank" rel="noopener">platform.claude.com</a>）。</p>
+        <p class="small">0.04 + 0.02 = <b>$0.06 / 任务</b>；重试率 20% → ≈ <b>$0.07</b>；1 万任务/天 ≈ <b>$720/天</b>。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">延迟构成</span>
+        <ul class="ul">
+          <li><b>模型响应</b>：首 token 延迟</li>
+          <li><b>工具调用</b>：每次往返 + 网络 + 服务端处理</li>
+          <li><b>重试 × 步数</b>：每多一步都累加，重试让延迟翻倍式上涨</li>
+        </ul>
+        <p class="small">demo 只测一步，生产是<b>多步连乘</b>——单步很快 ≠ 整个任务很快。</p>
+      </div>
+    </div>
+    <div class="call orange" style="margin-top:14px">
+      <b>很多项目不是技术不行，是单位经济算不过来。</b>上线前先算「每单多少钱、单次要多久」；算不清，别上线。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="凭什么上线" data-title="可观测性 Observability">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">凭什么上线</span><span class="t">可观测性 Observability：能复盘、能回滚</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px;align-items:stretch">
+      <div class="card bg-blue">
+        <p class="small"><b>可观测性（observability）≠ 评估。</b></p>
+        <p class="small">评估问<b>「好不好」</b>（这次平均正确率多少）；可观测问<b>「这次到底发生了什么」</b>（哪一步、哪个工具、什么输入）。</p>
+      </div>
+      <div class="card">
+        <span class="tag">每步记录什么</span>
+        <ul class="ul">
+          <li>输入 / 输出</li>
+          <li>工具调用（哪个工具、参数、返回）</li>
+          <li>耗时 / 花费 / 重试次数</li>
+        </ul>
+      </div>
+    </div>
+    <div class="call red" style="margin-top:16px">
+      <b>为什么必须：</b>demo 里出问题重跑一次就好；生产里出问题，要能<b>复盘</b>（先定位是哪一步），再<b>回滚</b>（回到上一个可用版本）。没有记录，两件事都做不到。
+    </div>
+    <div class="call green" style="margin-top:12px">
+      <b>落地：</b>从第一天就把每步日志带上 trace id——比事后补日志便宜一百倍。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="凭什么上线" data-title="人在环 Human-in-the-loop">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">凭什么上线</span><span class="t">人在环 Human-in-the-loop：高风险动作前有人</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px;align-items:stretch">
+      <div class="card col">
+        <span class="tag">审批点放哪</span>
+        <p class="small"><b>高风险动作之前</b>——发消息、写库、花钱、对外承诺。</p>
+        <p class="small">低风险动作不拦，否则没人用：每步都问，等于没有 agent。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">粒度多大</span>
+        <p class="small"><b>整任务批一次</b> vs <b>每步都批</b>：粒度越细越安全，也越费人。</p>
+        <p class="small">多数系统只在高风险步设闸：<b>前几步放行，最后一关人点</b>。</p>
+      </div>
+    </div>
+    <div class="call purple" style="margin-top:16px">
+      <b>与控制权连续谱直接挂钩：</b>越靠右（模型决定越多），越需要<b>人在环（human-in-the-loop）</b>兜底。「全自主」不意味着没人——自主度越高，人应该站在更关键的位置。
+    </div>
+    <p class="note" style="margin-top:12px">审批设计（谁来批、批几次、超时怎么办）点到为止，不在本讲展开。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="收尾" data-title="上线前清单（可直接抄）">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">收尾</span><span class="t">上线前清单：直接抄，逐项打勾</span></div>
+  </div>
+  <div class="body">
+    <p class="small" style="margin-top:4px"><b>抄下来，全部打勾再上线。没有一项是可选的。</b></p>
+    <div class="grid2" style="margin-top:10px">
+      <div class="card col">
+        <p class="small" style="position:relative;padding-left:28px;margin:5px 0"><span style="position:absolute;left:0;top:1px;width:15px;height:15px;border:2px solid var(--green);border-radius:4px;background:#ecfdf5"></span><b>有评估基准</b>：30 个真实任务 + 三档打分 + 任务完成率</p>
+        <p class="small" style="position:relative;padding-left:28px;margin:5px 0"><span style="position:absolute;left:0;top:1px;width:15px;height:15px;border:2px solid var(--green);border-radius:4px;background:#ecfdf5"></span><b>有止损与退出标准</b>：不达标就停，不硬上线</p>
+        <p class="small" style="position:relative;padding-left:28px;margin:5px 0"><span style="position:absolute;left:0;top:1px;width:15px;height:15px;border:2px solid var(--green);border-radius:4px;background:#ecfdf5"></span><b>有行为日志</b>：每步输入/输出/工具/耗时/花费</p>
+        <p class="small" style="position:relative;padding-left:28px;margin:5px 0"><span style="position:absolute;left:0;top:1px;width:15px;height:15px;border:2px solid var(--green);border-radius:4px;background:#ecfdf5"></span><b>有回滚</b>：一键回到上一个可用版本</p>
+        <p class="small" style="position:relative;padding-left:28px;margin:5px 0"><span style="position:absolute;left:0;top:1px;width:15px;height:15px;border:2px solid var(--green);border-radius:4px;background:#ecfdf5"></span><b>最小权限</b>：agent 只拿任务必需的工具与数据</p>
+      </div>
+      <div class="card col">
+        <p class="small" style="position:relative;padding-left:28px;margin:5px 0"><span style="position:absolute;left:0;top:1px;width:15px;height:15px;border:2px solid var(--green);border-radius:4px;background:#ecfdf5"></span><b>超时与重试</b>：超时上限 + 重试次数上限</p>
+        <p class="small" style="position:relative;padding-left:28px;margin:5px 0"><span style="position:absolute;left:0;top:1px;width:15px;height:15px;border:2px solid var(--green);border-radius:4px;background:#ecfdf5"></span><b>成本上限</b>：每任务 / 每日预算，超了就停</p>
+        <p class="small" style="position:relative;padding-left:28px;margin:5px 0"><span style="position:absolute;left:0;top:1px;width:15px;height:15px;border:2px solid var(--green);border-radius:4px;background:#ecfdf5"></span><b>审批点</b>：高风险动作之前有人点头</p>
+        <p class="small" style="position:relative;padding-left:28px;margin:5px 0"><span style="position:absolute;left:0;top:1px;width:15px;height:15px;border:2px solid var(--green);border-radius:4px;background:#ecfdf5"></span><b>有负责人</b>：出事找得到人，责任写清楚</p>
+        <p class="small" style="position:relative;padding-left:28px;margin:5px 0"><span style="position:absolute;left:0;top:1px;width:15px;height:15px;border:2px solid var(--green);border-radius:4px;background:#ecfdf5"></span><b>有降级方案</b>：agent 不可用时有人工或兜底流程</p>
+      </div>
+    </div>
+    <div class="call red" style="margin-top:14px">
+      <b>记忆口诀：</b>前五项是「出事能兜底」，后五项是「别让它出事」。缺任何一项，出的就不是产品，是事故。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide cover" data-act="收尾" data-title="收尾">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">收尾</span></div>
+  </div>
+  <div class="body">
+    <h1 class="h1">先在谱上定位，再决定工具；评估先行</h1>
+    <p class="p sec" style="max-width:880px">今天的输出：一张定位自己的<b>控制权连续谱</b> · 一个<b>用不用框架</b>的判断标准 · 一份可直接抄的<b>上线前清单</b>。</p>
+    <div class="card" style="max-width:880px">
+      <p class="small"><b>本讲讲到这里为止：</b></p>
+      <ul class="ul">
+        <li>只讲<b>下周就要做的决定</b>：定位、工具、清单。</li>
+        <li>趋势判断、协议细节、长期路线图，不是本讲内容。</li>
+        <li>「全自主」不是目标，<b>可控地交给模型</b>才是目标。</li>
+      </ul>
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>

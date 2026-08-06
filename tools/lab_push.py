@@ -167,17 +167,18 @@ def main():
         f.write("\n")
     print(f"\n✅ 已复制到 lab/{name}/，说明已写入 _meta.json")
 
-    # Action 会把索引 commit 回 main，本地必须先 rebase 上去
-    print("\n$ git pull --rebase")
-    if subprocess.run(["git", "pull", "--rebase"], cwd=ROOT).returncode != 0:
-        print("❌ pull --rebase 失败。文件已经复制好了，解决冲突后手动 add/commit/push 即可。")
-        return 1
-
+    # 必须先 commit 再 pull：带着未提交的改动 rebase 会被 git 直接拒绝
     git("add", "lab/")
     r = subprocess.run(["git", "commit", "-m", f"lab: {name}"], cwd=ROOT)
     if r.returncode != 0:
         print("（没有变化可提交）")
         return 0
+
+    # Action 会把索引 commit 回 main，推之前得先 rebase 上去
+    print("\n$ git pull --rebase")
+    if subprocess.run(["git", "pull", "--rebase"], cwd=ROOT).returncode != 0:
+        print("❌ pull --rebase 失败。改动已在本地提交，解决冲突后 git push 即可。")
+        return 1
 
     if args.no_push:
         print("已提交，未推送（--no-push）")

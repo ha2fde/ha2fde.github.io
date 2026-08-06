@@ -1,0 +1,209 @@
+</div>
+<div id="ov"><div id="ovhead">概览 — 点卡片跳转 · 按 O 或 Esc 关闭</div><div id="ovgrid"></div></div>
+<script>
+(function(){
+"use strict";
+var stage=document.getElementById('stage');
+var slides=Array.prototype.slice.call(document.querySelectorAll('.slide'));
+var N=slides.length;
+var cur=0;
+var ov=document.getElementById('ov');
+var ovgrid=document.getElementById('ovgrid');
+var KEY={RIGHT:39,LEFT:37,UP:38,DOWN:40,SPACE:32,HOME:36,END:35,J:74,K:75,O:79,F:70,ESC:27,PGDN:34,PGUP:33};
+function fit(){
+  var s=Math.min(window.innerWidth/1280,window.innerHeight/720)*0.96;
+  stage.style.transformOrigin='0 0';
+  stage.style.transform='translate('+((window.innerWidth-1280*s)/2)+'px,'+((window.innerHeight-720*s)/2)+'px) scale('+s+')';
+}
+function paint(){
+  slides.forEach(function(sl,idx){
+    var pgs=sl.querySelectorAll('.pg');
+    for(var i=0;i<pgs.length;i++){pgs[i].textContent=(idx+1)+' / '+N;}
+    var prog=sl.querySelector('.prog i');
+    if(prog){prog.style.width=Math.round((idx+1)/N*100)+'%';}
+  });
+}
+function checkOverflow(){
+  var b=slides[cur].querySelector('.body');
+  if(!b){return;}
+  if(b.scrollHeight>b.clientHeight+1){
+    slides[cur].classList.add('ovf');
+    if(window.console){console.warn('[overflow] slide '+(cur+1)+' vertical: scrollHeight '+b.scrollHeight+' > clientHeight '+b.clientHeight);}
+  }else{
+    slides[cur].classList.remove('ovf');
+  }
+}
+function checkAll(){
+  var issues=[];
+  slides.forEach(function(sl,idx){
+    var b=sl.querySelector('.body');
+    if(!b){return;}
+    if(b.scrollHeight>b.clientHeight+1){
+      issues.push({p:idx+1,type:'vertical',sh:b.scrollHeight,ch:b.clientHeight});
+      sl.classList.add('ovf');
+    }
+    var br=b.getBoundingClientRect();
+    var els=b.querySelectorAll('*');
+    for(var i=0;i<els.length;i++){
+      var el=els[i];
+      if(el.closest('svg')){continue;}
+      var er=el.getBoundingClientRect();
+      if(er.width===0&&er.height===0){continue;}
+      if(er.right>br.right+1||er.left<br.left-1){
+        issues.push({p:idx+1,type:'horizontal',tag:el.tagName,cls:(el.className&&el.className.baseVal!==undefined?el.className.baseVal:el.className).toString().slice(0,40)});
+        break;
+      }
+    }
+    sl.classList.remove('ovf');
+  });
+  return issues;
+}
+function go(i,hash){
+  cur=Math.max(0,Math.min(N-1,i));
+  slides.forEach(function(sl,idx){sl.classList.toggle('active',idx===cur);});
+  if(hash!==false){
+    var h='#'+(cur+1);
+    if(location.hash!==h){
+      try{history.replaceState(null,'',h);}
+      catch(e){location.hash=h;}
+    }
+  }
+  paint();
+  checkOverflow();
+}
+function toggleFs(){
+  if(document.fullscreenElement){document.exitFullscreen();}
+  else if(document.documentElement.requestFullscreen){document.documentElement.requestFullscreen();}
+  else if(document.webkitRequestFullscreen){document.documentElement.webkitRequestFullscreen();}
+}
+function buildOv(){
+  slides.forEach(function(sl,idx){
+    var d=document.createElement('div');
+    d.className='ovcell';
+    d.innerHTML='<div class="on"></div><div class="oa"></div><div class="ot"></div>';
+    d.querySelector('.on').textContent=idx+1;
+    d.querySelector('.oa').textContent=sl.getAttribute('data-act')||'';
+    d.querySelector('.ot').textContent=sl.getAttribute('data-title')||'';
+    d.addEventListener('click',function(e){
+      e.stopPropagation();
+      go(idx,true);
+      closeOv();
+    });
+    ovgrid.appendChild(d);
+  });
+}
+function paintOv(){
+  var cells=ovgrid.querySelectorAll('.ovcell');
+  for(var i=0;i<cells.length;i++){cells[i].classList.toggle('cur',i===cur);}
+}
+function openOv(){ov.classList.add('open');paintOv();}
+function closeOv(){ov.classList.remove('open');}
+function toggleOv(){if(ov.classList.contains('open')){closeOv();}else{openOv();}}
+function handleTap(e){
+  if(!e.target||e.target.nodeType!==1){return;}
+  if(e.target.closest('#ov')){
+    if(ov.classList.contains('open')&&!e.target.closest('.ovcell')){closeOv();}
+    return;
+  }
+  if(e.target.closest('a')){return;}
+  if(e.target.closest('pre')||e.target.closest('code')){return;}
+  var sel=window.getSelection();
+  if(sel&&sel.rangeCount&&!sel.isCollapsed){return;}
+  var r=stage.getBoundingClientRect();
+  var x=e.clientX-r.left,y=e.clientY-r.top;
+  if(x<0||y<0||x>r.width||y>r.height){return;}
+  if(x<r.width*0.28){go(cur-1,true);}else{go(cur+1,true);}
+}
+document.addEventListener('keydown',function(e){
+  var k=e.keyCode||e.which;
+  var ovOpen=ov.classList.contains('open');
+  if(k===KEY.ESC){
+    if(ovOpen){closeOv();}
+    else if(document.fullscreenElement){document.exitFullscreen();}
+    return;
+  }
+  if(k===KEY.O){toggleOv();e.preventDefault();return;}
+  if(k===KEY.F){toggleFs();e.preventDefault();return;}
+  if(ovOpen){return;}
+  if(k===KEY.RIGHT||k===KEY.PGDN||k===KEY.SPACE||k===KEY.J){go(cur+1,true);e.preventDefault();}
+  else if(k===KEY.LEFT||k===KEY.PGUP||k===KEY.K){go(cur-1,true);e.preventDefault();}
+  else if(k===KEY.HOME){go(0,true);e.preventDefault();}
+  else if(k===KEY.END){go(N-1,true);e.preventDefault();}
+});
+document.addEventListener('click',handleTap);
+var tsx=0,tsy=0;
+document.addEventListener('touchstart',function(e){var t=e.touches[0];tsx=t.clientX;tsy=t.clientY;},{passive:true});
+document.addEventListener('touchend',function(e){
+  var t=e.changedTouches[0];
+  var dx=t.clientX-tsx,dy=t.clientY-tsy;
+  if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){if(dx<0){go(cur+1,true);}else{go(cur-1,true);}}
+},{passive:true});
+window.addEventListener('resize',fit);
+window.addEventListener('hashchange',function(){
+  var m=/^#(\d+)$/.exec(location.hash);
+  if(m){go(parseInt(m[1],10)-1,false);}
+});
+function init(){
+  buildOv();
+  var m=/^#(\d+)$/.exec(location.hash);
+  if(m){cur=Math.max(0,Math.min(N-1,parseInt(m[1],10)-1));}
+  go(cur,false);
+  fit();
+}
+function runValidate(){
+  var res={total:N};
+  res.overflow=checkAll();
+  go(0,false);
+  document.dispatchEvent(new KeyboardEvent('keydown',{keyCode:35}));
+  res.end=(cur+1)===N;
+  document.dispatchEvent(new KeyboardEvent('keydown',{keyCode:36}));
+  res.home=(cur+1)===1;
+  document.dispatchEvent(new KeyboardEvent('keydown',{keyCode:39}));
+  res.right=(cur+1)===2;
+  document.dispatchEvent(new KeyboardEvent('keydown',{keyCode:37}));
+  res.left=(cur+1)===1;
+  go(0,false);
+  var r=stage.getBoundingClientRect();
+  stage.dispatchEvent(new MouseEvent('click',{clientX:r.left+r.width*0.1,clientY:r.top+300,bubbles:true}));
+  res.clickPrev=(cur+1)===1;
+  stage.dispatchEvent(new MouseEvent('click',{clientX:r.left+r.width*0.8,clientY:r.top+300,bubbles:true}));
+  res.clickNext=(cur+1)===2;
+  var a=document.createElement('a');
+  a.href='#vtest';
+  a.textContent='x';
+  a.style.position='absolute';
+  slides[1].querySelector('.body').appendChild(a);
+  a.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}));
+  res.anchorNoFlip=(cur+1)===2;
+  a.remove();
+  var pre=document.createElement('pre');
+  pre.textContent='code block';
+  pre.style.position='absolute';
+  slides[1].querySelector('.body').appendChild(pre);
+  pre.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}));
+  res.codeNoFlip=(cur+1)===2;
+  pre.remove();
+  document.dispatchEvent(new KeyboardEvent('keydown',{keyCode:79}));
+  res.ovOpen=ov.classList.contains('open');
+  document.dispatchEvent(new KeyboardEvent('keydown',{keyCode:27}));
+  res.ovClosed=!ov.classList.contains('open');
+  go(0,false);
+  document.dispatchEvent(new KeyboardEvent('keydown',{keyCode:70}));
+  res.fs=!!document.fullscreenElement;
+  document.dispatchEvent(new KeyboardEvent('keydown',{keyCode:27}));
+  var out=document.createElement('div');
+  out.id='valout';
+  out.textContent=JSON.stringify(res);
+  document.body.appendChild(out);
+}
+window.__ppt={total:N,go:function(i){go(i-1,true);},cur:function(){return cur+1;},checkAll:checkAll,selftest:runValidate};
+if(/[?&]v=1/.test(location.search)){
+  if(document.readyState==='loading'){window.addEventListener('DOMContentLoaded',runValidate);}
+  else{runValidate();}
+}
+if(document.readyState==='loading'){window.addEventListener('DOMContentLoaded',init);}
+else{init();}
+})();
+</script>
+</body>
+</html>

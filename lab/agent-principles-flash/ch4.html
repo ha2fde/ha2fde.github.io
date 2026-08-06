@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第四章 · Agent 的协议层</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#e9edf3;--slide:#ffffff;--panel:#f4f7fb;--line:#e2e8f0;
+--ink:#1f2937;--sec:#5b6675;--mut:#94a3b8;
+--blue:#2563eb;--green:#0e9f6e;--orange:#c2410c;--purple:#7c3aed;--red:#dc2626;
+--mx:56px;--hdr:72px;--ftr:40px;--bw:1168px;--bh:608px
+}
+html,body{height:100%}
+body{overflow:hidden;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC","Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+#stage{position:absolute;left:0;top:0;width:1280px;height:720px;background:var(--slide);box-shadow:0 10px 40px rgba(15,23,42,.14);transform-origin:0 0}
+/* ---- slides ---- */
+.slide{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .15s ease-in-out,visibility 0s linear .15s}
+.slide.active{opacity:1;visibility:visible;transition:opacity .15s ease-in-out}
+.slide.ovf .body{outline:3px solid var(--red);outline-offset:-3px}
+/* header / footer / safe areas */
+.hdr{position:absolute;top:0;left:0;right:0;height:72px;border-bottom:1px solid var(--line)}
+.prog{position:absolute;top:0;left:0;height:2px;width:100%}
+.prog i{display:block;height:100%;width:0;background:var(--mut)}
+.hrow{position:absolute;top:0;bottom:0;left:56px;right:56px;display:flex;align-items:center;gap:18px}
+.act{font-size:15px;font-weight:500;color:var(--sec);white-space:nowrap;letter-spacing:.02em}
+.act::before{content:"";display:inline-block;width:3px;height:15px;border-radius:2px;background:var(--mut);margin-right:10px;vertical-align:-2px}
+.t{font-size:30px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.body{position:absolute;top:72px;bottom:40px;left:56px;right:56px;font-size:18px;line-height:1.6}
+.ftr{position:absolute;bottom:0;left:0;right:0;height:40px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:flex-end;padding:0 56px}
+.pg{font-size:13px;color:var(--mut);letter-spacing:.03em}
+/* ---- type scale ---- */
+.h1{font-size:44px;font-weight:700;line-height:1.28;letter-spacing:.01em}
+.h2{font-size:21px;font-weight:600;line-height:1.45}
+.p{font-size:18px;line-height:1.6}
+.small{font-size:15px;line-height:1.55}
+.cap{font-size:13px;line-height:1.5}
+.note{font-size:13px;line-height:1.5;color:var(--mut)}
+b,strong{font-weight:600}
+/* ---- colors ---- */
+.sec{color:var(--sec)}.mut{color:var(--mut)}
+.blue{color:var(--blue)}.green{color:var(--green)}.orange{color:var(--orange)}.purple{color:var(--purple)}.red{color:var(--red)}
+.bg-blue{background:#eff6ff}.bg-green{background:#ecfdf5}.bg-orange{background:#fff7ed}.bg-purple{background:#f5f3ff}.bg-red{background:#fef2f2}
+/* ---- layout ---- */
+.row{display:flex;gap:16px;align-items:center}
+.row.wrap{flex-wrap:wrap}
+.col{display:flex;flex-direction:column;gap:10px}
+.grow{flex:1 1 0;min-width:0}
+.center{display:flex;align-items:center;justify-content:center}
+.space{justify-content:space-between}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.vh{display:flex;flex-direction:column;justify-content:space-between}
+.vr{width:1px;align-self:stretch;background:var(--line)}
+.hr{border:none;border-top:1px solid var(--line);margin:12px 0}
+/* ---- boxes ---- */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.dia{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.tag{display:inline-block;font-size:13px;font-weight:600;padding:2px 10px;border-radius:999px;background:var(--panel);border:1px solid var(--line);color:var(--sec);white-space:nowrap}
+.call{background:var(--panel);border-left:3px solid var(--blue);border-radius:0 10px 10px 0;padding:12px 16px}
+.call.orange{border-left-color:var(--orange)}
+.call.red{border-left-color:var(--red)}
+.call.green{border-left-color:var(--green)}
+.call.purple{border-left-color:var(--purple)}
+.pit{background:#fff;border:1px solid #fecaca;border-left:3px solid var(--red);border-radius:0 10px 10px 0;padding:10px 14px}
+.q{border-left:3px solid var(--mut);padding:4px 16px;color:var(--sec);font-size:18px}
+/* ---- lists ---- */
+.ul{list-style:none}
+.ul li{position:relative;padding-left:22px;margin:6px 0}
+.ul li::before{content:"";position:absolute;left:0;top:10px;width:7px;height:7px;border-radius:2px;background:var(--mut)}
+.ol{list-style:none;counter-reset:ol}
+.ol li{position:relative;padding-left:34px;margin:8px 0;counter-increment:ol}
+.ol li::before{content:counter(ol);position:absolute;left:0;top:1px;width:24px;height:24px;border-radius:50%;background:var(--panel);border:1px solid var(--line);color:var(--sec);font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center}
+/* ---- tables ---- */
+.tbl{width:100%;border-collapse:collapse;font-size:15px;line-height:1.5}
+.tbl th{text-align:left;font-weight:600;color:var(--sec);border-bottom:2px solid var(--line);padding:8px 12px}
+.tbl td{border-bottom:1px solid var(--line);padding:8px 12px;vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+/* ---- code ---- */
+code{font-family:"SF Mono","JetBrains Mono",Menlo,Consolas,"PingFang SC",monospace;font-size:.9em;background:#f1f5f9;padding:1px 6px;border-radius:4px;color:#0f172a}
+pre{background:#f6f8fa;border:1px solid var(--line);border-radius:10px;padding:14px 16px;font-family:"SF Mono","JetBrains Mono",Menlo,Consolas,"PingFang SC",monospace;font-size:15px;line-height:1.55;white-space:pre-wrap;word-break:break-word;color:#0f172a}
+pre code{background:none;padding:0;font-size:15px}
+/* ---- svg ---- */
+svg{display:block}
+svg text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif}
+/* ---- links ---- */
+a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,.35)}
+a:hover{border-bottom-color:var(--blue)}
+/* ---- cover ---- */
+.cover .body{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:18px}
+.cover .t{white-space:normal}
+/* ---- overview ---- */
+#ov{position:fixed;inset:0;background:rgba(233,237,243,.94);display:none;z-index:60;flex-direction:column;padding:36px 44px}
+#ov.open{display:flex}
+#ovhead{font-size:15px;color:var(--sec);margin-bottom:18px;flex:none}
+#ovgrid{flex:1;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;align-content:start}
+.ovcell{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 14px;cursor:pointer;position:relative}
+.ovcell:hover{border-color:var(--blue)}
+.ovcell.cur{border-color:var(--blue);background:#eff6ff}
+.ovcell .on{position:absolute;top:8px;right:10px;font-size:12px;color:var(--mut)}
+.ovcell .oa{font-size:13px;color:var(--mut);margin-bottom:2px}
+.ovcell .ot{font-size:15px;font-weight:600;color:var(--ink);line-height:1.35}
+</style>
+</head>
+<body>
+<div id="stage">
+<section class="slide cover" data-act="开场" data-title="封面">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">开场</span></div>
+  </div>
+  <div class="body">
+    <div class="note" style="letter-spacing:.22em">AGENT 原理与实践 · 第四章</div>
+    <h1 class="h1">Agent 的协议层</h1>
+    <p class="p sec" style="max-width:900px">模型只会输出文本。要让文本变成动作，需要一份「约定」——它由谁写、写在哪里、由谁执行，是这一层的全部问题。这一讲给你五套具体答案，样样能徒手画关系、看懂真实报文。</p>
+    <div class="row" style="justify-content:center;gap:12px">
+      <span class="tag">工具 Tools</span><span class="tag">MCP</span><span class="tag">CLI</span><span class="tag">ACI</span><span class="tag">Skills</span><span class="tag">A2A</span>
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="开场" data-title="本讲问题">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">开场</span><span class="t">本讲问题：让文本变成动作的「约定」</span></div>
+  </div>
+  <div class="body">
+    <div class="q" style="margin-top:8px">模型只会输出文本。要让文本变成动作，需要一份「约定」。</div>
+    <div class="grid3" style="margin-top:16px">
+      <div class="card col">
+        <span class="tag">问题一</span>
+        <h2 class="h2">约定由谁写？</h2>
+        <p class="small mut">是你自己定义 schema，还是协议标准定，还是工具作者早就写好了？</p>
+      </div>
+      <div class="card col">
+        <span class="tag">问题二</span>
+        <h2 class="h2">写在哪里？</h2>
+        <p class="small mut">在宿主进程里、在某个 server 上、在命令语法里，还是跟着项目走？</p>
+      </div>
+      <div class="card col">
+        <span class="tag">问题三</span>
+        <h2 class="h2">由谁执行？</h2>
+        <p class="small mut">模型永远不执行——真正动手的执行权，握在谁手上？</p>
+      </div>
+    </div>
+    <p class="p" style="margin-top:14px">五样机制各给了一套不同答案。带着三个问题往下读，读到哪一套都能立刻对上号。</p>
+    <p class="note" style="margin-top:10px">本讲只讲「接口怎么定义与传递」；评估、上线保障、「人在环」的审批设计不是本讲内容。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="开场" data-title="全讲结构">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">开场</span><span class="t">全讲结构：三组，别摊成一串</span></div>
+  </div>
+  <div class="body">
+    <div class="dia" style="margin-top:8px">
+      <svg viewBox="0 0 1168 310" role="img" aria-label="本讲结构图：第一组 tools MCP CLI 抽共通点，第二组抽象层 ACI，第三组 Skills 与 A2A 各换一个维度">
+        <defs><marker id="bus-c4-s3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker></defs>
+        <text x="0" y="30" font-size="15" font-weight="600" fill="#5b6675">① 同一族 · 三样都到同一刻度</text>
+        <rect x="0" y="44" width="250" height="88" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="125" y="76" text-anchor="middle" font-size="17" font-weight="600" fill="#2563eb">工具 Tools</text>
+        <text x="125" y="102" text-anchor="middle" font-size="13" fill="#5b6675">schema + 往返 + 报文</text>
+        <rect x="300" y="44" width="250" height="88" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="425" y="76" text-anchor="middle" font-size="17" font-weight="600" fill="#7c3aed">MCP</text>
+        <text x="425" y="102" text-anchor="middle" font-size="13" fill="#5b6675">模型上下文协议</text>
+        <rect x="600" y="44" width="250" height="88" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="725" y="76" text-anchor="middle" font-size="17" font-weight="600" fill="#2563eb">CLI</text>
+        <text x="725" y="102" text-anchor="middle" font-size="13" fill="#5b6675">命令行接口</text>
+        <line x1="850" y1="88" x2="898" y2="88" stroke="#94a3b8" stroke-width="2" marker-end="url(#bus-c4-s3)"/>
+        <text x="874" y="78" text-anchor="middle" font-size="13" fill="#5b6675">抽共通点</text>
+        <rect x="904" y="44" width="264" height="88" rx="10" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+        <text x="1036" y="76" text-anchor="middle" font-size="17" font-weight="600" fill="#0e9f6e">共通点</text>
+        <text x="1036" y="102" text-anchor="middle" font-size="13" fill="#5b6675">约定写在外，执行在宿主</text>
+        <line x1="150" y1="132" x2="150" y2="152" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5 4"/>
+        <line x1="450" y1="132" x2="450" y2="152" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5 4"/>
+        <line x1="750" y1="132" x2="750" y2="152" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5 4"/>
+        <line x1="150" y1="152" x2="750" y2="152" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5 4"/>
+        <line x1="300" y1="152" x2="300" y2="190" stroke="#94a3b8" stroke-width="2" marker-end="url(#bus-c4-s3)"/>
+        <text x="0" y="186" font-size="15" font-weight="600" fill="#5b6675">② 抽象层</text>
+        <text x="480" y="186" font-size="15" font-weight="600" fill="#5b6675">③ 各换一个维度</text>
+        <rect x="0" y="196" width="430" height="104" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="215" y="228" text-anchor="middle" font-size="17" font-weight="600" fill="#7c3aed">ACI · Agent–Computer Interface</text>
+        <text x="215" y="256" text-anchor="middle" font-size="13" fill="#5b6675">tools / MCP / CLI 背后的抽象</text>
+        <text x="215" y="278" text-anchor="middle" font-size="13" fill="#5b6675">接口写给概率模型看</text>
+        <rect x="480" y="196" width="320" height="104" rx="10" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+        <text x="640" y="228" text-anchor="middle" font-size="17" font-weight="600" fill="#0e9f6e">Skills</text>
+        <text x="640" y="256" text-anchor="middle" font-size="13" fill="#5b6675">管「该怎么做」how-to</text>
+        <text x="640" y="278" text-anchor="middle" font-size="13" fill="#5b6675">而非「能做什么」</text>
+        <rect x="820" y="196" width="348" height="104" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="994" y="228" text-anchor="middle" font-size="17" font-weight="600" fill="#7c3aed">A2A · Agent-to-Agent</text>
+        <text x="994" y="256" text-anchor="middle" font-size="13" fill="#5b6675">对端是另一个 Agent</text>
+        <text x="994" y="278" text-anchor="middle" font-size="13" fill="#5b6675">而非一台机器</text>
+      </svg>
+    </div>
+    <p class="note" style="margin-top:10px">注意：这张图是「本讲结构」，不是系列地图。①先讲同一族并抽共通点；②再讲抽象层 ACI；③最后讲各自换了一个维度的 Skills 与 A2A。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="同一族 · 工具" data-title="tools：能调用的清单">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">同一族 · 工具</span><span class="t">tools：模型看到一份「能调用的东西」清单</span></div>
+  </div>
+  <div class="body">
+    <div class="grid3" style="margin-top:8px">
+      <div class="card col">
+        <span class="tag">一份清单</span>
+        <p class="small">模型能看到「能调用的东西」清单——每个工具的名字、用途、参数。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">模型自己决定</span>
+        <p class="small">要不要调、调哪个、传什么参数，由模型按任务需要现场决定。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">宿主负责执行</span>
+        <p class="small">模型只输出「调用意图」；真正跑工具的永远是宿主 Host。</p>
+      </div>
+    </div>
+    <div class="call purple" style="margin-top:16px">
+      术语：<b>函数调用 Function Calling</b> 是模型 API 的能力；<b>工具 Tools</b> 是宿主提供的可调用项。两者合起来，就是「能做什么」的清单。
+    </div>
+    <p class="p" style="margin-top:14px">下一页看清单的<b>真实形态（schema）</b>，再下一页看<b>一次完整往返</b>。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="同一族 · 工具" data-title="tools 的 schema">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">同一族 · 工具</span><span class="t">tools 的 schema：name + description + parameters</span></div>
+  </div>
+  <div class="body">
+    <p class="small" style="margin-top:6px">一个工具 = <code>name</code> + <code>description</code> + <code>parameters</code>（JSON Schema）。这是 OpenAI 函数调用 <code>tools</code> 数组里的<b>真实结构</b>：</p>
+    <pre>{
+  "type": "function",
+  "function": {
+    "name": "get_weather",
+    "description": "查询指定地点的实时天气",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "location": { "type": "string", "description": "城市名，如：北京" },
+        "unit": { "type": "string", "enum": ["celsius", "fahrenheit"] }
+      },
+      "required": ["location"]
+    }
+  }
+}</pre>
+    <div class="grid2" style="margin-top:12px">
+      <div class="card bg-blue">
+        <p class="small"><b>选对：</b>模型靠 <code>name</code> 与 <code>description</code> 判断「该不该调、调哪个」。description 就是写给概率模型看的语义。</p>
+      </div>
+      <div class="card bg-green">
+        <p class="small"><b>填对：</b>模型靠 <code>parameters</code>（JSON Schema）知道参数类型、取值范围、哪些必填。</p>
+      </div>
+    </div>
+    <p class="note" style="margin-top:10px">为什么写 schema：模型不是人，没法「看着按钮猜」。描述得越清楚，选对、填对的概率越高。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="同一族 · 工具" data-title="tools 一次完整往返">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">同一族 · 工具</span><span class="t">tools 一次完整往返：宿主在中间跑腿</span></div>
+  </div>
+  <div class="body">
+    <div class="dia" style="margin-top:8px">
+      <svg viewBox="0 0 1168 500" role="img" aria-label="tools 一次完整往返的时序图：用户、宿主、模型、工具四条泳道">
+        <defs><marker id="seq-tool-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker></defs>
+        <rect x="74" y="16" width="240" height="44" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="194" y="44" text-anchor="middle" font-size="15" font-weight="600" fill="#2563eb">用户</text>
+        <rect x="334" y="16" width="240" height="44" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="454" y="44" text-anchor="middle" font-size="15" font-weight="600" fill="#2563eb">宿主 Host</text>
+        <rect x="594" y="16" width="240" height="44" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="714" y="44" text-anchor="middle" font-size="15" font-weight="600" fill="#7c3aed">模型 Model</text>
+        <rect x="854" y="16" width="240" height="44" rx="8" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+        <text x="974" y="44" text-anchor="middle" font-size="15" font-weight="600" fill="#0e9f6e">工具 Tool</text>
+        <line x1="194" y1="60" x2="194" y2="480" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <line x1="454" y1="60" x2="454" y2="480" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <line x1="714" y1="60" x2="714" y2="480" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <line x1="974" y1="60" x2="974" y2="480" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <line x1="454" y1="100" x2="712" y2="100" stroke="#94a3b8" stroke-width="2" marker-end="url(#seq-tool-a)"/>
+        <text x="583" y="92" text-anchor="middle" font-size="13" fill="#5b6675">① 把 tools 定义放进请求（随对话一起发）</text>
+        <line x1="714" y1="162" x2="456" y2="162" stroke="#94a3b8" stroke-width="2" marker-end="url(#seq-tool-a)"/>
+        <text x="585" y="154" text-anchor="middle" font-size="13" fill="#5b6675">② 输出 tool_call：{name, arguments}</text>
+        <line x1="454" y1="224" x2="972" y2="224" stroke="#94a3b8" stroke-width="2" marker-end="url(#seq-tool-a)"/>
+        <text x="713" y="216" text-anchor="middle" font-size="13" fill="#5b6675">③ 解析 tool_call，调用工具</text>
+        <line x1="974" y1="286" x2="456" y2="286" stroke="#94a3b8" stroke-width="2" marker-end="url(#seq-tool-a)"/>
+        <text x="715" y="278" text-anchor="middle" font-size="13" fill="#5b6675">④ 返回工具结果</text>
+        <line x1="454" y1="348" x2="712" y2="348" stroke="#94a3b8" stroke-width="2" marker-end="url(#seq-tool-a)"/>
+        <text x="583" y="340" text-anchor="middle" font-size="13" fill="#5b6675">⑤ 结果作为 role=tool 消息塞回上下文</text>
+        <line x1="714" y1="410" x2="196" y2="410" stroke="#94a3b8" stroke-width="2" marker-end="url(#seq-tool-a)"/>
+        <text x="455" y="402" text-anchor="middle" font-size="13" fill="#5b6675">⑥ 模型据此继续回答</text>
+      </svg>
+    </div>
+    <p class="cap mut" style="margin-top:10px">注意第 ②③ 步：模型不执行、不连真实服务——「发意图」与「执行」永远由宿主切开。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="同一族 · 工具" data-title="看懂真实报文">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">同一族 · 工具</span><span class="t">看懂真实报文：tool_calls 与 role=tool 回填</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px">
+      <div class="card col">
+        <span class="tag">模型返回 · assistant 消息里的 tool_calls</span>
+        <pre>{
+  "role": "assistant",
+  "content": null,
+  "tool_calls": [
+    {
+      "id": "call_abc123",
+      "type": "function",
+      "function": {
+        "name": "get_weather",
+        "arguments": "{\"location\":\"北京\",\"unit\":\"celsius\"}"
+      }
+    }
+  ]
+}</pre>
+      </div>
+      <div class="card col">
+        <span class="tag">宿主回填 · role=tool 的工具结果</span>
+        <pre>{
+  "role": "tool",
+  "tool_call_id": "call_abc123",
+  "content": "{\"temperature\":22,\"condition\":\"晴\"}"
+}</pre>
+        <p class="small mut">宿主把工具输出原样作为新消息塞回对话，模型据此继续。</p>
+      </div>
+    </div>
+    <p class="note" style="margin-top:10px">字段名取自 OpenAI Chat Completions API：<code>tool_calls</code> / <code>tool_call_id</code> / <code>role: tool</code>，未编造。报文里没有「模型自己动手」，只有「意图」与「结果」。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="同一族 · 工具" data-title="tools 什么时候不该用">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">同一族 · 工具</span><span class="t">tools 正反面：什么时候该用，什么时候别上</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px">
+      <div class="card col bg-green">
+        <span class="tag">该用</span>
+        <ul class="ul">
+          <li>能<b>枚举</b>的确定性动作：查天气、算数、查库、发消息</li>
+          <li>动作能被 <b>JSON 精确表达</b>，参数边界清楚</li>
+          <li>宿主<b>已有现成实现</b>，只差一个入口</li>
+        </ul>
+      </div>
+      <div class="card col bg-red">
+        <span class="tag">不该用</span>
+        <ul class="ul">
+          <li><b>权限敏感</b>：删除、转账只靠文本描述 → 容易越权</li>
+          <li>工具<b>太多</b>：description 全部吃上下文 context</li>
+          <li>动作<b>无法用 JSON 表达</b>：复杂图形编辑、物理操作</li>
+        </ul>
+      </div>
+    </div>
+    <div class="call orange" style="margin-top:14px">
+      <b>判别一句话：</b>「schema 能不能把这件事说清楚？」能 → tools；不能 → 换一种机制，或加人确认。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="同一族 · MCP" data-title="MCP 为什么出现">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">同一族 · MCP</span><span class="t">MCP 为什么出现：从「手动接一遍」到「标准插座」</span></div>
+  </div>
+  <div class="body">
+    <div class="card bg-blue">
+      <p class="small"><b>痛点：</b>每个工具都要宿主「手动接一遍」——定义 schema、写调用代码、处理认证。换一个宿主，全部重来。</p>
+    </div>
+    <p class="h2" style="margin-top:16px">需要一个「标准插座」</p>
+    <p class="p" style="margin-top:6px">Model Context Protocol（<b>模型上下文协议 MCP</b>）：统一「工具如何被发现与调用」的<b>开放协议</b>。</p>
+    <div class="grid2" style="margin-top:12px">
+      <div class="card col">
+        <span class="tag">统一定义与调用</span>
+        <p class="small">工具怎么描述、怎么列举、怎么调用，都有标准方法：<code>tools/list</code>、<code>tools/call</code>。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">统一连接</span>
+        <p class="small">stdio（本地子进程）与 Streamable HTTP（远程）两种 transport，基于 JSON-RPC 2.0。</p>
+      </div>
+    </div>
+    <div class="call purple" style="margin-top:14px">
+      <b>一句话：</b>tools 是「一个宿主自带的插件」；MCP 是「通用的插座标准」——server 写一次，任何 MCP 客户端都能接。
+    </div>
+    <p class="note" style="margin-top:10px">2024-11 由 Anthropic 开源；后纳入 Linux Foundation 主导的开放标准项目（Agentic AI）继续演进。官网：<a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">modelcontextprotocol.io</a> · 规范 <a href="https://modelcontextprotocol.io/specification/latest" target="_blank" rel="noopener">specification/latest</a></p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="同一族 · MCP" data-title="MCP 四个实体分清">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">同一族 · MCP</span><span class="t">MCP 实体分清：Agent 不直接连 Gmail</span></div>
+  </div>
+  <div class="body">
+    <div class="dia" style="margin-top:8px">
+      <svg viewBox="0 0 1168 240" role="img" aria-label="MCP 四个实体：Agent、MCP Client、MCP Server、原始服务提供者">
+        <defs><marker id="seq-mcp-ent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker></defs>
+        <rect x="0" y="50" width="250" height="130" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="125" y="82" text-anchor="middle" font-size="17" font-weight="600" fill="#2563eb">Agent（宿主）</text>
+        <text x="125" y="108" text-anchor="middle" font-size="13" fill="#5b6675">你的程序 / 应用</text>
+        <text x="125" y="130" text-anchor="middle" font-size="13" fill="#5b6675">要调工具的那个</text>
+        <rect x="296" y="50" width="250" height="130" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="421" y="82" text-anchor="middle" font-size="17" font-weight="600" fill="#7c3aed">MCP Client</text>
+        <text x="421" y="108" text-anchor="middle" font-size="13" fill="#5b6675">进程里的一个库</text>
+        <text x="421" y="130" text-anchor="middle" font-size="13" fill="#5b6675">list tools / call tool</text>
+        <rect x="592" y="50" width="250" height="130" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="717" y="82" text-anchor="middle" font-size="17" font-weight="600" fill="#7c3aed">MCP Server</text>
+        <text x="717" y="108" text-anchor="middle" font-size="13" fill="#5b6675">独立进程 / 服务</text>
+        <text x="717" y="130" text-anchor="middle" font-size="13" fill="#5b6675">把能力包装成工具</text>
+        <rect x="888" y="50" width="250" height="130" rx="10" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+        <text x="1013" y="82" text-anchor="middle" font-size="17" font-weight="600" fill="#0e9f6e">原始服务提供者</text>
+        <text x="1013" y="108" text-anchor="middle" font-size="13" fill="#5b6675">Gmail · GitHub · 数据库…</text>
+        <text x="1013" y="130" text-anchor="middle" font-size="13" fill="#5b6675">真正干活的那头</text>
+        <line x1="250" y1="115" x2="294" y2="115" stroke="#94a3b8" stroke-width="2" marker-end="url(#seq-mcp-ent)"/>
+        <line x1="546" y1="115" x2="590" y2="115" stroke="#94a3b8" stroke-width="2" marker-end="url(#seq-mcp-ent)"/>
+        <line x1="842" y1="115" x2="886" y2="115" stroke="#94a3b8" stroke-width="2" marker-end="url(#seq-mcp-ent)"/>
+      </svg>
+    </div>
+    <p class="small" style="margin-top:10px">关键分层：<b>Agent 不直接连 Gmail</b>——中间隔两层：Client 在 Agent 进程里负责协议，Server 把真实服务封装成工具。</p>
+    <div class="call purple" style="margin-top:12px">
+      分清四者：<b>Agent 发起 · Client 说协议 · Server 封装服务 · 原始服务真正干活。</b>MCP 只管「Client ↔ Server」这一段。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="同一族 · MCP" data-title="MCP 一次完整往返">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">同一族 · MCP</span><span class="t">MCP 一次完整往返：从握手到结果回传</span></div>
+  </div>
+  <div class="body">
+    <div class="dia" style="margin-top:8px">
+      <svg viewBox="0 0 1168 512" role="img" aria-label="MCP 一次完整往返时序图：用户、Agent、MCP Client、MCP Server、原始服务五条泳道">
+        <defs><marker id="seq-mcp-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker></defs>
+        <rect x="72" y="16" width="192" height="44" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="168" y="44" text-anchor="middle" font-size="15" font-weight="600" fill="#2563eb">用户</text>
+        <rect x="280" y="16" width="192" height="44" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="376" y="44" text-anchor="middle" font-size="15" font-weight="600" fill="#2563eb">Agent</text>
+        <rect x="488" y="16" width="192" height="44" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="584" y="44" text-anchor="middle" font-size="15" font-weight="600" fill="#7c3aed">MCP Client</text>
+        <rect x="696" y="16" width="192" height="44" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="792" y="44" text-anchor="middle" font-size="15" font-weight="600" fill="#7c3aed">MCP Server</text>
+        <rect x="904" y="16" width="192" height="44" rx="8" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+        <text x="1000" y="44" text-anchor="middle" font-size="15" font-weight="600" fill="#0e9f6e">原始服务</text>
+        <line x1="168" y1="60" x2="168" y2="500" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <line x1="376" y1="60" x2="376" y2="500" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <line x1="584" y1="60" x2="584" y2="500" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <line x1="792" y1="60" x2="792" y2="500" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <line x1="1000" y1="60" x2="1000" y2="500" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <line x1="584" y1="104" x2="790" y2="104" stroke="#94a3b8" stroke-width="2" marker-end="url(#seq-mcp-a)"/>
+        <text x="687" y="96" text-anchor="middle" font-size="13" fill="#5b6675">① tools/list（initialize 握手）</text>
+        <line x1="792" y1="158" x2="586" y2="158" stroke="#94a3b8" stroke-width="2" marker-end="url(#seq-mcp-a)"/>
+        <text x="689" y="150" text-anchor="middle" font-size="13" fill="#5b6675">② 返回工具清单</text>
+        <line x1="168" y1="212" x2="374" y2="212" stroke="#94a3b8" stroke-width="2" marker-end="url(#seq-mcp-a)"/>
+        <text x="271" y="204" text-anchor="middle" font-size="13" fill="#5b6675">③ 提问</text>
+        <line x1="376" y1="266" x2="582" y2="266" stroke="#94a3b8" stroke-width="2" marker-end="url(#seq-mcp-a)"/>
+        <text x="479" y="258" text-anchor="middle" font-size="13" fill="#5b6675">④ 模型决定调用 → tools/call</text>
+        <line x1="584" y1="320" x2="790" y2="320" stroke="#94a3b8" stroke-width="2" marker-end="url(#seq-mcp-a)"/>
+        <text x="687" y="312" text-anchor="middle" font-size="13" fill="#5b6675">⑤ tools/call get_weather</text>
+        <line x1="792" y1="374" x2="998" y2="374" stroke="#94a3b8" stroke-width="2" marker-end="url(#seq-mcp-a)"/>
+        <text x="895" y="366" text-anchor="middle" font-size="13" fill="#5b6675">⑥ 调真实服务取数</text>
+        <line x1="1000" y1="428" x2="794" y2="428" stroke="#94a3b8" stroke-width="2" marker-end="url(#seq-mcp-a)"/>
+        <text x="897" y="420" text-anchor="middle" font-size="13" fill="#5b6675">⑦ 返回数据</text>
+        <line x1="792" y1="482" x2="586" y2="482" stroke="#94a3b8" stroke-width="2" marker-end="url(#seq-mcp-a)"/>
+        <text x="689" y="474" text-anchor="middle" font-size="13" fill="#5b6675">⑧ 结果 text 回传</text>
+      </svg>
+    </div>
+    <p class="cap mut" style="margin-top:8px">要点：模型从不直接碰真实服务。最后一步由 Client 把结果塞回上下文，模型据以回答。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="同一族 · MCP" data-title="看懂真实 MCP 配置">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">同一族 · MCP</span><span class="t">看懂真实 MCP 配置：.mcp.json</span></div>
+  </div>
+  <div class="body">
+    <p class="small" style="margin-top:6px">真实形态：Claude Code 项目级配置 <code>.mcp.json</code>（各客户端大同小异，字段取自官方文档）：</p>
+    <pre>{
+  "mcpServers": {
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"]
+    },
+    "notion": {
+      "type": "http",
+      "url": "https://mcp.notion.com/mcp"
+    }
+  }
+}</pre>
+    <div class="grid2" style="margin-top:12px">
+      <div class="card">
+        <p class="small"><b>stdio：</b>client 启动一个本地子进程（如 npx），父子进程用 stdin/stdout 说话——适合本地工具。</p>
+      </div>
+      <div class="card">
+        <p class="small"><b>http：</b>client 连接一个 URL（Streamable HTTP），可跨机器——适合远程服务。</p>
+      </div>
+    </div>
+    <div class="call" style="margin-top:12px">
+      连上之后自动走一遍 <code>initialize</code> 握手，再 <code>tools/list</code> 拿工具清单——协议方法名见上一页泳道图。
+    </div>
+    <p class="note" style="margin-top:10px">MCP 基于 JSON-RPC 2.0；核心方法：initialize · tools/list · tools/call。规范：<a href="https://modelcontextprotocol.io/specification/latest" target="_blank" rel="noopener">modelcontextprotocol.io/specification/latest</a></p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="同一族 · MCP" data-title="MCP 什么时候不该用">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">同一族 · MCP</span><span class="t">MCP 正反面：别把每个工具都搬上 MCP</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px">
+      <div class="card col bg-red">
+        <span class="tag">过度设计</span>
+        <ul class="ul">
+          <li>单机、单工具、一次性：写个函数就能调，别上 MCP</li>
+          <li>引入 server 进程、协议版本与连接生命周期，代价不小</li>
+        </ul>
+      </div>
+      <div class="card col">
+        <span class="tag">生态参差</span>
+        <ul class="ul">
+          <li>社区 server 的质量与维护水平参差不齐</li>
+          <li>有的 server 工具定义粗糙，反而干扰模型判断</li>
+        </ul>
+      </div>
+      <div class="card col bg-orange">
+        <span class="tag">信任边界</span>
+        <ul class="ul">
+          <li>接外部 server = 把「谁能调什么」交给对方</li>
+          <li>第三方 server 可能接触到你的 token 与数据</li>
+        </ul>
+      </div>
+      <div class="card col">
+        <span class="tag">判断</span>
+        <ul class="ul">
+          <li>「这个能力要不要被<b>多家复用</b>？」要 → MCP；否 → 直接调</li>
+          <li>先做直达，长出第二个使用方再抽象</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="同一族 · CLI" data-title="CLI：最老也最普适">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">同一族 · CLI</span><span class="t">CLI：最老也最普适的「工具接口」</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px">
+      <div class="card col bg-blue">
+        <span class="tag">它是什么</span>
+        <p class="small">Command Line Interface（<b>命令行接口 CLI</b>）：模型直接生成 shell 命令，宿主负责去执行。</p>
+      </div>
+      <div class="card col bg-purple">
+        <span class="tag">为什么天然</span>
+        <p class="small">人类几十年的既有工具几乎都是命令行：grep、git、curl、jq、sqlite3…<b>不用重新定义 schema</b>。</p>
+      </div>
+    </div>
+    <div class="call green" style="margin-top:14px">
+      工具集免费：宿主只需给一个<b>沙箱</b>，整个 shell 世界就是工具库——命令语法早已写好，无需为每个动作写 JSON。
+    </div>
+    <p class="p" style="margin-top:12px">代价：命令没有「参数校验」，任何字符串都可能被执行 → 下一页讲风险与防护。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="同一族 · CLI" data-title="CLI 一次完整往返">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">同一族 · CLI</span><span class="t">CLI 一次完整往返：命令进，stdout 出</span></div>
+  </div>
+  <div class="body">
+    <div class="dia" style="margin-top:8px">
+      <svg viewBox="0 0 1168 410" role="img" aria-label="CLI 一次完整往返时序图：模型、宿主沙箱、Shell 三条泳道">
+        <defs><marker id="seq-cli-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker></defs>
+        <rect x="144" y="16" width="280" height="44" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="284" y="44" text-anchor="middle" font-size="15" font-weight="600" fill="#7c3aed">模型 Model</text>
+        <rect x="444" y="16" width="280" height="44" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="584" y="44" text-anchor="middle" font-size="15" font-weight="600" fill="#2563eb">宿主 Host（沙箱）</text>
+        <rect x="744" y="16" width="280" height="44" rx="8" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/>
+        <text x="884" y="44" text-anchor="middle" font-size="15" font-weight="600" fill="#c2410c">Shell 环境</text>
+        <line x1="284" y1="60" x2="284" y2="400" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <line x1="584" y1="60" x2="584" y2="400" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <line x1="884" y1="60" x2="884" y2="400" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <line x1="284" y1="100" x2="582" y2="100" stroke="#94a3b8" stroke-width="2" marker-end="url(#seq-cli-a)"/>
+        <text x="433" y="92" text-anchor="middle" font-size="13" fill="#5b6675">① 输出命令：grep -n "TODO" src/app.py</text>
+        <line x1="584" y1="162" x2="882" y2="162" stroke="#94a3b8" stroke-width="2" marker-end="url(#seq-cli-a)"/>
+        <text x="733" y="154" text-anchor="middle" font-size="13" fill="#5b6675">② 在沙箱里执行</text>
+        <line x1="884" y1="224" x2="586" y2="224" stroke="#94a3b8" stroke-width="2" marker-end="url(#seq-cli-a)"/>
+        <text x="735" y="216" text-anchor="middle" font-size="13" fill="#5b6675">③ 返回 stdout / stderr / exit code</text>
+        <line x1="584" y1="286" x2="286" y2="286" stroke="#94a3b8" stroke-width="2" marker-end="url(#seq-cli-a)"/>
+        <text x="435" y="278" text-anchor="middle" font-size="13" fill="#5b6675">④ 结果塞回上下文</text>
+        <line x1="284" y1="348" x2="582" y2="348" stroke="#94a3b8" stroke-width="2" marker-end="url(#seq-cli-a)"/>
+        <text x="433" y="340" text-anchor="middle" font-size="13" fill="#5b6675">⑤ 据 exit code 判断成败，继续或修正</text>
+      </svg>
+    </div>
+    <div class="row" style="margin-top:10px;align-items:stretch">
+      <div class="card grow">
+        <p class="small"><b>真实命令：</b></p>
+        <pre>$ grep -n "TODO" src/app.py
+src/app.py:12:    # TODO: 换掉这个临时实现
+[stdout 上一行 · exit code 0]</pre>
+      </div>
+      <div class="call orange grow">
+        <b>模型从不执行命令。</b>宿主管执行、管沙箱、管审计；exit code ≠ 0 就是给模型的失败信号。
+      </div>
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="同一族 · CLI" data-title="CLI 的风险与防护">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">同一族 · CLI</span><span class="t">CLI 的风险与防护：命令有破坏力</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px">
+      <div class="card col bg-red">
+        <span class="tag">破坏力</span>
+        <ul class="ul">
+          <li><code>rm -rf</code> 删文件、<code>curl</code> 发请求、<code>git push</code> 动远端</li>
+          <li>命令没有「参数校验」，输出还可能被注入进下一步</li>
+        </ul>
+      </div>
+      <div class="card col bg-green">
+        <span class="tag">防护</span>
+        <ul class="ul">
+          <li>沙箱：容器 / 子进程 / 专用目录</li>
+          <li>只读挂载、权限隔离、预算上限</li>
+          <li>命令审计日志</li>
+        </ul>
+      </div>
+    </div>
+    <div class="call red" style="margin-top:14px">
+      <b>什么时候不该用：</b>没有沙箱与审计的<b>裸 shell</b>，不要开放给模型。命令能到的地方，就是模型权限的边界。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="共通点" data-title="三样共通点">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">共通点</span><span class="t">抽共通点：约定写在外，执行在宿主</span></div>
+  </div>
+  <div class="body">
+    <table class="tbl" style="margin-top:8px">
+      <tr><th>机制</th><th>定义写在哪</th><th>执行权在谁</th><th>模型发什么</th></tr>
+      <tr><td><b>Tools</b></td><td>宿主请求里的 schema</td><td>宿主（解析 tool_call）</td><td>tool_call：{name, arguments}</td></tr>
+      <tr><td><b>MCP</b></td><td>Server 暴露 · Client 发现</td><td>Client → Server → 原始服务</td><td>tools/call：方法名 + 参数</td></tr>
+      <tr><td><b>CLI</b></td><td>shell 命令语法（早已存在）</td><td>宿主（沙箱内执行）</td><td>命令字符串</td></tr>
+    </table>
+    <div class="call green" style="margin-top:16px">
+      <b>三条同一种分工：</b>「约定」定义在外面，执行权握在宿主手里。模型永远只「发意图」，不执行。差别只在约定的载体：JSON schema · 协议方法 · 命令语法。
+    </div>
+    <p class="note" style="margin-top:10px">记住这一条主线，后面两样（Skills、A2A）是在这条主线上各自换了维度。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="抽象层 · ACI" data-title="ACI 是什么">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">抽象层 · ACI</span><span class="t">ACI：接口是写给概率模型看的</span></div>
+  </div>
+  <div class="body">
+    <p class="h2" style="margin-top:6px">Agent–Computer Interface（ACI）是什么</p>
+    <p class="p" style="margin-top:8px">计算机为 Agent 提供接口的<b>抽象</b>：把「工具、上下文、状态、反馈」组织成模型能读懂的界面。它不是一个具体协议。</p>
+    <div class="call purple" style="margin-top:14px">
+      <b>核心差异：接口是写给「概率模型」看的，不是写给编译器或人。</b>人看文档靠直觉，编译器靠类型，模型靠「语义描述 + 概率推断」。
+    </div>
+    <div class="card" style="margin-top:14px">
+      <p class="small"><b>由此推出的设计原则：</b></p>
+      <ul class="ul">
+        <li><b>可发现 Discoverable：</b>能力清单本身要能进入上下文</li>
+        <li><b>容错 Tolerant：</b>格式小瑕疵应能被猜回，而不是直接失败</li>
+        <li><b>明确的失败反馈：</b>报错要能告诉模型「为什么、怎么办」</li>
+        <li><b>少歧义：</b>一个意思只给一种写法</li>
+        <li><b>给足上下文：</b>缺上下文时模型只能靠猜</li>
+      </ul>
+    </div>
+    <p class="note" style="margin-top:10px">ACI 是一把「看穿工具类接口」的钥匙；具体机制怎么做，还是看前一组。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="抽象层 · ACI" data-title="ACI 的定位">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">抽象层 · ACI</span><span class="t">ACI 的定位：背后抽象，不是本讲总纲</span></div>
+  </div>
+  <div class="body">
+    <div class="dia" style="margin-top:8px">
+      <svg viewBox="0 0 1168 300" role="img" aria-label="ACI 定位图：tools MCP CLI 是三种实现，下面是抽象层 ACI，右侧标注 Skills 与 A2A 不硬塞进 ACI">
+        <defs><marker id="bus-c4-aci" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker></defs>
+        <rect x="0" y="40" width="300" height="88" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="150" y="72" text-anchor="middle" font-size="17" font-weight="600" fill="#2563eb">工具 Tools</text>
+        <text x="150" y="98" text-anchor="middle" font-size="13" fill="#5b6675">function calling</text>
+        <rect x="340" y="40" width="300" height="88" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="490" y="72" text-anchor="middle" font-size="17" font-weight="600" fill="#2563eb">MCP</text>
+        <text x="490" y="98" text-anchor="middle" font-size="13" fill="#5b6675">tools/list · tools/call</text>
+        <rect x="680" y="40" width="300" height="88" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="830" y="72" text-anchor="middle" font-size="17" font-weight="600" fill="#2563eb">CLI</text>
+        <text x="830" y="98" text-anchor="middle" font-size="13" fill="#5b6675">shell 命令</text>
+        <line x1="150" y1="128" x2="150" y2="148" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5 4"/>
+        <line x1="490" y1="128" x2="490" y2="148" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5 4"/>
+        <line x1="830" y1="128" x2="830" y2="148" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5 4"/>
+        <line x1="150" y1="148" x2="830" y2="148" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5 4"/>
+        <line x1="300" y1="148" x2="300" y2="176" stroke="#94a3b8" stroke-width="2" marker-end="url(#bus-c4-aci)"/>
+        <rect x="0" y="180" width="600" height="112" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="300" y="214" text-anchor="middle" font-size="17" font-weight="600" fill="#7c3aed">ACI · Agent–Computer Interface</text>
+        <text x="300" y="242" text-anchor="middle" font-size="13" fill="#5b6675">tools / MCP / CLI 都是它的实现</text>
+        <text x="300" y="264" text-anchor="middle" font-size="13" fill="#5b6675">接口写给概率模型看</text>
+        <rect x="640" y="180" width="528" height="112" rx="10" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="6 4"/>
+        <text x="904" y="212" text-anchor="middle" font-size="15" font-weight="600" fill="#dc2626">不是总纲，不替代任何一样</text>
+        <text x="904" y="240" text-anchor="middle" font-size="13" fill="#5b6675">Skills（管怎么做）与 A2A（对端是 Agent）</text>
+        <text x="904" y="262" text-anchor="middle" font-size="13" fill="#5b6675">各有自己的维度，不硬塞进 ACI</text>
+      </svg>
+    </div>
+    <p class="note" style="margin-top:10px">ACI 是理解工具类接口的一把钥匙：看前一组时用得上；它不替代任何一样，也不包揽后一组。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="换维度 · Skills" data-title="Skills：管怎么做">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">换维度 · Skills</span><span class="t">Skills 换的维度：该怎么做，而不是能做什么</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px">
+      <div class="card col bg-green">
+        <span class="tag">管什么</span>
+        <p class="small">Skill 管<b>「该怎么做」</b>（how-to），而不是「能做什么」（what）。它教 Agent 执行某类任务的<b>方法</b>。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">载体</span>
+        <p class="small">一个 skill = 一组<b>指令 / 模板 / 参考 / 脚本</b>，通常是目录里的 <code>SKILL.md</code> + 配套文件。</p>
+      </div>
+    </div>
+    <div class="call orange" style="margin-top:14px">
+      <b>与工具一句话点破：</b>工具回答「能做什么」——可调用的动作；skill 回答「该怎么做」——执行某类任务的流程。工具改不了模型的做法，skill 可以。
+    </div>
+    <div class="card" style="margin-top:14px">
+      <p class="small">触发方式：<code>description</code> 写清楚 what + when，模型按需加载；也可用 <code>/技能名</code> 手动调用。</p>
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="换维度 · Skills" data-title="Skills 的真实形态">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">换维度 · Skills</span><span class="t">Skills 的真实形态：一个目录 + SKILL.md</span></div>
+  </div>
+  <div class="body">
+    <p class="small" style="margin-top:6px">真实形态：一个 skill 就是一个目录，<code>SKILL.md</code> 必选，其余可选（Anthropic Agent Skills 约定）：</p>
+    <div class="grid2" style="margin-top:10px">
+      <div class="card col">
+        <span class="tag">目录结构</span>
+        <pre>.claude/skills/pdf-filler/
+├── SKILL.md          ← 必选：触发条件 + 步骤
+└── scripts/
+    └── fill.py       ← 可选：可执行脚本</pre>
+      </div>
+      <div class="card col">
+        <span class="tag">SKILL.md</span>
+        <pre>---
+name: pdf-filler
+description: 填写 PDF 表单；用户提到
+  PDF、表单、签字时使用。
+---
+
+# PDF 表单填写
+1. 读取表单字段
+2. 用 scripts/fill.py 填入
+3. 校验后交付</pre>
+      </div>
+    </div>
+    <div class="grid2" style="margin-top:10px">
+      <div class="card">
+        <p class="small"><b>分发渠道：</b>客户端内置、市场、GitHub 仓库（如 anthropics/skills）、随项目打包 <code>.claude/skills/</code>。</p>
+      </div>
+      <div class="card">
+        <p class="small"><b>省 context：</b>启动时只把 name + description 放进上下文；触发后才读取全文。</p>
+      </div>
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="换维度 · Skills" data-title="Skills 编写与应用">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">换维度 · Skills</span><span class="t">Skills 编写要点与应用场景</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px">
+      <div class="card col bg-orange">
+        <span class="tag">编写要点</span>
+        <ul class="ul">
+          <li><b>明确的触发条件</b>：description 写清楚 what + when</li>
+          <li><b>分步骤</b>：把流程写成能照做的步骤</li>
+          <li><b>给示例与反例</b>：让模型照着对</li>
+          <li><b>小而聚焦</b>：一个 skill 只干一类事</li>
+        </ul>
+      </div>
+      <div class="card col bg-green">
+        <span class="tag">应用场景</span>
+        <ul class="ul">
+          <li>需要<b>固定流程 / 固定格式</b>的重复性任务</li>
+          <li>需要<b>内部知识</b>的任务（品牌规范、代码规范）</li>
+          <li>要<b>保证输出一致</b>的团队流程</li>
+        </ul>
+      </div>
+    </div>
+    <div class="call red" style="margin-top:14px">
+      <b>什么时候不该用：</b>一次性的简单任务，一段 prompt 就够——上 skill 反而多一层加载与维护成本。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="换维度 · Skills" data-title="Skills 的未来发展">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">换维度 · Skills</span><span class="t">Skills 的未来发展：点到即止</span></div>
+  </div>
+  <div class="body">
+    <ul class="ul" style="margin-top:8px">
+      <li><b>资产类型更丰富：</b>脚本、模板、校验器、参考文档都能打包进 skill，agentskills.io 正在统一约定</li>
+      <li><b>生态与市场：</b>官方仓库（anthropics/skills）、IDE 与客户端的一键安装</li>
+      <li><b>与工具和 MCP 组合：</b>skill 管「怎么做」，MCP 管「连哪」，工具管「动作」——三者叠加使用</li>
+    </ul>
+    <div class="call purple" style="margin-top:14px">
+      趋势：skill 正在成为「可复用的方法论」的携带单位——把经验写进目录，而不是写进每次对话。
+    </div>
+    <p class="note" style="margin-top:10px">参考：<a href="https://code.claude.com/docs/en/skills" target="_blank" rel="noopener">code.claude.com/docs/en/skills</a> · <a href="https://agentskills.io" target="_blank" rel="noopener">agentskills.io</a></p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="换维度 · A2A" data-title="A2A：对端是另一个 Agent">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">换维度 · A2A</span><span class="t">A2A 换的维度：对端是另一个 Agent</span></div>
+  </div>
+  <div class="body">
+    <div class="dia" style="margin-top:8px">
+      <svg viewBox="0 0 1168 470" role="img" aria-label="A2A 一次完整往返时序图：用户、Agent A、Agent B 三条泳道">
+        <defs><marker id="seq-a2a-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker></defs>
+        <rect x="144" y="16" width="280" height="44" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="284" y="44" text-anchor="middle" font-size="15" font-weight="600" fill="#2563eb">用户</text>
+        <rect x="444" y="16" width="280" height="44" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="584" y="44" text-anchor="middle" font-size="15" font-weight="600" fill="#7c3aed">Agent A（客户端）</text>
+        <rect x="744" y="16" width="280" height="44" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="884" y="44" text-anchor="middle" font-size="15" font-weight="600" fill="#7c3aed">Agent B（服务端）</text>
+        <line x1="284" y1="60" x2="284" y2="460" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <line x1="584" y1="60" x2="584" y2="460" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <line x1="884" y1="60" x2="884" y2="460" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <line x1="284" y1="100" x2="582" y2="100" stroke="#94a3b8" stroke-width="2" marker-end="url(#seq-a2a-a)"/>
+        <text x="433" y="92" text-anchor="middle" font-size="13" fill="#5b6675">① 布置任务</text>
+        <line x1="584" y1="164" x2="882" y2="164" stroke="#94a3b8" stroke-width="2" marker-end="url(#seq-a2a-a)"/>
+        <text x="733" y="156" text-anchor="middle" font-size="13" fill="#5b6675">② SendMessage：任务（能力已匹配）</text>
+        <line x1="884" y1="228" x2="586" y2="228" stroke="#94a3b8" stroke-width="2" marker-end="url(#seq-a2a-a)"/>
+        <text x="735" y="220" text-anchor="middle" font-size="13" fill="#5b6675">③ 创建 Task：state = working</text>
+        <line x1="584" y1="292" x2="882" y2="292" stroke="#94a3b8" stroke-width="2" marker-end="url(#seq-a2a-a)"/>
+        <text x="733" y="284" text-anchor="middle" font-size="13" fill="#5b6675">④ 追问 / 补上下文</text>
+        <line x1="884" y1="356" x2="586" y2="356" stroke="#94a3b8" stroke-width="2" marker-end="url(#seq-a2a-a)"/>
+        <text x="735" y="348" text-anchor="middle" font-size="13" fill="#5b6675">⑤ 回报 Artifacts：state = completed</text>
+        <line x1="584" y1="420" x2="286" y2="420" stroke="#94a3b8" stroke-width="2" marker-end="url(#seq-a2a-a)"/>
+        <text x="435" y="412" text-anchor="middle" font-size="13" fill="#5b6675">⑥ 汇总交付</text>
+      </svg>
+    </div>
+    <p class="cap mut" style="margin-top:8px">对端是<b>另一个 Agent</b>，不是一台机器。发现靠 AgentCard（能力声明），任务靠 Task / Message 报文（下一页）。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="换维度 · A2A" data-title="看懂真实 A2A 报文">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">换维度 · A2A</span><span class="t">看懂真实 A2A 报文：Task 对象</span></div>
+  </div>
+  <div class="body">
+    <p class="small" style="margin-top:6px">真实结构：A2A 规范里的 <code>Task</code> 对象（字段名取自规范，非虚构）：</p>
+    <pre>{
+  "id": "task-report-7f3a",
+  "contextId": "ctx-conversation-abc",
+  "status": { "state": "TASK_STATE_WORKING" },
+  "message": {
+    "role": "user",
+    "parts": [
+      { "text": "请把这份数据整理成季度报告" }
+    ]
+  },
+  "artifacts": [],
+  "metadata": {}
+}</pre>
+    <div class="grid2" style="margin-top:12px">
+      <div class="card">
+        <p class="small"><b>Task 状态机：</b>submitted → working → completed / failed / canceled / input-required / auth-required。</p>
+      </div>
+      <div class="card">
+        <p class="small"><b>Part：</b>text / raw / url / data 四种内容；<b>Message</b> 有 role（user / agent）与 messageId。</p>
+      </div>
+    </div>
+    <div class="call red" style="margin-top:12px">
+      <b>什么时候不该用：</b>两个 agent 的事，用一个 agent + 工具就能做完时，别上 A2A——它解决的是跨组织、跨信任域的长期任务。
+    </div>
+    <p class="note" style="margin-top:10px">规范：<a href="https://a2a-protocol.org/latest/specification/" target="_blank" rel="noopener">a2a-protocol.org/latest/specification/</a> · 由 Linux Foundation 维护。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="收尾" data-title="收尾：一张表看穿五样">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">收尾</span><span class="t">收尾：五样机制，用同一套问题看穿</span></div>
+  </div>
+  <div class="body">
+    <table class="tbl" style="margin-top:8px">
+      <tr><th>机制</th><th>约定由谁写</th><th>写在哪里</th><th>由谁执行</th></tr>
+      <tr><td><b>Tools</b></td><td>宿主 / 厂商按 API 约定定义 schema</td><td>宿主进程内，随请求进上下文</td><td>宿主（解析 tool_call）</td></tr>
+      <tr><td><b>MCP</b></td><td>Server 实现者</td><td>Server 暴露 · 配置注册（.mcp.json）</td><td>Client → Server → 原始服务</td></tr>
+      <tr><td><b>CLI</b></td><td>工具作者（命令语法早已存在）</td><td>shell 命令字符串</td><td>宿主（沙箱内）</td></tr>
+      <tr><td><b>Skills</b></td><td>skill 作者</td><td>.claude/skills/&lt;name&gt;/SKILL.md</td><td>宿主按步骤代跑</td></tr>
+      <tr><td><b>A2A</b></td><td>A2A 协议 + 对端 Agent</td><td>Task / Message 报文</td><td>对端 Agent（服务端）</td></tr>
+    </table>
+    <div class="grid2" style="margin-top:14px">
+      <div class="card bg-green">
+        <p class="small"><b>主线没变：</b>模型只发意图、不执行；约定写在外、执行在宿主——五样全符合，差别只在「约定」的载体。</p>
+      </div>
+      <div class="card bg-blue">
+        <p class="small"><b>本讲边界：</b>只讲接口怎么定义与传递。评估、上线保障、「人在环」的审批设计，不是本讲内容。</p>
+      </div>
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+</div>
+<div id="ov"><div id="ovhead">概览 — 点卡片跳转 · 按 O 或 Esc 关闭</div><div id="ovgrid"></div></div>
+<script>
+(function(){
+"use strict";
+var stage=document.getElementById('stage');
+var slides=Array.prototype.slice.call(document.querySelectorAll('.slide'));
+var N=slides.length;
+var cur=0;
+var ov=document.getElementById('ov');
+var ovgrid=document.getElementById('ovgrid');
+var KEY={RIGHT:39,LEFT:37,UP:38,DOWN:40,SPACE:32,HOME:36,END:35,J:74,K:75,O:79,F:70,ESC:27,PGDN:34,PGUP:33};
+function fit(){
+  var s=Math.min(window.innerWidth/1280,window.innerHeight/720)*0.96;
+  stage.style.transformOrigin='0 0';
+  stage.style.transform='translate('+((window.innerWidth-1280*s)/2)+'px,'+((window.innerHeight-720*s)/2)+'px) scale('+s+')';
+}
+function paint(){
+  slides.forEach(function(sl,idx){
+    var pgs=sl.querySelectorAll('.pg');
+    for(var i=0;i<pgs.length;i++){pgs[i].textContent=(idx+1)+' / '+N;}
+    var prog=sl.querySelector('.prog i');
+    if(prog){prog.style.width=Math.round((idx+1)/N*100)+'%';}
+  });
+}
+function checkOverflow(){
+  var b=slides[cur].querySelector('.body');
+  if(!b){return;}
+  if(b.scrollHeight>b.clientHeight+1){
+    slides[cur].classList.add('ovf');
+    if(window.console){console.warn('[overflow] slide '+(cur+1)+' vertical: scrollHeight '+b.scrollHeight+' > clientHeight '+b.clientHeight);}
+  }else{
+    slides[cur].classList.remove('ovf');
+  }
+}
+function checkAll(){
+  var issues=[];
+  slides.forEach(function(sl,idx){
+    var b=sl.querySelector('.body');
+    if(!b){return;}
+    if(b.scrollHeight>b.clientHeight+1){
+      issues.push({p:idx+1,type:'vertical',sh:b.scrollHeight,ch:b.clientHeight});
+      sl.classList.add('ovf');
+    }
+    var br=b.getBoundingClientRect();
+    var els=b.querySelectorAll('*');
+    for(var i=0;i<els.length;i++){
+      var el=els[i];
+      if(el.closest('svg')){continue;}
+      var er=el.getBoundingClientRect();
+      if(er.width===0&&er.height===0){continue;}
+      if(er.right>br.right+1||er.left<br.left-1){
+        issues.push({p:idx+1,type:'horizontal',tag:el.tagName,cls:(el.className&&el.className.baseVal!==undefined?el.className.baseVal:el.className).toString().slice(0,40)});
+        break;
+      }
+    }
+    sl.classList.remove('ovf');
+  });
+  return issues;
+}
+function go(i,hash){
+  cur=Math.max(0,Math.min(N-1,i));
+  slides.forEach(function(sl,idx){sl.classList.toggle('active',idx===cur);});
+  if(hash!==false){
+    var h='#'+(cur+1);
+    if(location.hash!==h){
+      try{history.replaceState(null,'',h);}
+      catch(e){location.hash=h;}
+    }
+  }
+  paint();
+  checkOverflow();
+}
+function toggleFs(){
+  if(document.fullscreenElement){document.exitFullscreen();}
+  else if(document.documentElement.requestFullscreen){document.documentElement.requestFullscreen();}
+  else if(document.webkitRequestFullscreen){document.documentElement.webkitRequestFullscreen();}
+}
+function buildOv(){
+  slides.forEach(function(sl,idx){
+    var d=document.createElement('div');
+    d.className='ovcell';
+    d.innerHTML='<div class="on"></div><div class="oa"></div><div class="ot"></div>';
+    d.querySelector('.on').textContent=idx+1;
+    d.querySelector('.oa').textContent=sl.getAttribute('data-act')||'';
+    d.querySelector('.ot').textContent=sl.getAttribute('data-title')||'';
+    d.addEventListener('click',function(e){
+      e.stopPropagation();
+      go(idx,true);
+      closeOv();
+    });
+    ovgrid.appendChild(d);
+  });
+}
+function paintOv(){
+  var cells=ovgrid.querySelectorAll('.ovcell');
+  for(var i=0;i<cells.length;i++){cells[i].classList.toggle('cur',i===cur);}
+}
+function openOv(){ov.classList.add('open');paintOv();}
+function closeOv(){ov.classList.remove('open');}
+function toggleOv(){if(ov.classList.contains('open')){closeOv();}else{openOv();}}
+function handleTap(e){
+  if(!e.target||e.target.nodeType!==1){return;}
+  if(e.target.closest('#ov')){
+    if(ov.classList.contains('open')&&!e.target.closest('.ovcell')){closeOv();}
+    return;
+  }
+  if(e.target.closest('a')){return;}
+  if(e.target.closest('pre')||e.target.closest('code')){return;}
+  var sel=window.getSelection();
+  if(sel&&sel.rangeCount&&!sel.isCollapsed){return;}
+  var r=stage.getBoundingClientRect();
+  var x=e.clientX-r.left,y=e.clientY-r.top;
+  if(x<0||y<0||x>r.width||y>r.height){return;}
+  if(x<r.width*0.28){go(cur-1,true);}else{go(cur+1,true);}
+}
+document.addEventListener('keydown',function(e){
+  var k=e.keyCode||e.which;
+  var ovOpen=ov.classList.contains('open');
+  if(k===KEY.ESC){
+    if(ovOpen){closeOv();}
+    else if(document.fullscreenElement){document.exitFullscreen();}
+    return;
+  }
+  if(k===KEY.O){toggleOv();e.preventDefault();return;}
+  if(k===KEY.F){toggleFs();e.preventDefault();return;}
+  if(ovOpen){return;}
+  if(k===KEY.RIGHT||k===KEY.PGDN||k===KEY.SPACE||k===KEY.J){go(cur+1,true);e.preventDefault();}
+  else if(k===KEY.LEFT||k===KEY.PGUP||k===KEY.K){go(cur-1,true);e.preventDefault();}
+  else if(k===KEY.HOME){go(0,true);e.preventDefault();}
+  else if(k===KEY.END){go(N-1,true);e.preventDefault();}
+});
+document.addEventListener('click',handleTap);
+var tsx=0,tsy=0;
+document.addEventListener('touchstart',function(e){var t=e.touches[0];tsx=t.clientX;tsy=t.clientY;},{passive:true});
+document.addEventListener('touchend',function(e){
+  var t=e.changedTouches[0];
+  var dx=t.clientX-tsx,dy=t.clientY-tsy;
+  if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){if(dx<0){go(cur+1,true);}else{go(cur-1,true);}}
+},{passive:true});
+window.addEventListener('resize',fit);
+window.addEventListener('hashchange',function(){
+  var m=/^#(\d+)$/.exec(location.hash);
+  if(m){go(parseInt(m[1],10)-1,false);}
+});
+function init(){
+  buildOv();
+  var m=/^#(\d+)$/.exec(location.hash);
+  if(m){cur=Math.max(0,Math.min(N-1,parseInt(m[1],10)-1));}
+  go(cur,false);
+  fit();
+}
+function runValidate(){
+  var res={total:N};
+  res.overflow=checkAll();
+  go(0,false);
+  document.dispatchEvent(new KeyboardEvent('keydown',{keyCode:35}));
+  res.end=(cur+1)===N;
+  document.dispatchEvent(new KeyboardEvent('keydown',{keyCode:36}));
+  res.home=(cur+1)===1;
+  document.dispatchEvent(new KeyboardEvent('keydown',{keyCode:39}));
+  res.right=(cur+1)===2;
+  document.dispatchEvent(new KeyboardEvent('keydown',{keyCode:37}));
+  res.left=(cur+1)===1;
+  go(0,false);
+  var r=stage.getBoundingClientRect();
+  stage.dispatchEvent(new MouseEvent('click',{clientX:r.left+r.width*0.1,clientY:r.top+300,bubbles:true}));
+  res.clickPrev=(cur+1)===1;
+  stage.dispatchEvent(new MouseEvent('click',{clientX:r.left+r.width*0.8,clientY:r.top+300,bubbles:true}));
+  res.clickNext=(cur+1)===2;
+  var a=document.createElement('a');
+  a.href='#vtest';
+  a.textContent='x';
+  a.style.position='absolute';
+  slides[1].querySelector('.body').appendChild(a);
+  a.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}));
+  res.anchorNoFlip=(cur+1)===2;
+  a.remove();
+  var pre=document.createElement('pre');
+  pre.textContent='code block';
+  pre.style.position='absolute';
+  slides[1].querySelector('.body').appendChild(pre);
+  pre.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}));
+  res.codeNoFlip=(cur+1)===2;
+  pre.remove();
+  document.dispatchEvent(new KeyboardEvent('keydown',{keyCode:79}));
+  res.ovOpen=ov.classList.contains('open');
+  document.dispatchEvent(new KeyboardEvent('keydown',{keyCode:27}));
+  res.ovClosed=!ov.classList.contains('open');
+  go(0,false);
+  document.dispatchEvent(new KeyboardEvent('keydown',{keyCode:70}));
+  res.fs=!!document.fullscreenElement;
+  document.dispatchEvent(new KeyboardEvent('keydown',{keyCode:27}));
+  var out=document.createElement('div');
+  out.id='valout';
+  out.textContent=JSON.stringify(res);
+  document.body.appendChild(out);
+}
+window.__ppt={total:N,go:function(i){go(i-1,true);},cur:function(){return cur+1;},checkAll:checkAll,selftest:runValidate};
+if(/[?&]v=1/.test(location.search)){
+  if(document.readyState==='loading'){window.addEventListener('DOMContentLoaded',runValidate);}
+  else{runValidate();}
+}
+if(document.readyState==='loading'){window.addEventListener('DOMContentLoaded',init);}
+else{init();}
+})();
+</script>
+</body>
+</html>

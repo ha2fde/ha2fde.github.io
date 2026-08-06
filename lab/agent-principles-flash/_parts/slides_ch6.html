@@ -1,0 +1,448 @@
+<section class="slide cover" data-act="开场" data-title="封面">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">开场</span></div>
+  </div>
+  <div class="body">
+    <div class="note" style="letter-spacing:.22em">AGENT 原理与实践 · 第六章</div>
+    <h1 class="h1">从 Agent 到 AGI</h1>
+    <p class="p sec" style="max-width:820px">不预测「何时到」，只梳理「有几条路」。每条路摆证据、说瓶颈，并把预测换成一张可证伪的观察清单。</p>
+    <div class="row" style="justify-content:center;gap:12px">
+      <span class="tag">五条路线</span><span class="tag">只讲已发生</span><span class="tag">硬约束：不给时间表</span>
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="开场" data-title="为什么本讲不预测：AGI 没有公认定义">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">开场</span><span class="t">为什么本讲不预测：AGI 没有公认定义</span></div>
+  </div>
+  <div class="body">
+    <p class="p"><b>AGI（Artificial General Intelligence，通用人工智能）</b>这个词没有公认定义。同一个词，三种口径各说各话：</p>
+    <div class="grid3" style="margin-top:12px">
+      <div class="card col">
+        <span class="tag">经济定义</span>
+        <p class="small">能干<b>人类所有经济工作</b>，且不比人差、不比人贵。源自对人类劳动替代的测算研究（<a href="https://arxiv.org/abs/2303.10130" target="_blank" rel="noopener">GPTs are GPTs，2023</a>）。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">能力基准定义</span>
+        <p class="small">在<b>几乎所有测试里达到人类水平</b>。DeepMind 给出过可操作的分级框架，把「智能」拆成等级表（<a href="https://arxiv.org/abs/2311.02462" target="_blank" rel="noopener">Levels of AGI，2024</a>）。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">自主性定义</span>
+        <p class="small">能<b>自主完成长程目标</b>，不需要人拆步骤。对应 Agent 的「自主行动」一极——正是本讲从今天 Agent 出发的理由。</p>
+      </div>
+    </div>
+    <div class="call" style="margin-top:14px">
+      既然<b>目标没有公认标尺</b>，「预测何时到」就没有意义——每个定义都能给出自己的「到了」。所以本讲不拿 AGI 当目标，只问：从今天的 Agent 出发有哪几条路，各自的证据与瓶颈是什么，怎么判断哪条在走通。
+    </div>
+    <p class="note" style="margin-top:10px">定义之争是前提不是重点；本讲只使用可核实的「已发生」事实，推断部分一律明确标注。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="方法" data-title="方法：四栏硬结构，信号可证伪">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">方法</span><span class="t">方法：每条路线固定四栏</span></div>
+  </div>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:8px">
+      <div class="card col">
+        <span class="tag">① 主张是什么</span>
+        <p class="small">这条路<b>假设了什么机制</b>、相信能力从哪来。一句话能讲清，讲不清就等于没主张。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">② 目前有什么证据</span>
+        <p class="small">只摆<b>已发生</b>的：已发表的论文、已跑出的实验、已在用的产品。每条注明出处、年份、链接。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">③ 已知瓶颈</span>
+        <p class="small">这条路<b>硬约束在哪</b>：数据、算力、可验证性、成本、物理世界。瓶颈决定路能走多长。</p>
+      </div>
+      <div class="card col" style="border-top:3px solid var(--purple)">
+        <span class="tag purple">④ 走通的信号</span>
+        <p class="small">如果它对了，<b>我们先看到什么</b>。写实、可观察、可证伪——「看到 X 算走通，看到 Y 就不算」。</p>
+      </div>
+    </div>
+    <div class="call red" style="margin-top:14px">
+      <b>硬约束：本讲不给时间表。</b>不出现任何年份预测。一旦给「AGI 在哪年到」的年份，这一讲就从「可证伪的路径梳理」变成算命，前面可核实的部分会被连坐。
+    </div>
+    <p class="note" style="margin-top:10px">后文每条路线按同一四栏展开；证据厚的给两页，单薄的一页讲完。最后一栏留给反复对照。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="路线一 Scaling" data-title="路线一 · 继续 Scaling：四栏">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">路线一 · 继续 Scaling</span><span class="t">更大模型 + 更多算力与数据 → 能力继续涨</span></div>
+  </div>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:8px">
+      <div class="card col">
+        <span class="tag">主张</span>
+        <p class="small">能力随<b>参数、数据、算力</b>的规模增大而提升，且提升遵循可预测的规律——「大力出奇迹」是一条可复现的路。</p>
+      </div>
+      <div class="card col" style="border-top:3px solid var(--green)">
+        <span class="tag green">证据</span>
+        <p class="small">标度律（scaling laws）有可复现的观察：损失随规模按<b>幂律下降</b>（<a href="https://arxiv.org/abs/2001.08361" target="_blank" rel="noopener">Kaplan 2020</a>）；「数据/参数」存在<b>最优比例</b>（<a href="https://arxiv.org/abs/2203.15556" target="_blank" rel="noopener">Chinchilla 2022</a>）。</p>
+      </div>
+      <div class="card col" style="border-top:3px solid var(--orange)">
+        <span class="tag orange">瓶颈</span>
+        <p class="small"><b>数据墙</b>：人类文本总量有上限；<b>算力成本</b>随规模陡增；<b>评测饱和</b>：榜单越做越挤不出差距；「继续涨还是收益递减」本身有争议。</p>
+      </div>
+      <div class="card col" style="border-top:3px solid var(--purple)">
+        <span class="tag purple">信号（可证伪）</span>
+        <p class="small">① 新能力出现在<b>没被针对性优化过</b>的任务上；② 榜单被普通任务饱和主导，<b>前沿差距缩小到难以测量</b>；③ 算力投入继续单调增长，但<b>性价比明显下降</b>。</p>
+      </div>
+    </div>
+    <p class="cap mut" style="margin-top:12px">信号①对照「涌现」：不是玄学，是「没优化过的任务也变好」，可直接测试。信号③是警示灯：投入涨而回报不涨，说明单靠 scaling 的路正在见顶。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="路线一 Scaling" data-title="路线一 · 深挖：标度律与涌现之争">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">路线一 · 继续 Scaling</span><span class="t">深挖：标度律的观察与争议</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px">
+      <div class="card col">
+        <span class="tag green">证据厚在哪：两个可复现的观察</span>
+        <ul class="ul small">
+          <li><b>幂律损失曲线：</b>模型大小、数据量、算力与损失之间是平滑幂律（Kaplan 2020），训练可以「预算化」。</li>
+          <li><b>最优分配：</b>Chinchilla（2022）指出当时主流模型「参数过剩、数据不足」，按计算量最优比例分配能显著提效。</li>
+          <li><b>后续兑现：</b>o 系列、DeepSeek-R1（2025）等前沿模型仍以「规模 + 更大投入」为底座，标度律至今没被证伪。</li>
+        </ul>
+      </div>
+      <div class="card col">
+        <span class="tag orange">争议在哪：涌现是真实还是度量假象</span>
+        <ul class="ul small">
+          <li><b>涌现（emergence）：</b><a href="https://arxiv.org/abs/2206.07686" target="_blank" rel="noopener">Wei 等（2022）</a>观察到某些能力跨规模「跳变」出现，像质变。</li>
+          <li><b>争议：</b><a href="https://arxiv.org/abs/2304.15004" target="_blank" rel="noopener">Schaeffer 等（2023）</a>指它可能是<b>非线性度量</b>造成的假象——换线性度量曲线就平滑。两派都有人支持。</li>
+          <li><b>怎么裁决：</b>不看话术，只看「跳变」是否在<b>多种度量下都成立</b>，是否出现在没针对性优化的任务上。</li>
+        </ul>
+      </div>
+    </div>
+    <div class="call" style="margin-top:14px">
+      一句话：<b>标度律的「观察」是实的（损失曲线可复现），「解释」是有争议的（涌现是不是度量假象）。</b>这就是「证据厚」与「证据仍需验证」同时成立的来源。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="路线二 RL" data-title="路线二 · RL + 可验证环境：四栏">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">路线二 · RL + 可验证环境</span><span class="t">在可验证反馈里强化学习，推理能被直接训练出来</span></div>
+  </div>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:8px">
+      <div class="card col">
+        <span class="tag">主张</span>
+        <p class="small">在<b>可验证奖励（verifiable rewards）</b>的环境里做强化学习（reinforcement learning，RL），推理能力能被<b>直接训练</b>出来，而不是等着涌现。</p>
+      </div>
+      <div class="card col" style="border-top:3px solid var(--green)">
+        <span class="tag green">证据</span>
+        <p class="small"><a href="https://www.nature.com/articles/nature16961" target="_blank" rel="noopener">AlphaGo（2016）</a>在可验证的棋类环境用 RL 击败人类冠军；<a href="https://deepmind.google/discover/blog/ai-solves-imo-problems-at-silver-medal-level/" target="_blank" rel="noopener">AlphaProof（2024）</a>数学接近 IMO 金牌；<a href="https://arxiv.org/abs/2501.12948" target="_blank" rel="noopener">DeepSeek-R1（2025）</a>与 o 系列证明 RL 能提升通用模型推理。</p>
+      </div>
+      <div class="card col" style="border-top:3px solid var(--orange)">
+        <span class="tag orange">瓶颈</span>
+        <p class="small"><b>可验证的任务空间有限</b>：能自动打分的只有数学、代码、棋类、定理证明；真实世界绝大多数任务<b>没有自动裁判</b>。RL 的天花板 = 裁判能判的边界。</p>
+      </div>
+      <div class="card col" style="border-top:3px solid var(--purple)">
+        <span class="tag purple">信号（可证伪）</span>
+        <p class="small">① RL 训出的推理<b>迁移到非形式化任务</b>（写方案、做规划）并带来可测提升；② 训练算力分配<b>明显转向 RL</b>，而不是只堆预训练；③ 「长思考」在更多任务上带来<b>系统性收益</b>，而非时好时坏。</p>
+      </div>
+    </div>
+    <p class="cap mut" style="margin-top:12px">信号①最关键：如果 RL 只提高「考试类」成绩、出了考场就没用，它只是刷题工具；走通的标志是推理迁移出可验证领域。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="路线二 RL" data-title="路线二 · 深挖：RLVR 怎么运作">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">路线二 · RL + 可验证环境</span><span class="t">深挖：RLVR 生成 → 打分 → 强化</span></div>
+  </div>
+  <div class="body">
+    <div class="row" style="margin-top:10px;align-items:stretch">
+      <div class="card grow col">
+        <span class="tag">三步闭环</span>
+        <p class="small"><b>生成候选：</b>模型对同一道题（或同一个代码/数学任务）产出多个解答。</p>
+        <p class="small"><b>规则/程序打分：</b>确定性规则判对错——代码跑测试看通过率，数学看答案与标准是否一致，博弈看胜负。全程无人评分，所以可海量做。</p>
+        <p class="small"><b>强化：</b>用 RL 把「得分高」的思维路径强化出来、把「得分低」的淘汰掉，反复多轮。</p>
+      </div>
+      <div class="card grow col">
+        <span class="tag">优点 vs 天花板</span>
+        <p class="small green"><b>优点：</b>信号干净、可自动化、样本可无限扩充；因此 <b>RLVR（reinforcement learning with verifiable rewards，基于可验证奖励的强化学习）</b>让 DeepSeek-R1（2025）用相对小成本把推理拉到前沿。</p>
+        <p class="small red"><b>天花板：</b>它把「智能」压缩进「可验证任务的求解器」。离开可验证领域，信号从「对/错」退化成「人觉得好不好」，这套就失效了。</p>
+      </div>
+    </div>
+    <div class="call purple" style="margin-top:14px">
+      判读点：RLVR 证明了「<b>可验证反馈 → 直接强化出推理</b>」这条因果链成立（o 系列、R1、AlphaProof 都是已发生证据）。它能不能通向 AGI，取决于「可验证任务」的边界能不能扩大——这正是第四栏在盯的。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="路线三 学习与记忆" data-title="路线三 · 连续学习与记忆：四栏">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">路线三 · 连续学习与记忆</span><span class="t">会记住、会更新、不遗忘，才算会学习</span></div>
+  </div>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:8px">
+      <div class="card col">
+        <span class="tag">主张</span>
+        <p class="small">智能不能每次从头开始。模型要<b>持续从新经验学习（continual learning）</b>、长期记住、按需更新，而不是只靠一次预训练 + 一个上下文窗口。</p>
+      </div>
+      <div class="card col" style="border-top:3px solid var(--green)">
+        <span class="tag green">证据</span>
+        <p class="small">上下文与<b>记忆系统</b>已落地：RAG 检索增强、<a href="https://arxiv.org/abs/2310.08560" target="_blank" rel="noopener">MemGPT（2023）</a>的「换页式内存」；长程任务有基准可测（<a href="https://arxiv.org/abs/2311.12983" target="_blank" rel="noopener">GAIA 2023</a>）。</p>
+      </div>
+      <div class="card col" style="border-top:3px solid var(--orange)">
+        <span class="tag orange">瓶颈</span>
+        <p class="small"><b>灾难性遗忘（catastrophic forgetting）</b>是早有记录的老问题：学新忘旧；权重不稳定，微调后旧能力回退；模型<b>分不清该记住还是该忘记</b>。多数「记忆」只是外挂检索，不是真在学。</p>
+      </div>
+      <div class="card col" style="border-top:3px solid var(--purple)">
+        <span class="tag purple">信号（可证伪）</span>
+        <p class="small">① <b>跨天 / 跨会话</b>的长程任务完成率显著提升（不只是单轮）；② 记忆被<b>跨会话复用</b>——新会话主动利用旧结论，而不是每次重塞上下文；③ 微调后<b>旧能力不回退</b>，可复现地保持。</p>
+      </div>
+    </div>
+    <p class="cap mut" style="margin-top:12px">信号②是分水岭：今天多数「记忆」是把文档塞进上下文，靠「读得快」不是「记得住」。看到复用才算真记忆。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="路线三 学习与记忆" data-title="路线三 · 深挖：记忆的三种形态">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">路线三 · 连续学习与记忆</span><span class="t">深挖：现在的「记忆」其实是三种东西</span></div>
+  </div>
+  <div class="body">
+    <div class="col" style="margin-top:6px">
+      <div class="card row">
+        <span class="tag" style="flex:none">① 上下文记忆</span>
+        <p class="small grow">材料塞进窗口，<b>读一遍、用完即忘</b>。最便宜，也是今天的默认形态；缺点是长、贵、每次重读整段。</p>
+      </div>
+      <div class="card row">
+        <span class="tag" style="flex:none">② 外挂记忆</span>
+        <p class="small grow">检索增强（RAG）、MemGPT（2023）式换页内存：<b>模型本身没变，存取由外部系统管</b>。已是成熟工程，但「记得」不等于「在学」。</p>
+      </div>
+      <div class="card row">
+        <span class="tag" style="flex:none">③ 权重记忆</span>
+        <p class="small grow">把经验<b>写进模型参数</b>，才是真持续学习。问题正是灾难性遗忘：学新忘旧，且模型无法区分「该记」与「该忘」。</p>
+      </div>
+    </div>
+    <div class="call red" style="margin-top:12px">
+      分界点：<b>①②是工程问题，③是学习问题。</b>第四栏信号里「记忆跨会话复用」「微调后旧能力不回退」盯的正是 ③ 是否真正出现。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="路线四 多 Agent" data-title="路线四 · 多 Agent 分工与经济体：四栏">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">路线四 · 多 Agent 分工与经济体</span><span class="t">单个不够，就上一群；协作里涌现能力</span></div>
+  </div>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:8px">
+      <div class="card col">
+        <span class="tag">主张</span>
+        <p class="small">单个 Agent 做不动的任务，交给<b>一堆 Agent 分工协作（multi-agent systems，多 Agent 系统）</b>；交互中涌现（emergence）出单个体没有的能力，像经济体一样自我组织。</p>
+      </div>
+      <div class="card col" style="border-top:3px solid var(--green)">
+        <span class="tag green">证据</span>
+        <p class="small">多智能体辩论（<a href="https://arxiv.org/abs/2305.14325" target="_blank" rel="noopener">Du 2023</a>）提升答案一致性与事实性；<a href="https://a2a-protocol.org" target="_blank" rel="noopener">A2A 协议（2025）</a>让不同厂商的 Agent 互相通信成为互操作标准。</p>
+      </div>
+      <div class="card col" style="border-top:3px solid var(--orange)">
+        <span class="tag orange">瓶颈</span>
+        <p class="small">通信开销与<b>延迟</b>；错误经分工被<b>放大传播</b>；token 成本随 agent 数量<b>爆炸</b>；没有统一目标时，各 agent 的行动会<b>互相抵消</b>。</p>
+      </div>
+      <div class="card col" style="border-top:3px solid var(--purple)">
+        <span class="tag purple">信号（可证伪）</span>
+        <p class="small">① 多 agent 在<b>单 agent 必失败</b>的任务类上稳定达标；② 出现<b>未被显式编程</b>的协作行为（自发分工、自行排优先级）；③ <b>通信/协调开销占比下降</b>，规模变大反而更划算。</p>
+      </div>
+    </div>
+    <p class="cap mut" style="margin-top:12px">信号①是硬门槛：如果只是「单 agent 也能做、多 agent 更贵」，这条路就不成立。目前多 agent 的优势大多仍停留在演示层。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="路线五 世界模型与具身" data-title="路线五 · 世界模型与具身：四栏">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">路线五 · 世界模型与具身</span><span class="t">智能来自与世界持续交互：世界模型 + 身体</span></div>
+  </div>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:8px">
+      <div class="card col">
+        <span class="tag">主张</span>
+        <p class="small">真正智能要<b>接触真实世界</b>：在体内建一个能预测下一步的世界模型（world model），再靠身体（embodied，具身）去验证和修正，而不是只读文本。</p>
+      </div>
+      <div class="card col" style="border-top:3px solid var(--green)">
+        <span class="tag green">证据</span>
+        <p class="small">世界模型在<b>视频预测</b>落地：<a href="https://deepmind.google/discover/blog/genie-a-generative-interactive-environment/" target="_blank" rel="noopener">Genie（2024）</a>从视频学到可交互环境；机器人从大模型学动作（<a href="https://deepmind.google/discover/blog/rt-2-new-model-translates-vision-and-language-into-action/" target="_blank" rel="noopener">RT-2 2023</a>）。</p>
+      </div>
+      <div class="card col" style="border-top:3px solid var(--orange)">
+        <span class="tag orange">瓶颈</span>
+        <p class="small">真实世界反馈<b>慢、贵、有危险</b>（试错成本高）；<b>仿真到现实（sim-to-real）</b>有鸿沟——仿真里学的在真机打折扣；物理数据量远小于文本数据。</p>
+      </div>
+      <div class="card col" style="border-top:3px solid var(--purple)">
+        <span class="tag purple">信号（可证伪）</span>
+        <p class="small">① 机器人训练从「预训练 + 微调」转向<b>持续在线学习</b>；② <b>长时程预测一致性</b>改善（预测未来几十步不出戏）；③ 行为在<b>未见过的场景</b>里泛化，而不是记住训练环境。</p>
+      </div>
+    </div>
+    <p class="cap mut" style="margin-top:12px">信号③最难也最真：世界模型的价值 = 对「没见过的情况」预测得有多准，这可以直接测。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="对照" data-title="五条路对照总览">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">对照</span><span class="t">五条路对照：证据厚薄 × 一句信号速览</span></div>
+  </div>
+  <div class="body">
+    <table class="tbl" style="margin-top:8px">
+      <tr><th style="width:160px">路线</th><th style="width:150px">证据厚薄</th><th>一句话信号（可证伪）</th></tr>
+      <tr>
+        <td><b>继续 Scaling</b></td>
+        <td><span class="tag">厚 · 观察可复现</span></td>
+        <td>新能力出现在没针对性优化的任务上；榜单饱和到前沿差距难测。</td>
+      </tr>
+      <tr>
+        <td><b>RL + 可验证环境</b></td>
+        <td><span class="tag">厚 · 多组实验</span></td>
+        <td>RL 训出的推理迁移到非形式化任务；训练算力明显转向 RL。</td>
+      </tr>
+      <tr>
+        <td><b>连续学习与记忆</b></td>
+        <td><span class="tag">中 · 记忆系统</span></td>
+        <td>长程任务完成率提升；记忆跨会话复用而非每次重塞上下文。</td>
+      </tr>
+      <tr>
+        <td><b>多 Agent 分工</b></td>
+        <td><span class="tag">薄 · 多为演示</span></td>
+        <td>单 agent 必失败的任务类上稳定达标；协作行为未经显式编程。</td>
+      </tr>
+      <tr>
+        <td><b>世界模型与具身</b></td>
+        <td><span class="tag">薄 · 早期阶段</span></td>
+        <td>训练转向持续在线学习；行为在未见过的场景里泛化。</td>
+      </tr>
+    </table>
+    <div class="call" style="margin-top:14px">
+      读法：<b>厚 ≠ 正确，薄 ≠ 没希望。</b>证据厚说明「机制已部分兑现」；证据薄说明「还在演示层」。这张表只回答「现在站在哪」，不回答「什么时候到」。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="对照" data-title="怎么判断哪条在走通">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">对照</span><span class="t">怎么判断「哪条在走通」：看信号，不听营销</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px">
+      <div class="card col">
+        <span class="tag">看什么：第四栏的观察清单</span>
+        <ul class="ul small">
+          <li>每条路线都写了「走通信号」，<b>它必须可证伪（falsifiable）</b>：看到 X 才算走通，看到 Y 就不算。</li>
+          <li>把信号做成<b>检查表</b>，按「已出现 / 未出现 / 反例」三格记账，隔一段时间对一次。</li>
+          <li>信号要可测：<b>基准、完成率、开销占比、迁移得分</b>——能查数，别凭感觉。</li>
+        </ul>
+      </div>
+      <div class="card col">
+        <span class="tag">不看什么：三类话术</span>
+        <ul class="ul small">
+          <li><b>口号式：</b>「我们领先一个数量级」——没给出可复现的测法。</li>
+          <li><b>到达式：</b>「已经具备通用智能」——没有任何公认定义支撑。</li>
+          <li><b>预测式：</b>「还有 X 年就 AGI」——给了时间表却给不出可证伪的信号，这正是不该听的。</li>
+        </ul>
+      </div>
+    </div>
+    <div class="call green" style="margin-top:14px">
+      判断口诀：<b>信号优先于声明。</b>先看有没有可复现的观测，再看它符不符合「走通」的定义；营销口径不进入判断。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="组合" data-title="交叉与组合：五条路不是单选题">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">组合</span><span class="t">交叉与组合：五条路不是单选题</span></div>
+  </div>
+  <div class="body">
+    <div class="grid3" style="margin-top:8px">
+      <div class="card col">
+        <span class="tag">今天的产品大多是组合</span>
+        <p class="small">主流 Agent 产品 = <b>继续 scaling 的底座 + 记忆（检索/上下文）+ 多 agent 分工</b>（1+3+4）。单一路线是教学切分，现实是拼装。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">路径之间互相喂养</span>
+        <p class="small">scaling 给 RL 提供更好的底座；RL 的推理给多 agent 提供「会干活的个体」；记忆给长程任务提供连续性。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">判断也要组合着看</span>
+        <p class="small">一条路走通，往往会<b>放大另一条路的信号</b>；反过来，一条路的瓶颈可能拖累别的路——比如数据墙同时压着 scaling 和世界模型。</p>
+      </div>
+    </div>
+    <div class="call" style="margin-top:14px">
+      判读提示：与其问「哪条路通往 AGI」，不如问「<b>组合里哪些瓶颈正在被解决</b>」——记忆真被解决，多 agent 的长程协作自动变强。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="收尾" data-title="回到开头：为什么不能给时间表">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">收尾</span><span class="t">回到开头：为什么不能给时间表</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px">
+      <div class="card col">
+        <span class="tag">原因一：定义不统一，时间无从谈起</span>
+        <p class="small">三个定义各有各的「到了」：经济定义看劳动替代，能力定义看测试全过，自主性定义看长程自治。<b>没有统一终点，就没有统一的倒数。</b></p>
+      </div>
+      <div class="card col">
+        <span class="tag">原因二：一给年份，本讲就变成算命</span>
+        <p class="small">「X 年到 AGI」没有可证伪的检验——信号由第四栏决定，时间由算命决定。<b>一旦给了年份，前面可核实的路径梳理会被连坐</b>，整讲失去可信度。</p>
+      </div>
+    </div>
+    <div class="card col" style="margin-top:14px">
+      <span class="tag">替换方案：把时间换成语境</span>
+      <p class="small">把「什么时候」换成「<b>在什么条件下</b>」：当可验证任务边界扩大、记忆跨会话复用、单 agent 必失败的任务被多 agent 稳定接管时，就是「组合在走通」——我们只描述条件，不押日期。</p>
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide cover" data-act="收尾" data-title="收尾">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">收尾</span></div>
+  </div>
+  <div class="body">
+    <h1 class="h1">不预测，只给你一套对照表</h1>
+    <p class="p sec">五条路 · 四栏结构 · 证据与瓶颈 · 可证伪的观察清单。</p>
+    <div class="card" style="max-width:880px">
+      <p class="small"><b>本讲做完了三件事：</b></p>
+      <ul class="ul">
+        <li>不做预测：<b>AGI 没有公认定义</b>，预测「何时到」没有标尺。</li>
+        <li>只做梳理：<b>摆证据、讲瓶颈、写信号</b>。信号栏留着反复对照。</li>
+        <li>以后看到任何「快到 / 到了」的说法，<b>先问一句：你对照的是哪个信号？</b></li>
+      </ul>
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>

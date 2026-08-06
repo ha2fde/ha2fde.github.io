@@ -1,4 +1,8 @@
 {
+  "agent-principles-flash": {
+    "desc": "同一套提示词交给 DeepSeek Flash 生成的六章版本，可与 posts/agent-principles/ 对照看模型差异。_parts/ 是分片源和拼装脚本",
+    "src": "/Users/fde/Documents/agent ppt flash"
+  },
   "agent-principles-src": {
     "desc": "《Agent 原理与实践》六章的创作过程：提示词定稿（约 15 轮打磨）+ 溢出检测脚本 + 建章模板",
     "src": "~/agent-ppt-prompts.md + ~/agent-principles-ppt/"

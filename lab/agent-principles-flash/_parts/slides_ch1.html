@@ -1,0 +1,531 @@
+<section class="slide cover" data-act="开场" data-title="封面">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">开场</span></div>
+  </div>
+  <div class="body">
+    <div class="note" style="letter-spacing:.22em">AGENT 原理与实践 · 第一章</div>
+    <h1 class="h1">装上你的第一个 Agent</h1>
+    <p class="p sec" style="max-width:820px">客户端（Client）和模型（Model）是两回事。今天把它们各自挑好、自由组合，当晚就跑起来一个能干活的 Agent。</p>
+    <div class="row" style="justify-content:center;gap:12px">
+      <span class="tag">零基础可跟</span><span class="tag">不写代码也能跑</span><span class="tag">全系列共 6 讲</span>
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="开场" data-title="这讲你能得到什么">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">开场</span><span class="t">这讲你能得到什么</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px">
+      <div class="card col">
+        <span class="tag">四个能力</span>
+        <ul class="ul">
+          <li>分得清 <b>Agent（智能体）</b> 和 <b>Chatbot（聊天机器人）</b> 的差别</li>
+          <li>认全常见客户端：对话、代码补全、编程 Agent、AI 编辑器</li>
+          <li>会估这台机器能跑动多大的本地模型</li>
+          <li>能自己算一笔模型开销的账</li>
+        </ul>
+      </div>
+      <div class="card col">
+        <span class="tag">本讲边界（讲到哪为止）</span>
+        <ul class="ul">
+          <li>只讲"怎么用起来"，不讲内部原理</li>
+          <li>"循环"讲到 <b>思考 → 行动 → 看结果</b> 为止</li>
+          <li>"模型从哪来"是 <b>买卖口径</b>，不是训练口径</li>
+          <li>不写代码的人全程能跟</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note" style="margin-top:14px">术语一律给规范中英文（首次出现附英文原名），比喻只用来辅助理解，不替代术语。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="开场" data-title="Agent 和聊天机器人差在哪">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">开场</span><span class="t">Agent 和聊天机器人差在哪</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2">
+      <div class="card col">
+        <span class="tag">聊天机器人（Chatbot）</span>
+        <p class="small">你问一句，它答一句。<b>输出就是终点</b>，下一步永远由你来做。</p>
+        <p class="small mut">例：客服问答、随手查个定义。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">Agent（智能体）</span>
+        <p class="small">给它一个目标，它自己拆步骤、自己动手，<b>做完才算完</b>。</p>
+        <p class="small mut">例：读完整份项目、改完代码、跑完测试再汇报。</p>
+      </div>
+    </div>
+    <div class="dia" style="margin-top:14px">
+      <svg viewBox="0 0 800 224" role="img" aria-label="思考-行动-看结果循环">
+        <defs><marker id="loop-a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker></defs>
+        <rect x="0" y="36" width="240" height="88" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="120" y="78" text-anchor="middle" font-size="17" font-weight="600" fill="#7c3aed">思考</text>
+        <text x="120" y="102" text-anchor="middle" font-size="13" fill="#5b6675">模型决定下一步</text>
+        <rect x="280" y="36" width="240" height="88" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="400" y="78" text-anchor="middle" font-size="17" font-weight="600" fill="#2563eb">行动</text>
+        <text x="400" y="102" text-anchor="middle" font-size="13" fill="#5b6675">客户端调用工具 / 发命令</text>
+        <rect x="560" y="36" width="240" height="88" rx="10" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+        <text x="680" y="78" text-anchor="middle" font-size="17" font-weight="600" fill="#0e9f6e">看结果</text>
+        <text x="680" y="102" text-anchor="middle" font-size="13" fill="#5b6675">读回工具输出，回到思考</text>
+        <line x1="240" y1="80" x2="276" y2="80" stroke="#94a3b8" stroke-width="2" marker-end="url(#loop-a3)"/>
+        <line x1="520" y1="80" x2="556" y2="80" stroke="#94a3b8" stroke-width="2" marker-end="url(#loop-a3)"/>
+        <polyline points="680,128 680,176 120,176 120,132" fill="none" stroke="#94a3b8" stroke-width="2" marker-end="url(#loop-a3)"/>
+      </svg>
+    </div>
+    <p class="cap mut">差别不在"会不会说话"，而在"会不会自己把事做完"。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="两个零件" data-title="客户端和模型是两回事">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">两个零件</span><span class="t">客户端和模型是两回事</span></div>
+  </div>
+  <div class="body">
+    <div class="dia" style="margin-top:8px">
+      <svg viewBox="0 0 1200 240" role="img" aria-label="客户端经由API连接模型">
+        <defs><marker id="conn-a4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker></defs>
+        <rect x="60" y="60" width="340" height="120" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="230" y="92" text-anchor="middle" font-size="18" font-weight="600" fill="#2563eb">客户端 Client</text>
+        <text x="230" y="118" text-anchor="middle" font-size="13" fill="#5b6675">你眼前的界面</text>
+        <text x="230" y="140" text-anchor="middle" font-size="13" fill="#5b6675">网页 / App / 终端 / 编辑器</text>
+        <rect x="800" y="60" width="340" height="120" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="970" y="92" text-anchor="middle" font-size="18" font-weight="600" fill="#7c3aed">模型 Model</text>
+        <text x="970" y="118" text-anchor="middle" font-size="13" fill="#5b6675">真正干活的"大脑"</text>
+        <text x="970" y="140" text-anchor="middle" font-size="13" fill="#5b6675">在云端，或在本地</text>
+        <line x1="400" y1="120" x2="536" y2="120" stroke="#94a3b8" stroke-width="2" marker-end="url(#conn-a4)"/>
+        <line x1="800" y1="120" x2="664" y2="120" stroke="#94a3b8" stroke-width="2" marker-end="url(#conn-a4)"/>
+        <rect x="540" y="100" width="120" height="40" rx="8" fill="#fff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <text x="600" y="124" text-anchor="middle" font-size="14" font-weight="600" fill="#5b6675">API</text>
+      </svg>
+    </div>
+    <div class="grid2" style="margin-top:12px">
+      <div class="card">
+        <p class="small"><b>客户端</b>负责"把话说出去、把结果摆出来"。它决定你怎么跟模型交流，但不决定模型是谁。</p>
+      </div>
+      <div class="card">
+        <p class="small"><b>模型</b>负责"真正想问题"。它通常不直接出现，你通过客户端或 <b>API（Application Programming Interface，应用程序接口）</b> 跟它对话。</p>
+      </div>
+    </div>
+    <p class="p" style="margin-top:12px">同一个客户端可以接不同模型，同一个模型也可以被不同客户端调用。<span class="orange"><b>谁跟谁组合，完全由你决定。</b></span>类比：遥控器换了，播放器照播；播放器换了，遥控器照用。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="两个零件" data-title="客户端有哪些（一）：对话聊天">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">两个零件</span><span class="t">客户端有哪些（一）：对话聊天</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2">
+      <div class="card col">
+        <span class="tag">ChatGPT · OpenAI</span>
+        <p class="small">对话、写作、读文档、看图；有免费档和订阅档。</p>
+        <p class="small"><a href="https://chatgpt.com" target="_blank" rel="noopener">chatgpt.com</a></p>
+      </div>
+      <div class="card col">
+        <span class="tag">Claude · Anthropic</span>
+        <p class="small">长文档、写作、代码分析见长；订阅里还带编程 Agent。</p>
+        <p class="small"><a href="https://claude.ai" target="_blank" rel="noopener">claude.ai</a></p>
+      </div>
+      <div class="card col">
+        <span class="tag">Gemini · Google</span>
+        <p class="small">和 Google 全家桶（Gmail、Docs）结合紧密。</p>
+        <p class="small"><a href="https://gemini.google.com" target="_blank" rel="noopener">gemini.google.com</a></p>
+      </div>
+      <div class="card col">
+        <span class="tag">DeepSeek · 深度求索</span>
+        <p class="small">网页对话免费额度大，推理模型便宜，适合日常用。</p>
+        <p class="small"><a href="https://chat.deepseek.com" target="_blank" rel="noopener">chat.deepseek.com</a></p>
+      </div>
+    </div>
+    <p class="p" style="margin-top:14px">这类客户端的特点是<b>开箱即用</b>：浏览器打开就能聊。适合对话式任务——问、答、改、总结。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="两个零件" data-title="客户端有哪些（二）：代码三兄弟">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">两个零件</span><span class="t">客户端有哪些（二）：代码三兄弟别搞混</span></div>
+  </div>
+  <div class="body">
+    <div class="grid3">
+      <div class="card col">
+        <span class="tag">代码补全</span>
+        <p class="small">在光标处<b>接着写几行</b>，你按 Tab 接受。作用范围 = 一小段代码。</p>
+        <p class="small mut">例：GitHub Copilot、Cursor 的 Tab 补全</p>
+      </div>
+      <div class="card col">
+        <span class="tag">编程 Agent</span>
+        <p class="small">给它一个任务，它<b>读仓库、改代码、跑测试</b>，做完才停。作用范围 = 整个项目。</p>
+        <p class="small mut">例：Claude Code、Codex CLI</p>
+      </div>
+      <div class="card col">
+        <span class="tag">AI 编辑器</span>
+        <p class="small">把前面两者<b>装进"房子"</b>里，边写边用。作用范围 = 你的开发环境。</p>
+        <p class="small mut">例：Cursor、Windsurf、Zed</p>
+      </div>
+    </div>
+    <div class="call orange" style="margin-top:18px">
+      <b>一句话分界：</b>补全帮你"打几个字"；Agent 帮你"把一个任务做完"；AI 编辑器是它们住的房子。三者经常一起出现，但不是一回事。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="模型" data-title="模型从哪来（一）：云端三买法">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">模型</span><span class="t">模型从哪来（一）：云端，三种买法</span></div>
+  </div>
+  <div class="body">
+    <div class="col" style="margin-top:6px">
+      <div class="card row">
+        <span class="tag">① 按量 API</span>
+        <p class="small grow">充钱、按 <b>token 用量</b>付费。适合<b>自己写程序</b>、做自动化。<a href="https://openai.com/api/pricing" target="_blank" rel="noopener">OpenAI API</a>、<a href="https://platform.claude.com" target="_blank" rel="noopener">Anthropic API</a>。</p>
+      </div>
+      <div class="card row">
+        <span class="tag">② 订阅</span>
+        <p class="small grow">月费买<b>额度和产品功能</b>，人直接用。例：<a href="https://claude.com/pricing" target="_blank" rel="noopener">Claude Pro</a>（$20/月，含 Claude Code）、ChatGPT Plus。</p>
+      </div>
+      <div class="card row">
+        <span class="tag">③ 借别人的产品</span>
+        <p class="small grow">不直接接触模型，<b>工具商已经接好</b>。例：办公软件、笔记、搜索里的"AI 按钮"。</p>
+      </div>
+    </div>
+    <div class="call" style="margin-top:16px">
+      一句话选法：<b>想自己造 → 按量 API；想省事 → 订阅；只是想用 → 借。</b>
+    </div>
+    <p class="note" style="margin-top:12px">三条路都会把数据发到厂商服务器，用之前看一眼隐私条款。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="模型" data-title="模型从哪来（二）：本地自己跑">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">模型</span><span class="t">模型从哪来（二）：本地自己跑</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px">
+      <div class="card col">
+        <span class="tag">Ollama</span>
+        <p class="small">命令行工具，一行命令下载并运行开源模型，几乎零门槛。</p>
+        <pre>ollama run qwen3:8b</pre>
+        <p class="small mut"><a href="https://ollama.com" target="_blank" rel="noopener">ollama.com</a></p>
+      </div>
+      <div class="card col">
+        <span class="tag">LM Studio</span>
+        <p class="small">带图形界面：下载模型、聊天、调参数都不碰命令行。</p>
+        <p class="small mut"><a href="https://lmstudio.ai" target="_blank" rel="noopener">lmstudio.ai</a></p>
+      </div>
+    </div>
+    <div class="grid2" style="margin-top:12px">
+      <div class="card bg-green">
+        <p class="small"><b>为什么值得跑本地：</b>数据不出机器、断网可用、不按量烧钱（只花电费）。</p>
+      </div>
+      <div class="card bg-orange">
+        <p class="small"><b>代价：</b>能力明显弱于云端前沿模型；速度取决于硬件。</p>
+      </div>
+    </div>
+    <p class="note" style="margin-top:12px">开源模型（Llama、Qwen、DeepSeek 等）在 <a href="https://ollama.com/library" target="_blank" rel="noopener">ollama.com/library</a> 免费下载。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="模型" data-title="硬件对号入座">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">模型</span><span class="t">硬件对号入座：你的机器能跑多大</span></div>
+  </div>
+  <div class="body">
+    <table class="tbl" style="margin-top:8px">
+      <tr><th>模型规模（Q4 量化）</th><th>约需显存</th><th>常见配置</th><th>能干什么</th></tr>
+      <tr><td>3–4B</td><td>≈2–3 GB</td><td>笔记本 CPU 也能扛</td><td>轻量问答、起草</td></tr>
+      <tr><td>7–8B</td><td>≈4–6 GB</td><td>8 GB 显存 / 16 GB 内存</td><td>日常聊天、翻译、总结</td></tr>
+      <tr><td>13–14B</td><td>≈8–10 GB</td><td>12–16 GB 显存</td><td>写代码、较复杂任务</td></tr>
+      <tr><td>32B</td><td>≈20 GB</td><td>24 GB 显存（如 RTX 4090）</td><td>复杂推理</td></tr>
+      <tr><td>70B</td><td>≈40 GB</td><td>48 GB 显存或双卡</td><td>接近前沿，速度慢</td></tr>
+    </table>
+    <div class="row" style="margin-top:14px;align-items:stretch">
+      <div class="card grow col">
+        <p class="small"><b>估算口诀：</b><b>Quantization（量化）</b>到 Q4 后，参数每 10 亿 ≈ 0.6 GB。7B ≈ 4–5 GB，70B ≈ 40 GB。</p>
+        <p class="small"><b>Apple 用户：</b>统一内存 = 显存，M 系列 16 GB 能舒服跑 13B。</p>
+      </div>
+      <div class="call red grow">
+        <b>能跑 ≠ 跑得快。</b>显存不够会把数据挤进内存，速度掉 5–20 倍；CPU 单跑大模型会很慢。
+      </div>
+    </div>
+    <p class="note" style="margin-top:10px">口径：Q4 量化、单用户。核对 2026-07。详细数据见 <a href="https://ollama.com/library" target="_blank" rel="noopener">ollama.com/library</a> 与 LM Studio 文档。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="用起来" data-title="怎么换模型（一）：在客户端里换">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">用起来</span><span class="t">怎么换模型（一）：在客户端里换</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px">
+      <div class="card col">
+        <span class="tag">网页 / App</span>
+        <p class="small">对话框附近或设置里的<b>模型选择器</b>，点一下切换（ChatGPT、Claude、Gemini 都有）。</p>
+        <p class="small">对话历史通常<b>不丢</b>——只换大脑，不换本子。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">本地（Ollama）</span>
+        <p class="small">直接指定要跑哪个模型：</p>
+        <pre>ollama run qwen3:32b</pre>
+        <p class="small">LM Studio 在侧栏下拉里换，即换即用。</p>
+      </div>
+    </div>
+    <div class="call" style="margin-top:16px">
+      关键点：<b>换的是模型，客户端不用换。</b>这正是"客户端与模型分离"的第一个体现。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="用起来" data-title="怎么换模型（二）：API 里换 = 改一行">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">用起来</span><span class="t">怎么换模型（二）：API 里换 = 改一行</span></div>
+  </div>
+  <div class="body">
+    <div class="row" style="margin-top:8px;align-items:stretch">
+      <div class="grow col">
+        <p class="small">写程序时，换模型就是改 <code>model</code> 参数这一行：</p>
+        <pre>from openai import OpenAI
+client = OpenAI()
+
+resp = client.chat.completions.create(
+    model="gpt-4.1-mini",   # 改这一行，就换了模型
+    messages=[
+        {"role": "user", "content": "把这份材料总结成三条要点"}
+    ],
+)
+print(resp.choices[0].message.content)</pre>
+      </div>
+      <div class="card grow col">
+        <span class="tag">背后的道理</span>
+        <p class="small">程序只负责"把话递过去、把结果拿回来"，<b>模型是谁不重要</b>。</p>
+        <p class="small">同一条消息，今天发给 GPT、明天发给 Claude、后天发给本地模型，代码几乎不动。</p>
+        <p class="small">（各家接口略有差异，切换时需小改——接口细节不在这讲展开。）</p>
+      </div>
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="成本" data-title="要花多少钱（一）：token 计价">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">成本</span><span class="t">要花多少钱（一）：token 计价</span></div>
+  </div>
+  <div class="body">
+    <div class="row" style="margin-top:6px;align-items:stretch">
+      <div class="card grow col">
+        <span class="tag">怎么计价</span>
+        <p class="small"><b>Token（词元）</b>是模型读写文本的基本单位，中文一个字通常 1–2 个 token。</p>
+        <p class="small">账单 = <b>输入价 × 输入量 + 输出价 × 输出量</b>。<b>输出普遍贵 4 倍上下</b>。</p>
+        <table class="tbl" style="margin-top:10px">
+          <tr><th>模型（参考价）</th><th>输入 $/百万</th><th>输出 $/百万</th></tr>
+          <tr><td>GPT-4.1（OpenAI）</td><td>2.00</td><td>8.00</td></tr>
+          <tr><td>GPT-4.1-mini</td><td>0.40</td><td>1.60</td></tr>
+          <tr><td>Claude Sonnet 5</td><td>2.00（促销期）</td><td>10.00</td></tr>
+          <tr><td>Claude Haiku 4.5</td><td>1.00</td><td>5.00</td></tr>
+        </table>
+      </div>
+      <div class="card grow col">
+        <span class="tag">算一笔真实的账</span>
+        <p class="small">让模型写 1000 字 ≈ 1500–2000 个输出 token。</p>
+        <p class="small">用 GPT-4.1-mini：0.2 万 × $1.60/百万 ≈ <b>$0.003</b></p>
+        <p class="small">用 Claude Sonnet 5：0.2 万 × $10/百万 ≈ <b>$0.02</b></p>
+        <p class="small">单次很便宜；<b>贵在频率和输出长度</b>。高频批量跑一天也就一杯咖啡钱，但别不记账。</p>
+      </div>
+    </div>
+    <p class="note" style="margin-top:10px">价格随时变动，以官网当日为准（核对 2026-08）：<a href="https://openai.com/api/pricing" target="_blank" rel="noopener">openai.com/api/pricing</a> · <a href="https://platform.claude.com" target="_blank" rel="noopener">platform.claude.com</a>。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="成本" data-title="上下文与缓存">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">成本</span><span class="t">要花多少钱（二）：上下文越长越贵，缓存帮你打折</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px">
+      <div class="card col">
+        <span class="tag">上下文（Context）</span>
+        <p class="small">每次提问，模型都把<b>整段对话连同提示词重读一遍</b>，这一段按输入计价。</p>
+        <p class="small">对话越长、塞的材料越多 → 每次付的钱越多。模型没有"只记重点"这回事。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">提示词缓存（Prompt Caching）</span>
+        <p class="small">重复出现的前缀会<b>命中缓存</b>，命中部分大幅打折：</p>
+        <p class="small">Claude 命中约按 <b>10%</b> 计价；OpenAI 命中约按 <b>50%</b> 计价。</p>
+        <p class="small">固定说明、长文档当"背景"反复引用时，缓存能省一大截。</p>
+      </div>
+    </div>
+    <div class="call orange" style="margin-top:16px">
+      <b>省钱习惯：</b>别把海量材料塞进每次提示词；系统说明、长文档放前缀，让它吃缓存；一个任务结束就开新对话，别让上下文无限堆长。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="成本" data-title="按量 vs 订阅">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">成本</span><span class="t">要花多少钱（三）：按量 vs 订阅</span></div>
+  </div>
+  <div class="body">
+    <table class="tbl" style="margin-top:8px">
+      <tr><th></th><th>按量 API</th><th>订阅</th></tr>
+      <tr><td><b>怎么付</b></td><td>用多少 token 付多少</td><td>固定月费，$20 上下起步</td></tr>
+      <tr><td><b>适合谁</b></td><td>写程序、批量任务、自己做 Agent</td><td>个人日常对话、想稳定用产品功能</td></tr>
+      <tr><td><b>上限</b></td><td>钱花完为止，无软性限额</td><td>有额度，超出会限速或等窗口</td></tr>
+      <tr><td><b>典型例子</b></td><td>OpenAI API、Anthropic API</td><td>ChatGPT Plus $20 · Claude Pro $20</td></tr>
+    </table>
+    <div class="call" style="margin-top:16px">
+      经验法则：<b>自己写程序 → 按量</b>（可控、可算）；<b>人直接对话 → 订阅</b>（省心）。订阅也常把 Agent 工具打包进来——例如 Claude Pro 就含 Claude Code。
+    </div>
+    <p class="note" style="margin-top:10px">价格核对 2026-08；免费额度与促销随时变，以官网为准。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="开始" data-title="按角色选一套">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">开始</span><span class="t">怎么开始（一）：按角色选一套</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px">
+      <div class="card col">
+        <span class="tag">写代码的</span>
+        <p class="small">编程 Agent + 终端：<b>Claude Code / Codex CLI</b></p>
+        <p class="small mut">订阅或按量都行，它自己会调模型。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">写文档、汇报的</span>
+        <p class="small">对话客户端：<b>ChatGPT / Claude 网页</b></p>
+        <p class="small mut">重点在长文、总结、改写。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">想尝鲜、不想花钱</span>
+        <p class="small">免费客户端 + 本地 3–8B 开源模型</p>
+        <p class="small mut">先跑通流程，再决定要不要投入。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">重隐私 / 常离线</span>
+        <p class="small"><b>Ollama / LM Studio</b> 跑本地开源模型</p>
+        <p class="small mut">数据不出机器，代价是能力打折。</p>
+      </div>
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="开始" data-title="0 成本也能跑">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">开始</span><span class="t">怎么开始（二）：0 成本也能跑</span></div>
+  </div>
+  <div class="body">
+    <ul class="ul" style="margin-top:8px">
+      <li><b>免费聊天客户端：</b>ChatGPT、Claude、Gemini 都有免费档，够日常对话和大部分写作。</li>
+      <li><b>新账户赠金：</b>OpenAI / Anthropic 的新 API 账户通常会送少量额度（约 $5），够把第一个程序跑通。</li>
+      <li><b>本地开源模型：</b>Llama、Qwen、DeepSeek 在 Ollama / LM Studio 里免费下载，3–8B 多数笔记本带得动。</li>
+      <li><b>开源客户端：</b>免费的编程 Agent、聊天界面层出不穷，基础能力够用。</li>
+    </ul>
+    <div class="call green" style="margin-top:16px">
+      <b>0 成本 ≠ 0 能力。</b>本地 7–8B 模型足够体验"给任务 → 看它做 → 修问题"的完整循环。先把流程跑起来，再谈投入。
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="开始" data-title="第一次上手，三步">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">开始</span><span class="t">怎么开始（三）：第一次上手，三步</span></div>
+  </div>
+  <div class="body">
+    <div class="col" style="margin-top:6px">
+      <div class="card row"><span class="tag">①</span><p class="small grow"><b>装一个客户端。</b>网页版就行，零安装。</p></div>
+      <div class="card row"><span class="tag">②</span><p class="small grow"><b>选一个模型。</b>先用默认推荐，别纠结。</p></div>
+      <div class="card row"><span class="tag">③</span><p class="small grow"><b>给一个真实任务。</b>越小、越具体越好。</p></div>
+    </div>
+    <div class="dia" style="margin-top:14px">
+      <p class="small"><b>一个能直接抄的任务：</b></p>
+      <pre>读一下这个文件夹里的三份文档，
+用三句话总结每份的内容，
+再列出一条你觉得被遗漏的重点。</pre>
+    </div>
+    <p class="cap mut">任务要"具体 + 有交付物"。别问"你能帮我吗"，直接说"把 X 做成 Y"。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide" data-act="开始" data-title="安全底线">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">开始</span><span class="t">安全底线：喂之前先想三件事</span></div>
+  </div>
+  <div class="body">
+    <div class="grid2" style="margin-top:8px">
+      <div class="card col bg-red">
+        <span class="tag">① 不喂什么</span>
+        <p class="small">密钥、API Key、密码、身份证号、未脱敏的个人与客户数据。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">② 数据去哪</span>
+        <p class="small">云端模型 = 数据进入厂商服务器，先看隐私条款；本地模型 = 数据不出机器。</p>
+      </div>
+      <div class="card col">
+        <span class="tag">③ 授权什么</span>
+        <p class="small">让 Agent 读写文件、发消息、花钱之前，先看清它的工具权限和你的确认机制。</p>
+      </div>
+      <div class="card col bg-red">
+        <span class="tag">④ 渠道</span>
+        <p class="small">只用官方渠道。来路不明的"破解版""赠送额度"往往是钓鱼。</p>
+      </div>
+    </div>
+    <p class="note" style="margin-top:14px">记住：发给模型的，默认等于"贴到公网上"。敏感内容先脱敏，再让 Agent 处理。</p>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>
+
+<section class="slide cover" data-act="收尾" data-title="收尾">
+  <div class="hdr">
+    <div class="prog"><i></i></div>
+    <div class="hrow"><span class="act">收尾</span></div>
+  </div>
+  <div class="body">
+    <h1 class="h1">你的第一个 Agent，装好了</h1>
+    <p class="p sec">今天你已经会：挑客户端、买模型、估本地配置、算账、安全上手。</p>
+    <div class="card" style="max-width:880px">
+      <p class="small"><b>本讲讲到这里为止：</b></p>
+      <ul class="ul">
+        <li>"循环"只讲到 <b>思考 → 行动 → 看结果</b>；更具体的推理范式不是本讲内容。</li>
+        <li>"模型从哪来"是 <b>买卖口径</b>；模型是怎么训练出来的，不是本讲内容。</li>
+        <li>客户端和模型的清单还有很多，但<b>够用的选择</b>你已经会做。</li>
+      </ul>
+    </div>
+  </div>
+  <div class="ftr"><span class="pg"></span></div>
+</section>

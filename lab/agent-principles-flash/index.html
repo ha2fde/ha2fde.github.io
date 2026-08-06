@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent 原理 · 六讲</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#e9edf3;--panel:#f4f7fb;--line:#d7deea;--card:#ffffff;
+--ink:#1f2937;--sec:#5b6675;--mut:#8a97a8;
+--blue:#2563eb;--green:#0e9f6e;--orange:#c2410c;--purple:#7c3aed;--red:#dc2626
+}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC","Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6}
+.wrap{max-width:880px;margin:0 auto;padding:64px 32px 80px}
+.head h1{font-size:40px;font-weight:700;letter-spacing:.01em;line-height:1.3}
+.head p{margin-top:14px;color:var(--sec);font-size:17px}
+hr{border:none;border-top:1px solid var(--line);margin:36px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 26px;display:flex;gap:22px;align-items:flex-start;text-decoration:none;color:inherit;margin-bottom:16px;transition:border-color .15s ease,transform .15s ease}
+.card:hover{border-color:var(--blue);transform:translateY(-1px)}
+.num{flex:none;width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;margin-top:2px}
+.n1{background:var(--blue)}.n2{background:var(--purple)}.n3{background:var(--green)}.n4{background:var(--orange)}.n5{background:#0e7490}.n6{background:var(--red)}
+.card h2{font-size:21px;font-weight:600}
+.card .d{margin-top:6px;color:var(--sec);font-size:15px}
+.card .meta{margin-top:10px;font-size:13px;color:var(--mut);display:flex;gap:16px}
+.card .meta i{font-style:normal;display:inline-flex;align-items:center;gap:6px}
+.card .meta i::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--mut);display:inline-block}
+.enter{margin-left:auto;align-self:center;flex:none;font-size:14px;color:var(--blue);white-space:nowrap}
+.foot{margin-top:40px;color:var(--mut);font-size:13px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <h1>Agent 原理 · 六讲</h1>
+    <p>从工具调用到 AGI 的一条主线：理解每一代系统在解决什么瓶颈，而不是记住一堆名词。共六讲，用键盘 →/←、空格、PgDn/PgUp 翻页，按 O 打开总览，按 F 全屏。</p>
+  </div>
+  <hr>
+
+  <a class="card" href="ch1.html">
+    <div class="num n1">一</div>
+    <div>
+      <h2>第一章 · 装上你的第一个 Agent</h2>
+      <div class="d">从 ChatGPT 到真正会"干活"的 Agent：什么是工具调用、为什么现在能落地上手，并用一个最小例子亲手把它装起来。</div>
+      <div class="meta"><i>19 页</i><i>工具调用 / 成本与选型</i></div>
+    </div>
+    <span class="enter">打开 →</span>
+  </a>
+
+  <a class="card" href="ch2.html">
+    <div class="num n2">二</div>
+    <div>
+      <h2>第二章 · 从图灵到 Transformer</h2>
+      <div class="d">AI 的两度寒冬各自被什么打死，符号主义 / 连接主义 / 行为主义三派如何合流，注意力与 Transformer 又是怎么让"大"第一次成为可能的。</div>
+      <div class="meta"><i>24 页</i><i>寒冬 / 三大流派 / Transformer</i></div>
+    </div>
+    <span class="enter">打开 →</span>
+  </a>
+
+  <a class="card" href="ch3.html">
+    <div class="num n3">三</div>
+    <div>
+      <h2>第三章 · 从 chat 到 agent</h2>
+      <div class="d">对话与自主行动的分界：ReAct 的自由文本循环与工具调用的结构化输出差别在哪，agent 循环怎么把"说"变成"做"。</div>
+      <div class="meta"><i>20 页</i><i>ReAct / 工具调用 / agent 循环</i></div>
+    </div>
+    <span class="enter">打开 →</span>
+  </a>
+
+  <a class="card" href="ch4.html">
+    <div class="num n4">四</div>
+    <div>
+      <h2>第四章 · Agent 的协议层</h2>
+      <div class="d">工具、MCP、CLI 三个接口一样深地讲清楚，抽出它们背后的抽象接口 ACI，再往上看 Skills 与 A2A 如何让 Agent 之间协作。</div>
+      <div class="meta"><i>26 页</i><i>Tools / MCP / ACI / A2A</i></div>
+    </div>
+    <span class="enter">打开 →</span>
+  </a>
+
+  <a class="card" href="ch5.html">
+    <div class="num n5">五</div>
+    <div>
+      <h2>第五章 · 从 demo 到生产</h2>
+      <div class="d">控制权从人到系统的连续谱，评估为什么必须排在所有优化前面，把花哨的 demo 变成可维护、可回滚的生产系统。</div>
+      <div class="meta"><i>21 页</i><i>控制谱系 / 评估 / 护栏与观测</i></div>
+    </div>
+    <span class="enter">打开 →</span>
+  </a>
+
+  <a class="card" href="ch6.html">
+    <div class="num n6">六</div>
+    <div>
+      <h2>第六章 · 从 Agent 到 AGI</h2>
+      <div class="d">通向通用智能的四条路线各自赌什么，什么信号值得当真、什么信号只是演示，以及一个明确的反思：不设时间表。</div>
+      <div class="meta"><i>16 页</i><i>四条路线 / 信号 / 反思</i></div>
+    </div>
+    <span class="enter">打开 →</span>
+  </a>
+
+  <div class="foot">Agent 原理 · 六讲 · 2026-08 · 全部文件自包含，可离线打开</div>
+</div>
+</body>
+</html>
