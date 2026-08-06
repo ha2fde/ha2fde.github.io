@@ -12,7 +12,7 @@
 | 内容 | 入口 |
 |---|---|
 | 单文件书（HTML） | [`book.html`](book.html) |
-| 七讲幻灯片（HTML） | [`slides/`](slides/) — 01~07 |
+| 七讲幻灯片（HTML） | 见下面「七讲一览」— `slides/` 01~07 |
 | 配套脚本（Python ×17 + 1 Skill） | [`scripts/index.html`](scripts/index.html)（带说明的索引页） |
 | 构建 / 导出脚本 | [`build_book.py`](build_book.py) · [`export_pdf.py`](export_pdf.py) · [`pdf_to_pptx.py`](pdf_to_pptx.py) |
 | 下载中心（HTML 入口） | [`downloads.html`](downloads.html) |
