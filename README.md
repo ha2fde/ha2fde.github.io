@@ -1,47 +1,25 @@
-# Ha2fde's Site
+# ha2fde.github.io
 
-My personal website hosted on GitHub Pages.
+个人站点，GitHub Pages 托管：<https://ha2fde.github.io>
 
-Visit: https://ha2fde.github.io
+分两个区：**对外区**放成品，首页链接、搜索引擎收录；**归档区 `lab/`** 放中间过程和旧版本，首页不链接、`noindex` + `robots.txt` 挡爬虫（仓库是 public，所以这是"不显眼"而非"私密"）。
 
----
+## 东西往哪放
 
-## AI Agent 系列培训 · 整合版
+| 东西 | 去处 |
+|---|---|
+| 单个 HTML 文章，对外 | `posts/<名字>.html` |
+| 多个文件的项目，对外 | `posts/<项目名>/`，入口必须叫 `index.html` |
+| 中间过程 / 半成品 / 旧版本 | `lab/<项目名>/` |
 
-七讲一条主线：**用起来 → 懂原理 → 会开发 → 能落地 → 看远方**。一份资料，三种形态：单文件书、分讲幻灯片、可运行脚本。资料集中在 **[`ai-agent-training/`](ai-agent-training/)** 子目录，与本站其余内容相互独立。
-
-👉 **在线阅读（推荐）**：[ai-agent-training/book.html](ai-agent-training/book.html) — 七讲整合进一个 HTML 文件（约 0.49 MB，离线可读，像一本书）。
-👉 **资料总览页**：[ai-agent-training/index.html](ai-agent-training/index.html)（含脚本 / HTML / PDF / PPTX 全部入口）。
-
-### 目录结构（ai-agent-training/）
-
-| 内容 | 形态 | 入口 |
-|---|---|---|
-| **单文件书** | HTML（推荐） | [`book.html`](ai-agent-training/book.html) |
-| **七讲幻灯片** | HTML | [`slides/`](ai-agent-training/slides/) — 01~07 共 7 讲 |
-| **配套脚本** | Python ×17 + 1 Skill | [`scripts/index.html`](ai-agent-training/scripts/index.html)（索引页，带说明与复制） |
-| **PDF 导出** | 16:9 PDF | [`exports/`](ai-agent-training/exports/) — `00-全书合订本.pdf`（158 页）+ 七讲分讲 |
-| **PPTX** | 放映版 + 原生可编辑 | [`pptx/`](ai-agent-training/pptx/) |
-| **构建/导出脚本** | Python | [`build_book.py`](ai-agent-training/build_book.py) · [`export_pdf.py`](ai-agent-training/export_pdf.py) · [`pdf_to_pptx.py`](ai-agent-training/pdf_to_pptx.py) |
-| **版本记录** | Markdown | [`VERSIONS.md`](ai-agent-training/VERSIONS.md)（当前 v2.1） |
-
-### 七讲一览
-
-1. **破冰指南**（全员）— [HTML](ai-agent-training/slides/01-破冰指南.html) · [PDF](ai-agent-training/exports/01-破冰指南.pdf) · [PPTX](ai-agent-training/pptx/01-破冰指南（放映版）.pptx)
-2. **从计算机到 GPT**（懂技术）— [HTML](ai-agent-training/slides/02-从计算机到GPT.html) · [PDF](ai-agent-training/exports/02-从计算机到GPT.pdf) · [PPTX](ai-agent-training/pptx/02-从计算机到GPT（放映版）.pptx)
-3. **ChatGPT 是怎么工作的**（懂技术）— [HTML](ai-agent-training/slides/03-ChatGPT是怎么工作的.html) · [PDF](ai-agent-training/exports/03-ChatGPT是怎么工作的.pdf) · [PPTX](ai-agent-training/pptx/03-ChatGPT是怎么工作的（放映版）.pptx)
-4. **开发 Agent**（开发者）— [HTML](ai-agent-training/slides/04-开发Agent.html) · [PDF](ai-agent-training/exports/04-开发Agent.pdf) · [PPTX](ai-agent-training/pptx/04-开发Agent（放映版）.pptx) / [原生可编辑](ai-agent-training/pptx/开发Agent-从API到框架编排.pptx)
-5. **Agent 工程化全景**（技术+管理）— [HTML](ai-agent-training/slides/05-Agent工程化全景.html) · [PDF](ai-agent-training/exports/05-Agent工程化全景.pdf) · [PPTX](ai-agent-training/pptx/05-Agent工程化全景（放映版）.pptx)
-6. **通往 AGI 之路**（收束篇）— [HTML](ai-agent-training/slides/06-通往AGI之路.html) · [PDF](ai-agent-training/exports/06-通往AGI之路.pdf) · [PPTX](ai-agent-training/pptx/06-通往AGI之路（放映版）.pptx)
-7. **资料索引**（全员）— [HTML](ai-agent-training/slides/07-资料索引.html) · [PDF](ai-agent-training/exports/07-资料索引.pdf) · [PPTX](ai-agent-training/pptx/07-资料索引（放映版）.pptx)
-
-### 本地重新生成
+## 归档一个目录
 
 ```bash
-pip install pymupdf python-pptx
-python build_book.py        # slides/ 七讲 → book.html 单文件书
-python export_pdf.py        # 七讲 HTML → exports/*.pdf
-python pdf_to_pptx.py       # exports/*.pdf → pptx/*.pptx
+python3 tools/lab_push.py <目录> --desc "一句话说明"     # Windows: python tools\lab_push.py ...
 ```
 
-> 资料与本站其余页面相互独立；`ai-agent-training/` 内的相对链接在 GitHub Pages 与本地 `file://` 下均可正常打开。
+纯标准库零安装。复制 → 确认清单 → 写说明 → push。`lab/index.html` 由 GitHub Actions 重建，**不要手改**。
+
+## 完整规矩
+
+见 **[AGENTS.md](AGENTS.md)** —— 三层规则、换机器、硬禁止（不提交大二进制、不链接 `/lab/`）。所有 agent 动这个仓库前都读那一份，这里只是摘要。

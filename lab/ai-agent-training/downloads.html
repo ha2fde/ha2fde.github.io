@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>下载中心 · AI Agent 系列培训整合版 v1</title>
+<style>
+  :root{
+    --blue:#2563EB; --blue-dark:#1D4ED8; --panel:#EFF6FF;
+    --ink:#1F2937; --gray:#6B7280; --faint:#9CA3AF;
+    --line:#E2E8F0; --bg:#E8EDF4;
+    --font:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--font);color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;line-height:1.6}
+  .wrap{max-width:1100px;margin:0 auto;padding:44px 32px 64px}
+  .back{display:inline-block;font-size:13.5px;color:var(--blue);text-decoration:none;margin-bottom:18px}
+  .back:hover{text-decoration:underline}
+  .kicker{font-size:14px;font-weight:600;letter-spacing:.14em;color:var(--blue);margin-bottom:10px}
+  h1{font-size:34px;font-weight:800;letter-spacing:-.01em;margin-bottom:10px}
+  .sub{font-size:16px;color:var(--gray);max-width:800px}
+
+  .fmt{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:26px 0 8px}
+  .fmt div{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px}
+  .fmt b{display:block;font-size:14.5px;color:var(--blue-dark);margin-bottom:3px}
+  .fmt span{font-size:13px;color:var(--gray)}
+
+  table{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border:1px solid var(--line);
+    border-radius:14px;overflow:hidden;margin-top:22px;font-size:14px}
+  th{text-align:left;font-size:12.5px;letter-spacing:.06em;color:var(--gray);font-weight:600;
+    background:#F8FAFC;padding:12px 16px;border-bottom:1px solid var(--line);white-space:nowrap}
+  td{padding:13px 16px;border-bottom:1px solid #F1F5F9;vertical-align:middle}
+  tr:last-child td{border-bottom:none}
+  tr:hover td{background:#FAFCFF}
+  .t{font-weight:600;font-size:14.5px}
+  .t small{display:block;font-weight:400;font-size:12.5px;color:var(--gray);margin-top:2px}
+  .p{font-size:12.5px;color:var(--gray);white-space:nowrap}
+  a.dl{display:inline-block;font-size:12.5px;font-weight:600;text-decoration:none;border-radius:7px;
+    padding:5px 12px;margin-right:6px;border:1px solid transparent;white-space:nowrap}
+  a.web{color:var(--blue-dark);background:var(--panel);border-color:#BFD4F7}
+  a.pdf{color:#B91C1C;background:#FEF2F2;border-color:#FCA5A5}
+  a.ppt{color:#B45309;background:#FEF3E2;border-color:#F59E0B}
+  a.src{color:#0E7490;background:#ECFEFF;border-color:#67E8F9}
+  a.dl:hover{filter:brightness(.96)}
+  span.gone{color:#9CA3AF;background:#F3F4F6;border-color:#E5E7EB;text-decoration:line-through;cursor:not-allowed}
+  .note{margin-top:24px;background:#fff;border:1px dashed #C7D2E0;border-radius:14px;padding:18px 22px;font-size:13.5px;color:var(--gray)}
+  .note b{color:var(--ink)}
+  .note ul{margin:8px 0 0 18px}
+  .note li{margin-bottom:5px}
+  footer{margin-top:30px;font-size:12.5px;color:var(--faint);border-top:1px solid var(--line);padding-top:14px}
+  code{background:#F3F4F6;border-radius:4px;padding:1px 6px;font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a class="back" href="index.html">← 返回课程主页</a>
+  <div class="kicker">DOWNLOAD CENTER</div>
+  <h1>下载中心 · 七讲全套</h1>
+  <p class="sub">网页版可直接打开。<b>PDF 与 PPTX 已从仓库剥离</b>（原本 41 MB，是纯派生产物），下方划掉的按钮表示该格式需要本地重新生成，方法见页面底部。全部为 960×540 标准 16:9，共 154 页。</p>
+
+  <div class="fmt">
+    <div><b>网页版 HTML</b><span>体验最好：← → 翻页、O 键总览、P 键打印，导航悬浮不遮挡正文</span></div>
+    <div><b>PDF（16:9）</b><span>已剥离 · 本地 <code>python export_pdf.py</code> 重新生成</span></div>
+    <div><b>PPTX 放映版</b><span>已剥离 · 本地 <code>python pdf_to_pptx.py</code> 重新生成</span></div>
+    <div><b>PPTX 原生版</b><span>已剥离 · 仅第 1、4 讲曾有，无法脚本再生</span></div>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th style="width:34%">讲次</th><th style="width:8%">页数</th><th>下载</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="t">第 1 讲 · AI Agent 破冰指南<small>装上、用起来（全员）</small></td>
+        <td class="p">28 页</td>
+        <td>
+          <a class="dl web" href="slides/01-破冰指南.html">网页</a>
+          <span class="dl gone" title="已从仓库剥离，见页面下方说明">PDF</span>
+          <span class="dl gone" title="已从仓库剥离，见页面下方说明">PPTX 放映</span>
+          <span class="dl gone" title="已从仓库剥离，见页面下方说明">PPTX 原生</span>
+        </td>
+      </tr>
+      <tr>
+        <td class="t">第 2 讲 · 从计算机到 GPT<small>大模型怎么一步步长出来</small></td>
+        <td class="p">18 页</td>
+        <td>
+          <a class="dl web" href="slides/02-从计算机到GPT.html">网页</a>
+          <span class="dl gone" title="已从仓库剥离，见页面下方说明">PDF</span>
+          <span class="dl gone" title="已从仓库剥离，见页面下方说明">PPTX 放映</span>
+        </td>
+      </tr>
+      <tr>
+        <td class="t">第 3 讲 · ChatGPT 是怎么工作的<small>从接话机器到会干活的助手（含并入的 4 页工程内容）</small></td>
+        <td class="p">24 页</td>
+        <td>
+          <a class="dl web" href="slides/03-ChatGPT是怎么工作的.html">网页</a>
+          <span class="dl gone" title="已从仓库剥离，见页面下方说明">PDF</span>
+          <span class="dl gone" title="已从仓库剥离，见页面下方说明">PPTX 放映</span>
+        </td>
+      </tr>
+      <tr>
+        <td class="t">第 4 讲 · 开发 Agent<small>从直接调 API 到用框架编排（开发者）</small></td>
+        <td class="p">19 页</td>
+        <td>
+          <a class="dl web" href="slides/04-开发Agent.html">网页</a>
+          <span class="dl gone" title="已从仓库剥离，见页面下方说明">PDF</span>
+          <span class="dl gone" title="已从仓库剥离，见页面下方说明">PPTX 放映</span>
+          <span class="dl gone" title="已从仓库剥离，见页面下方说明">PPTX 原生</span>
+        </td>
+      </tr>
+      <tr>
+        <td class="t">第 5 讲 · Agent 工程化全景<small>从能用到能信、能管、能连、能落地</small></td>
+        <td class="p">26 页</td>
+        <td>
+          <a class="dl web" href="slides/05-Agent工程化全景.html">网页</a>
+          <span class="dl gone" title="已从仓库剥离，见页面下方说明">PDF</span>
+          <span class="dl gone" title="已从仓库剥离，见页面下方说明">PPTX 放映</span>
+        </td>
+      </tr>
+      <tr>
+        <td class="t">第 6 讲 · 通往 AGI 之路<small>系列收束篇：苦涩的教训 → 体验的时代</small></td>
+        <td class="p">27 页</td>
+        <td>
+          <a class="dl web" href="slides/06-通往AGI之路.html">网页</a>
+          <span class="dl gone" title="已从仓库剥离，见页面下方说明">PDF</span>
+          <span class="dl gone" title="已从仓库剥离，见页面下方说明">PPTX 放映</span>
+        </td>
+      </tr>
+      <tr>
+        <td class="t">第 7 讲 · 权威资料索引<small>23 条精选资料的课后深造地图</small></td>
+        <td class="p">12 页</td>
+        <td>
+          <a class="dl web" href="slides/07-资料索引.html">网页</a>
+          <span class="dl gone" title="已从仓库剥离，见页面下方说明">PDF</span>
+          <span class="dl gone" title="已从仓库剥离，见页面下方说明">PPTX 放映</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    <b>几点说明</b>
+    <ul>
+      <li><b>PDF / PPTX 为什么没了</b>：22 MB PDF + 19 MB PPTX 把仓库撑到了 73 MB，而它们完全可以由 <code>slides/*.html</code> 再生，所以从仓库剥离。需要时本地跑：<code>pip install pymupdf python-pptx</code> → <code>python export_pdf.py</code> → <code>python pdf_to_pptx.py</code>。</li>
+      <li><b>自己重新导 PDF</b>：网页里按 <code>P</code> 或 Ctrl+P，纸张选「横向」、边距「无」、勾选「背景图形」，缩放 100%，即得同样的 16:9 PDF。</li>
+      <li><b>配套代码</b>见 <a class="back" style="margin:0" href="scripts/index.html">脚本索引（17 个）</a>，覆盖第 2、3、4 讲的可运行演示，纯 CPU 可跑。</li>
+      <li><b>原始文件未被改动</b>，本目录是独立拷贝。</li>
+    </ul>
+  </div>
+
+  <footer>整合版 v1 · 2026-08-03 ｜ 七讲共 154 页 ｜ PDF 与 PPTX 由 <code>slides/*.html</code> 自动导出，需要时本地再生</footer>
+
+</div>
+</body>
+</html>

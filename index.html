@@ -59,6 +59,16 @@
         .hidden { display: none !important; }
 
         footer { text-align: center; padding: 2rem; color: #999; font-size: 0.85rem; }
+
+        .section-h {
+            font-size: 0.8rem; font-weight: 600; letter-spacing: 0.1em; color: #aaa;
+            margin: 0.5rem 0 0.8rem;
+        }
+        .post.work {
+            border-bottom: none; background: #fff; border: 1px solid #e6edf5;
+            border-radius: 10px; padding: 1.5rem; margin-bottom: 2rem;
+        }
+        .post.work:hover { border-color: #cfe1f5; }
     </style>
 </head>
 <body>
@@ -67,11 +77,23 @@
             <h1>Ha2fde's Blog</h1>
             <p>记录技术学习笔记</p>
             <div class="nav">
-                <a href="/ai-agent-training/">AI Agent 培训</a>
+                <a href="posts/agent-principles/">Agent 原理与实践</a>
                 <a href="https://github.com/ha2fde">GitHub</a>
             </div>
         </header>
 
+        <div class="section-h">作品</div>
+        <div class="post work">
+            <div class="post-thumb" style="background:#eef6ff; font-size: 2rem;">🧭</div>
+            <div class="post-content">
+                <div class="post-cat agent">六章 · 幻灯片</div>
+                <div class="post-title"><a href="posts/agent-principles/index.html">Agent 原理与实践</a></div>
+                <div class="post-meta">6 章 · 约 150 分钟 · 2026-08-06</div>
+                <div class="post-desc">从装上第一个 Agent 讲到 AGI 的五条路线：客户端与模型怎么组合、Transformer 为什么管用、续写模型怎么变成会干活的东西、tools 与 MCP 各自解决什么、上线前必须答上来的问题。键盘翻页，浏览器直接看。</div>
+            </div>
+        </div>
+
+        <div class="section-h">文章</div>
         <div class="tabs">
             <div class="tab active" data-tab="all" onclick="filterPosts('all')">全部</div>
             <div class="tab" data-tab="agent" onclick="filterPosts('agent')">AI Agent</div>

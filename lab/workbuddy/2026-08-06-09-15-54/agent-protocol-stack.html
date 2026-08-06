@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent 协议栈 — 从 Tools 到 A2A</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --panel2:#1c2330; --border:#30363d;
+    --text:#e6edf3; --dim:#8b949e; --faint:#6e7681;
+    --blue:#58a6ff; --purple:#bc8cff; --green:#3fb950; --orange:#d29922;
+    --red:#f85149; --teal:#39c5cf; --pink:#f778ba;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;background:var(--bg);color:var(--text);
+    font-family:-apple-system,"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;overflow:hidden}
+  .deck{position:relative;width:100vw;height:100vh}
+  .slide{position:absolute;inset:0;display:none;flex-direction:column;
+    padding:56px 72px 70px;overflow:hidden}
+  .slide.active{display:flex}
+  .kicker{font-size:15px;letter-spacing:3px;color:var(--blue);font-weight:600;margin-bottom:10px}
+  h1{font-size:52px;line-height:1.2;font-weight:700}
+  h2{font-size:34px;font-weight:700;margin-bottom:6px}
+  .sub{font-size:18px;color:var(--dim);margin-bottom:26px}
+  .body{flex:1;display:flex;gap:34px;min-height:0}
+  .col{flex:1;min-width:0;display:flex;flex-direction:column;gap:14px;justify-content:center}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px 20px}
+  .card h3{font-size:17px;margin-bottom:8px}
+  .card p,.card li{font-size:15px;color:var(--dim);line-height:1.75}
+  ul{list-style:none}
+  li{padding-left:18px;position:relative}
+  li::before{content:"▸";position:absolute;left:0;color:var(--blue)}
+  li b, p b{color:var(--text)}
+  code{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.88em;
+    background:#21262d;padding:2px 7px;border-radius:5px;color:var(--teal)}
+  pre{background:#0a0d12;border:1px solid var(--border);border-radius:10px;
+    padding:16px 18px;font-family:"SF Mono",Menlo,Consolas,monospace;font-size:13.5px;
+    line-height:1.7;color:#c9d1d9;overflow:auto}
+  pre .k{color:var(--purple)} pre .s{color:#a5d6ff} pre .c{color:var(--faint)} pre .f{color:var(--orange)}
+  .tag{display:inline-block;font-size:12px;padding:2px 10px;border-radius:20px;
+    border:1px solid var(--border);color:var(--dim);margin-right:6px}
+  .hl{color:var(--orange);font-weight:600}
+  .accent{color:var(--blue)}
+  .footer{position:absolute;bottom:22px;left:72px;right:72px;display:flex;
+    justify-content:space-between;align-items:center;color:var(--faint);font-size:13px}
+  .progress{position:fixed;top:0;left:0;height:3px;background:var(--blue);
+    transition:width .3s;z-index:10}
+  .nav{position:fixed;bottom:20px;right:28px;display:flex;gap:10px;z-index:10}
+  .nav button{background:var(--panel);color:var(--text);border:1px solid var(--border);
+    width:40px;height:40px;border-radius:8px;font-size:17px;cursor:pointer}
+  .nav button:hover{border-color:var(--blue);color:var(--blue)}
+  table{border-collapse:collapse;width:100%;font-size:14px}
+  th,td{border:1px solid var(--border);padding:10px 13px;text-align:left;vertical-align:top;line-height:1.6}
+  th{background:var(--panel2);font-weight:600;font-size:14px}
+  td{color:var(--dim)}
+  td:first-child{color:var(--text);font-weight:600;white-space:nowrap}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+  .note{font-size:13.5px;color:var(--faint);border-left:3px solid var(--orange);padding-left:12px;line-height:1.7}
+  svg text{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif}
+  .big-num{font-size:44px;font-weight:800;color:var(--blue);line-height:1}
+  .quote{font-size:20px;line-height:1.9;color:var(--text);border-left:4px solid var(--blue);padding-left:20px}
+  .center{align-items:center;justify-content:center;text-align:center}
+</style>
+</head>
+<body>
+<div class="progress" id="bar"></div>
+<div class="deck" id="deck">
+
+<!-- ============ S1 封面 ============ -->
+<section class="slide center">
+  <div class="kicker">AGENT ENGINEERING · 协议层</div>
+  <h1>Agent 协议栈</h1>
+  <p style="font-size:24px;color:var(--dim);margin-top:16px">从 Tools 到 A2A —— 实体、流程与共通本质</p>
+  <div style="margin-top:44px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+    <span class="tag" style="border-color:var(--blue);color:var(--blue)">Tools / Function Calling</span>
+    <span class="tag" style="border-color:var(--purple);color:var(--purple)">MCP</span>
+    <span class="tag" style="border-color:var(--green);color:var(--green)">CLI</span>
+    <span class="tag" style="border-color:var(--orange);color:var(--orange)">ACI</span>
+    <span class="tag" style="border-color:var(--teal);color:var(--teal)">Skills</span>
+    <span class="tag" style="border-color:var(--pink);color:var(--pink)">A2A</span>
+  </div>
+  <p style="margin-top:44px;color:var(--faint);font-size:15px">前置已完成：AI → Transformer（概念层）✓ &nbsp;·&nbsp; Chat → Agent（工程层）✓ &nbsp;·&nbsp; 本篇：协议与接口层</p>
+</section>
+
+<!-- ============ S2 全景地图 ============ -->
+<section class="slide">
+  <div class="kicker">OVERVIEW</div>
+  <h2>一张地图：Agent 协议栈全景</h2>
+  <p class="sub">所有协议回答同一个问题：<span class="hl">模型如何安全、标准地触达外部世界</span></p>
+  <div class="body">
+    <svg viewBox="0 0 1100 470" style="width:100%;height:100%">
+      <!-- L0 model -->
+      <rect x="380" y="10" width="340" height="56" rx="12" fill="#1c2330" stroke="#58a6ff" stroke-width="2"/>
+      <text x="550" y="35" text-anchor="middle" fill="#e6edf3" font-size="17" font-weight="700">LLM（大脑）</text>
+      <text x="550" y="55" text-anchor="middle" fill="#8b949e" font-size="12">只会输出 token，不会执行任何动作</text>
+      <!-- ACI layer -->
+      <rect x="60" y="100" width="980" height="52" rx="12" fill="none" stroke="#d29922" stroke-width="2" stroke-dasharray="8 5"/>
+      <text x="550" y="132" text-anchor="middle" fill="#d29922" font-size="16" font-weight="700">ACI — Agent-Computer Interface（智能体与计算机的接口层 · 本篇核心概念）</text>
+      <!-- three impls -->
+      <rect x="80" y="185" width="280" height="70" rx="12" fill="#161b22" stroke="#58a6ff" stroke-width="1.5"/>
+      <text x="220" y="215" text-anchor="middle" fill="#58a6ff" font-size="17" font-weight="700">Tools</text>
+      <text x="220" y="238" text-anchor="middle" fill="#8b949e" font-size="12.5">代码内直连 · 应用自有</text>
+      <rect x="410" y="185" width="280" height="70" rx="12" fill="#161b22" stroke="#bc8cff" stroke-width="1.5"/>
+      <text x="550" y="215" text-anchor="middle" fill="#bc8cff" font-size="17" font-weight="700">MCP</text>
+      <text x="550" y="238" text-anchor="middle" fill="#8b949e" font-size="12.5">标准化工具协议 · 跨应用复用</text>
+      <rect x="740" y="185" width="280" height="70" rx="12" fill="#161b22" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="880" y="215" text-anchor="middle" fill="#3fb950" font-size="17" font-weight="700">CLI</text>
+      <text x="880" y="238" text-anchor="middle" fill="#8b949e" font-size="12.5">把 shell 当作万能工具</text>
+      <!-- skills -->
+      <rect x="80" y="290" width="450" height="70" rx="12" fill="#161b22" stroke="#39c5cf" stroke-width="1.5"/>
+      <text x="305" y="320" text-anchor="middle" fill="#39c5cf" font-size="17" font-weight="700">Skills</text>
+      <text x="305" y="343" text-anchor="middle" fill="#8b949e" font-size="12.5">教 agent「怎么做」的知识与流程（上下文工程）</text>
+      <!-- a2a -->
+      <rect x="570" y="290" width="450" height="70" rx="12" fill="#161b22" stroke="#f778ba" stroke-width="1.5"/>
+      <text x="795" y="320" text-anchor="middle" fill="#f778ba" font-size="17" font-weight="700">A2A</text>
+      <text x="795" y="343" text-anchor="middle" fill="#8b949e" font-size="12.5">agent 与 agent 之间的协作协议（横向）</text>
+      <!-- world -->
+      <rect x="60" y="395" width="980" height="56" rx="12" fill="#1c2330" stroke="#30363d"/>
+      <text x="550" y="420" text-anchor="middle" fill="#e6edf3" font-size="15" font-weight="600">外部世界</text>
+      <text x="550" y="440" text-anchor="middle" fill="#8b949e" font-size="12.5">API · 数据库 · 文件系统 · 浏览器 · 命令行 · 其他 Agent · 人</text>
+      <!-- arrows -->
+      <line x1="550" y1="66" x2="550" y2="98" stroke="#58a6ff" stroke-width="2"/>
+      <line x1="220" y1="152" x2="220" y2="183" stroke="#30363d" stroke-width="2"/>
+      <line x1="550" y1="152" x2="550" y2="183" stroke="#30363d" stroke-width="2"/>
+      <line x1="880" y1="152" x2="880" y2="183" stroke="#30363d" stroke-width="2"/>
+      <line x1="220" y1="255" x2="220" y2="393" stroke="#30363d" stroke-width="2"/>
+      <line x1="550" y1="255" x2="550" y2="393" stroke="#30363d" stroke-width="2"/>
+      <line x1="880" y1="255" x2="880" y2="290" stroke="#30363d" stroke-width="2"/>
+      <line x1="305" y1="360" x2="305" y2="393" stroke="#30363d" stroke-width="2"/>
+      <line x1="795" y1="360" x2="795" y2="393" stroke="#30363d" stroke-width="2"/>
+      <line x1="880" y1="360" x2="880" y2="393" stroke="#30363d" stroke-width="2"/>
+    </svg>
+  </div>
+  <p class="note" style="margin-top:6px">读法：Tools / MCP / CLI 是 ACI 的<b>三种实现</b>；Skills 叠加在上层<b>提供方法论</b>；A2A 解决<b>多个 Agent 横向协作</b>。下面逐一拆解。</p>
+</section>
+
+<!-- ============ S3 Tools 定义 ============ -->
+<section class="slide">
+  <div class="kicker">PART 1 · TOOLS</div>
+  <h2>Tools（Function Calling）：一切的开始</h2>
+  <p class="sub">核心事实：<span class="hl">LLM 从不执行工具，它只输出一个「调用请求」的 JSON</span>，由宿主程序执行后把结果回填</p>
+  <div class="body">
+    <div class="col">
+      <div class="card">
+        <h3>一个 Tool 的三要素</h3>
+        <ul>
+          <li><b>name</b> —— 函数名，模型决策的依据之一</li>
+          <li><b>description</b> —— 自然语言说明「何时用、怎么用」，<span class="hl">写得好坏直接决定调用准确率</span></li>
+          <li><b>parameters</b> —— JSON Schema 定义的入参结构</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>为什么这是范式级突破</h3>
+        <p>把「模型输出文本」变成「模型输出<b>结构化的、可执行的意图</b>」。从这一刻起，聊天机器人变成了可以行动的系统 —— 这正是从 Chat 到 Agent 的那个分水岭。</p>
+      </div>
+    </div>
+    <div class="col">
+<pre>{
+  <span class="k">"name"</span>: <span class="s">"get_weather"</span>,
+  <span class="k">"description"</span>: <span class="s">"查询指定城市的实时天气，
+    当用户问到天气、温度、
+    是否下雨时使用"</span>,
+  <span class="k">"parameters"</span>: {
+    <span class="k">"type"</span>: <span class="s">"object"</span>,
+    <span class="k">"properties"</span>: {
+      <span class="k">"city"</span>: {<span class="k">"type"</span>: <span class="s">"string"</span>}
+    },
+    <span class="k">"required"</span>: [<span class="s">"city"</span>]
+  }
+}</pre>
+      <p class="note">模型看到的不是代码，而是这份 Schema + 描述。所以 Tool 设计本质上是「写给模型看的 API 文档」。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ S4 Tools 流程图 ============ -->
+<section class="slide">
+  <div class="kicker">PART 1 · TOOLS</div>
+  <h2>Tools 调用循环（Agent Loop 的最小单元）</h2>
+  <p class="sub">五个实体、一个循环 —— 记住这张图，后面所有协议都是它的变体</p>
+  <div class="body">
+    <svg viewBox="0 0 1100 480" style="width:100%;height:100%">
+      <defs>
+        <marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M0,0 L8,4 L0,8 z" fill="#8b949e"/>
+        </marker>
+        <marker id="arb" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M0,0 L8,4 L0,8 z" fill="#58a6ff"/>
+        </marker>
+        <marker id="arg" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+          <path d="M0,0 L8,4 L0,8 z" fill="#3fb950"/>
+        </marker>
+      </defs>
+      <!-- entities -->
+      <rect x="30" y="30" width="180" height="64" rx="10" fill="#161b22" stroke="#8b949e"/>
+      <text x="120" y="58" text-anchor="middle" fill="#e6edf3" font-size="16" font-weight="700">用户</text>
+      <text x="120" y="78" text-anchor="middle" fill="#8b949e" font-size="12">提出需求</text>
+
+      <rect x="300" y="30" width="220" height="64" rx="10" fill="#1c2330" stroke="#d29922" stroke-width="2"/>
+      <text x="410" y="58" text-anchor="middle" fill="#e6edf3" font-size="16" font-weight="700">宿主程序 / Agent</text>
+      <text x="410" y="78" text-anchor="middle" fill="#8b949e" font-size="12">编排循环 · 真正执行动作</text>
+
+      <rect x="610" y="30" width="200" height="64" rx="10" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+      <text x="710" y="58" text-anchor="middle" fill="#e6edf3" font-size="16" font-weight="700">LLM</text>
+      <text x="710" y="78" text-anchor="middle" fill="#8b949e" font-size="12">决策：要不要调工具</text>
+
+      <rect x="900" y="30" width="170" height="64" rx="10" fill="#161b22" stroke="#3fb950"/>
+      <text x="985" y="58" text-anchor="middle" fill="#e6edf3" font-size="16" font-weight="700">Tool 实现</text>
+      <text x="985" y="78" text-anchor="middle" fill="#8b949e" font-size="12">一段普通代码</text>
+
+      <!-- steps -->
+      <line x1="210" y1="62" x2="296" y2="62" stroke="#8b949e" stroke-width="1.5" marker-end="url(#ar)"/>
+      <text x="253" y="52" text-anchor="middle" fill="#8b949e" font-size="12">① 提问</text>
+
+      <!-- agent -> llm -->
+      <path d="M 520 45 L 606 45" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#arb)"/>
+      <text x="563" y="35" text-anchor="middle" fill="#58a6ff" font-size="12">② 消息 + 工具 Schema 列表</text>
+
+      <!-- llm -> agent tool_call -->
+      <path d="M 606 84 L 524 84" stroke="#bc8cff" stroke-width="1.5" marker-end="url(#ar)"/>
+      <text x="565" y="104" text-anchor="middle" fill="#bc8cff" font-size="12">③ tool_call JSON（name + arguments）</text>
+
+      <!-- agent -> tool -->
+      <path d="M 520 62 L 700 62 L 700 130 L 985 130 L 985 98" stroke="#3fb950" stroke-width="1.5" fill="none" marker-end="url(#arg)"/>
+      <text x="840" y="122" text-anchor="middle" fill="#3fb950" font-size="12">④ 宿主执行：调用真实代码 / API</text>
+
+      <!-- tool -> agent result -->
+      <path d="M 985 94 L 985 165 L 410 165 L 410 98" stroke="#3fb950" stroke-width="1.5" fill="none" stroke-dasharray="6 4" marker-end="url(#arg)"/>
+      <text x="700" y="158" text-anchor="middle" fill="#3fb950" font-size="12">⑤ 结果回填为 role=tool 的消息</text>
+
+      <!-- loop back to llm -->
+      <path d="M 410 98 L 410 210 L 710 210 L 710 98" stroke="#58a6ff" stroke-width="1.5" fill="none" stroke-dasharray="6 4" marker-end="url(#arb)"/>
+      <text x="560" y="203" text-anchor="middle" fill="#58a6ff" font-size="12">⑥ 带着结果再问 LLM（循环，直到不再需要工具）</text>
+
+      <!-- final answer -->
+      <path d="M 710 98 L 710 255 L 120 255 L 120 98" stroke="#d29922" stroke-width="2" fill="none" marker-end="url(#ar)"/>
+      <text x="400" y="248" text-anchor="middle" fill="#d29922" font-size="13">⑦ 生成最终回答</text>
+
+      <!-- loop badge -->
+      <rect x="440" y="290" width="220" height="46" rx="23" fill="none" stroke="#d29922" stroke-dasharray="6 4"/>
+      <text x="550" y="318" text-anchor="middle" fill="#d29922" font-size="14" font-weight="600">②~⑥ 可能循环 N 次</text>
+
+      <!-- key insight -->
+      <rect x="60" y="360" width="980" height="100" rx="12" fill="#161b22" stroke="#30363d"/>
+      <text x="90" y="395" fill="#e6edf3" font-size="15" font-weight="700">关键洞察</text>
+      <text x="90" y="420" fill="#8b949e" font-size="13.5">· LLM 的「工具调用」只是文本协议：约定一种特殊 JSON 输出格式，宿主负责解析并执行</text>
+      <text x="90" y="444" fill="#8b949e" font-size="13.5">· 上下文里累积的 tool_call + tool_result 构成了 agent 的「记忆」，循环就是在这个上下文上滚动</text>
+    </svg>
+  </div>
+</section>
+
+<!-- ============ S5 N×M ============ -->
+<section class="slide">
+  <div class="kicker">PART 2 · MCP</div>
+  <h2>Tools 的痛点 → MCP 的动机</h2>
+  <p class="sub">工具逻辑写在每个应用内部：N 个 Agent 应用 × M 个外部服务 = <span class="hl">N×M 份重复适配代码</span></p>
+  <div class="body">
+    <div class="col">
+      <svg viewBox="0 0 480 330" style="width:100%">
+        <!-- before -->
+        <text x="240" y="24" text-anchor="middle" fill="#f85149" font-size="15" font-weight="700">没有 MCP：N×M</text>
+        <rect x="20" y="50" width="110" height="40" rx="8" fill="#161b22" stroke="#58a6ff"/>
+        <text x="75" y="75" text-anchor="middle" fill="#e6edf3" font-size="13">Claude App</text>
+        <rect x="20" y="110" width="110" height="40" rx="8" fill="#161b22" stroke="#58a6ff"/>
+        <text x="75" y="135" text-anchor="middle" fill="#e6edf3" font-size="13">IDE 插件</text>
+        <rect x="20" y="170" width="110" height="40" rx="8" fill="#161b22" stroke="#58a6ff"/>
+        <text x="75" y="195" text-anchor="middle" fill="#e6edf3" font-size="13">自研 Agent</text>
+        <rect x="350" y="50" width="110" height="40" rx="8" fill="#161b22" stroke="#3fb950"/>
+        <text x="405" y="75" text-anchor="middle" fill="#e6edf3" font-size="13">GitHub</text>
+        <rect x="350" y="110" width="110" height="40" rx="8" fill="#161b22" stroke="#3fb950"/>
+        <text x="405" y="135" text-anchor="middle" fill="#e6edf3" font-size="13">数据库</text>
+        <rect x="350" y="170" width="110" height="40" rx="8" fill="#161b22" stroke="#3fb950"/>
+        <text x="405" y="195" text-anchor="middle" fill="#e6edf3" font-size="13">飞书</text>
+        <g stroke="#f85149" stroke-width="1" opacity=".6">
+          <line x1="130" y1="70" x2="348" y2="70"/><line x1="130" y1="70" x2="348" y2="130"/><line x1="130" y1="70" x2="348" y2="190"/>
+          <line x1="130" y1="130" x2="348" y2="70"/><line x1="130" y1="130" x2="348" y2="130"/><line x1="130" y1="130" x2="348" y2="190"/>
+          <line x1="130" y1="190" x2="348" y2="70"/><line x1="130" y1="190" x2="348" y2="130"/><line x1="130" y1="190" x2="348" y2="190"/>
+        </g>
+        <text x="240" y="255" text-anchor="middle" fill="#8b949e" font-size="13">每个应用都为每个服务写一套对接 + 鉴权 + 重试</text>
+        <text x="240" y="300" text-anchor="middle" fill="#e6edf3" font-size="14" font-weight="600">类比：USB 出现之前，每种设备一种接口</text>
+      </svg>
+    </div>
+    <div class="col">
+      <svg viewBox="0 0 480 330" style="width:100%">
+        <text x="240" y="24" text-anchor="middle" fill="#3fb950" font-size="15" font-weight="700">有了 MCP：N + M</text>
+        <rect x="20" y="50" width="110" height="40" rx="8" fill="#161b22" stroke="#58a6ff"/>
+        <text x="75" y="75" text-anchor="middle" fill="#e6edf3" font-size="13">Claude App</text>
+        <rect x="20" y="110" width="110" height="40" rx="8" fill="#161b22" stroke="#58a6ff"/>
+        <text x="75" y="135" text-anchor="middle" fill="#e6edf3" font-size="13">IDE 插件</text>
+        <rect x="20" y="170" width="110" height="40" rx="8" fill="#161b22" stroke="#58a6ff"/>
+        <text x="75" y="195" text-anchor="middle" fill="#e6edf3" font-size="13">自研 Agent</text>
+        <!-- MCP bus -->
+        <rect x="185" y="40" width="110" height="180" rx="12" fill="#1c2330" stroke="#bc8cff" stroke-width="2"/>
+        <text x="240" y="125" text-anchor="middle" fill="#bc8cff" font-size="18" font-weight="800">MCP</text>
+        <text x="240" y="148" text-anchor="middle" fill="#8b949e" font-size="11.5">标准协议层</text>
+        <rect x="350" y="50" width="110" height="40" rx="8" fill="#161b22" stroke="#3fb950"/>
+        <text x="405" y="75" text-anchor="middle" fill="#e6edf3" font-size="13">GitHub</text>
+        <rect x="350" y="110" width="110" height="40" rx="8" fill="#161b22" stroke="#3fb950"/>
+        <text x="405" y="135" text-anchor="middle" fill="#e6edf3" font-size="13">数据库</text>
+        <rect x="350" y="170" width="110" height="40" rx="8" fill="#161b22" stroke="#3fb950"/>
+        <text x="405" y="195" text-anchor="middle" fill="#e6edf3" font-size="13">飞书</text>
+        <g stroke="#3fb950" stroke-width="1.5">
+          <line x1="130" y1="70" x2="183" y2="70"/><line x1="130" y1="130" x2="183" y2="130"/><line x1="130" y1="190" x2="183" y2="190"/>
+          <line x1="297" y1="70" x2="348" y2="70"/><line x1="297" y1="130" x2="348" y2="130"/><line x1="297" y1="190" x2="348" y2="190"/>
+        </g>
+        <text x="240" y="255" text-anchor="middle" fill="#8b949e" font-size="13">服务方写一次 MCP Server，所有应用即插即用</text>
+        <text x="240" y="300" text-anchor="middle" fill="#e6edf3" font-size="14" font-weight="600">MCP ≈ AI 应用的 USB-C 接口（官方原话）</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ============ S6 MCP 实体 ============ -->
+<section class="slide">
+  <div class="kicker">PART 2 · MCP</div>
+  <h2>MCP 的四个实体：谁是谁</h2>
+  <p class="sub">2024.11 由 Anthropic 发布并开源 —— 先把实体关系图刻进脑子，协议细节都是填充</p>
+  <div class="body">
+    <svg viewBox="0 0 1100 470" style="width:100%;height:100%">
+      <defs><marker id="ar2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#bc8cff"/></marker></defs>
+      <!-- host boundary -->
+      <rect x="40" y="30" width="560" height="300" rx="16" fill="#10141c" stroke="#d29922" stroke-width="1.5" stroke-dasharray="8 5"/>
+      <text x="70" y="62" fill="#d29922" font-size="15" font-weight="700">① MCP Host（Agent 应用本体）</text>
+      <text x="70" y="84" fill="#8b949e" font-size="12.5">例：Claude Desktop / Cursor / WorkBuddy / 你的自研 Agent —— 用户面对的那个程序</text>
+      <!-- inside host -->
+      <rect x="80" y="110" width="200" height="90" rx="10" fill="#161b22" stroke="#58a6ff"/>
+      <text x="180" y="145" text-anchor="middle" fill="#e6edf3" font-size="15" font-weight="700">LLM + Agent 循环</text>
+      <text x="180" y="168" text-anchor="middle" fill="#8b949e" font-size="12">决策用哪个工具</text>
+      <text x="180" y="186" text-anchor="middle" fill="#8b949e" font-size="12">（即 S4 的循环）</text>
+      <rect x="340" y="110" width="220" height="90" rx="10" fill="#161b22" stroke="#bc8cff" stroke-width="2"/>
+      <text x="450" y="140" text-anchor="middle" fill="#bc8cff" font-size="15" font-weight="700">② MCP Client × N</text>
+      <text x="450" y="162" text-anchor="middle" fill="#8b949e" font-size="12">Host 内置的协议客户端</text>
+      <text x="450" y="180" text-anchor="middle" fill="#8b949e" font-size="12">每个 Client 与一个 Server 保持 1:1 会话</text>
+      <line x1="280" y1="155" x2="336" y2="155" stroke="#8b949e" stroke-width="1.5" marker-end="url(#ar2)"/>
+      <text x="308" y="145" text-anchor="middle" fill="#8b949e" font-size="11">转发 tool_call</text>
+      <!-- client config hint -->
+      <text x="70" y="240" fill="#6e7681" font-size="12">Host 的配置文件（如 mcp.json）声明要连哪些 Server、用什么命令启动 —— 连接哪些能力，由用户/开发者决定</text>
+      <!-- servers -->
+      <rect x="680" y="30" width="180" height="80" rx="10" fill="#161b22" stroke="#bc8cff" stroke-width="2"/>
+      <text x="770" y="62" text-anchor="middle" fill="#bc8cff" font-size="14" font-weight="700">③ MCP Server A</text>
+      <text x="770" y="84" text-anchor="middle" fill="#8b949e" font-size="11.5">轻量适配层（几百行代码）</text>
+      <rect x="680" y="130" width="180" height="80" rx="10" fill="#161b22" stroke="#bc8cff" stroke-width="2"/>
+      <text x="770" y="162" text-anchor="middle" fill="#bc8cff" font-size="14" font-weight="700">③ MCP Server B</text>
+      <text x="770" y="184" text-anchor="middle" fill="#8b949e" font-size="11.5">协议翻译 + 鉴权 + 限流</text>
+      <rect x="680" y="230" width="180" height="80" rx="10" fill="#161b22" stroke="#bc8cff" stroke-width="2"/>
+      <text x="770" y="262" text-anchor="middle" fill="#bc8cff" font-size="14" font-weight="700">③ MCP Server C</text>
+      <text x="770" y="284" text-anchor="middle" fill="#8b949e" font-size="11.5">可以是本地子进程或远程服务</text>
+      <!-- origins -->
+      <rect x="920" y="30" width="150" height="80" rx="10" fill="#161b22" stroke="#3fb950"/>
+      <text x="995" y="62" text-anchor="middle" fill="#3fb950" font-size="14" font-weight="700">④ 原始服务</text>
+      <text x="995" y="84" text-anchor="middle" fill="#8b949e" font-size="11.5">GitHub / 飞书 API</text>
+      <rect x="920" y="130" width="150" height="80" rx="10" fill="#161b22" stroke="#3fb950"/>
+      <text x="995" y="162" text-anchor="middle" fill="#3fb950" font-size="14" font-weight="700">④ 原始资源</text>
+      <text x="995" y="184" text-anchor="middle" fill="#8b949e" font-size="11.5">数据库 / 文件系统</text>
+      <rect x="920" y="230" width="150" height="80" rx="10" fill="#161b22" stroke="#3fb950"/>
+      <text x="995" y="262" text-anchor="middle" fill="#3fb950" font-size="14" font-weight="700">④ 原始能力</text>
+      <text x="995" y="284" text-anchor="middle" fill="#8b949e" font-size="11.5">浏览器 / 命令行</text>
+      <!-- connections -->
+      <line x1="560" y1="140" x2="676" y2="70" stroke="#bc8cff" stroke-width="1.5" marker-end="url(#ar2)"/>
+      <line x1="560" y1="155" x2="676" y2="170" stroke="#bc8cff" stroke-width="1.5" marker-end="url(#ar2)"/>
+      <line x1="560" y1="170" x2="676" y2="270" stroke="#bc8cff" stroke-width="1.5" marker-end="url(#ar2)"/>
+      <text x="610" y="96" fill="#bc8cff" font-size="11">JSON-RPC 2.0</text>
+      <text x="610" y="112" fill="#6e7681" font-size="11">stdio / Streamable HTTP</text>
+      <line x1="860" y1="70" x2="916" y2="70" stroke="#3fb950" stroke-width="1.5"/>
+      <line x1="860" y1="170" x2="916" y2="170" stroke="#3fb950" stroke-width="1.5"/>
+      <line x1="860" y1="270" x2="916" y2="270" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="888" y="60" text-anchor="middle" fill="#3fb950" font-size="11">私有协议</text>
+      <!-- bottom insight -->
+      <rect x="40" y="350" width="1030" height="100" rx="12" fill="#161b22" stroke="#30363d"/>
+      <text x="70" y="385" fill="#e6edf3" font-size="15" font-weight="700">实体边界一句话版</text>
+      <text x="70" y="410" fill="#8b949e" font-size="13.5">· <tspan fill="#e6edf3">Server 不直接碰 LLM</tspan>：它只暴露能力清单，模型选择由 Host 内的 Client 转达 —— 安全边界由此而来</text>
+      <text x="70" y="434" fill="#8b949e" font-size="13.5">· <tspan fill="#e6edf3">Server 通常不是原始服务</tspan>：它是「原始服务的 MCP 化包装」，同一原始服务可有社区版/官方版多个 Server</text>
+    </svg>
+  </div>
+</section>
+
+<!-- ============ S7 MCP 时序 ============ -->
+<section class="slide">
+  <div class="kicker">PART 2 · MCP</div>
+  <h2>MCP 完整时序：从启动到一次调用</h2>
+  <p class="sub">对照 S4 的 Tools 循环 —— MCP 只是把「Tool 实现」挪到了进程外，<span class="hl">模型侧完全无感</span></p>
+  <div class="body">
+    <svg viewBox="0 0 1100 480" style="width:100%;height:100%">
+      <defs><marker id="ar3" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8b949e"/></marker></defs>
+      <!-- lifelines -->
+      <g font-size="14" font-weight="700">
+        <rect x="60" y="15" width="150" height="42" rx="8" fill="#1c2330" stroke="#d29922"/><text x="135" y="42" text-anchor="middle" fill="#e6edf3">Host / Agent</text>
+        <rect x="300" y="15" width="150" height="42" rx="8" fill="#161b22" stroke="#58a6ff"/><text x="375" y="42" text-anchor="middle" fill="#e6edf3">LLM</text>
+        <rect x="540" y="15" width="150" height="42" rx="8" fill="#161b22" stroke="#bc8cff"/><text x="615" y="42" text-anchor="middle" fill="#e6edf3">MCP Client</text>
+        <rect x="750" y="15" width="140" height="42" rx="8" fill="#161b22" stroke="#bc8cff"/><text x="820" y="42" text-anchor="middle" fill="#e6edf3">MCP Server</text>
+        <rect x="950" y="15" width="120" height="42" rx="8" fill="#161b22" stroke="#3fb950"/><text x="1010" y="42" text-anchor="middle" fill="#e6edf3">原始服务</text>
+      </g>
+      <g stroke="#30363d" stroke-dasharray="4 4"><line x1="135" y1="57" x2="135" y2="455"/><line x1="375" y1="57" x2="375" y2="455"/><line x1="615" y1="57" x2="615" y2="455"/><line x1="820" y1="57" x2="820" y2="455"/><line x1="1010" y1="57" x2="1010" y2="455"/></g>
+      <!-- phase 1 -->
+      <rect x="30" y="70" width="1050" height="118" rx="10" fill="#0a0d12" stroke="#30363d"/>
+      <text x="45" y="93" fill="#d29922" font-size="13" font-weight="700">阶段一：启动 & 能力发现（Host 启动时，只做一次）</text>
+      <line x1="615" y1="118" x2="814" y2="118" stroke="#bc8cff" stroke-width="1.5" marker-end="url(#ar3)"/>
+      <text x="715" y="111" text-anchor="middle" fill="#bc8cff" font-size="12">① initialize 握手（协议版本、能力协商）</text>
+      <line x1="615" y1="150" x2="814" y2="150" stroke="#bc8cff" stroke-width="1.5" marker-end="url(#ar3)"/>
+      <text x="715" y="143" text-anchor="middle" fill="#bc8cff" font-size="12">② tools/list ——「你有哪些工具？Schema 给我」</text>
+      <line x1="820" y1="172" x2="621" y2="172" stroke="#8b949e" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#ar3)"/>
+      <text x="715" y="166" text-anchor="middle" fill="#8b949e" font-size="12">③ 返回工具清单（与 S3 的 JSON 格式一致）</text>
+      <!-- phase 2 -->
+      <rect x="30" y="200" width="1050" height="120" rx="10" fill="#0a0d12" stroke="#30363d"/>
+      <text x="45" y="223" fill="#d29922" font-size="13" font-weight="700">阶段二：注入上下文（每次对话）</text>
+      <line x1="615" y1="250" x2="141" y2="250" stroke="#8b949e" stroke-width="1.5" marker-end="url(#ar3)"/>
+      <text x="380" y="243" text-anchor="middle" fill="#8b949e" font-size="12">④ Client 把工具 Schema 交给 Host</text>
+      <line x1="135" y1="282" x2="369" y2="282" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#ar3)"/>
+      <text x="252" y="275" text-anchor="middle" fill="#58a6ff" font-size="12">⑤ Host 拼 prompt：用户消息 + 所有工具 Schema</text>
+      <!-- phase 3 -->
+      <rect x="30" y="332" width="1050" height="128" rx="10" fill="#0a0d12" stroke="#30363d"/>
+      <text x="45" y="355" fill="#d29922" font-size="13" font-weight="700">阶段三：调用（模型决定用工具时，就是 S4 的循环）</text>
+      <line x1="375" y1="380" x2="141" y2="380" stroke="#bc8cff" stroke-width="1.5" marker-end="url(#ar3)"/>
+      <text x="258" y="373" text-anchor="middle" fill="#bc8cff" font-size="12">⑥ tool_call JSON</text>
+      <line x1="135" y1="404" x2="609" y2="404" stroke="#8b949e" stroke-width="1.5" marker-end="url(#ar3)"/>
+      <line x1="615" y1="404" x2="814" y2="404" stroke="#bc8cff" stroke-width="1.5" marker-end="url(#ar3)"/>
+      <text x="480" y="397" text-anchor="middle" fill="#8b949e" font-size="12">⑦ Host→Client 转发</text>
+      <text x="715" y="397" text-anchor="middle" fill="#bc8cff" font-size="12">⑧ tools/call</text>
+      <line x1="820" y1="428" x2="1004" y2="428" stroke="#3fb950" stroke-width="1.5" marker-end="url(#ar3)"/>
+      <text x="912" y="421" text-anchor="middle" fill="#3fb950" font-size="12">⑨ 调真实 API / DB</text>
+      <text x="570" y="450" text-anchor="middle" fill="#8b949e" font-size="12">⑩ 结果原路返回 ⑨→⑧→⑦→⑥，回填上下文，回到 ⑤ 继续循环</text>
+    </svg>
+  </div>
+</section>
+
+<!-- ============ S8 MCP 原语 ============ -->
+<section class="slide">
+  <div class="kicker">PART 2 · MCP</div>
+  <h2>MCP 不只有 Tools：三种原语 + 两种传输</h2>
+  <p class="sub">按「谁来决定使用」区分 —— 这是 MCP 设计的精髓</p>
+  <div class="body" style="flex-direction:column;gap:18px">
+    <div class="grid3">
+      <div class="card" style="border-top:3px solid var(--blue)">
+        <h3>Tools <span class="tag">模型决定</span></h3>
+        <p>可执行的函数。模型在循环中自主决定调用。<br>例：<code>create_issue</code>、<code>run_query</code><br><span class="hl">最常用，前几张图讲的都是它</span></p>
+      </div>
+      <div class="card" style="border-top:3px solid var(--green)">
+        <h3>Resources <span class="tag">应用决定</span></h3>
+        <p>只读数据，类似 GET。由应用/用户挑选后塞进上下文。<br>例：<code>file:///log.txt</code>、<code>db://schema</code><br>不占工具决策，按需挂载</p>
+      </div>
+      <div class="card" style="border-top:3px solid var(--orange)">
+        <h3>Prompts <span class="tag">用户决定</span></h3>
+        <p>预置的提示词模板，用户主动触发（类似斜杠命令）。<br>例：<code>/code-review</code><br>Server 可以把「最佳用法」打包分发</p>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h3>传输：stdio（本地）</h3>
+        <p>Host 用 <code>npx</code>/<code>uvx</code> 把 Server 拉起来当<b>子进程</b>，走标准输入输出。零网络配置、进程隔离，本地工具首选。你在 <code>mcp.json</code> 里写 command + args 就是这种。</p>
+      </div>
+      <div class="card">
+        <h3>传输：Streamable HTTP（远程）</h3>
+        <p>Server 部署在远端，走 HTTP + SSE 流式回传，配 OAuth 鉴权。企业级 / 多用户共享服务的标准姿势。</p>
+      </div>
+    </div>
+    <p class="note">底层消息格式统一为 <b>JSON-RPC 2.0</b>。另有两个进阶能力：Sampling（Server 反向请求 Host 的 LLM 补全）与 Roots（Client 告诉 Server 可访问的目录边界），了解即可。</p>
+  </div>
+</section>
+
+<!-- ============ S9 CLI ============ -->
+<section class="slide">
+  <div class="kicker">PART 3 · CLI</div>
+  <h2>CLI：最古老、也最暴力的 ACI</h2>
+  <p class="sub">思路反转：不为每个能力写工具，而是给 Agent <span class="hl">一个 bash</span> —— 整个 Unix 生态瞬间都是它的工具</p>
+  <div class="body">
+    <div class="col">
+      <div class="card">
+        <h3>工作方式</h3>
+        <ul>
+          <li>Agent 只有一个核心工具：<code>run_shell_command(cmd)</code></li>
+          <li>模型生成命令 → 执行 → <b>stdout/stderr 纯文本回填</b> → 模型读懂文本继续</li>
+          <li>代表：Claude Code、Codex CLI、Aider、Gemini CLI</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>优势</h3>
+        <ul>
+          <li><b>零适配成本</b>：git、curl、jq、ffmpeg… 装好就能用</li>
+          <li><b>组合性</b>：管道让模型自己拼装工作流</li>
+          <li>模型在训练语料里见过海量 CLI 用法，<b>先验知识极强</b></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>代价</h3>
+        <ul>
+          <li>输出<b>非结构化</b>：靠模型解析文本，脆弱</li>
+          <li><b>token 消耗大</b>：一次 ls 也可能几百 token</li>
+          <li><b>危险面大</b>：rm、git push 都在射程内 → 权限/沙箱成必备</li>
+        </ul>
+      </div>
+    </div>
+    <div class="col">
+      <svg viewBox="0 0 500 420" style="width:100%">
+        <defs><marker id="ar4" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#3fb950"/></marker></defs>
+        <rect x="140" y="15" width="220" height="60" rx="10" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+        <text x="250" y="40" text-anchor="middle" fill="#e6edf3" font-size="15" font-weight="700">LLM</text>
+        <text x="250" y="60" text-anchor="middle" fill="#8b949e" font-size="12">生成 shell 命令</text>
+        <rect x="140" y="130" width="220" height="60" rx="10" fill="#1c2330" stroke="#3fb950" stroke-width="2"/>
+        <text x="250" y="155" text-anchor="middle" fill="#3fb950" font-size="15" font-weight="700">bash 工具</text>
+        <text x="250" y="175" text-anchor="middle" fill="#8b949e" font-size="12">（通常带权限确认 / 沙箱）</text>
+        <line x1="250" y1="75" x2="250" y2="126" stroke="#58a6ff" stroke-width="2" marker-end="url(#ar4)"/>
+        <line x1="250" y1="190" x2="250" y2="241" stroke="#3fb950" stroke-width="2" marker-end="url(#ar4)"/>
+        <path d="M 360 160 L 430 160 L 430 45 L 364 45" stroke="#8b949e" stroke-width="1.5" fill="none" stroke-dasharray="6 4" marker-end="url(#ar4)"/>
+        <text x="432" y="105" text-anchor="end" fill="#8b949e" font-size="12">stdout / stderr 回填</text>
+        <g>
+          <rect x="40" y="245" width="130" height="44" rx="8" fill="#161b22" stroke="#30363d"/><text x="105" y="272" text-anchor="middle" fill="#8b949e" font-size="13">git</text>
+          <rect x="185" y="245" width="130" height="44" rx="8" fill="#161b22" stroke="#30363d"/><text x="250" y="272" text-anchor="middle" fill="#8b949e" font-size="13">curl / jq</text>
+          <rect x="330" y="245" width="130" height="44" rx="8" fill="#161b22" stroke="#30363d"/><text x="395" y="272" text-anchor="middle" fill="#8b949e" font-size="13">python / node</text>
+          <rect x="40" y="305" width="130" height="44" rx="8" fill="#161b22" stroke="#30363d"/><text x="105" y="332" text-anchor="middle" fill="#8b949e" font-size="13">文件系统</text>
+          <rect x="185" y="305" width="130" height="44" rx="8" fill="#161b22" stroke="#30363d"/><text x="250" y="332" text-anchor="middle" fill="#8b949e" font-size="13">ffmpeg</text>
+          <rect x="330" y="305" width="130" height="44" rx="8" fill="#161b22" stroke="#30363d"/><text x="395" y="332" text-anchor="middle" fill="#8b949e" font-size="13">一切 CLI</text>
+        </g>
+        <line x1="250" y1="190" x2="105" y2="241" stroke="#30363d" stroke-width="1.5"/>
+        <line x1="250" y1="190" x2="395" y2="241" stroke="#30363d" stroke-width="1.5"/>
+        <text x="250" y="390" text-anchor="middle" fill="#d29922" font-size="13.5" font-weight="600">一个工具 = 整个操作系统生态</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ============ S10 共通性 ============ -->
+<section class="slide">
+  <div class="kicker">PART 4 · 共通本质</div>
+  <h2>Tools / MCP / CLI：一张皮的三张脸</h2>
+  <p class="sub">三者差异只在「<b>能力在哪里、怎么连</b>」，对模型而言循环完全一致</p>
+  <div class="body" style="flex-direction:column;gap:18px">
+    <table>
+      <tr><th style="width:15%"></th><th>Tools</th><th>MCP</th><th>CLI</th></tr>
+      <tr><td>能力在哪</td><td>应用进程内的函数</td><td>进程外的标准 Server</td><td>操作系统的一切命令</td></tr>
+      <tr><td>连接方式</td><td>代码直接调用</td><td>JSON-RPC（stdio / HTTP）</td><td>fork 子进程，读写管道</td></tr>
+      <tr><td>Schema 来源</td><td>开发者手写</td><td>tools/list 动态发现</td><td>无显式 Schema，靠模型先验 + --help</td></tr>
+      <tr><td>结果形态</td><td>结构化 JSON</td><td>结构化 JSON / 内容块</td><td>非结构化文本流</td></tr>
+      <tr><td>复用范围</td><td>本应用内</td><td>跨应用、跨厂商</td><td>跨一切（OS 级）</td></tr>
+    </table>
+    <div class="card" style="border-left:4px solid var(--blue)">
+      <h3>共通循环（换皮不换骨）</h3>
+      <p style="font-size:16px;color:var(--text)">① 能力声明进上下文 → ② 模型决策并输出<b>结构化意图</b> → ③ 宿主执行 → ④ 观察结果回填 → ⑤ 回到 ① 直到任务完成</p>
+      <p style="margin-top:8px">差异只是第 ① 步的声明方式（手写 Schema / tools/list / 模型先验）和第 ③ 步的执行位置（进程内 / 进程间 / 操作系统）。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ S11 ACI ============ -->
+<section class="slide">
+  <div class="kicker">PART 4 · 共通本质</div>
+  <h2>ACI：Agent-Computer Interface</h2>
+  <p class="sub">a16z 提出的概念：<span class="hl">正如 HCI 决定人用软件的效率，ACI 决定 Agent 用计算机的效率</span></p>
+  <div class="body">
+    <div class="col">
+      <div class="quote">工具不是给人用的 API 套个壳，<br>而是<b>为模型重新设计的接口</b>。</div>
+      <div class="card">
+        <h3>视角转换</h3>
+        <p>传统 API 设计假设调用方是「写代码的工程师」；ACI 假设调用方是「<b>读描述、一次填参、会犯错的模型</b>」。设计标准因此完全不同。</p>
+      </div>
+      <div class="card">
+        <h3>为什么 Skills / MCP 都是 ACI 话题</h3>
+        <p>它们都在优化同一件事：<b>单位 token 内，模型能调用的有效能力密度</b>。上下文窗口就是 ACI 的带宽。</p>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card">
+        <h3>ACI 设计六要点</h3>
+        <ul>
+          <li><b>命名与描述即文档</b> —— 模型靠它决策，写烂 = 调错</li>
+          <li><b>Schema 收紧</b> —— 枚举、范围、互斥约束写进 JSON Schema，别指望模型猜</li>
+          <li><b>输出要省 token</b> —— 返回摘要而非原始大对象，支持分页/截断</li>
+          <li><b>错误信息可操作</b> ——「参数 city 不支持拼音，请用英文城市名」而非「400」</li>
+          <li><b>幂等与确认</b> —— 写操作要求确认回路（human-in-the-loop），读操作自由</li>
+          <li><b>粒度面向任务</b> —— 宁可 <code>search_and_summarize</code>，不要 5 个底层 API 让模型自己拼</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ S12 Skills 是什么 ============ -->
+<section class="slide">
+  <div class="kicker">PART 5 · SKILLS</div>
+  <h2>Skills：不是协议，是「给 Agent 的操作手册」</h2>
+  <p class="sub">2025.10 Anthropic 推出 Agent Skills 并开放为标准 —— 本质：<span class="hl">把领域知识、流程、脚本打包成文件夹，按需注入上下文</span></p>
+  <div class="body">
+    <div class="col">
+      <pre>my-skill/                  <span class="c">← 一个 Skill 就是一个文件夹</span>
+├── <span class="f">SKILL.md</span>             <span class="c">← 唯一必需文件</span>
+│   ├─ YAML frontmatter
+│   │   <span class="k">name</span>: pdf-report
+│   │   <span class="k">description</span>: <span class="s">生成 PDF 财报，
+│   │     当用户要求导出/下载
+│   │     报告时使用</span>      <span class="c">← 触发决策全靠它</span>
+│   └─ Markdown 正文
+│       <span class="c">（步骤、规范、禁忌、示例）</span>
+├── scripts/               <span class="c">← 可执行脚本（确定性工作交给代码）</span>
+│   └── render.py
+├── references/            <span class="c">← 参考文档，按需读入</span>
+│   └── style-guide.md
+└── assets/                <span class="c">← 模板、素材（不读入上下文）</span>
+    └── template.docx</pre>
+    </div>
+    <div class="col">
+      <div class="card">
+        <h3>Skills 教 Agent「怎么做」，Tools 给 Agent「能做什么」</h3>
+        <p>MCP Server 告诉你「能创建工单」；Skill 告诉你「<b>我们团队创建工单的规范流程是…先查重、字段这样填、最后通知值班群</b>」。前者是能力，后者是<b>方法论与组织记忆</b>。</p>
+      </div>
+      <div class="card">
+        <h3>为什么不用超长 System Prompt？</h3>
+        <p>把所有知识常驻上下文 = 浪费 token + 互相干扰。Skills 的思路是<b>渐进式披露</b>：只花 ~100 token 常驻元数据，命中才加载正文，资源文件用到才读 —— 下页详解。</p>
+      </div>
+      <div class="card">
+        <h3>与 MCP 的关系</h3>
+        <p>正交互补：MCP 连能力，Skills 教用法。一个 Skill 里可以写「使用某某 MCP 工具时遵守以下步骤」，也可以自带脚本完全不依赖 MCP。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ S13 渐进式披露 ============ -->
+<section class="slide">
+  <div class="kicker">PART 5 · SKILLS</div>
+  <h2>核心机制：渐进式披露（Progressive Disclosure）</h2>
+  <p class="sub">三级加载 —— 让 Agent 可以「装备」上百个 Skill 而不撑爆上下文</p>
+  <div class="body">
+    <svg viewBox="0 0 1100 470" style="width:100%;height:100%">
+      <defs><marker id="ar5" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#39c5cf"/></marker></defs>
+      <!-- context bar -->
+      <rect x="60" y="20" width="980" height="54" rx="12" fill="#1c2330" stroke="#58a6ff" stroke-width="1.5"/>
+      <text x="90" y="53" fill="#58a6ff" font-size="15" font-weight="700">Agent 上下文窗口（宝贵带宽）</text>
+      <!-- L1 -->
+      <rect x="60" y="105" width="300" height="230" rx="12" fill="#161b22" stroke="#3fb950" stroke-width="2"/>
+      <text x="210" y="140" text-anchor="middle" fill="#3fb950" font-size="16" font-weight="700">L1 · 元数据</text>
+      <text x="210" y="165" text-anchor="middle" fill="#e6edf3" font-size="13">name + description</text>
+      <text x="210" y="195" text-anchor="middle" fill="#8b949e" font-size="12.5">≈ 100 token / 个</text>
+      <text x="210" y="218" text-anchor="middle" fill="#8b949e" font-size="12.5">启动即常驻</text>
+      <rect x="90" y="240" width="240" height="70" rx="8" fill="#0a0d12" stroke="#30363d"/>
+      <text x="210" y="268" text-anchor="middle" fill="#8b949e" font-size="12">模型扫一眼清单就知道</text>
+      <text x="210" y="290" text-anchor="middle" fill="#8b949e" font-size="12">「有哪些技能可用」</text>
+      <!-- L2 -->
+      <rect x="400" y="105" width="300" height="230" rx="12" fill="#161b22" stroke="#d29922" stroke-width="2"/>
+      <text x="550" y="140" text-anchor="middle" fill="#d29922" font-size="16" font-weight="700">L2 · 指令正文</text>
+      <text x="550" y="165" text-anchor="middle" fill="#e6edf3" font-size="13">SKILL.md 的 Markdown 正文</text>
+      <text x="550" y="195" text-anchor="middle" fill="#8b949e" font-size="12.5">建议 &lt; 500 行 / ~5k token</text>
+      <text x="550" y="218" text-anchor="middle" fill="#8b949e" font-size="12.5">判定相关时才加载</text>
+      <rect x="430" y="240" width="240" height="70" rx="8" fill="#0a0d12" stroke="#30363d"/>
+      <text x="550" y="268" text-anchor="middle" fill="#8b949e" font-size="12">用户请求命中 description</text>
+      <text x="550" y="290" text-anchor="middle" fill="#8b949e" font-size="12">→ 模型读入正文照做</text>
+      <!-- L3 -->
+      <rect x="740" y="105" width="300" height="230" rx="12" fill="#161b22" stroke="#bc8cff" stroke-width="2"/>
+      <text x="890" y="140" text-anchor="middle" fill="#bc8cff" font-size="16" font-weight="700">L3 · 资源与脚本</text>
+      <text x="890" y="165" text-anchor="middle" fill="#e6edf3" font-size="13">references/ scripts/ assets/</text>
+      <text x="890" y="195" text-anchor="middle" fill="#8b949e" font-size="12.5">体积几乎无上限</text>
+      <text x="890" y="218" text-anchor="middle" fill="#8b949e" font-size="12.5">用到才读 / 直接执行</text>
+      <rect x="770" y="240" width="240" height="70" rx="8" fill="#0a0d12" stroke="#30363d"/>
+      <text x="890" y="263" text-anchor="middle" fill="#8b949e" font-size="12">脚本被执行而非读入 ——</text>
+      <text x="890" y="283" text-anchor="middle" fill="#8b949e" font-size="12">只有输出进上下文</text>
+      <text x="890" y="303" text-anchor="middle" fill="#bc8cff" font-size="11.5">（最精妙的一点）</text>
+      <!-- arrows up -->
+      <line x1="210" y1="105" x2="210" y2="78" stroke="#3fb950" stroke-width="2" marker-end="url(#ar5)"/>
+      <line x1="550" y1="105" x2="550" y2="78" stroke="#d29922" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#ar5)"/>
+      <line x1="890" y1="105" x2="890" y2="78" stroke="#bc8cff" stroke-width="2" stroke-dasharray="3 4" marker-end="url(#ar5)"/>
+      <!-- bottom -->
+      <rect x="60" y="365" width="980" height="90" rx="12" fill="#161b22" stroke="#30363d"/>
+      <text x="90" y="398" fill="#e6edf3" font-size="15" font-weight="700">一句话总结</text>
+      <text x="90" y="424" fill="#8b949e" font-size="13.5">常驻的永远只是「目录卡片」，正文按需加载，大块资料与脚本根本不进上下文 —— 上下文成本 ≈ 0，能力覆盖 ≈ ∞</text>
+    </svg>
+  </div>
+</section>
+
+<!-- ============ S14 Skills 分发+编写 ============ -->
+<section class="slide">
+  <div class="kicker">PART 5 · SKILLS</div>
+  <h2>Skills 的分发渠道 与 编写要点</h2>
+  <p class="sub">分发 = 文件夹往哪放；编写 = description 决定生死</p>
+  <div class="body">
+    <div class="col">
+      <div class="card">
+        <h3>分发渠道（由近及远）</h3>
+        <ul>
+          <li><b>个人级</b>：<code>~/.claude/skills</code>、<code>~/.workbuddy/skills</code> —— 跨项目生效，自己的武器库</li>
+          <li><b>项目级</b>：<code>&lt;repo&gt;/.claude/skills</code> —— 随 git 仓库走，<b>团队共享规范的首选</b></li>
+          <li><b>插件/市场</b>：插件包内捆绑 skills，一键安装（各家 IDE/CLI 的 marketplace）</li>
+          <li><b>开源仓库</b>：<code>anthropics/skills</code>（官方示例集）、社区精选 awesome 列表 —— git clone 即用</li>
+          <li><b>企业内部</b>：私有 registry / 内部 Git，沉淀组织流程资产</li>
+        </ul>
+      </div>
+      <p class="note">因为 Skill 只是纯文件，所以<b>天然兼容 git 的一切</b>：版本管理、code review、PR 协作 —— 这是它作为分发格式的隐藏优势。</p>
+    </div>
+    <div class="col">
+      <div class="card">
+        <h3>编写五要点</h3>
+        <ul>
+          <li><b>description 是触发器</b>：用第三人称写清「做什么 + 何时触发」，塞入用户可能说的关键词 —— 写差了模型永远不调用</li>
+          <li><b>单一职责</b>：一个 Skill 干一件事；「代码审查」和「发布部署」别混</li>
+          <li><b>确定性逻辑写成脚本</b>：模型不该做的（排序、格式转换、校验）交给 scripts/，正文里只写「运行 xx.py」</li>
+          <li><b>正文具体可执行</b>：步骤化、给正反例、写清禁忌；模糊建议 = 没有建议</li>
+          <li><b>控制层级</b>：正文 &lt;500 行，超出拆进 references/，正文里留指针</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>一个判断标准</h3>
+        <p>把 Skill 给一个<b>聪明但第一天上班的实习生</b>看 —— 他能照做不出错，就是好 Skill。模型就是那个实习生。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ S15 Skills 场景+未来 ============ -->
+<section class="slide">
+  <div class="kicker">PART 5 · SKILLS</div>
+  <h2>Skills 的应用场景 与 未来走向</h2>
+  <div class="body">
+    <div class="col">
+      <div class="card">
+        <h3>典型应用场景</h3>
+        <ul>
+          <li><b>文档工厂</b>：docx / pptx / xlsx / pdf 生成（Anthropic 官方四件套），模板与规范全在 Skill 里</li>
+          <li><b>团队规范固化</b>：代码审查清单、发布流程、SQL 规范 —— 新人新模型都一致</li>
+          <li><b>领域工作流</b>：投研报告、法律文书、病历摘要 —— 行业 know-how 的载体</li>
+          <li><b>工具编排</b>：教 Agent「什么时候、按什么顺序」组合多个 MCP 工具</li>
+          <li><b>自我进化</b>：Agent 把刚踩过的坑写成新 Skill —— 经验可积累</li>
+        </ul>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card">
+        <h3>未来发展（已在发生）</h3>
+        <ul>
+          <li><b>走向开放标准</b>：agentskills.io 发布，OpenAI（Codex）、VS Code Copilot、Cursor 等相继兼容同一格式 —— 一次编写，处处运行</li>
+          <li><b>生态市场化</b>：Skill 市场 / registry 出现，像 npm 包一样被发现、评分、安装</li>
+          <li><b>与 MCP 融合</b>：MCP Server 分发时自带 Skill 说明「本工具的最佳实践」，能力与方法论一体分发</li>
+          <li><b>自动生成与进化</b>：Agent 自动把成功会话提炼成 Skill，组织知识飞轮转动</li>
+          <li><b>治理与安全</b>：Skill 可注入指令 → 供应链审计、签名、权限分级会成为刚需</li>
+        </ul>
+      </div>
+      <p class="note">判断：MCP 标准化了「能力」，Skills 正在标准化「经验」。后者离业务价值更近，可能是企业侧更快落地的一个。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ S16 A2A 定位 ============ -->
+<section class="slide">
+  <div class="kicker">PART 6 · A2A</div>
+  <h2>A2A：Agent 与 Agent 之间的协议</h2>
+  <p class="sub">2025.4 Google 发布，后捐给 Linux Foundation —— 回答的问题变了：<span class="hl">不是我的 Agent 怎么用工具，而是我的 Agent 怎么委托别的 Agent 干活</span></p>
+  <div class="body">
+    <div class="col">
+      <div class="card">
+        <h3>为什么需要它</h3>
+        <ul>
+          <li>现实系统由<b>多家厂商、多个团队的 Agent</b> 组成：订票 Agent、报销 Agent、法务 Agent…</li>
+          <li>它们不可能共享同一个 LLM 循环和上下文 —— 需要<b>跨组织边界</b>的协作语言</li>
+          <li>把对方 Agent 包成 MCP Tool 理论上可行，但丢失了<b>多轮协商、长任务状态、产物交付</b>的表达能力</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>与 MCP 的定位差异（关键！）</h3>
+        <ul>
+          <li><b>MCP：纵向</b> —— Agent → 工具/资源（我调你，你是能力）</li>
+          <li><b>A2A：横向</b> —— Agent ↔ Agent（我委托你，你是同事）</li>
+          <li>两者互补：一个 A2A 远程 Agent 内部照样用 MCP 连自己的工具</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>核心设计：不透明（Opaque）</h3>
+        <p>远程 Agent 是<b>黑盒</b> —— 不暴露内部 prompt、工具、记忆。双方只交换「任务、消息、产物」，像两个公司之间走合同而不是共用大脑。</p>
+      </div>
+    </div>
+    <div class="col">
+      <svg viewBox="0 0 500 430" style="width:100%">
+        <defs><marker id="ar6" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#f778ba"/></marker></defs>
+        <!-- client agent -->
+        <rect x="30" y="40" width="200" height="120" rx="12" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+        <text x="130" y="72" text-anchor="middle" fill="#58a6ff" font-size="15" font-weight="700">Client Agent</text>
+        <text x="130" y="94" text-anchor="middle" fill="#8b949e" font-size="12">（发起方 · 你的 Agent）</text>
+        <text x="130" y="120" text-anchor="middle" fill="#8b949e" font-size="11.5">识别自己搞不定 →</text>
+        <text x="130" y="138" text-anchor="middle" fill="#8b949e" font-size="11.5">寻找并委托专业 Agent</text>
+        <!-- remote agent -->
+        <rect x="290" y="40" width="180" height="120" rx="12" fill="#161b22" stroke="#f778ba" stroke-width="2"/>
+        <text x="380" y="72" text-anchor="middle" fill="#f778ba" font-size="15" font-weight="700">Remote Agent</text>
+        <text x="380" y="94" text-anchor="middle" fill="#8b949e" font-size="12">（服务方 · 黑盒）</text>
+        <text x="380" y="120" text-anchor="middle" fill="#8b949e" font-size="11.5">内部用自己的 LLM / 工具</text>
+        <text x="380" y="138" text-anchor="middle" fill="#8b949e" font-size="11.5">（可能正用着 MCP）</text>
+        <line x1="230" y1="85" x2="286" y2="85" stroke="#f778ba" stroke-width="2" marker-end="url(#ar6)"/>
+        <line x1="286" y1="120" x2="234" y2="120" stroke="#f778ba" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#ar6)"/>
+        <text x="258" y="75" text-anchor="middle" fill="#f778ba" font-size="11">A2A</text>
+        <!-- card -->
+        <rect x="290" y="190" width="180" height="64" rx="10" fill="#1c2330" stroke="#d29922"/>
+        <text x="380" y="215" text-anchor="middle" fill="#d29922" font-size="13" font-weight="700">Agent Card</text>
+        <text x="380" y="233" text-anchor="middle" fill="#8b949e" font-size="11">/.well-known/agent.json</text>
+        <text x="380" y="248" text-anchor="middle" fill="#8b949e" font-size="11">能力名片：会什么、怎么连、如何鉴权</text>
+        <line x1="380" y1="160" x2="380" y2="186" stroke="#d29922" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <!-- task concepts -->
+        <rect x="30" y="290" width="440" height="120" rx="12" fill="#161b22" stroke="#30363d"/>
+        <text x="55" y="318" fill="#e6edf3" font-size="14" font-weight="700">A2A 的三个核心对象</text>
+        <text x="55" y="344" fill="#8b949e" font-size="12.5"><tspan fill="#f778ba" font-weight="700">Task</tspan> —— 有状态的工作单元（有生命周期，可长可短）</text>
+        <text x="55" y="368" fill="#8b949e" font-size="12.5"><tspan fill="#f778ba" font-weight="700">Message</tspan> —— 任务内的多轮沟通（text / file / 结构化 data 三种 part）</text>
+        <text x="55" y="392" fill="#8b949e" font-size="12.5"><tspan fill="#f778ba" font-weight="700">Artifact</tspan> —— 最终交付的产物（报告、票据、代码…）</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ============ S17 A2A 时序 ============ -->
+<section class="slide">
+  <div class="kicker">PART 6 · A2A</div>
+  <h2>A2A 协作时序 与 任务状态机</h2>
+  <p class="sub">技术上：HTTP + JSON-RPC，SSE 做流式推送，Webhook 支持超长任务</p>
+  <div class="body">
+    <svg viewBox="0 0 1100 470" style="width:100%;height:100%">
+      <defs><marker id="ar7" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#f778ba"/></marker></defs>
+      <!-- lifelines -->
+      <rect x="150" y="12" width="200" height="42" rx="8" fill="#161b22" stroke="#58a6ff"/><text x="250" y="39" text-anchor="middle" fill="#e6edf3" font-size="14" font-weight="700">Client Agent</text>
+      <rect x="700" y="12" width="200" height="42" rx="8" fill="#161b22" stroke="#f778ba"/><text x="800" y="39" text-anchor="middle" fill="#e6edf3" font-size="14" font-weight="700">Remote Agent</text>
+      <line x1="250" y1="54" x2="250" y2="330" stroke="#30363d" stroke-dasharray="4 4"/>
+      <line x1="800" y1="54" x2="800" y2="330" stroke="#30363d" stroke-dasharray="4 4"/>
+      <line x1="250" y1="85" x2="794" y2="85" stroke="#d29922" stroke-width="1.5" marker-end="url(#ar7)"/>
+      <text x="525" y="78" text-anchor="middle" fill="#d29922" font-size="12.5">① GET /.well-known/agent.json —— 发现能力（「你会订国际机票吗？支持流式吗？」）</text>
+      <line x1="250" y1="122" x2="794" y2="122" stroke="#f778ba" stroke-width="1.5" marker-end="url(#ar7)"/>
+      <text x="525" y="115" text-anchor="middle" fill="#f778ba" font-size="12.5">② tasks/send：创建 Task，附第一条 Message（需求描述 + 约束）</text>
+      <line x1="800" y1="159" x2="256" y2="159" stroke="#8b949e" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#ar7)"/>
+      <text x="525" y="152" text-anchor="middle" fill="#8b949e" font-size="12.5">③ SSE 流式回推状态 / 中间消息（「找到 3 个航班方案，要哪个？」）</text>
+      <line x1="250" y1="196" x2="794" y2="196" stroke="#f778ba" stroke-width="1.5" marker-end="url(#ar7)"/>
+      <text x="525" y="189" text-anchor="middle" fill="#f778ba" font-size="12.5">④ 补充 Message（多轮协商，可来回复多次）</text>
+      <line x1="800" y1="233" x2="256" y2="233" stroke="#3fb950" stroke-width="1.5" marker-end="url(#ar7)"/>
+      <text x="525" y="226" text-anchor="middle" fill="#3fb950" font-size="12.5">⑤ 完成：状态 → completed，交付 Artifact（行程单 PDF + 结构化 JSON）</text>
+      <text x="525" y="270" text-anchor="middle" fill="#6e7681" font-size="12">超长任务：Client 可挂断，Remote 完成后通过 Webhook 推送通知</text>
+      <!-- state machine -->
+      <rect x="60" y="300" width="980" height="150" rx="12" fill="#161b22" stroke="#30363d"/>
+      <text x="90" y="330" fill="#e6edf3" font-size="14" font-weight="700">Task 状态机（A2A 的灵魂 —— 工具调用没有的东西）</text>
+      <g font-size="12.5">
+        <rect x="90" y="352" width="120" height="36" rx="18" fill="#0a0d12" stroke="#8b949e"/><text x="150" y="375" text-anchor="middle" fill="#8b949e">submitted</text>
+        <rect x="255" y="352" width="120" height="36" rx="18" fill="#0a0d12" stroke="#58a6ff"/><text x="315" y="375" text-anchor="middle" fill="#58a6ff">working</text>
+        <rect x="420" y="352" width="150" height="36" rx="18" fill="#0a0d12" stroke="#d29922"/><text x="495" y="375" text-anchor="middle" fill="#d29922">input-required</text>
+        <rect x="615" y="352" width="120" height="36" rx="18" fill="#0a0d12" stroke="#3fb950"/><text x="675" y="375" text-anchor="middle" fill="#3fb950">completed</text>
+        <rect x="780" y="352" width="100" height="36" rx="18" fill="#0a0d12" stroke="#f85149"/><text x="830" y="375" text-anchor="middle" fill="#f85149">failed</text>
+        <rect x="915" y="352" width="100" height="36" rx="18" fill="#0a0d12" stroke="#8b949e"/><text x="965" y="375" text-anchor="middle" fill="#8b949e">canceled</text>
+        <line x1="210" y1="370" x2="251" y2="370" stroke="#8b949e" stroke-width="1.5" marker-end="url(#ar7)"/>
+        <line x1="375" y1="370" x2="416" y2="370" stroke="#8b949e" stroke-width="1.5" marker-end="url(#ar7)"/>
+        <line x1="570" y1="370" x2="611" y2="370" stroke="#8b949e" stroke-width="1.5" marker-end="url(#ar7)"/>
+        <line x1="375" y1="378" x2="780" y2="400" stroke="#f85149" stroke-width="1" opacity=".5"/>
+      </g>
+      <text x="90" y="425" fill="#8b949e" font-size="12.5">input-required ⇄ working 可往返：远程 Agent 干活途中回头要信息 —— 这正是「同事」与「工具」的区别</text>
+    </svg>
+  </div>
+</section>
+
+<!-- ============ S18 大对比 ============ -->
+<section class="slide">
+  <div class="kicker">PART 7 · 合流</div>
+  <h2>四者对比：各管一层，互不替代</h2>
+  <div class="body" style="flex-direction:column;gap:16px">
+    <table>
+      <tr><th style="width:13%"></th><th>Tools</th><th>MCP</th><th>Skills</th><th>A2A</th></tr>
+      <tr><td>解决什么</td><td>模型怎么发起一个动作</td><td>能力如何标准化接入</td><td>经验/流程如何沉淀复用</td><td>Agent 之间怎么协作</td></tr>
+      <tr><td>本质</td><td>模型输出约定</td><td>通信协议（JSON-RPC）</td><td>文件夹 + Markdown（上下文工程）</td><td>通信协议（HTTP/JSON-RPC）</td></tr>
+      <tr><td>实体关系</td><td>LLM ↔ 宿主内函数</td><td>Host/Client ↔ Server ↔ 原始服务</td><td>模型 ↔ 按需加载的知识</td><td>Client Agent ↔ Remote Agent（黑盒）</td></tr>
+      <tr><td>发现机制</td><td>开发者写死 Schema</td><td>tools/list 动态发现</td><td>description 常驻元数据匹配</td><td>Agent Card（well-known URL）</td></tr>
+      <tr><td>状态</td><td>无状态单次调用</td><td>会话级连接，调用无状态</td><td>无运行态（纯静态资产）</td><td>有状态 Task 生命周期</td></tr>
+      <tr><td>类比</td><td>函数调用</td><td>USB-C / ODBC</td><td>员工手册 / SOP</td><td>公司间的合同与邮件</td></tr>
+    </table>
+    <p class="note">记忆锚点：<b>Tools 是起点，MCP 标准化了能力，Skills 标准化了经验，A2A 标准化了协作。</b>CLI 则是绕过一切协议、直接借用 OS 生态的「野路子」—— 但同样是 ACI 的一种实现。</p>
+  </div>
+</section>
+
+<!-- ============ S19 全景 ============ -->
+<section class="slide">
+  <div class="kicker">PART 7 · 合流</div>
+  <h2>放回大图：一次真实任务的完整链路</h2>
+  <p class="sub">「帮我分析竞对上季度财报并写成 PPT 发到评审群」—— 所有协议同时登场</p>
+  <div class="body">
+    <svg viewBox="0 0 1100 460" style="width:100%;height:100%">
+      <defs><marker id="ar8" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8b949e"/></marker></defs>
+      <rect x="400" y="15" width="300" height="60" rx="12" fill="#1c2330" stroke="#58a6ff" stroke-width="2"/>
+      <text x="550" y="40" text-anchor="middle" fill="#e6edf3" font-size="16" font-weight="700">你的 Agent（Host）</text>
+      <text x="550" y="60" text-anchor="middle" fill="#8b949e" font-size="12">LLM + Agent 循环</text>
+      <!-- skills overlay -->
+      <rect x="60" y="110" width="980" height="70" rx="12" fill="none" stroke="#39c5cf" stroke-width="1.5" stroke-dasharray="7 5"/>
+      <text x="550" y="138" text-anchor="middle" fill="#39c5cf" font-size="14" font-weight="700">Skills 层：「财报分析方法论」+「PPT 制作规范」命中加载 → 指导下方所有调用</text>
+      <text x="550" y="160" text-anchor="middle" fill="#6e7681" font-size="12">（先拉数据 → 同比环比 → 图表规范 → 每页一个论点 → 发送前自检清单）</text>
+      <!-- three channels -->
+      <rect x="60" y="215" width="300" height="90" rx="12" fill="#161b22" stroke="#bc8cff" stroke-width="1.5"/>
+      <text x="210" y="245" text-anchor="middle" fill="#bc8cff" font-size="14" font-weight="700">MCP：金融数据 Server</text>
+      <text x="210" y="267" text-anchor="middle" fill="#8b949e" font-size="12">tools/call 拉取结构化财报数据</text>
+      <text x="210" y="287" text-anchor="middle" fill="#6e7681" font-size="11.5">↓ 原始服务：行情/财报 API</text>
+      <rect x="400" y="215" width="300" height="90" rx="12" fill="#161b22" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="550" y="245" text-anchor="middle" fill="#3fb950" font-size="14" font-weight="700">CLI / Tools：本地执行</text>
+      <text x="550" y="267" text-anchor="middle" fill="#8b949e" font-size="12">python 脚本算指标、画图</text>
+      <text x="550" y="287" text-anchor="middle" fill="#6e7681" font-size="11.5">↓ 文件系统生成 report.pptx</text>
+      <rect x="740" y="215" width="300" height="90" rx="12" fill="#161b22" stroke="#f778ba" stroke-width="1.5"/>
+      <text x="890" y="245" text-anchor="middle" fill="#f778ba" font-size="14" font-weight="700">A2A：委托「设计 Agent」</text>
+      <text x="890" y="267" text-anchor="middle" fill="#8b949e" font-size="12">tasks/send：把 PPT 美化成品牌模板</text>
+      <text x="890" y="287" text-anchor="middle" fill="#6e7681" font-size="11.5">← Artifact：美化后的成品</text>
+      <line x1="480" y1="75" x2="210" y2="211" stroke="#8b949e" stroke-width="1.5" marker-end="url(#ar8)"/>
+      <line x1="550" y1="75" x2="550" y2="211" stroke="#8b949e" stroke-width="1.5" marker-end="url(#ar8)"/>
+      <line x1="620" y1="75" x2="890" y2="211" stroke="#8b949e" stroke-width="1.5" marker-end="url(#ar8)"/>
+      <!-- final -->
+      <rect x="60" y="340" width="980" height="80" rx="12" fill="#161b22" stroke="#d29922" stroke-width="1.5"/>
+      <text x="550" y="372" text-anchor="middle" fill="#d29922" font-size="14" font-weight="700">最后又走 MCP：「企业微信 Server」把成品发到评审群</text>
+      <text x="550" y="396" text-anchor="middle" fill="#8b949e" font-size="12.5">同一次任务里：Skills 提供方法 → MCP/CLI 提供能力 → A2A 提供外部协作 —— 这就是协议栈的全貌</text>
+    </svg>
+  </div>
+</section>
+
+<!-- ============ S20 总结 ============ -->
+<section class="slide center">
+  <div class="kicker">TAKEAWAYS</div>
+  <h2 style="font-size:40px">六句话带走</h2>
+  <div style="max-width:900px;text-align:left;margin-top:30px;display:flex;flex-direction:column;gap:14px">
+    <div class="card"><p><b style="color:var(--blue)">1.</b> LLM 从不执行，只输出意图 —— Tools 循环（声明→决策→执行→回填）是一切协议的母循环。</p></div>
+    <div class="card"><p><b style="color:var(--purple)">2.</b> MCP = 把工具挪到进程外并标准化：Host / Client / Server / 原始服务四实体，tools/list 发现、tools/call 调用、JSON-RPC 传输。</p></div>
+    <div class="card"><p><b style="color:var(--green)">3.</b> CLI 是野路子 ACI：一个 bash 换整个 OS 生态，代价是非结构化输出与安全面。</p></div>
+    <div class="card"><p><b style="color:var(--orange)">4.</b> ACI 是统一视角：为「会犯错的模型」设计接口 —— 描述即文档、输出省 token、错误可操作。</p></div>
+    <div class="card"><p><b style="color:var(--teal)">5.</b> Skills 不是协议是资产：SKILL.md + 渐进式披露，标准化的是「经验」，description 决定生死。</p></div>
+    <div class="card"><p><b style="color:var(--pink)">6.</b> A2A 管横向协作：Agent Card 发现、有状态 Task、Message 协商、Artifact 交付，远程 Agent 是不透明黑盒。</p></div>
+  </div>
+  <p style="margin-top:26px;color:var(--faint);font-size:15px">← → 翻页回顾任意章节</p>
+</section>
+
+</div>
+
+<div class="footer"><span>Agent 协议栈 — Tools · MCP · CLI · ACI · Skills · A2A</span><span id="pageNum"></span></div>
+<div class="nav">
+  <button onclick="go(-1)">←</button>
+  <button onclick="go(1)">→</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  let cur = 0;
+  function show(i){
+    cur = Math.max(0, Math.min(slides.length-1, i));
+    slides.forEach((s,idx)=>s.classList.toggle('active', idx===cur));
+    document.getElementById('bar').style.width = ((cur+1)/slides.length*100)+'%';
+    document.getElementById('pageNum').textContent = (cur+1)+' / '+slides.length;
+  }
+  function go(d){ show(cur+d); }
+  document.addEventListener('keydown', e=>{
+    if(['ArrowRight','ArrowDown','PageDown',' '].includes(e.key)) go(1);
+    if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)) go(-1);
+    if(e.key==='Home') show(0);
+    if(e.key==='End') show(slides.length-1);
+  });
+  document.getElementById('deck').addEventListener('click', e=>{
+    if(e.target.closest('button')) return;
+    go(1);
+  });
+  show(0);
+</script>
+</body>
+</html>

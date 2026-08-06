@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>从计算机到 GPT：大模型是怎么一步步长出来的</title>
+<style>
+  :root{
+    --bg:#f4f5f7; --card:#ffffff; --ink:#1c2333; --muted:#667085;
+    --primary:#4338ca; --primary-soft:#eef0ff; --accent:#0d9488; --accent-soft:#e6f7f5;
+    --line:#e5e7ee; --art-bg:#fbfcfe; --code-bg:#f8fafc;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:"Microsoft YaHei","PingFang SC","Noto Sans SC",sans-serif;
+    overflow:hidden;
+  }
+  /* ---------- slide frame ---------- */
+  .slide{
+    display:none; height:100vh; width:100vw;
+    flex-direction:column; padding:2.8vh 4vw 5.5vh;
+    background:var(--card);
+  }
+  .slide.active{display:flex;}
+  .slide>*{width:100%; max-width:1560px; margin-left:auto; margin-right:auto;}
+  .slide header{margin-bottom:1.6vh;}
+  .tag{
+    display:inline-block; font-size:1.8vmin; font-weight:700; letter-spacing:.12em;
+    color:var(--primary); background:var(--primary-soft);
+    padding:.5em 1em; border-radius:999px; margin-bottom:1vh;
+  }
+  .tag.green{color:var(--accent); background:var(--accent-soft);}
+  h1{font-size:4.3vmin; line-height:1.25;}
+  h1 .sub{display:block; font-size:2.3vmin; color:var(--muted); font-weight:400; margin-top:.6vh;}
+  /* ---------- question & point ---------- */
+  .band{display:flex; gap:2vw; align-items:stretch; margin-bottom:1.4vh;}
+  .q{
+    flex:1; background:var(--primary-soft); border-radius:12px; padding:1.4vh 1.4vw;
+    font-size:2.55vmin; line-height:1.55;
+  }
+  .q .lbl{display:block; font-size:1.7vmin; font-weight:700; color:var(--primary); letter-spacing:.1em; margin-bottom:.4vh;}
+  .q em{font-style:normal; font-weight:700;}
+  .pt{
+    flex:1.25; background:#fff; border:1px solid var(--line); border-left:4px solid var(--primary);
+    border-radius:12px; padding:1.4vh 1.4vw; font-size:2.55vmin; line-height:1.6;
+  }
+  .pt .lbl{display:block; font-size:1.7vmin; font-weight:700; color:var(--primary); letter-spacing:.1em; margin-bottom:.4vh;}
+  .pt b{color:var(--primary);}
+  /* ---------- art ---------- */
+  .art-wrap{flex:1; display:flex; align-items:center; justify-content:center; min-height:0;}
+  pre.art{
+    font-family:"Cascadia Mono","Cascadia Code",Consolas,"Courier New",monospace;
+    background:var(--art-bg); border:1px solid var(--line); border-radius:14px;
+    padding:2.4vh 3vw; font-size:2.15vmin; line-height:1.45; color:#2b3648;
+    max-width:100%; overflow-x:auto; white-space:pre;
+  }
+  pre.art .hl{color:var(--primary); font-weight:700;}
+  pre.art .ok{color:var(--accent); font-weight:700;}
+  pre.art .dim{color:#7a8699;}
+  /* ---------- footer: takeaway + code ---------- */
+  .foot{display:flex; justify-content:space-between; align-items:flex-end; gap:2vw; margin-top:1.4vh;}
+  .take{
+    flex:1; font-size:2.3vmin; line-height:1.55; color:#0b5c54;
+    background:var(--accent-soft); border-radius:12px; padding:1.3vh 1.3vw;
+  }
+  .take .lbl{display:block; font-size:1.65vmin; font-weight:700; letter-spacing:.1em; color:var(--accent); margin-bottom:.3vh;}
+  .code{
+    flex:0 0 auto; max-width:48%;
+    background:var(--code-bg); border:1px solid var(--line); border-radius:12px;
+    padding:1.2vh 1.2vw;
+  }
+  .code .lbl{display:block; font-family:"Microsoft YaHei",sans-serif; font-size:1.55vmin; font-weight:700; letter-spacing:.1em; color:var(--muted); margin-bottom:.5vh;}
+  .code pre{
+    font-family:"Cascadia Mono",Consolas,monospace;
+    font-size:1.9vmin; line-height:1.5; color:#0f172a; white-space:pre;
+  }
+  .code .cm{color:#64748b;}
+  .code .st{color:#0d9488;}
+  /* ---------- chrome ---------- */
+  #bar{position:fixed; left:0; bottom:0; height:5px; background:var(--primary); width:0; transition:width .25s; z-index:20;}
+  #cnt{
+    position:fixed; top:2vh; right:2.4vw; font-size:1.8vmin; color:var(--muted);
+    font-variant-numeric:tabular-nums; z-index:20;
+  }
+  #nav{position:fixed; bottom:2vh; right:2.4vw; display:flex; gap:.6vw; z-index:20;}
+  #nav button{
+    width:5.4vmin; height:5.4vmin; border-radius:50%; border:1px solid var(--line);
+    background:#fff; color:var(--primary); font-size:2.5vmin; cursor:pointer;
+    box-shadow:0 2px 8px rgba(16,24,40,.08);
+  }
+  #nav button:hover{background:var(--primary); color:#fff;}
+  #hint{position:fixed; bottom:2.2vh; left:2.4vw; font-size:1.65vmin; color:#a0a8b8; z-index:20;}
+  /* ---------- cover & special ---------- */
+  .cover{justify-content:center; align-items:center; text-align:center; background:linear-gradient(160deg,#eef0ff 0%,#ffffff 55%,#e6f7f5 100%);}
+  .cover h1{font-size:6.2vmin; line-height:1.3;}
+  .cover .sub2{font-size:2.9vmin; color:var(--muted); margin-top:2.5vh; line-height:1.7;}
+  .cover .series{margin-top:3.5vh; font-size:2.15vmin; color:var(--primary); background:#fff; border:1px solid var(--line); border-radius:999px; padding:.8vh 2vw;}
+  .cover pre.art{border:none; background:transparent; margin-top:4vh; color:#6b7390; font-size:2.1vmin;}
+  .end{justify-content:center; align-items:center; text-align:center; background:linear-gradient(160deg,#e6f7f5 0%,#ffffff 55%,#eef0ff 100%);}
+  .end h1{font-size:4.6vmin; line-height:1.65;}
+  .end .next{margin-top:4vh; font-size:2.9vmin; color:var(--primary); font-weight:700;}
+  ul.clean{list-style:none; font-size:1.95vmin; line-height:2;}
+  ul.clean li::before{content:"▸ "; color:var(--primary); font-weight:700;}
+  table.app{border-collapse:collapse; width:100%; font-size:2.25vmin;}
+  table.app th{background:var(--primary-soft); color:var(--primary); padding:1vh 1vw; text-align:left;}
+  table.app td{padding:1vh 1vw; border-bottom:1px solid var(--line); line-height:1.5;}
+  table.app td:first-child{font-family:Consolas,monospace; color:var(--accent); font-weight:700; white-space:nowrap;}
+  @media print{
+    body{overflow:visible;}
+    .slide{display:flex !important; page-break-after:always; height:100vh;}
+    #bar,#cnt,#nav,#hint{display:none;}
+  }
+</style>
+<style id="wb-shell-css">
+/* === wb-shell v1: 系列统一外壳（追加注入，不改动原样式） === */
+body{font-family:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",system-ui,-apple-system,"Segoe UI",sans-serif !important}
+#wb-nav{position:fixed;left:50%;bottom:16px;transform:translateX(-50%) translateY(10px);z-index:99999;display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.94);border:1px solid #E2E8F0;border-radius:999px;padding:6px 12px;box-shadow:0 6px 24px rgba(15,23,42,.14);font:13px/1.4 "PingFang SC","Microsoft YaHei",sans-serif;color:#4B5563;opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;white-space:nowrap}
+#wb-nav.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+#wb-nav a{color:#2563EB;text-decoration:none;font-weight:600;padding:4px 8px;border-radius:8px}
+#wb-nav a:hover{background:#EFF6FF}
+#wb-nav button{width:30px;height:30px;border:1px solid #E2E8F0;background:#fff;border-radius:50%;cursor:pointer;font-size:16px;line-height:1;color:#374151;display:flex;align-items:center;justify-content:center}
+#wb-nav button:hover{background:#F3F4F6}
+#wb-nav .wb-page{font-variant-numeric:tabular-nums;min-width:56px;text-align:center;color:#6B7280;font-size:13px}
+#wb-nav .wb-sep{width:1px;height:16px;background:#E5E7EB}
+#wb-nav .wb-tip{font-size:11px;color:#9CA3AF}
+.wb-xlink{display:inline-block;margin-top:10px;font-size:13px;color:#1D4ED8;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:999px;padding:4px 14px;line-height:1.5}
+.wb-series{font-size:15px;color:#4B5563;background:#EFF6FF;border-left:3px solid #2563EB;padding:10px 16px;border-radius:0 8px 8px 0;margin:0 0 18px;max-width:820px;line-height:1.6}
+@media print{
+  @page{size:1280px 720px;margin:0}
+  html,body{height:auto !important;overflow:visible !important;background:#fff !important}
+  #wb-nav{display:none !important}
+  #stage,.stage,#viewport{position:static !important;inset:auto !important;transform:none !important;width:auto !important;height:auto !important;display:block !important;overflow:visible !important}
+  .slide{display:flex !important;flex-direction:column !important;position:relative !important;inset:auto !important;left:auto !important;top:auto !important;transform:none !important;opacity:1 !important;animation:none !important;transition:none !important;width:1280px !important;height:720px !important;min-height:0 !important;overflow:hidden !important;page-break-after:always !important;break-after:page !important;box-shadow:none !important;border-radius:0 !important;margin:0 !important;visibility:visible !important}
+  .slide:last-of-type{page-break-after:auto !important;break-after:auto !important}
+}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<div id="cnt"></div>
+<div id="nav"><button id="prev" title="上一页">‹</button><button id="next" title="下一页">›</button></div>
+<div id="hint">← → 翻页 · P 打印/PDF</div>
+
+<!-- ================= P1 封面 ================= -->
+<section class="slide cover">
+  <div class="tag">技术科普 · 系列前传</div>
+  <h1>从计算机到 GPT<br>大模型是怎么一步步长出来的</h1>
+  <div class="sub2">一条「卡在哪 → 怎么解决」的知识前置链<br>写给懂 IT、还没碰过机器学习的你</div>
+  <div class="series">下一篇：《从 token 到 agent》</div>
+  <pre class="art">你写的每一行代码，最后都变成了数字。
+GPT 也一样 —— 它只是把这件事做到了极致。</pre>
+</section>
+
+<!-- ================= P2 全篇地图 ================= -->
+<section class="slide">
+  <header><span class="tag">导读</span><h1>全篇地图：一条因果链<span class="sub">不是概念清单 —— 每一环都为解决上一环的痛而生</span></h1></header>
+  <div class="art-wrap">
+<pre class="art"> 文字 ──→ 数字 ──→ 词向量 ──→ 神经网络 ──→ 注意力 ──→ Transformer ──→ 预训练 ──→ <span class="hl">GPT</span>
+          │        │         │          │          │             │
+        <span class="ok">机器只懂</span>   <span class="ok">数字没有</span>   <span class="ok">记词组</span>     <span class="ok">顺序读</span>      <span class="ok">光并行会</span>     <span class="ok">架构有了</span>
+        <span class="ok">数字 ①</span>   <span class="ok">"意思" ②</span>  <span class="ok">太笨 ③④</span>  <span class="ok">慢且健忘 ⑤</span>  <span class="ok">乱顺序 ⑥⑦</span>   <span class="ok">没"知识"⑧⑨</span></pre>
+  </div>
+  <div class="foot">
+    <div class="take"><span class="lbl">阅读约定 · 每章四块</span>① 你可能的疑惑 → ② 点破卡点 → ③ 一张字符画（承载 80% 的理解）→ ④ 右下角几行主干代码。全篇零公式。</div>
+  </div>
+</section>
+
+<!-- ================= P3 第1章 ================= -->
+<section class="slide">
+  <header><span class="tag">第 1 章 · 文字数字化</span><h1>机器真的"懂"文字吗？</h1></header>
+  <div class="band">
+    <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"语音助手都能听懂我说话了，机器不是早就懂文字了吗？"</em></div>
+    <div class="pt"><span class="lbl">② 点破卡点</span>机器里只有高低电平，它从没"见过"文字。文字、图片、声音进计算机的第一件事，都是<b>变成数字</b>——后面所有故事都建立在这之上。</div>
+  </div>
+  <div class="art-wrap">
+<pre class="art">     你看到的                机器看到的
+ ┌────────────┐      ┌───────────────────────┐
+ │ "猫"        │  →   │ 231, 140, 171  (字节)  │
+ │ 一张猫的照片 │  →   │ 255, 200, 180, 45, …  │
+ │ 一段猫叫声   │  →   │ 0.12, -0.87, 0.33, …  │
+ └────────────┘      └───────────────────────┘
+        <span class="hl">机器世界里只有一种数据：数字</span></pre>
+  </div>
+  <div class="foot">
+    <div class="take"><span class="lbl">一句话说清</span>数字化解决"机器无法表示文字"——一切先变数字，机器才能接手。</div>
+    <div class="code"><span class="lbl">④ 数据流 · Python</span><pre>text = <span class="st">"猫"</span>
+numbers = text.encode(<span class="st">"utf-8"</span>)  <span class="cm"># 文字 -&gt; 字节</span>
+print(list(numbers))         <span class="cm"># [231, 140, 171]</span></pre></div>
+  </div>
+</section>
+
+<!-- ================= P4 第2章上 ================= -->
+<section class="slide">
+  <header><span class="tag">第 2 章 · 上</span><h1>编号不是意思：one-hot 的死胡同</h1></header>
+  <div class="band">
+    <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"词变数字还不简单？给每个词编个号不就行了。"</em></div>
+    <div class="pt"><span class="lbl">② 点破卡点</span>编号里没有"意思"。"猫"是 3 号、"狗"是 4 号，3 和 4 挨得近，<b>不代表猫和狗像</b>。机器拿到的只有"一样 / 不一样"，永远算不出"有多像"。</div>
+  </div>
+  <div class="art-wrap">
+<pre class="art"> 词表 = ["我", "爱", "猫", "狗", …]   共 50000 个词
+
+ "猫" → [0, 0, <span class="hl">1</span>, 0, 0, 0, …, 0]   ← 第 3 位是 1，其余全 0
+ "狗" → [0, 0, 0, <span class="hl">1</span>, 0, 0, …, 0]   ← 第 4 位是 1，其余全 0
+
+ 这只是一个"位置号码"：
+   "猫"和"狗"的距离  <span class="hl">==</span>  "猫"和"汽车"的距离
+   → 语义信息：<span class="hl">零</span></pre>
+  </div>
+  <div class="foot">
+    <div class="take"><span class="lbl">一句话说清</span>one-hot 让每个词有了数字表示，但表示里不含语义——这正是下一个瓶颈的入口。</div>
+    <div class="code"><span class="lbl">④ 数据流 · Python</span><pre>vocab = [<span class="st">"我"</span>, <span class="st">"爱"</span>, <span class="st">"猫"</span>, <span class="st">"狗"</span>]
+onehot = {w: [int(i == j) for i in range(4)]
+          for j, w in enumerate(vocab)}
+print(onehot[<span class="st">"猫"</span>])  <span class="cm"># [0, 0, 1, 0] 只是位置号</span></pre></div>
+  </div>
+</section>
+
+<!-- ================= P5 第2章下 ================= -->
+<section class="slide">
+  <header><span class="tag">第 2 章 · 下</span><h1>embedding：词义 = 向量</h1></header>
+  <div class="band">
+    <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"那怎么让数字带上意思？"</em></div>
+    <div class="pt"><span class="lbl">② 点破卡点</span>需要的不是"编号"，而是<b>"坐标"</b>：让意思相近的词，坐标也相近——"像不像"从此变成"距离近不近"，机器就能算了。</div>
+  </div>
+  <div class="art-wrap">
+<pre class="art">        语义空间（几百维，压成 2 维示意）
+   高 │
+ 王   │     ●国王            ●女王
+ 室   │            ●男人   ●女人
+      │
+ 水   │          ●苹果(水果)
+ 果   │    ●香蕉
+      └──────────────────────────→
+
+ 关键性质：<span class="hl">方向也带含义</span>   国王 − 男人 + 女人 ≈ <span class="hl">女王</span>
+ <span class="dim">坐标不用人设计：读够多文本，"上下文相似的词"会自动凑到一块儿</span></pre>
+  </div>
+  <div class="foot">
+    <div class="take"><span class="lbl">一句话说清</span>embedding 解决"数字没有语义"——词义被编码成向量，语义相近则向量相近。（动手：附录脚本 1 embedding_demo.py）</div>
+    <div class="code"><span class="lbl">④ 数据流 · Python</span><pre>vec = embeddings[<span class="st">"猫"</span>]      <span class="cm"># 几百维浮点数组</span>
+similarity(embeddings[<span class="st">"猫"</span>], embeddings[<span class="st">"狗"</span>])  <span class="cm"># 0.78</span>
+similarity(embeddings[<span class="st">"猫"</span>], embeddings[<span class="st">"车"</span>])  <span class="cm"># 0.12</span></pre></div>
+  </div>
+</section>
+
+<!-- ================= P6 第3章 ================= -->
+<section class="slide">
+  <header><span class="tag">第 3 章 · 语言模型任务</span><h1>机器怎么学会"造句"？——从 n-gram 起步</h1></header>
+  <div class="band">
+    <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"词能表示了，可'造句'对机器来说到底是个什么任务？"</em></div>
+    <div class="pt"><span class="lbl">② 点破卡点</span>造句不是一口气生成，而是一连串"下一个词该接什么"的小决定。<b>全篇主线任务：给定前文，预测下一个词。</b>最早的解法朴素到可爱：数频次。</div>
+  </div>
+  <div class="art-wrap">
+<pre class="art"> 主线任务：<span class="hl">预测下一个词</span>   "我 今天 想吃 ___" → 饭? 苹果? 火锅?
+
+ n-gram 的做法：翻统计表（历史上"想吃"后面接过什么）
+   "想吃" → 饭×80   苹果×45   火锅×30  …   谁次数多谁赢
+
+ 两个致命伤：
+ ① <span class="hl">组合爆炸</span>：前 3 个词的组合数 = 词表³，表根本装不下
+ ② <span class="hl">没有泛化</span>："他想吃 ___"表里没见过 → 直接抓瞎
+   <span class="dim">（明明和"我想吃"很像，但表格不懂"很像"）</span></pre>
+  </div>
+  <div class="foot">
+    <div class="take"><span class="lbl">一句话说清</span>n-gram 用"统计前文后最常接什么"来预测，直观但只会死记硬背。（动手：附录脚本 2 ngram_demo.py）</div>
+    <div class="code"><span class="lbl">④ 数据流 · Python</span><pre>for a, b, c in sliding_windows(words, n=3):
+    counts[(a, b)][c] += 1   <span class="cm"># 前文 -&gt; 下一个词</span>
+next_word = most_common(counts[(<span class="st">"想"</span>, <span class="st">"吃"</span>)])</pre></div>
+  </div>
+</section>
+
+<!-- ================= P7 第4章 ================= -->
+<section class="slide">
+  <header><span class="tag">第 4 章 · 神经网络登场</span><h1>神经网络来干什么？——不记死词，学规律</h1></header>
+  <div class="band">
+    <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"统计表不够用了，加个'神经网络'到底多干了什么？"</em></div>
+    <div class="pt"><span class="lbl">② 点破卡点</span>n-gram 是背答案：装不下所有组合，更不会举一反三。要换成<b>"学规律"</b>：相似的前文应该给出相似的预测——前文是向量，"像不像"终于能算了。</div>
+  </div>
+  <div class="art-wrap">
+<pre class="art"> 前文词向量 → [加权变换] → [加权变换] → [加权变换] → 词表上每个词的概率
+ "我 今天 想吃"                                   饭    0.41
+                                                 苹果  0.27
+                                                 火锅  0.18
+                                                 <span class="dim">…（其余 5 万个词）</span>
+
+ 关键：输入是<span class="hl">向量</span>
+ "他喜欢吃苹果" ≈ "我喜欢吃苹果"（向量相近）
+ → 输出概率自动相近 = <span class="hl">举一反三</span>，没见过也能猜
+ <span class="dim">权重怎么来？预测错了就微调，重复亿万次（细节本篇不展开）</span></pre>
+  </div>
+  <div class="foot">
+    <div class="take"><span class="lbl">一句话说清</span>神经网络解决"背不下、不会类推"——把查表换成学规律，向量进、概率出。</div>
+    <div class="code"><span class="lbl">④ 数据流 · Python</span><pre>x = embed(context_words)      <span class="cm"># 前文 -&gt; 向量</span>
+h = layer3(layer2(layer1(x))) <span class="cm"># 若干层加权变换</span>
+probs = to_vocab_probs(h)     <span class="cm"># -&gt; 每个候选词的概率</span></pre></div>
+  </div>
+</section>
+
+<!-- ================= P8 第5章 ================= -->
+<section class="slide">
+  <header><span class="tag">第 5 章 · 序列问题</span><h1>读句子的方式为什么重要？——RNN 的顺序瓶颈</h1></header>
+  <div class="band">
+    <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"句子有先有后，神经网络怎么'读'一串词？一个个读不就行了？"</em></div>
+    <div class="pt"><span class="lbl">② 点破卡点</span>早期标准答案 RNN/LSTM 就是逐词顺序读、滚动更新"记忆"。两个治不好的病：<b>慢</b>——前一个不算完下一个不能开始，GPU 干瞪眼；<b>健忘</b>——读到句尾，句首已被冲刷干净。</div>
+  </div>
+  <div class="art-wrap">
+<pre class="art"> RNN 顺序读：
+  我 → 今天 → 想 → 吃 → …
+  ↓     ↓    ↓   ↓
+ [记忆]→[记忆]→[记忆]→[记忆]→…   <span class="hl">第 1000 个词要等前 999 个算完</span>
+
+ 长句实测：
+ "我出生在中国，……（隔了 50 个词）……所以我说一口流利的 ___"
+ 读到结尾时，"中国"的信息已磨损殆尽 → 填不出"中文"
+
+ <span class="dim">病根：信息只能从前往后、挤一条缝传过来</span></pre>
+  </div>
+  <div class="foot">
+    <div class="take"><span class="lbl">一句话说清</span>RNN 用"顺序读 + 滚动记忆"处理序列，慢且记不住长的——瓶颈就在"顺序"本身。</div>
+    <div class="code"><span class="lbl">④ 数据流 · Python</span><pre>memory = init()
+for word in sentence:            <span class="cm"># 只能顺序循环</span>
+    memory = rnn_step(memory, embed(word))
+probs = predict(memory)          <span class="cm"># 用最后的记忆预测</span></pre></div>
+  </div>
+</section>
+
+<!-- ================= P9 第6章上 ================= -->
+<section class="slide">
+  <header><span class="tag">第 6 章 · 上</span><h1>注意力：让每个词"看全局"</h1></header>
+  <div class="band">
+    <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"不顺序读，机器怎么知道每个词在句子里是什么意思？"</em></div>
+    <div class="pt"><span class="lbl">② 点破卡点</span>RNN 的病根是"信息只能排队往前挤"。反过来：<b>每个词确定自己含义时，直接同时看整句话所有词，重点看跟自己相关的</b>。词义不再是死的——由上下文现场决定。</div>
+  </div>
+  <div class="art-wrap">
+<pre class="art"> 句子："我 买了 一部 苹果 手机"
+
+ 确定"苹果"的含义时，它同时看所有词（线粗 = 关注多）：
+
+           我  ············  弱
+   苹果 →  买了 ───────────  中
+           手机 <span class="hl">═══════════  强 ← 重点！</span>
+           一部 ············  弱
+
+ "苹果"的新向量 = 全句按关注度加权汇总
+ → 挨着"手机"它是<span class="hl">公司</span>，挨着"吃"它是<span class="ok">水果</span></pre>
+  </div>
+  <div class="foot">
+    <div class="take"><span class="lbl">一句话说清</span>注意力解决"看不见全局"——词义由上下文决定，任意两个词都能直接连线，不管隔多远。</div>
+    <div class="code"><span class="lbl">④ 数据流 · Python</span><pre>for word in sentence:                     <span class="cm"># 每个词</span>
+    scores = relevance(word, sentence)    <span class="cm"># 与全句算相关度</span>
+    meaning[word] = weighted_sum(sentence, scores)</pre></div>
+  </div>
+</section>
+
+<!-- ================= P10 第6章下 ================= -->
+<section class="slide">
+  <header><span class="tag">第 6 章 · 下</span><h1>注意力的副产品：顺手治好了"慢"</h1></header>
+  <div class="band">
+    <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"看完上下文之后呢？这跟 RNN 比到底赢在哪？"</em></div>
+    <div class="pt"><span class="lbl">② 点破卡点</span>每个词"看全句"这件事互相不用等——"苹果"看它的，"手机"看它的，<b>所有词同时算</b>。RNN 的"慢"被一起治了：GPU 终于火力全开。</div>
+  </div>
+  <div class="art-wrap">
+<pre class="art">   我     买了    一部    苹果    手机
+   ↓      ↓      ↓      ↓      ↓
+ ┌──────────────────────────────┐
+ │  各自看全句，<span class="hl">同时算，互不等待</span>  │ ← 一次矩阵运算全部算完
+ └──────────────────────────────┘
+   ↓      ↓      ↓      ↓      ↓
+  新向量  新向量  新向量  新向量  新向量
+ <span class="dim">（每个新向量都"泡过"整句上下文）</span>
+
+ 对比 RNN：必须等"苹果"算完，才能开始算"手机"
+ 拿"泡过上下文"的向量去预测下一个词，质量远超那份"被冲刷的记忆"</pre>
+  </div>
+  <div class="foot">
+    <div class="take"><span class="lbl">一句话说清</span>注意力天然并行——全局感知和速度，一次解决。</div>
+    <div class="code"><span class="lbl">④ 数据流 · Python</span><pre><span class="cm"># 所有词同时计算（矩阵运算，一次算完）</span>
+context_vecs = attention(embed(sentence))  <span class="cm"># 并行</span></pre></div>
+  </div>
+</section>
+
+<!-- ================= P11 第7章上 ================= -->
+<section class="slide">
+  <header><span class="tag">第 7 章 · 上</span><h1>Transformer 到底是什么？——三件事</h1></header>
+  <div class="band">
+    <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"Transformer 听起来很玄，是不是一个特别复杂的黑盒？"</em></div>
+    <div class="pt"><span class="lbl">② 点破卡点</span>不玄，就是三块拼图各治一病——前两块你已经见过了。唯一的真问题：<b>所有词同时看，不就不知道谁先谁后了吗？</b>所以补一块"位置编码"。</div>
+  </div>
+  <div class="art-wrap">
+<pre class="art"> ① <span class="hl">注意力</span>   → 全局感知（治"看不见全局"，第 6 章）
+ ② <span class="hl">并行</span>     → 治 RNN 的慢（第 5 章）
+ ③ <span class="hl">位置编码</span> → 治"并行导致的乱序"：把"第几个词"直接加进向量
+
+ 输入: [词向量 + 位置戳]   ← 每个词自带"我排第几"
+        ↓
+ ┌────────────────────────┐
+ │ 注意力：每个词看全句      │
+ │ 变换层：加权变换提取规律  │
+ └────────────────────────┘
+        ↓  <span class="dim">同样的块，堆几十层</span>
+ 输出：每个位置的向量 → 预测下一个词的概率</pre>
+  </div>
+  <div class="foot">
+    <div class="take"><span class="lbl">一句话说清</span>Transformer = 注意力（全局）+ 并行（快）+ 位置编码（不乱序）。三块各治一病，合起来就是全部。</div>
+    <div class="code"><span class="lbl">④ 数据流 · Python</span><pre>x = embed(tokens) + position_stamps  <span class="cm"># 加位置戳</span>
+for block in blocks:
+    x = block(attention(x))            <span class="cm"># 同样的块堆叠</span>
+probs = vocab_head(x[-1])              <span class="cm"># -&gt; 下一个词概率</span></pre></div>
+  </div>
+</section>
+
+<!-- ================= P12 第7章下 ================= -->
+<section class="slide">
+  <header><span class="tag">第 7 章 · 下</span><h1>为什么赢的是它</h1></header>
+  <div class="band">
+    <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"架构之争我看淡了——凭什么 Transformer 统一了江湖？"</em></div>
+    <div class="pt"><span class="lbl">② 点破卡点</span>不是它更"聪明"，是它<b>吃得下</b>：并行让它能吃互联网级数据，注意力让它能学长距离规律。两者相加，才撑得起后面的"大力出奇迹"。</div>
+  </div>
+  <div class="art-wrap">
+<pre class="art">                RNN                     Transformer
+ 读法      逐词顺序，等前一个          所有词同时看
+ 速度      慢，GPU 大量闲置            并行，GPU 跑满
+ 长程信息  句首信息一路磨损            任意两词直接连线，距离无关
+ 能吃数据  小                         <span class="hl">互联网级</span>
+
+ → 架构竞争的终点不是"谁巧妙"，是<span class="hl">"谁能吃下更多数据"</span></pre>
+  </div>
+  <div class="foot">
+    <div class="take"><span class="lbl">一句话说清</span>Transformer 赢在工程属性——并行吃数据、连线学长程，为规模化铺平了路。</div>
+    <div class="code"><span class="lbl">④ 数据流 · Python</span><pre><span class="cm"># 输入输出形式和从前一样：向量进，概率出</span>
+<span class="cm"># 变的是中间：顺序挤记忆 → 并行看全局</span>
+probs = transformer(context_tokens)</pre></div>
+  </div>
+</section>
+
+<!-- ================= P13 第8章上 ================= -->
+<section class="slide">
+  <header><span class="tag">第 8 章 · 上</span><h1>预训练：在海量文本上练"续写"</h1></header>
+  <div class="band">
+    <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"架构是骨架，可模型的'知识'到底从哪灌进去的？"</em></div>
+    <div class="pt"><span class="lbl">② 点破卡点</span>答案简单得不像话：把互联网文本切成无数道"前文 → 下一个词"练习题，反复做、错了就调权重。<b>不需要人工标注——原文的下一个词就是标准答案。</b></div>
+  </div>
+  <div class="art-wrap">
+<pre class="art"> 互联网海量文本 → 自动切成练习题（免费，要多少有多少）
+   "巴黎是法国的___"   答案："首都"（原文自带）
+   "水在零度会___"     答案："结冰"
+ 亿万道题 × 反复练习 → 权重慢慢调好 = <span class="hl">基础模型</span>
+
+ 练完它会的不只是接词：语法、常识、推理雏形都被压进权重
+
+ 两条路线：
+   <span class="hl">GPT</span>：从左往右"续写" → 擅长生成（写、说、编）
+   BERT：遮住中间"填空" → 擅长理解（分类、检索）
+ <span class="dim">生成式应用爆发，走的是 GPT 路线</span></pre>
+  </div>
+  <div class="foot">
+    <div class="take"><span class="lbl">一句话说清</span>预训练解决"知识从哪来"——用文本自身当答案，在海量续写练习中学会语言。</div>
+    <div class="code"><span class="lbl">④ 数据流 · Python</span><pre>for text in internet_corpus:          <span class="cm"># 海量文本</span>
+    context, answer = text[:-1], text[1:]
+    err = model.error(context, answer)  <span class="cm"># 错多少</span>
+    adjust_weights(err)                 <span class="cm"># 错了就微调</span></pre></div>
+  </div>
+</section>
+
+<!-- ================= P14 第8章下 ================= -->
+<section class="slide">
+  <header><span class="tag">第 8 章 · 下</span><h1>微调：从"会背书"到"会干活"</h1></header>
+  <div class="band">
+    <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"会续写 ≠ 会干活。我要它当客服、写代码，怎么办？"</em></div>
+    <div class="pt"><span class="lbl">② 点破卡点</span>不用从头再练。预训练已把"语言本身"学完（贵，但只练一次）；之后用<b>少量任务样本再练一小段</b>——这叫微调。分工：预训练学语言，微调学干活。</div>
+  </div>
+  <div class="art-wrap">
+<pre class="art"> 预训练（贵，一次）          微调（便宜，随便多少次）
+ 海量文本 → 基础模型 ──┬─ + 客服对话样本 → <span class="hl">客服机器人</span>
+ （续写练习）          ├─ + 代码样本     → <span class="hl">编程助手</span>
+                      └─ + 法律文书样本 → <span class="hl">法律助手</span>
+
+ 类比：预训练 = 读完整个图书馆；微调 = <span class="ok">入职培训</span></pre>
+  </div>
+  <div class="foot">
+    <div class="take"><span class="lbl">一句话说清</span>微调解决"通用不会干活"——在基础模型上用少量样本二次训练，便宜的定制化。</div>
+    <div class="code"><span class="lbl">④ 数据流 · Python</span><pre>base = load_pretrained()               <span class="cm"># 预训练权重</span>
+for sample in task_samples:            <span class="cm"># 少量任务样本</span>
+    adjust_weights(base.error(sample)) <span class="cm"># 再练一小段</span></pre></div>
+  </div>
+</section>
+
+<!-- ================= P15 第9章 ================= -->
+<section class="slide">
+  <header><span class="tag">第 9 章 · 规模</span><h1>为什么模型越大越强？——缩放定律与涌现</h1></header>
+  <div class="band">
+    <div class="q"><span class="lbl">① 你可能的疑惑</span><em>"为什么不'设计'一个更聪明的模型，而是一门心思越堆越大？"</em></div>
+    <div class="pt"><span class="lbl">② 点破卡点</span>因为"变大"本身就是可靠的进步路线：参数量、数据量、算力<b>同步</b>放大时，错误率平滑持续下降（缩放定律）。更意外的是<b>涌现</b>——有些能力小模型几乎为零，过了某个规模突然就会了。</div>
+  </div>
+  <div class="art-wrap">
+<pre class="art"> 预测错误率 │╲
+           │ ╲___ <span class="hl">随规模平滑下降，还没看到头</span>（缩放定律）
+           │
+ 某项能力  │           ····· 大到一定程度：<span class="hl">突然会了</span>（涌现）
+           │ ········· 小模型：几乎为零
+           └──────────────────────→ 参数↑ 数据↑ 算力↑（同步放大）
+
+ <span class="dim">直觉：足够大的"预测下一个词"机器，
+ 为了把预测压得更准，被迫学会了语言背后的规律</span></pre>
+  </div>
+  <div class="foot">
+    <div class="take"><span class="lbl">一句话说清</span>缩放定律解决"怎么稳定变强"——规模同步放大，能力非线性提升，这就是"大力出奇迹"的依据。</div>
+    <div class="code"><span class="lbl">④ 数据流 · Python</span><pre><span class="cm"># 训练流程和第 4 章的小模型一模一样</span>
+<span class="cm"># 唯一变化：模型更大、数据更多、算力更足</span>
+train(big_model, big_data)</pre></div>
+  </div>
+</section>
+
+<!-- ================= P16 第10章 ================= -->
+<section class="slide">
+  <header><span class="tag">第 10 章 · 收束</span><h1>总结与衔接：一张递进图</h1></header>
+  <div class="art-wrap">
+<pre class="art"> 文字 ─①→ 数字 ─②→ 词向量 ─④→ 神经网络 ─⑥→ 注意力 ─⑦→ Transformer
+        机器只懂数字  编号没语义   记词组太笨    顺序读慢且健忘  并行会乱序
+                                                                │
+                                            预训练+微调 ←⑧──────┘
+                                                │⑨
+                                                ↓
+                                            <span class="hl">LLM（大模型）</span>
+                                                │
+                            <span class="ok">"它本质上，还是一台很会预测下一个词的机器"</span>
+                                                │
+                              对齐 → 会聊天的助手 → 会用工具的智能体
+                                                │
+                              <span class="hl">▶▶ 系列下一篇《从 token 到 agent》</span></pre>
+  </div>
+  <div class="foot">
+    <div class="take"><span class="lbl">留给下一篇的三个钩子</span>1. token 是什么？为什么大模型按 token 算钱？　2. 只会"预测下一个词"的机器，为什么能听懂指令、还会一本正经地胡说八道？　3. 从"会说"到"会做"——agent 是怎么调用工具的？</div>
+  </div>
+</section>
+
+<!-- ================= P17 附录 ================= -->
+<section class="slide">
+  <header><span class="tag green">附录</span><h1>三个能跑的小实验<span class="sub">全部本地 CPU 可跑 · Python 3.10+ · 几分钟出结果</span></h1></header>
+  <div class="art-wrap" style="align-items:flex-start; width:100%;">
+    <table class="app">
+      <tr><th>脚本</th><th>演示什么</th><th>对应章节</th><th>你会看到</th></tr>
+      <tr><td>embedding_demo.py</td><td>词义 = 向量</td><td>第 2 章</td><td>几个词两两的相似度：语义相近的词分数明显更高，"猫-狗"远超"猫-汽车"</td></tr>
+      <tr><td>ngram_demo.py</td><td>统计造句</td><td>第 3 章</td><td>用 n-gram 统计一段文本并生成"模仿腔"——腔调很像，细看全是破绽</td></tr>
+      <tr><td>tiny_lm_train_demo.py</td><td>训练 = 压预测错误</td><td>第 3~9 章</td><td>一个几万参数的小模型从头训练：loss 一路下降，续写从乱码长成"有点像"</td></tr>
+    </table>
+  </div>
+  <div class="foot">
+    <div class="take"><span class="lbl">运行方式</span>每个脚本一条命令直接跑：python embedding_demo.py　（脚本 3 需 numpy：pip install numpy）</div>
+  </div>
+</section>
+
+<!-- ================= P18 结束页 ================= -->
+<section class="slide end">
+  <h1>机器从没懂过文字，它懂的是数字——<br>但当"预测下一个数字"被做到极致，<br>懂文字的样子，就自己长出来了。</h1>
+  <div class="next">下一篇：《从 token 到 agent》</div>
+</section>
+
+<script>
+  const slides=[...document.querySelectorAll('.slide')];
+  let i=0;
+  const bar=document.getElementById('bar'),cnt=document.getElementById('cnt');
+  function show(n){
+    i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+    cnt.textContent=(i+1)+' / '+slides.length;
+    bar.style.width=((i+1)/slides.length*100)+'%';
+    location.hash='/'+(i+1);
+  }
+  document.getElementById('next').onclick=()=>show(i+1);
+  document.getElementById('prev').onclick=()=>show(i-1);
+  document.addEventListener('keydown',e=>{
+    if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();show(i+1);}
+    else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();show(i-1);}
+    else if(e.key==='Home')show(0);
+    else if(e.key==='End')show(slides.length-1);
+    else if(e.key==='p'||e.key==='P')window.print();
+  });
+  const m=location.hash.match(/\/(\d+)/);
+  show(m?parseInt(m[1])-1:0);
+</script>
+<script id="wb-shell-js">
+/* === wb-shell v1: 统一导航条（自动隐藏，不遮挡内容；键盘事件复用各deck原生翻页） === */
+(function(){
+  if(window.__wbShell) return; window.__wbShell = true;
+  var nav = document.createElement('div');
+  nav.id = 'wb-nav';
+  nav.innerHTML = '<a href="../index.html" title="返回目录">☰ 目录</a><span class="wb-sep"></span>'
+    + '<button id="wb-prev" title="上一页（←）">&#8249;</button>'
+    + '<span class="wb-page" id="wb-page">–</span>'
+    + '<button id="wb-next" title="下一页（→）">&#8250;</button>'
+    + '<span class="wb-sep"></span><span class="wb-tip">P 打印PDF</span>';
+  document.body.appendChild(nav);
+  var timer = null;
+  function poke(){
+    nav.classList.add('show');
+    if(timer) clearTimeout(timer);
+    timer = setTimeout(function(){ nav.classList.remove('show'); }, 2400);
+  }
+  ['mousemove','keydown','touchstart'].forEach(function(ev){ window.addEventListener(ev, poke, {passive:true}); });
+  function sendKey(k){
+    document.dispatchEvent(new KeyboardEvent('keydown',{key:k,bubbles:true,cancelable:true}));
+  }
+  document.getElementById('wb-prev').addEventListener('click',function(e){e.stopPropagation();sendKey('ArrowLeft');poke();});
+  document.getElementById('wb-next').addEventListener('click',function(e){e.stopPropagation();sendKey('ArrowRight');poke();});
+  nav.addEventListener('click',function(e){ e.stopPropagation(); });
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var pageEl = document.getElementById('wb-page');
+  function update(){
+    var i = -1, k;
+    for(k=0;k<slides.length;k++){ if(slides[k].classList.contains('active')){ i=k; break; } }
+    if(i<0){ for(k=0;k<slides.length;k++){ var cs=getComputedStyle(slides[k]); if(cs.display!=='none'&&cs.visibility!=='hidden'){ i=k; break; } } }
+    pageEl.textContent = (i>=0? i+1 : 1) + ' / ' + slides.length;
+  }
+  if('MutationObserver' in window){
+    var mo = new MutationObserver(function(){ update(); });
+    slides.forEach(function(s){ mo.observe(s,{attributes:true,attributeFilter:['class','style']}); });
+  }
+  window.addEventListener('load',update);
+  setTimeout(update,300);
+  window.addEventListener('keydown',function(e){
+    if(e.key==='p'||e.key==='P'){ e.preventDefault(); window.print(); }
+  });
+})();
+</script>
+</body>
+</html>

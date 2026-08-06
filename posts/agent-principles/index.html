@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Agent 原理与实践</title>
+<style>
+:root{
+  --bg:#e9edf3; --card:#fff; --panel:#f4f7fb; --line:#e2e8f0;
+  --ink:#1f2937; --sub:#5b6675; --faint:#94a3b8;
+  --blue:#2563eb; --green:#0e9f6e; --orange:#c2410c; --purple:#7c3aed; --red:#dc2626;
+  --font:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);font-family:var(--font);color:var(--ink);line-height:1.6;
+     -webkit-font-smoothing:antialiased;padding:64px 24px 80px}
+.wrap{max-width:900px;margin:0 auto}
+
+header{margin-bottom:44px}
+.ser{font-size:13px;letter-spacing:.18em;color:var(--faint)}
+h1{font-size:40px;line-height:1.25;font-weight:700;margin-top:10px}
+.rule{width:56px;height:3px;background:var(--blue);margin:20px 0}
+.sl{font-size:17px;color:var(--sub);max-width:640px}
+
+ol{list-style:none}
+li{margin-bottom:14px}
+a.ch{display:flex;gap:20px;align-items:flex-start;background:var(--card);border:1px solid var(--line);
+     border-left:4px solid var(--blue);border-radius:6px;padding:20px 24px;text-decoration:none;color:inherit;
+     transition:box-shadow .12s ease,transform .12s ease}
+a.ch:hover{box-shadow:0 8px 24px rgba(15,23,42,.10);transform:translateY(-1px)}
+a.ch:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.num{flex:none;width:34px;font-size:22px;font-weight:700;color:var(--faint);line-height:1.3}
+.txt{flex:1}
+.tt{font-size:21px;font-weight:600}
+.dd{font-size:15px;color:var(--sub);margin-top:5px}
+.tag{display:inline-block;font-size:12px;color:var(--faint);border:1px solid var(--line);
+     border-radius:99px;padding:1px 9px;margin-top:9px}
+
+.b1{border-left-color:var(--blue)}   .b2{border-left-color:var(--purple)}
+.b3{border-left-color:var(--green)}  .b4{border-left-color:var(--orange)}
+.b5{border-left-color:var(--red)}    .b6{border-left-color:var(--faint)}
+
+.note{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:16px 20px;
+      font-size:14px;color:var(--sub);margin-top:36px}
+.note b{color:var(--ink)}
+.kbd{display:inline-block;font-size:12px;border:1px solid var(--line);background:#fff;
+     border-radius:4px;padding:0 6px;margin:0 1px}
+footer{margin-top:28px;font-size:13px;color:var(--faint)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="ser">A G E N T</div>
+  <h1>Agent 原理与实践</h1>
+  <div class="rule"></div>
+  <div class="sl">六章。每一章各自成篇，可以单独看，顺序随你。</div>
+</header>
+
+<ol>
+  <li><a class="ch b1" href="ch1.html">
+    <div class="num">01</div>
+    <div class="txt">
+      <div class="tt">装上你的第一个 Agent</div>
+      <div class="dd">客户端和模型是两回事，可以自由组合——怎么装、怎么换、要花多少钱，以及哪几条底线不能越。</div>
+      <div class="tag">零基础 · 不写代码也能跟</div>
+    </div></a></li>
+
+  <li><a class="ch b2" href="ch2.html">
+    <div class="num">02</div>
+    <div class="txt">
+      <div class="tt">从图灵到 Transformer</div>
+      <div class="dd">每一代都在解决上一代的什么瓶颈——两次寒冬、三大流派的交替，一直讲到自注意力为什么管用。</div>
+      <div class="tag">概念课 · 一条线讲到底</div>
+    </div></a></li>
+
+  <li><a class="ch b3" href="ch3.html">
+    <div class="num">03</div>
+    <div class="txt">
+      <div class="tt">从 chat 到 agent</div>
+      <div class="dd">一个只会续写的模型，是怎么一步步变成能自己干活的东西的——预训练、对齐、思维链、工具调用、上下文工程。</div>
+      <div class="tag">工程课 · 讲清每一步加了什么</div>
+    </div></a></li>
+
+  <li><a class="ch b4" href="ch4.html">
+    <div class="num">04</div>
+    <div class="txt">
+      <div class="tt">Agent 的协议层</div>
+      <div class="dd">tools、MCP、CLI、Skills、A2A 分别在解决什么问题——真实报文、实体关系，以及各自什么时候不该用。</div>
+      <div class="tag">对接层 · 图和报文为主</div>
+    </div></a></li>
+
+  <li><a class="ch b5" href="ch5.html">
+    <div class="num">05</div>
+    <div class="txt">
+      <div class="tt">从 demo 到生产</div>
+      <div class="dd">先定控制权，再选工具——连续谱上怎么给自己定位，以及上线前必须能答上来的那些问题。</div>
+      <div class="tag">决策型 · 附上线前清单</div>
+    </div></a></li>
+
+  <li><a class="ch b6" href="ch6.html">
+    <div class="num">06</div>
+    <div class="txt">
+      <div class="tt">从 Agent 到 AGI</div>
+      <div class="dd">不预测，只梳理路径——五条路线各自的主张、证据、瓶颈，以及如果它对了我们会先看到什么信号。</div>
+      <div class="tag">观点型 · 不给时间表</div>
+    </div></a></li>
+</ol>
+
+<div class="note">
+  <b>翻页方式</b>　方向键 <span class="kbd">←</span> <span class="kbd">→</span>、空格、或者点击页面左右两侧翻页；
+  <span class="kbd">O</span> 打开缩略图总览，<span class="kbd">F</span> 全屏，<span class="kbd">Home</span> / <span class="kbd">End</span> 跳到首末页。
+  地址栏加 <span class="kbd">#12</span> 可以直接跳到第 12 页。
+</div>
+
+<footer>整理日期 2026-08 · 全部内容离线可读，不依赖任何外部资源</footer>
+
+</div>
+</body>
+</html>

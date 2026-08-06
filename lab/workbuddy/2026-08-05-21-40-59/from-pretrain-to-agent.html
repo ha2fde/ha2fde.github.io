@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>从预训练到 Agent：一个 ChatBot 是如何长成的</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg2: #161b22;
+    --bg3: #1c2430;
+    --border: #2d3748;
+    --text: #e6edf3;
+    --dim: #9aa7b4;
+    --accent: #58a6ff;
+    --accent2: #f78166;
+    --green: #3fb950;
+    --yellow: #d29922;
+    --purple: #bc8cff;
+    --pink: #f778ba;
+    --mono: "SF Mono", "JetBrains Mono", Consolas, "Courier New", monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; background: var(--bg); color: var(--text);
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+    overflow: hidden; }
+  .slide { display: none; width: 100vw; height: 100vh; padding: 56px 80px 70px;
+    flex-direction: column; overflow-y: auto; }
+  .slide.active { display: flex; }
+  .kicker { color: var(--accent); font-size: 15px; letter-spacing: 2px; font-weight: 600;
+    text-transform: uppercase; margin-bottom: 10px; }
+  h1 { font-size: 54px; line-height: 1.2; margin-bottom: 18px; }
+  h2 { font-size: 36px; line-height: 1.25; margin-bottom: 6px; }
+  .sub { color: var(--dim); font-size: 19px; margin-bottom: 26px; }
+  .cols { display: flex; gap: 36px; flex: 1; min-height: 0; }
+  .col { flex: 1; min-width: 0; }
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px;
+    padding: 18px 22px; margin-bottom: 14px; }
+  .card h3 { font-size: 18px; margin-bottom: 8px; color: var(--accent); }
+  .card h3.warn { color: var(--accent2); }
+  .card h3.ok { color: var(--green); }
+  .card p, .card li { font-size: 15.5px; line-height: 1.75; color: var(--text); }
+  ul { padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  li::marker { color: var(--accent); }
+  b, strong { color: #fff; }
+  .hl { color: var(--yellow); font-weight: 600; }
+  .hl2 { color: var(--accent2); font-weight: 600; }
+  .ok { color: var(--green); font-weight: 600; }
+  .pp { color: var(--purple); font-weight: 600; }
+  code { font-family: var(--mono); background: #21293a; padding: 2px 7px; border-radius: 5px;
+    font-size: 0.9em; color: #79c0ff; }
+  pre { font-family: var(--mono); background: #0a0e14; border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px 18px; font-size: 13.5px; line-height: 1.65;
+    overflow-x: auto; color: #c9d4e3; margin-bottom: 14px; white-space: pre; }
+  pre .c { color: #6e7f93; }          /* comment */
+  pre .s { color: #a5d6a7; }          /* string */
+  pre .k { color: #f778ba; }          /* keyword */
+  pre .f { color: #d2a8ff; }          /* function */
+  pre .n { color: #79c0ff; }          /* number/special */
+  pre .o { color: #f78166; }          /* operator/special token */
+  .formula { font-family: var(--mono); background: var(--bg3); border-left: 3px solid var(--accent);
+    padding: 12px 18px; border-radius: 0 8px 8px 0; font-size: 16px; margin: 10px 0 16px; color: #d8e2ee; }
+  .tag { display: inline-block; font-size: 12px; font-weight: 700; padding: 3px 10px;
+    border-radius: 20px; margin-right: 6px; vertical-align: middle; }
+  .tag.p { background: rgba(88,166,255,.15); color: var(--accent); border: 1px solid rgba(88,166,255,.4); }
+  .tag.e { background: rgba(247,129,102,.13); color: var(--accent2); border: 1px solid rgba(247,129,102,.4); }
+  .tag.g { background: rgba(63,185,80,.13); color: var(--green); border: 1px solid rgba(63,185,80,.4); }
+  .flow { display: flex; align-items: stretch; gap: 0; margin: 14px 0; flex-wrap: wrap; }
+  .fnode { background: var(--bg3); border: 1px solid var(--accent); border-radius: 10px;
+    padding: 12px 16px; text-align: center; font-size: 14.5px; line-height: 1.5; }
+  .fnode b { display: block; font-size: 15.5px; }
+  .farrow { align-self: center; color: var(--accent); font-size: 22px; padding: 0 10px; }
+  svg { max-width: 100%; height: auto; display: block; }
+  .figcap { text-align: center; color: var(--dim); font-size: 13px; margin-top: 6px; }
+  #progress { position: fixed; top: 0; left: 0; height: 3px; background: var(--accent);
+    z-index: 99; transition: width .25s; }
+  #nav { position: fixed; bottom: 18px; right: 26px; color: var(--dim); font-size: 13px;
+    font-family: var(--mono); z-index: 99; background: rgba(13,17,23,.7); padding: 4px 12px;
+    border-radius: 16px; border: 1px solid var(--border); }
+  #hint { position: fixed; bottom: 18px; left: 26px; color: #4a5568; font-size: 12px; z-index: 99; }
+  .center-wrap { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  table { border-collapse: collapse; width: 100%; font-size: 14.5px; margin-bottom: 12px; }
+  th, td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; line-height: 1.5; }
+  th { background: var(--bg3); color: var(--accent); }
+  td { background: var(--bg2); }
+  .big-quote { font-size: 24px; line-height: 1.7; color: var(--text); border-left: 4px solid var(--accent2);
+    padding: 6px 0 6px 22px; margin: 18px 0; }
+  .toc-item { display: flex; align-items: center; gap: 18px; padding: 13px 20px; background: var(--bg2);
+    border: 1px solid var(--border); border-radius: 12px; margin-bottom: 12px; font-size: 19px; }
+  .toc-num { font-family: var(--mono); color: var(--accent); font-size: 22px; font-weight: 700; min-width: 44px; }
+  .toc-item small { color: var(--dim); font-size: 14px; margin-left: auto; }
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+</style>
+</head>
+<body>
+<div id="progress"></div>
+
+<!-- ==================== S1 封面 ==================== -->
+<section class="slide active">
+  <div class="center-wrap" style="align-items:flex-start;">
+    <div class="kicker">技术分享 · LLM 系统工程</div>
+    <h1>从预训练到 Agent<br><span style="color:var(--accent)">一个 ChatBot 是如何长成的</span></h1>
+    <p class="sub" style="font-size:22px; max-width:900px; line-height:1.7;">
+      接龙 → 对齐 → Chat &nbsp;·&nbsp; CoT → ReAct → Tool Call &nbsp;·&nbsp; Agent<br>
+      <span style="font-size:16px;">不只讲概念，讲清楚每一步的<strong style="color:var(--yellow)">机制原理</strong>与<strong style="color:var(--accent2)">工程要点</strong></span>
+    </p>
+    <div style="margin-top:40px; color:var(--dim); font-size:14px; font-family:var(--mono)">
+      按 → / ← 翻页 &nbsp;·&nbsp; F 全屏
+    </div>
+  </div>
+</section>
+
+<!-- ==================== S2 全景路线 ==================== -->
+<section class="slide">
+  <div class="kicker">Roadmap</div>
+  <h2>全景：一条主线，两次跃迁</h2>
+  <p class="sub">整个故事只有一条主线：<b>模型能力的每一次解锁，都来自"训练目标 / 交互协议"的一次重新设计</b></p>
+  <svg viewBox="0 0 1160 430">
+    <defs><marker id="ar" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#58a6ff"/></marker></defs>
+    <!-- stage boxes -->
+    <g font-family="inherit" text-anchor="middle">
+      <rect x="20" y="60" width="200" height="110" rx="14" fill="#1c2430" stroke="#58a6ff" stroke-width="1.5"/>
+      <text x="120" y="95" fill="#58a6ff" font-size="19" font-weight="700">预训练</text>
+      <text x="120" y="122" fill="#9aa7b4" font-size="13">Next-Token Prediction</text>
+      <text x="120" y="142" fill="#9aa7b4" font-size="13">产出：Base Model</text>
+
+      <rect x="270" y="60" width="200" height="110" rx="14" fill="#1c2430" stroke="#58a6ff" stroke-width="1.5"/>
+      <text x="370" y="95" fill="#58a6ff" font-weight="700" font-size="19">对齐</text>
+      <text x="370" y="122" fill="#9aa7b4" font-size="13">SFT + RLHF/DPO</text>
+      <text x="370" y="142" fill="#9aa7b4" font-size="13">产出：Chat Model</text>
+
+      <rect x="520" y="60" width="200" height="110" rx="14" fill="#1c2430" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="620" y="95" fill="#3fb950" font-weight="700" font-size="19">推理增强</text>
+      <text x="620" y="122" fill="#9aa7b4" font-size="13">CoT / Self-Consistency</text>
+      <text x="620" y="142" fill="#9aa7b4" font-size="13">产出：会"想"的模型</text>
+
+      <rect x="770" y="60" width="200" height="110" rx="14" fill="#1c2430" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="870" y="95" fill="#3fb950" font-weight="700" font-size="19">行动能力</text>
+      <text x="870" y="122" fill="#9aa7b4" font-size="13">ReAct / Tool Call</text>
+      <text x="870" y="142" fill="#9aa7b4" font-size="13">产出：会"做"的模型</text>
+
+      <rect x="400" y="270" width="360" height="110" rx="14" fill="#161b22" stroke="#f78166" stroke-width="2"/>
+      <text x="580" y="312" fill="#f78166" font-weight="700" font-size="22">Agent</text>
+      <text x="580" y="340" fill="#9aa7b4" font-size="13.5">感知 · 规划 · 行动 · 观察 · 记忆 的闭环系统</text>
+      <text x="580" y="360" fill="#9aa7b4" font-size="13.5">模型是引擎，工程是底盘</text>
+    </g>
+    <line x1="220" y1="115" x2="265" y2="115" stroke="#58a6ff" stroke-width="2" marker-end="url(#ar)"/>
+    <line x1="470" y1="115" x2="515" y2="115" stroke="#58a6ff" stroke-width="2" marker-end="url(#ar)"/>
+    <line x1="720" y1="115" x2="765" y2="115" stroke="#3fb950" stroke-width="2" marker-end="url(#ar)"/>
+    <path d="M 870 170 Q 870 325 765 325" fill="none" stroke="#f78166" stroke-width="2" marker-end="url(#ar)"/>
+    <path d="M 620 170 L 620 265" fill="none" stroke="#f78166" stroke-width="2" marker-end="url(#ar)"/>
+    <!-- annotation -->
+    <text x="580" y="235" fill="#d29922" font-size="15" text-anchor="middle" font-weight="600">第二次跃迁：从"对话"到"行动"（推理 + 工具 + 循环）</text>
+    <text x="235" y="215" fill="#d29922" font-size="15" font-weight="600">第一次跃迁：</text>
+    <text x="235" y="235" fill="#d29922" font-size="15" font-weight="600">从"续写"到"对话"</text>
+  </svg>
+  <div class="card">
+    <p><span class="hl">演讲地图：</span>第 1 部分讲 Chat 怎么来（预训练 → 对齐 → 推理服务），第 2 部分讲 Agent 怎么来（CoT → ReAct → Tool Call → Agent Loop）。每一站都回答两个问题：<b>机制上发生了什么？工程上要注意什么？</b></p>
+  </div>
+</section>
+
+<!-- ==================== S3 回顾 Transformer ==================== -->
+<section class="slide">
+  <div class="kicker">Recap · 衔接</div>
+  <h2>回顾：Transformer 给我们的唯一接口</h2>
+  <p class="sub">你已经懂 Transformer —— 但请记住一个事实：<b>它只会做一件事</b></p>
+  <div class="cols">
+    <div class="col">
+      <div class="card">
+        <h3>唯一的接口：下一个 token 的概率分布</h3>
+        <p>输入一段 token 序列，Transformer 对词表中每个词输出一个 logits，经 softmax 得到概率分布：</p>
+        <div class="formula">P(x<sub>t</sub> | x<sub>1</sub>, x<sub>2</sub>, …, x<sub>t-1</sub>) = softmax(W · h<sub>t-1</sub>)</div>
+        <p>所谓"生成"，就是<b>反复从这个分布里取样一个 token、拼回输入、再来一次</b>。聊天、推理、调工具——全都建立在这个单调的接口之上。</p>
+      </div>
+      <div class="card">
+        <h3 class="warn">关键认知</h3>
+        <p>模型<b>没有"回答问题"的原生概念</b>。它只会"续写文本"。后面所有的魔法——聊天、推理、Agent——都是围绕这个接口做的<b>训练设计与协议设计</b>。</p>
+      </div>
+    </div>
+    <div class="col">
+      <svg viewBox="0 0 520 330">
+        <defs><marker id="ar2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 z" fill="#9aa7b4"/></marker></defs>
+        <g font-family="inherit">
+          <!-- input tokens -->
+          <rect x="20" y="30" width="76" height="40" rx="8" fill="#1c2430" stroke="#2d3748"/>
+          <text x="58" y="55" fill="#e6edf3" font-size="14" text-anchor="middle">今天</text>
+          <rect x="104" y="30" width="76" height="40" rx="8" fill="#1c2430" stroke="#2d3748"/>
+          <text x="142" y="55" fill="#e6edf3" font-size="14" text-anchor="middle">天气</text>
+          <rect x="188" y="30" width="76" height="40" rx="8" fill="#1c2430" stroke="#2d3748"/>
+          <text x="226" y="55" fill="#e6edf3" font-size="14" text-anchor="middle">怎么</text>
+          <rect x="272" y="30" width="76" height="40" rx="8" fill="#1c2430" stroke="#d29922" stroke-width="2"/>
+          <text x="310" y="55" fill="#d29922" font-size="14" text-anchor="middle">样</text>
+          <!-- transformer -->
+          <line x1="310" y1="70" x2="310" y2="100" stroke="#9aa7b4" marker-end="url(#ar2)"/>
+          <rect x="160" y="104" width="300" height="70" rx="12" fill="#161b22" stroke="#58a6ff" stroke-width="1.5"/>
+          <text x="310" y="133" fill="#58a6ff" font-size="17" text-anchor="middle" font-weight="700">Transformer</text>
+          <text x="310" y="158" fill="#9aa7b4" font-size="12.5" text-anchor="middle">self-attention × N 层 · 只用到最后一个位置</text>
+          <line x1="310" y1="174" x2="310" y2="204" stroke="#9aa7b4" marker-end="url(#ar2)"/>
+          <!-- distribution bar chart -->
+          <text x="30" y="222" fill="#9aa7b4" font-size="13">词表上的概率分布（softmax 后）：</text>
+          <rect x="60" y="240" width="200" height="22" rx="4" fill="#3fb950"/>
+          <text x="268" y="256" fill="#e6edf3" font-size="13">"？" 0.61</text>
+          <rect x="60" y="270" width="70" height="22" rx="4" fill="#2d6a4f"/>
+          <text x="138" y="286" fill="#e6edf3" font-size="13">"呢" 0.21</text>
+          <rect x="60" y="300" width="30" height="22" rx="4" fill="#214e3a"/>
+          <text x="98" y="316" fill="#e6edf3" font-size="13">"的" 0.09 …</text>
+        </g>
+      </svg>
+      <p class="figcap">注意力再复杂，出口只有一个：最后一个位置上的概率分布</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== S4 预训练原理 ==================== -->
+<section class="slide">
+  <div class="kicker">Part 1 · 预训练</div>
+  <h2>预训练：把"压缩互联网"写成一道数学题</h2>
+  <p class="sub"><span class="tag p">原理</span>目标函数朴素到不可思议——但它是后面一切的地基</p>
+  <div class="cols">
+    <div class="col">
+      <div class="card">
+        <h3>目标：最小化负对数似然（交叉熵）</h3>
+        <div class="formula">L = − Σ<sub>t</sub> log P<sub>θ</sub>(x<sub>t</sub> | x<sub>&lt;t</sub>)</div>
+        <ul>
+          <li><b>Teacher Forcing</b>：训练时输入永远是"正确的前文"，而不是模型自己生成的——一条语料并行算出所有位置的 loss，一次前向 + 一次反向就完成。</li>
+          <li>每个位置都是一道 <b>|V| 分类</b>（词表规模，通常 3 万~15 万）的多分类题；万亿 token = 万亿道题。</li>
+          <li><b>评估指标：Perplexity（困惑度）</b> = exp(平均 loss)，直觉是"模型在下一个词上平均犹豫几个候选"。</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>为什么"接龙"能学会知识？</h3>
+        <p>为了降低 loss，模型被迫学习<b>一切有助于预测的东西</b>：语法 → 事实 → 逻辑 → 代码 → 数学模式。预测即压缩，<span class="hl">压缩即智能</span>（Ilya 的名言：预测下一个词，逼着你理解产生这些词的世界）。</p>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card">
+        <h3>一条语料在训练中的样子</h3>
+      </div>
+<pre><span class="c"># 语料: "巴黎是法国的首都"</span>
+输入位置:  [巴黎]  [是]   [法国]  [的]   [首都]
+预测目标:   是     法国    的     首都   [EOS]
+            ↑      ↑      ↑      ↑      ↑
+          每个位置都算一个交叉熵 loss，<span class="k">并行</span>计算</pre>
+      <div class="card">
+        <h3 class="warn">Base Model 的"性格"</h3>
+        <p>训练完成后它是一个<b>概率化的互联网文本续写器</b>：你给它问题，它可能续写出"更多相似的问题"——因为在互联网语料里，问题后面经常跟着另一个问题。<span class="hl2">它能聊天，但它不知道自己在聊天。</span>这就是对齐要解决的问题。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== S5 预训练工程 ==================== -->
+<section class="slide">
+  <div class="kicker">Part 1 · 预训练</div>
+  <h2>预训练工程：真正烧钱的地方全是细节</h2>
+  <p class="sub"><span class="tag e">工程</span>业界共识：算法早就公开，差距在数据与系统工程</p>
+  <div class="cols">
+    <div class="col">
+      <div class="card">
+        <h3>① 数据管线（决定上限）</h3>
+        <ul>
+          <li><b>清洗与过滤</b>：去 boilerplate、语言识别、质量分类器（用小型模型给语料打分）。</li>
+          <li><b>去重</b>：MinHash / SimHash 模糊去重——重复数据显著拉低效果。</li>
+          <li><b>配比是一门玄学</b>：网页 : 书籍 : 代码 : 数学 : 多语言的比例直接塑造能力结构；<span class="hl">代码数据被证明显著提升推理能力</span>。</li>
+          <li><b>Tokenizer</b>：BPE 把文本切成 subword；压缩率影响训练成本与多语言能力。</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>② Scaling Law（决定预算怎么花）</h3>
+        <p>Loss 随 参数量 / 数据量 / 算力 呈<b>可预测的幂律下降</b>。Chinchilla 结论：模型与数据应<b>同比扩展</b>（约 20 tokens / 参数）。意义：<span class="hl">小实验外推大训练，先在 1% 成本上验证再梭哈</span>。</p>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card">
+        <h3>③ 分布式训练（决定能不能训完）</h3>
+        <table>
+          <tr><th>并行策略</th><th>切什么</th><th>解决什么</th></tr>
+          <tr><td>数据并行 DP / ZeRO / FSDP</td><td>batch 与优化器状态</td><td>吞吐量</td></tr>
+          <tr><td>张量并行 TP</td><td>单层权重矩阵横切</td><td>单层放不下</td></tr>
+          <tr><td>流水并行 PP</td><td>按层切段到不同机器</td><td>整模型放不下</td></tr>
+        </table>
+        <ul>
+          <li><b>混合精度</b>：bf16 计算 + fp32 主权重，省显存不掉点。</li>
+          <li><b>MFU</b>（算力利用率）是核心 KPI，优秀团队 50%+。</li>
+          <li><b>万卡集群必然天天坏</b>：周期性 checkpoint + 自动故障恢复 + loss spike 监控（发散就回滚重来）。</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 class="ok">一句话总结</h3>
+        <p>预训练 = <b>好数据 × 大算力 × 不翻车</b>。产出 Base Model，此时它只会"接龙"。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== S6 为什么接龙≠聊天 ==================== -->
+<section class="slide">
+  <div class="kicker">Part 1 · 对齐</div>
+  <h2>第一次跃迁：为什么"接龙"≠"聊天"</h2>
+  <p class="sub"><span class="tag p">原理</span>问题不在能力，在<b>分布</b>：互联网文本里"问答对话"只是很小一部分</p>
+  <div class="cols">
+    <div class="col">
+<pre><span class="c"># 直接问 Base Model：</span>
+<span class="n">输入：</span>中国的首都是哪里？
+
+<span class="n">可能的续写（都是"合理"的接龙）：</span>
+<span class="o">A.</span> 美国的首都是哪里？英国的首都是哪里？  <span class="c">← 续写"题库"</span>
+<span class="o">B.</span> 这个问题困扰了很多人。首先要明确……  <span class="c">← 续写"论坛帖"</span>
+<span class="o">C.</span> 北京。                              <span class="c">← 碰巧答对，但风格不可控</span></pre>
+      <div class="card">
+        <h3 class="warn">症结</h3>
+        <p>模型学的是<b>互联网上文本的分布</b>，而"一个乐于助人的助手直接回答用户问题"这种分布在原始语料里占比极低。<span class="hl2">对齐 = 扭转输出的条件分布</span>：给定同样的前文，让"助手式回答"的概率压过其他一切续写。</p>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card">
+        <h3>对齐要解决的三件事（H 原则）</h3>
+        <ul>
+          <li><b>Helpful（有用）</b>：理解指令、直接作答、不打太极。→ 主要靠 <span class="pp">SFT</span></li>
+          <li><b>Honest（诚实）</b>：不知道就说不知道，不编。→ SFT + <span class="pp">RLHF</span></li>
+          <li><b>Harmless（无害）</b>：拒绝危险请求。→ 主要靠 <span class="pp">RLHF / 安全数据</span></li>
+        </ul>
+      </div>
+      <div class="flow">
+        <div class="fnode"><b>Base Model</b>互联网接龙机</div>
+        <div class="farrow">→</div>
+        <div class="fnode" style="border-color:var(--purple)"><b>SFT</b>学会"对话格式"</div>
+        <div class="farrow">→</div>
+        <div class="fnode" style="border-color:var(--purple)"><b>RLHF / DPO</b>学会"人的偏好"</div>
+        <div class="farrow">→</div>
+        <div class="fnode" style="border-color:var(--green)"><b>Chat Model</b>可发布的产品</div>
+      </div>
+      <div class="card">
+        <h3 class="ok">经验法则</h3>
+        <p><b>SFT 教格式，RLHF 调味。</b>能力的 95% 来自预训练，对齐做的是"解锁"与"塑形"，而不是"注入新知识"。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== S7 SFT 原理 ==================== -->
+<section class="slide">
+  <div class="kicker">Part 1 · 对齐</div>
+  <h2>SFT：用"对话模板"把接龙改造成问答</h2>
+  <p class="sub"><span class="tag p">原理</span>核心技巧只有两个：<b>结构化模板</b> + <b>Loss Mask</b></p>
+  <div class="cols">
+    <div class="col">
+      <div class="card">
+        <h3>① Chat Template：把对话序列化成"一种新文档"</h3>
+<pre><span class="o">&lt;|im_start|&gt;</span><span class="n">system</span>
+你是一个乐于助人的助手。<span class="o">&lt;|im_end|&gt;</span>
+<span class="o">&lt;|im_start|&gt;</span><span class="n">user</span>
+中国的首都是哪里？<span class="o">&lt;|im_end|&gt;</span>
+<span class="o">&lt;|im_start|&gt;</span><span class="n">assistant</span>
+中国的首都是北京。<span class="o">&lt;|im_end|&gt;</span></pre>
+        <p>特殊 token（<code>&lt;|im_start|&gt;</code> 等）在预训练中从未出现，<span class="hl">从零学起、语义干净</span>。模型学到：看到 <code>assistant</code> 开头，就进入"回答模式"；生成 <code>&lt;|im_end|&gt;</code> 就<b>停止</b>——聊天有了"句号"，这是它能成为产品的前提。</p>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card">
+        <h3>② Loss Mask：只在"助手该说的部分"上算损失</h3>
+<pre>token:  system...  user问题...   assistant  回答   <span class="o">&lt;|im_end|&gt;</span>
+mask:    <span class="o">0（不算）</span>   <span class="o">0（不算）</span>      <span class="o">0</span>      <span class="k">1</span>      <span class="k">1（算！）</span></pre>
+        <p>问题部分的 token <b>不作为训练目标</b>（用户说什么不该由模型"负责"），但仍在上下文中提供条件。<span class="hl">EOS token 必须算 loss</span>，否则模型永远学不会停下。</p>
+      </div>
+      <div class="card">
+        <h3>本质</h3>
+        <p>目标函数没变，还是 next-token 交叉熵。变的是<b>数据分布</b>：几万~几百万条高质量 (指令, 回答) 对。模型把"接龙能力"重新聚焦到"助手行为"上——这就是<b>行为克隆（Behavior Cloning）</b>。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== S8 SFT 工程 ==================== -->
+<section class="slide">
+  <div class="kicker">Part 1 · 对齐</div>
+  <h2>SFT 工程：数据质量是唯一护城河</h2>
+  <p class="sub"><span class="tag e">工程</span>LIMA 论文的震撼结论：1000 条精修数据，胜过高量低质</p>
+  <div class="cols">
+    <div class="col">
+      <div class="card">
+        <h3>数据侧</h3>
+        <ul>
+          <li><b>质量 ≫ 数量</b>：标注一致性差的数据会教会模型"精神分裂"。</li>
+          <li><b>多样性覆盖</b>：问答 / 写作 / 代码 / 数学 / 拒答 / 多轮，配比即产品性格。</li>
+          <li><b>蒸馏是捷径</b>：用更强的模型（GPT-4 级）生成回答，人工抽检后微调小模型——行业标配。</li>
+          <li><b>去污染</b>：严格剔除评测集泄露，否则 benchmark 全是虚高。</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 class="warn">常见坑</h3>
+        <ul>
+          <li><b>灾难性遗忘</b>：SFT 学太猛会损失预训练的通用能力 → 混入少量通用数据 + 小学习率。</li>
+          <li><b>长度偏置</b>：训练数据全是长回答，模型就会变得啰嗦。</li>
+        </ul>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card">
+        <h3>训练侧超参（与预训练完全不同）</h3>
+        <table>
+          <tr><th>项</th><th>典型做法</th><th>原因</th></tr>
+          <tr><td>学习率</td><td>1e-5 ~ 2e-5（预训练的 1/10）</td><td>只塑形，别破坏</td></tr>
+          <tr><td>轮数</td><td>2~3 epoch</td><td>多了立刻过拟合</td></tr>
+          <tr><td>Packing</td><td>多条对话拼满 4k/8k 上下文</td><td>GPU 利用率翻倍</td></tr>
+          <tr><td>Attention</td><td>packing 内样本间要 mask 隔离</td><td>防止串味</td></tr>
+          <tr><td>显存不够</td><td>LoRA / QLoRA 只训低秩增量</td><td>成本降一个量级</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <h3 class="ok">里程碑</h3>
+        <p>SFT 之后模型已经"会聊天"了——事实上很多开源模型只做到这一步就发布。但距离"聊得好"还差最后一步：<b>对齐人类偏好</b>。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== S9 RLHF ==================== -->
+<section class="slide">
+  <div class="kicker">Part 1 · 对齐</div>
+  <h2>RLHF / DPO：把"我觉得更好"写进模型</h2>
+  <p class="sub"><span class="tag p">原理</span>很多偏好转不成规则（哪个回答"更好"？）——但可以<b>比较</b>，比较就能学</p>
+  <div class="cols">
+    <div class="col">
+      <svg viewBox="0 0 540 400">
+        <defs><marker id="ar3" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 z" fill="#bc8cff"/></marker></defs>
+        <g font-family="inherit" text-anchor="middle">
+          <rect x="20" y="20" width="230" height="56" rx="10" fill="#1c2430" stroke="#2d3748"/>
+          <text x="135" y="42" fill="#e6edf3" font-size="14" font-weight="700">① 同一 prompt 采样</text>
+          <text x="135" y="62" fill="#9aa7b4" font-size="12">SFT 模型生成多个回答</text>
+          <line x1="250" y1="48" x2="295" y2="48" stroke="#bc8cff" stroke-width="1.5" marker-end="url(#ar3)"/>
+          <rect x="300" y="20" width="220" height="56" rx="10" fill="#1c2430" stroke="#2d3748"/>
+          <text x="410" y="42" fill="#e6edf3" font-size="14" font-weight="700">② 人工排序</text>
+          <text x="410" y="62" fill="#9aa7b4" font-size="12">A 比 B 好（pairwise）</text>
+          <line x1="410" y1="76" x2="410" y2="106" stroke="#bc8cff" stroke-width="1.5" marker-end="url(#ar3)"/>
+          <rect x="300" y="110" width="220" height="56" rx="10" fill="#1c2430" stroke="#bc8cff"/>
+          <text x="410" y="132" fill="#bc8cff" font-size="14" font-weight="700">③ 训练奖励模型 RM</text>
+          <text x="410" y="152" fill="#9aa7b4" font-size="12">给回答打分 r(x,y)</text>
+          <line x1="300" y1="138" x2="140" y2="196" stroke="#bc8cff" stroke-width="1.5" marker-end="url(#ar3)"/>
+          <rect x="20" y="200" width="230" height="56" rx="10" fill="#1c2430" stroke="#bc8cff"/>
+          <text x="135" y="222" fill="#bc8cff" font-size="14" font-weight="700">④ PPO 强化学习</text>
+          <text x="135" y="242" fill="#9aa7b4" font-size="12">最大化 RM 分数</text>
+          <line x1="135" y1="256" x2="135" y2="286" stroke="#bc8cff" stroke-width="1.5" marker-end="url(#ar3)"/>
+          <rect x="20" y="290" width="230" height="56" rx="10" fill="#161b22" stroke="#3fb950" stroke-width="2"/>
+          <text x="135" y="312" fill="#3fb950" font-size="14" font-weight="700">对齐后的 Chat 模型</text>
+          <text x="135" y="332" fill="#9aa7b4" font-size="12">更受人类偏好</text>
+          <rect x="300" y="200" width="220" height="90" rx="10" fill="#0a0e14" stroke="#d29922" stroke-dasharray="5,4"/>
+          <text x="410" y="228" fill="#d29922" font-size="13.5" font-weight="700">关键约束：KL 惩罚</text>
+          <text x="410" y="250" fill="#9aa7b4" font-size="12">不许偏离 SFT 模型太远</text>
+          <text x="410" y="270" fill="#9aa7b4" font-size="12">否则 → 奖励 hacking / 崩坏</text>
+        </g>
+      </svg>
+    </div>
+    <div class="col">
+      <div class="card">
+        <h3>RM 怎么学？——Bradley-Terry  pairwise loss</h3>
+        <div class="formula">L = − log σ( r(x, y<sub>好</sub>) − r(x, y<sub>差</sub>) )</div>
+        <p>不需要绝对分数，只要"好的比差的分高"。</p>
+      </div>
+      <div class="card">
+        <h3>PPO 的不稳定 → DPO 的优雅</h3>
+        <p>PPO 要同时维护 4 个模型（actor/critic/RM/ref），调参地狱。<b>DPO</b> 直接从偏好对推导闭式目标：</p>
+        <div class="formula">L<sub>DPO</sub> = − log σ( β·log π(y<sub>好</sub>)/π<sub>ref</sub>(y<sub>好</sub>) − β·log π(y<sub>差</sub>)/π<sub>ref</sub>(y<sub>差</sub>) )</div>
+        <p>不需要 RM、不需要 RL，一次监督式训练搞定——<span class="hl">现在开源界事实标准</span>。</p>
+      </div>
+      <div class="card">
+        <h3 class="warn">工程警示</h3>
+        <p><b>Reward Hacking</b>：模型会找到刷分捷径（如回答变长、堆奉承话）。对策：RM 集成、长度惩罚、定期换 RM。<b>对齐税</b>：过度对齐会变怂变啰嗦，需权衡。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== S10 推理工程 ==================== -->
+<section class="slide">
+  <div class="kicker">Part 1 · Chat 诞生</div>
+  <h2>Chat 上线：推理侧的工程同样决定体验</h2>
+  <p class="sub"><span class="tag e">工程</span>模型文件只是半成品——服务层让它变成"你感受到的那个 Chat"</p>
+  <div class="cols">
+    <div class="col">
+      <div class="card">
+        <h3>① 自回归解码 + KV Cache</h3>
+        <p>每生成 1 个 token 都要完整跑一次前向。朴素实现复杂度 O(n²)；<b>KV Cache</b> 缓存历史 token 的 Key/Value，每步只算新 token 的注意力 → 近 O(n)。</p>
+        <ul>
+          <li>代价：KV Cache 吃显存（与 序列长 × batch 成正比）→ <b>GQA / MLA</b> 压缩 KV 头。</li>
+          <li><b>PagedAttention（vLLM）</b>：像操作系统管内存一样分页管理 KV Cache，吞吐量数倍提升。</li>
+          <li><b>Continuous Batching</b>：请求不等齐步走，谁生成完谁下线、新请求随时插入。</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>③ 采样参数 = 产品的"性格旋钮"</h3>
+        <table>
+          <tr><th>参数</th><th>作用</th><th>直觉</th></tr>
+          <tr><td>Temperature</td><td>分布锐化/摊平</td><td>0=最确定，越高越野</td></tr>
+          <tr><td>Top-p</td><td>只在累计概率 p 内采样</td><td>砍掉长尾胡话</td></tr>
+          <tr><td>Repetition penalty</td><td>惩罚已出现 token</td><td>防复读机</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card">
+        <h3>② 停止与流式</h3>
+        <ul>
+          <li>模型生成 <code>&lt;|im_end|&gt;</code>（SFT 教它的）即触发 <b>stop</b>；同时设 max_tokens 兜底。</li>
+          <li><b>Streaming（SSE）</b>：每出一个 token 立刻推给前端——首 token 延迟（TTFT）比总耗时更影响体感。</li>
+          <li><b>多轮对话</b>没有魔法：每轮把<b>全部历史按 chat template 重新拼接</b>再喂进去。上下文长度就是这样被吃掉的。</li>
+        </ul>
+      </div>
+<pre><span class="c"># 一个请求在服务端的生命周期</span>
+用户消息 → 拼接 chat template(全量历史)
+        → prefill（一次算完全部 KV）     <span class="c"># 算力密集</span>
+        → decode 逐 token 生成 + 流式推送  <span class="c"># 显存带宽密集</span>
+        → 命中 EOS / stop → 释放 KV 槽位</pre>
+      <div class="card">
+        <h3 class="ok">至此，Chat 诞生</h3>
+        <p>预训练给能力，SFT 给格式，RLHF 给品味，推理工程给体验。<span class="hl">但它只会"说"，不会"想"，更不会"做"。</span>下半场开始。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== S11 桥接 ==================== -->
+<section class="slide">
+  <div class="center-wrap">
+    <div class="kicker">转折点</div>
+    <h2>Chat 的天花板：一次前向，一次机会</h2>
+    <div class="big-quote">"9.11 和 9.9 哪个大？" —— 模型必须在一个 token 的时间里给出答案。</div>
+    <div class="cols" style="margin-top:20px;">
+      <div class="col card">
+        <h3 class="warn">三个结构性短板</h3>
+        <ul>
+          <li><b>算不动</b>：复杂推理需要多步计算，但生成是"脱口而出"，没有打草稿的机会。</li>
+          <li><b>不知道</b>：知识截止于训练数据，且无检索手段 → 幻觉。</li>
+          <li><b>做不到</b>：不能查数据库、发邮件、跑代码——输出只有文本。</li>
+        </ul>
+      </div>
+      <div class="col card">
+        <h3 class="ok">下半场的三个补丁</h3>
+        <ul>
+          <li><b>CoT</b>：让它<b>把思考写下来</b> → 解决"算不动"</li>
+          <li><b>ReAct</b>：让思考与<b>外部交互</b>交替 → 解决"不知道"</li>
+          <li><b>Tool Call</b>：把交互<b>协议化、结构化</b> → 解决"做不到"</li>
+        </ul>
+        <p style="margin-top:8px;">三者合体，套上一个循环 → <span class="hl2">Agent</span>。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== S12 CoT 原理 ==================== -->
+<section class="slide">
+  <div class="kicker">Part 2 · CoT</div>
+  <h2>Chain-of-Thought：把"打草稿"变成输出的一部分</h2>
+  <p class="sub"><span class="tag p">原理</span>Wei et al. 2022：在回答前先生成推理步骤，数学/逻辑任务暴涨</p>
+  <div class="cols">
+    <div class="col">
+<pre><span class="c"># 直接回答（错）</span>
+Q: 小明有 3 箱苹果，每箱 24 个，吃了 15 个，还剩几个？
+A: 57 个。 <span class="o">✗</span>
+
+<span class="c"># CoT（对）</span>
+Q: 小明有 3 箱苹果，每箱 24 个，吃了 15 个，还剩几个？
+A: 先算总数：3 × 24 = 72 个。
+   再减去吃掉的：72 − 15 = 57…… 
+   等一下，<span class="n">3 × 24 = 72</span>，72 − 15 = <span class="n">57</span>。
+   所以还剩 57 个。 <span class="o">✗→✓ 中间步骤让每一步只需"局部正确"</span></pre>
+      <div class="card">
+        <h3>为什么有效？三个机制</h3>
+        <ul>
+          <li><b>串行计算预算</b>：Transformer 一层只有一次"思考"，中间 token = 额外的计算步数。想得越久，能解的题越难。</li>
+          <li><b>分解降低单步难度</b>：每步只是简单算术/局部推理，落在模型可靠区内。</li>
+          <li><b>草稿即上下文</b>：中间结果写出来后，成为后续生成的条件——相当于外置工作记忆。</li>
+        </ul>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card">
+        <h3>三种用法</h3>
+        <ul>
+          <li><b>Few-shot CoT</b>：在 prompt 里给几个"带推理过程"的示例。</li>
+          <li><b>Zero-shot CoT</b>：一句咒语 <code>Let's think step by step</code>（Kojima 2022）。</li>
+          <li><b>Self-Consistency</b>：采样多条推理路径，<b>对最终答案投票</b>——推理路径可错，答案多数为王。</li>
+        </ul>
+      </div>
+      <svg viewBox="0 0 520 240">
+        <g font-family="inherit">
+          <text x="20" y="26" fill="#9aa7b4" font-size="13.5">Self-Consistency：多条路径 → 投票</text>
+          <line x1="60" y1="45" x2="200" y2="80" stroke="#58a6ff" stroke-width="1.5"/>
+          <line x1="60" y1="45" x2="200" y2="135" stroke="#58a6ff" stroke-width="1.5"/>
+          <line x1="60" y1="45" x2="200" y2="190" stroke="#58a6ff" stroke-width="1.5"/>
+          <rect x="15" y="32" width="90" height="28" rx="8" fill="#1c2430" stroke="#2d3748"/>
+          <text x="60" y="51" fill="#e6edf3" font-size="13" text-anchor="middle">问题</text>
+          <rect x="200" y="65" width="130" height="30" rx="8" fill="#1c2430" stroke="#58a6ff"/>
+          <text x="265" y="84" fill="#e6edf3" font-size="12.5" text-anchor="middle">路径1 → 57</text>
+          <rect x="200" y="120" width="130" height="30" rx="8" fill="#1c2430" stroke="#58a6ff"/>
+          <text x="265" y="139" fill="#e6edf3" font-size="12.5" text-anchor="middle">路径2 → 57</text>
+          <rect x="200" y="175" width="130" height="30" rx="8" fill="#1c2430" stroke="#d29922"/>
+          <text x="265" y="194" fill="#e6edf3" font-size="12.5" text-anchor="middle">路径3 → 62（错）</text>
+          <rect x="370" y="112" width="130" height="46" rx="10" fill="#161b22" stroke="#3fb950" stroke-width="2"/>
+          <text x="435" y="133" fill="#3fb950" font-size="14" text-anchor="middle" font-weight="700">投票：57 (2/3)</text>
+          <text x="435" y="150" fill="#9aa7b4" font-size="11.5" text-anchor="middle">代价：n 倍推理开销</text>
+          <line x1="330" y1="80" x2="368" y2="120" stroke="#3fb950" stroke-width="1.5"/>
+          <line x1="330" y1="135" x2="368" y2="135" stroke="#3fb950" stroke-width="1.5"/>
+          <line x1="330" y1="190" x2="368" y2="150" stroke="#d29922" stroke-width="1.5" stroke-dasharray="4,3"/>
+        </g>
+      </svg>
+      <div class="card">
+        <h3>演进：从 prompt 技巧到训练目标</h3>
+        <p>推理模型（o1/R1 路线）：用 <b>RL 直接奖励长 CoT + 正确答案</b>，模型自己学会反思、验证、回溯。<span class="hl">CoT 从"提示词"内化为"能力"</span>——代价是推理 token 暴涨，工程上要有 thinking budget。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== S13 ReAct ==================== -->
+<section class="slide">
+  <div class="kicker">Part 2 · ReAct</div>
+  <h2>ReAct：让"想"和"查"交替进行</h2>
+  <p class="sub"><span class="tag p">原理</span>Yao et al. 2022：Thought → Action → Observation 循环，专治"闭门造车"</p>
+  <div class="cols">
+    <div class="col">
+<pre><span class="n">Question:</span> 现任苹果公司 CEO 出生的城市，2023 年人口大约多少？
+
+<span class="pp">Thought 1:</span> 我需要先查苹果现任 CEO 是谁。
+<span class="o">Action 1:</span> search[<span class="s">"current CEO of Apple"</span>]
+<span class="k">Observation 1:</span> Tim Cook，自 2011 年起担任 CEO。
+
+<span class="pp">Thought 2:</span> 查到了，是 Tim Cook。接下来查他的出生地。
+<span class="o">Action 2:</span> search[<span class="s">"Tim Cook birthplace"</span>]
+<span class="k">Observation 2:</span> 出生于美国阿拉巴马州莫比尔（Mobile）。
+
+<span class="pp">Thought 3:</span> 出生城市是莫比尔。现在查它 2023 年人口。
+<span class="o">Action 3:</span> search[<span class="s">"Mobile Alabama population 2023"</span>]
+<span class="k">Observation 3:</span> 约 18.3 万人。
+
+<span class="pp">Thought 4:</span> 信息齐全，可以回答了。
+<span class="o">Action 4:</span> finish[<span class="s">"约 18.3 万人"</span>]</pre>
+    </div>
+    <div class="col">
+      <div class="card">
+        <h3>设计精髓</h3>
+        <ul>
+          <li><b>推理轨迹显式化</b>：Thought 让模型规划"下一步查什么"、解读"查到了什么"。</li>
+          <li><b>外部信息锚定</b>：Observation 是真实世界的反馈，<span class="hl">把幻觉拽回地面</span>——纯 CoT 容易"一本正经地推错到底"。</li>
+          <li><b>实现就是 prompt + 解析</b>：few-shot 示例教格式，程序正则解析 Action、执行、把结果拼回上下文。零训练即可跑。</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 class="warn">ReAct 的工程痛点（引出 Tool Call）</h3>
+        <ul>
+          <li><b>格式脆弱</b>：模型输出稍走样（少了冒号、多了废话），正则解析就崩。</li>
+          <li><b>参数是自由文本</b>：<code>search["..."]</code> 里的参数没有类型、没有校验。</li>
+          <li><b>错误难处理</b>：解析失败只能"重新问一遍"，没有结构化错误通道。</li>
+        </ul>
+        <p style="margin-top:6px;"><span class="hl2">→ 需要把"调用"从文本风格升级为协议：Tool Call。</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== S14 Tool Call 原理 ==================== -->
+<section class="slide">
+  <div class="kicker">Part 2 · Tool Call</div>
+  <h2>Tool Call（上）：模型是怎么"学会"调工具的</h2>
+  <p class="sub"><span class="tag p">原理</span>不是魔法，还是 SFT：把"调用"变成一种<b>带特殊 token 的结构化文本</b></p>
+  <div class="cols">
+    <div class="col">
+      <div class="card">
+        <h3>训练视角：三件事教给模型</h3>
+        <ul>
+          <li><b>认识工具</b>：工具的 JSON Schema（名称/参数/说明）注入 system prompt，模型学会"有哪些工具、参数什么意思"。</li>
+          <li><b>决定调不调</b>：训练数据里既有"直接回答"也有"发起调用"的样本 → 模型学会<b>路由判断</b>。</li>
+          <li><b>生成合法调用</b>：用特殊 token 包裹的 JSON 作为训练目标（同样只在 assistant 段算 loss）：</li>
+        </ul>
+<pre><span class="o">&lt;|im_start|&gt;</span><span class="n">assistant</span>
+<span class="o">&lt;tool_call&gt;</span>
+{<span class="s">"name"</span>: <span class="s">"get_weather"</span>,
+ <span class="s">"arguments"</span>: {<span class="s">"city"</span>: <span class="s">"北京"</span>, <span class="s">"unit"</span>: <span class="s">"celsius"</span>}}
+<span class="o">&lt;/tool_call&gt;</span><span class="o">&lt;|im_end|&gt;</span></pre>
+      </div>
+      <div class="card">
+        <h3>数据从哪来</h3>
+        <p>人工构造 + 强模型蒸馏：给定工具集，让强模型生成"何时调、传什么参、多轮怎么串"的轨迹，过滤校验后训练。<b>校验必须机械化</b>：JSON 可解析 + 参数过 Schema，才准入训练集。</p>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card">
+        <h3>对比 ReAct：从"风格"到"协议"</h3>
+        <table>
+          <tr><th></th><th>ReAct 文本解析</th><th>Tool Call 协议</th></tr>
+          <tr><td>格式保障</td><td>靠 prompt 自觉</td><td>特殊 token + 训练内化</td></tr>
+          <tr><td>参数类型</td><td>自由文本</td><td>JSON Schema 强类型</td></tr>
+          <tr><td>解析可靠性</td><td>正则，易碎</td><td>可<b>约束解码</b>：生成时强制合法 JSON</td></tr>
+          <tr><td>并行调用</td><td>难</td><td>一次输出多个调用</td></tr>
+          <tr><td>错误通道</td><td>无</td><td>结构化错误回填</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <h3 class="warn">关键工程点：约束解码（Constrained Decoding）</h3>
+        <p>生成 tool_call 段时，用 Schema 构造<b>状态机</b>，每一步把不合法的 token 概率清零（logit mask）。<span class="hl">语法 100% 合法由解码器保证，语义正确性由模型能力保证</span>——分工明确，各管各的。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== S15 Tool Call 工程闭环 ==================== -->
+<section class="slide">
+  <div class="kicker">Part 2 · Tool Call</div>
+  <h2>Tool Call（下）：工程闭环的完整时序</h2>
+  <p class="sub"><span class="tag e">工程</span>模型只负责"提出调用"，执行与回填全是你的代码——这个循环就是 Agent 的发动机</p>
+  <svg viewBox="0 0 1160 340">
+    <defs><marker id="ar4" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+      <path d="M0,0 L9,4.5 L0,9 z" fill="#58a6ff"/></marker></defs>
+    <g font-family="inherit">
+      <text x="150" y="24" fill="#58a6ff" font-size="15" font-weight="700" text-anchor="middle">你的应用 / Agent 运行时</text>
+      <text x="560" y="24" fill="#bc8cff" font-size="15" font-weight="700" text-anchor="middle">LLM</text>
+      <text x="980" y="24" fill="#3fb950" font-size="15" font-weight="700" text-anchor="middle">外部工具</text>
+      <line x1="150" y1="34" x2="150" y2="320" stroke="#2d3748" stroke-dasharray="4,4"/>
+      <line x1="560" y1="34" x2="560" y2="320" stroke="#2d3748" stroke-dasharray="4,4"/>
+      <line x1="980" y1="34" x2="980" y2="320" stroke="#2d3748" stroke-dasharray="4,4"/>
+      <!-- messages -->
+      <line x1="150" y1="60" x2="555" y2="60" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#ar4)"/>
+      <text x="350" y="52" fill="#e6edf3" font-size="13" text-anchor="middle">① 请求：对话历史 + tools Schema + tool_choice</text>
+      <line x1="560" y1="95" x2="155" y2="95" stroke="#bc8cff" stroke-width="1.5" marker-end="url(#ar4)"/>
+      <text x="350" y="87" fill="#e6edf3" font-size="13" text-anchor="middle">② 输出 tool_calls（可多个，可约束解码）</text>
+      <line x1="150" y1="130" x2="975" y2="130" stroke="#3fb950" stroke-width="1.5" marker-end="url(#ar4)"/>
+      <text x="560" y="122" fill="#e6edf3" font-size="13" text-anchor="middle">③ 校验 Schema → 执行（鉴权/超时/重试/幂等）→ 拿结果</text>
+      <line x1="980" y1="165" x2="155" y2="165" stroke="#3fb950" stroke-width="1.5" marker-end="url(#ar4)"/>
+      <text x="560" y="157" fill="#e6edf3" font-size="13" text-anchor="middle">④ 返回结果 / 结构化错误</text>
+      <line x1="150" y1="200" x2="555" y2="200" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#ar4)"/>
+      <text x="350" y="192" fill="#e6edf3" font-size="13" text-anchor="middle">⑤ 追加 role=tool 消息（tool_call_id 对应），再次请求</text>
+      <line x1="560" y1="235" x2="155" y2="235" stroke="#bc8cff" stroke-width="1.5" marker-end="url(#ar4)"/>
+      <text x="350" y="227" fill="#e6edf3" font-size="13" text-anchor="middle">⑥ 生成最终回答 …或又一轮 tool_calls</text>
+      <!-- loop -->
+      <path d="M 590 235 C 700 260 700 90 590 95" fill="none" stroke="#d29922" stroke-width="1.8" stroke-dasharray="6,4" marker-end="url(#ar4)"/>
+      <text x="730" y="172" fill="#d29922" font-size="13.5" font-weight="700">循环，直到模型不再发起调用</text>
+      <text x="150" y="312" fill="#9aa7b4" font-size="12.5">⑦ 终止条件：无 tool_calls / 达到 max_iterations / 超时 / 预算耗尽</text>
+    </g>
+  </svg>
+  <div class="cols">
+    <div class="col card">
+      <h3>必须做对的工程细节</h3>
+      <ul>
+        <li><b>Schema 即文档</b>：参数描述写得越清楚，模型传参越准——description 是写给 LLM 的 prompt。</li>
+        <li><b>执行层防护</b>：超时、重试、幂等键、权限最小化；<span class="hl2">模型输出永远不可信，校验后才能执行</span>。</li>
+        <li><b>结果回填要"消化"</b>：大结果先截断/摘要，否则上下文爆炸。</li>
+      </ul>
+    </div>
+    <div class="col card">
+      <h3 class="warn">高频坑</h3>
+      <ul>
+        <li><b>死循环</b>：模型反复调同一失败工具 → 必须设 max_iterations + 失败计数。</li>
+        <li><b>错误吞掉</b>：把异常文本原样回填（含 stack trace），模型会模仿报错风格 → 回结构化的、可行动的错误信息。</li>
+        <li><b>并行调用顺序依赖</b>：有依赖的调用别放同一批。</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== S16 Agent 诞生 ==================== -->
+<section class="slide">
+  <div class="kicker">Part 2 · Agent</div>
+  <h2>Agent 诞生：把循环升级为系统</h2>
+  <p class="sub"><span class="tag p">原理</span>Agent = LLM（大脑）+ Tools（手）+ Memory（经验）+ Loop（意志）</p>
+  <svg viewBox="0 0 1160 400">
+    <defs><marker id="ar5" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#f78166"/></marker></defs>
+    <g font-family="inherit" text-anchor="middle">
+      <!-- center -->
+      <circle cx="580" cy="200" r="72" fill="#161b22" stroke="#f78166" stroke-width="2.5"/>
+      <text x="580" y="193" fill="#f78166" font-size="19" font-weight="700">Agent Loop</text>
+      <text x="580" y="215" fill="#9aa7b4" font-size="12">while not done</text>
+      <!-- nodes -->
+      <rect x="500" y="30" width="160" height="58" rx="12" fill="#1c2430" stroke="#58a6ff" stroke-width="1.5"/>
+      <text x="580" y="54" fill="#58a6ff" font-size="15" font-weight="700">① 感知上下文</text>
+      <text x="580" y="74" fill="#9aa7b4" font-size="12">历史/记忆/工具结果</text>
+      <rect x="830" y="170" width="190" height="58" rx="12" fill="#1c2430" stroke="#bc8cff" stroke-width="1.5"/>
+      <text x="925" y="194" fill="#bc8cff" font-size="15" font-weight="700">② 规划与决策</text>
+      <text x="925" y="214" fill="#9aa7b4" font-size="12">CoT 推理 · 选工具或直接答</text>
+      <rect x="500" y="312" width="160" height="58" rx="12" fill="#1c2430" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="580" y="336" fill="#3fb950" font-size="15" font-weight="700">③ 行动</text>
+      <text x="580" y="356" fill="#9aa7b4" font-size="12">Tool Call 执行</text>
+      <rect x="130" y="170" width="190" height="58" rx="12" fill="#1c2430" stroke="#d29922" stroke-width="1.5"/>
+      <text x="225" y="194" fill="#d29922" font-size="15" font-weight="700">④ 观察与反思</text>
+      <text x="225" y="214" fill="#9aa7b4" font-size="12">结果回填 · 自我纠错</text>
+      <!-- arrows -->
+      <path d="M 640 100 C 760 110 860 140 890 165" fill="none" stroke="#f78166" stroke-width="2" marker-end="url(#ar5)"/>
+      <path d="M 890 235 C 850 280 730 320 665 325" fill="none" stroke="#f78166" stroke-width="2" marker-end="url(#ar5)"/>
+      <path d="M 495 325 C 400 310 280 260 250 235" fill="none" stroke="#f78166" stroke-width="2" marker-end="url(#ar5)"/>
+      <path d="M 250 165 C 290 120 420 80 505 70" fill="none" stroke="#f78166" stroke-width="2" marker-end="url(#ar5)"/>
+      <!-- memory -->
+      <rect x="80" y="40" width="180" height="50" rx="12" fill="#0a0e14" stroke="#2d3748" stroke-dasharray="5,4"/>
+      <text x="170" y="60" fill="#9aa7b4" font-size="13" font-weight="700">记忆系统</text>
+      <text x="170" y="78" fill="#6e7f93" font-size="11.5">短期上下文 / 长期向量库</text>
+      <line x1="260" y1="65" x2="495" y2="55" stroke="#2d3748" stroke-dasharray="4,4"/>
+    </g>
+  </svg>
+  <div class="cols">
+    <div class="col card">
+      <h3>本质上它就是那个 while 循环</h3>
+<pre><span class="k">while</span> <span class="k">not</span> done <span class="k">and</span> steps &lt; max_steps:
+    resp = llm(messages, tools)          <span class="c"># 感知+决策</span>
+    <span class="k">if</span> resp.tool_calls:
+        results = execute(resp.tool_calls) <span class="c"># 行动</span>
+        messages += to_tool_msgs(results)  <span class="c"># 观察回填</span>
+    <span class="k">else</span>:
+        done, answer = <span class="n">True</span>, resp.text</pre>
+    </div>
+    <div class="col card">
+      <h3>与 ChatBot 的分水岭</h3>
+      <p>ChatBot：<b>一问一答，单轮无状态</b>，输出即终点。<br>Agent：<b>目标驱动，多轮闭环</b>，输出是中间态——只有"任务完成"才是终点。模型没变，<span class="hl">是外部的循环与状态管理让它"有了意志"</span>。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== S17 Agent 工程 ==================== -->
+<section class="slide">
+  <div class="kicker">Part 2 · Agent</div>
+  <h2>Agent 工程：Demo 到产品之间隔着这五座山</h2>
+  <p class="sub"><span class="tag e">工程</span>让 Agent 跑起来只要 50 行代码，让它可靠需要一整套系统</p>
+  <div class="cols">
+    <div class="col">
+      <div class="card">
+        <h3>① 上下文管理（最硬的仗）</h3>
+        <ul>
+          <li>长任务几轮就爆 context：<b>分层压缩</b>——工具结果即时摘要、历史滚动摘要、关键事实外置记忆。</li>
+          <li><b>Context 即 prompt 预算</b>：塞得越多，注意力越涣散（lost in the middle），不是越多越好。</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>② 规划与可靠性</h3>
+        <ul>
+          <li>复杂任务先 <b>Plan 再 Execute</b>（或 Plan-Act 混合）；子任务可分派 <b>子 Agent</b> 隔离上下文。</li>
+          <li>错误恢复三件套：重试、换工具、回退一步重规划。</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>③ 成本控制</h3>
+        <p>每一步都是一次全量推理：分层模型（规划用强模型、杂活用弱模型）、缓存、step/预算硬上限。</p>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card">
+        <h3>④ 安全与护栏</h3>
+        <ul>
+          <li><b>最小权限</b>：工具按能力分级，危险操作（写/删/付款）强制人工确认（human-in-the-loop）。</li>
+          <li><b>Prompt Injection 是 Agent 的头号威胁</b>：工具返回的内容=不可信输入，可能挟持后续行为 → 内容隔离 + 行为白名单。</li>
+          <li>全程<b>可观测</b>：trace 每一步 thought/action/observation，否则无法调试。</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>⑤ 评估（比训练更难）</h3>
+        <ul>
+          <li>没有标准答案 → 用 <b>任务成功率</b> + LLM-as-Judge + 人工抽检。</li>
+          <li>回归测试：固定任务集，每次改 prompt/模型后重跑——Agent 系统<span class="hl2">任何小改动都会蝴蝶效应</span>。</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 class="ok">经验之谈</h3>
+        <p>80% 的提升来自<b>更好的工具描述、更干净的上下文、更狠的评估集</b>，而不是换更强的模型。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== S18 总结 ==================== -->
+<section class="slide">
+  <div class="kicker">Summary</div>
+  <h2>总结：一张图记住整条线</h2>
+  <table>
+    <tr><th>阶段</th><th>机制（原理）</th><th>工程要点</th><th>产物</th></tr>
+    <tr><td><b>预训练</b></td><td>Next-token 交叉熵，压缩即智能</td><td>数据清洗/配比、3D 并行、Scaling Law、checkpoint 容错</td><td>会接龙的 Base Model</td></tr>
+    <tr><td><b>SFT</b></td><td>Chat template + Loss Mask，行为克隆</td><td>质量&gt;数量、packing、小 lr 防遗忘</td><td>会"对话格式"的模型</td></tr>
+    <tr><td><b>RLHF/DPO</b></td><td>偏好比较 → 奖励模型 → 策略优化</td><td>KL 约束、防 reward hacking、对齐税</td><td>有"品味"的 Chat 模型</td></tr>
+    <tr><td><b>推理服务</b></td><td>自回归解码</td><td>KV Cache、PagedAttention、流式、采样参数</td><td>可用的 Chat 产品</td></tr>
+    <tr><td><b>CoT</b></td><td>中间 token = 串行计算 + 外置草稿</td><td>self-consistency、thinking budget、RL 内化</td><td>会"想"的模型</td></tr>
+    <tr><td><b>ReAct</b></td><td>Thought-Action-Observation 交替</td><td>格式解析脆弱 → 催生协议化</td><td>会"查"的模型</td></tr>
+    <tr><td><b>Tool Call</b></td><td>调用 = 特殊 token 包裹的结构化文本</td><td>Schema 设计、约束解码、校验执行、错误回填、防死循环</td><td>会"做"的模型</td></tr>
+    <tr><td><b>Agent</b></td><td>LLM + Tools + Memory + while 循环</td><td>上下文压缩、护栏、防注入、任务成功率评估</td><td>目标驱动的系统</td></tr>
+  </table>
+  <div class="card" style="margin-top:6px;">
+    <p><span class="hl">贯穿始终的一句话：</span>模型始终只会"预测下一个 token"。Chat、推理、工具、Agent——全部是<b>围绕这个接口设计的数据分布、协议与循环系统</b>。理解这一点，就理解了 LLM 工程的全部。</p>
+  </div>
+</section>
+
+<!-- ==================== S19 结束 ==================== -->
+<section class="slide">
+  <div class="center-wrap" style="align-items:center; text-align:center;">
+    <h1 style="font-size:64px;">谢谢</h1>
+    <p class="sub" style="font-size:20px;">Q &amp; A</p>
+    <p style="color:var(--dim); font-size:15px; max-width:700px; line-height:2;">
+      延伸阅读：Attention Is All You Need (2017) · InstructGPT (2022) · LIMA (2023)<br>
+      Scaling Laws / Chinchilla (2022) · Chain-of-Thought (2022) · Self-Consistency (2022)<br>
+      ReAct (2022) · DPO (2023) · ToolLLM / Gorilla (2023)
+    </p>
+  </div>
+</section>
+
+<div id="nav"></div>
+<div id="hint">← → 翻页 · Home/End 首末页 · F 全屏</div>
+
+<script>
+(function(){
+  var slides = document.querySelectorAll('.slide');
+  var total = slides.length;
+  var cur = 0;
+  function clamp(i){ return Math.max(0, Math.min(total-1, i)); }
+  function show(i){
+    cur = clamp(i);
+    slides.forEach(function(s, idx){ s.classList.toggle('active', idx === cur); });
+    document.getElementById('progress').style.width = ((cur+1)/total*100) + '%';
+    document.getElementById('nav').textContent = (cur+1) + ' / ' + total;
+    if (history.replaceState) history.replaceState(null, '', '#' + (cur+1));
+  }
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') show(cur+1);
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') show(cur-1);
+    else if (e.key === 'Home') show(0);
+    else if (e.key === 'End') show(total-1);
+    else if (e.key === 'f' || e.key === 'F') {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    }
+  });
+  document.addEventListener('click', function(e){
+    if (e.clientX > window.innerWidth * 0.5) show(cur+1); else show(cur-1);
+  });
+  var start = parseInt((location.hash || '').replace('#',''), 10);
+  if (!isNaN(start)) show(start-1); else show(0);
+})();
+</script>
+</body>
+</html>

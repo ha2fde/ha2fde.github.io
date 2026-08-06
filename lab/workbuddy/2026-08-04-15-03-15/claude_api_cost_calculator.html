@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude 官方 API 月费估算器</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --panel2:#1c2230; --border:#30363d;
+    --text:#e6edf3; --muted:#8b949e; --accent:#58a6ff; --cost:#f0883e;
+    --green:#3fb950; --red:#f85149;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+    padding:28px;line-height:1.5;font-size:14px}
+  h1{font-size:20px;margin:0 0 4px}
+  .sub{color:var(--muted);margin:0 0 20px;font-size:13px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:1000px}
+  @media(max-width:760px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:18px}
+  .card h2{font-size:14px;margin:0 0 14px;color:var(--accent);letter-spacing:.3px}
+  label{display:block;margin:12px 0 5px;color:var(--muted);font-size:12px}
+  select,input{width:100%;background:var(--panel2);border:1px solid var(--border);
+    color:var(--text);border-radius:7px;padding:8px 10px;font-size:13px}
+  input:focus,select:focus{outline:none;border-color:var(--accent)}
+  .row{display:flex;gap:10px}
+  .row>div{flex:1}
+  .result{text-align:center;padding:8px 0}
+  .big{font-size:34px;font-weight:700;color:var(--cost)}
+  .big small{font-size:15px;color:var(--muted);font-weight:400}
+  .per{color:var(--muted);font-size:13px;margin-top:6px}
+  table{width:100%;border-collapse:collapse;margin-top:6px;font-size:13px}
+  th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--border)}
+  th{color:var(--muted);font-weight:500;font-size:12px}
+  td.num{text-align:right;font-variant-numeric:tabular-nums}
+  .tag{display:inline-block;padding:1px 8px;border-radius:20px;font-size:11px;font-weight:600}
+  .tag.cheap{background:rgba(63,185,80,.15);color:var(--green)}
+  .tag.exp{background:rgba(248,81,73,.15);color:var(--red)}
+  .note{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--accent);
+    border-radius:8px;padding:12px 14px;margin-top:16px;color:var(--muted);font-size:12px;max-width:1000px}
+  .note b{color:var(--text)}
+  .breakeven{margin-top:14px;font-size:13px;color:var(--text)}
+  .breakeven b{color:var(--cost)}
+</style>
+</head>
+<body>
+  <h1>Claude 官方 API 月费估算器</h1>
+  <p class="sub">单价、用量、汇率全部可编辑 · 只算钱，不谈别的 · 价格以来源官方页面为准，这里给的是默认值</p>
+
+  <div class="grid">
+    <!-- 左：模型与单价 -->
+    <div class="card">
+      <h2>① 模型与单价（每百万 token，USD）</h2>
+      <label>选择模型</label>
+      <select id="model">
+        <option value="opus4">Claude Opus 4</option>
+        <option value="sonnet4" selected>Claude Sonnet 4</option>
+        <option value="haiku35">Claude Haiku 3.5</option>
+      </select>
+      <div class="row">
+        <div><label>输入单价 $/MTok</label><input id="pin" type="number" step="0.01" value="3"></div>
+        <div><label>输出单价 $/MTok</label><input id="pout" type="number" step="0.01" value="15"></div>
+      </div>
+      <label>提示词缓存命中比例（% 输入走 0.1x 读价）</label>
+      <input id="cache" type="number" step="1" min="0" max="100" value="0">
+      <label>USD → CNY 汇率（可改）</label>
+      <input id="fx" type="number" step="0.1" value="7.2">
+    </div>
+
+    <!-- 右：用量 -->
+    <div class="card">
+      <h2>② 你的用量</h2>
+      <div class="row">
+        <div><label>平均输入 token / 次</label><input id="tin" type="number" step="100" value="2000"></div>
+        <div><label>平均输出 token / 次</label><input id="tout" type="number" step="100" value="800"></div>
+      </div>
+      <div class="row">
+        <div><label>请求次数 / 天</label><input id="req" type="number" step="1" value="50"></div>
+        <div><label>使用天数 / 月</label><input id="days" type="number" step="1" value="30"></div>
+      </div>
+      <div class="breakeven" id="be"></div>
+    </div>
+  </div>
+
+  <!-- 结果 -->
+  <div class="card result" style="max-width:1000px;margin-top:16px">
+    <div class="big" id="monthUsd">$0 <small>/ 月</small></div>
+    <div class="per" id="monthCny">≈ ¥0 / 月 · 单次约 $0</div>
+  </div>
+
+  <!-- 对比 -->
+  <div class="card" style="max-width:1000px;margin-top:16px">
+    <h2>③ 与订阅档对比（按你上面的月用量）</h2>
+    <table>
+      <thead><tr><th>方案</th><th class="num">月费(USD)</th><th class="num">月费(CNY)</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td>官方 API（你上面的估算）</td><td class="num" id="cApi">-</td><td class="num" id="cApiCny">-</td><td><span class="tag cheap">按量</span> 与 5 小时窗口无关</td></tr>
+        <tr><td>Claude Pro</td><td class="num">$20</td><td class="num" id="cPro">-</td><td><span class="tag exp">受限</span> 5 小时窗口 + 单次上限</td></tr>
+        <tr><td>Claude Max 5x</td><td class="num">$100</td><td class="num" id="cMax5">-</td><td><span class="tag exp">受限</span> 额度约 5 倍 Pro</td></tr>
+        <tr><td>Claude Max 20x</td><td class="num">$200</td><td class="num" id="cMax20">-</td><td><span class="tag exp">受限</span> 额度约 20 倍 Pro</td></tr>
+      </tbody>
+    </table>
+    <div class="breakeven" id="verdict"></div>
+  </div>
+
+  <div class="note">
+    <b>怎么读这张表：</b>把你的真实用量填进去，看「官方 API」那行是绿还是红。
+    如果 API 月费 < $20，那 Pro 订阅其实更贵（但你被 5h 窗口卡）；
+    如果 API 月费落在 $20–$200 之间，<b>官方 API 通常比 Max 订阅更划算也更稳</b>，因为 Max 是按订阅卖、用不满就是亏；
+    只有当你 API 月费冲到 $200+，Max 20x 才显得值。<br>
+    <b>关于缓存：</b>大量请求复用同一段长 system prompt / 文档时，开缓存能把输入成本砍到 1/10 量级，记得把「缓存命中比例」调高再看结果。<br>
+    <b>价格默认值是示意（Opus4 ≈ $15/$75，Sonnet4 ≈ $3/$15，Haiku3.5 ≈ $0.8/$4），请到 Anthropic 官网核对最新价后再下结论。</b>
+  </div>
+
+<script>
+  const prices={opus4:[15,75],sonnet4:[3,15],haiku35:[0.8,4]};
+  const M=1e6;
+  const $=id=>document.getElementById(id);
+  function recalc(){
+    const m=$('model').value;
+    if(document.activeElement!==$('pin'))$('pin').value=prices[m][0];
+    if(document.activeElement!==$('pout'))$('pout').value=prices[m][1];
+    const pin=+$('pin').value, pout=+$('pout').value;
+    const cache=Math.max(0,Math.min(100,+$('cache').value))/100;
+    const fx=+$('fx').value||7.2;
+    const tin=+$('tin').value||0, tout=+$('tout').value||0;
+    const req=+$('req').value||0, days=+$('days').value||0;
+
+    // 输入有效单价：缓存读 0.1x，其余原价（忽略写溢价简化）
+    const effIn=pin*(cache*0.1+(1-cache)*1.0);
+    const costPerReq=(tin/M*effIn)+(tout/M*pout);
+    const monthUsd=costPerReq*req*days;
+    const monthCny=monthUsd*fx;
+
+    $('monthUsd').innerHTML='$'+monthUsd.toFixed(2)+' <small>/ 月</small>';
+    $('monthCny').textContent='≈ ¥'+monthCny.toFixed(0)+' / 月 · 单次约 $'+costPerReq.toFixed(4);
+
+    $('cApi').textContent='$'+monthUsd.toFixed(2);
+    $('cApiCny').textContent='¥'+monthCny.toFixed(0);
+    const cny=v=>'¥'+(v*fx).toFixed(0);
+    $('cPro').textContent=cny(20);
+    $('cMax5').textContent=cny(100);
+    $('cMax20').textContent=cny(200);
+
+    // 盈亏平衡：Pro $20 对应多少请求/天
+    const perDayBudget=20/days;
+    const reqPerDayBreak=perDayBudget/costPerReq;
+    $('be').innerHTML='盈亏平衡：当 <b>'+reqPerDayBreak.toFixed(1)+'</b> 次/天时，官方 API 月费 = Pro($20)。低于此值 Pro 更省，高于此值 API 更划算。';
+
+    let v;
+    if(monthUsd<=20) v='当前用量下，<b>Pro 订阅($20)比官方 API 更便宜</b>，但受 5 小时窗口限制；想要 API 形态的稳定访问，按量付费仍可控。';
+    else if(monthUsd<=100) v='当前用量下，<b>官方 API 比 Max 5x($100)更划算</b>，且不受 5 小时窗口卡，建议直接官方 API。';
+    else if(monthUsd<=200) v='当前用量下，<b>官方 API 与 Max 5x 接近</b>，但 API 更灵活；只有冲到 $200+ 才值得上 Max 20x。';
+    else v='用量很大，<b>Max 20x($200) 开始显出性价比</b>，但官方 API 仍是稳定合规首选，可混合用。';
+    $('verdict').innerHTML=v;
+  }
+  ['model','pin','pout','cache','fx','tin','tout','req','days'].forEach(id=>{
+    $(id).addEventListener('input',recalc);
+  });
+  recalc();
+</script>
+</body>
+</html>

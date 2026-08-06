@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第 7 章 深造 — 大模型与 AI Agent 权威资料索引 · AI Agent 实战手册</title>
+<link rel="stylesheet" href="assets/book.css">
+</head>
+<body>
+
+<aside id="bk-side">
+  <div class="bk-brand">
+    <div class="bk-b-k">AI AGENT 系列培训</div>
+    <h1>AI Agent 实战手册</h1>
+    <p>从装上第一个 Agent，到把它送进生产</p>
+  </div>
+  <div class="bk-search"><input id="bk-q" type="search" placeholder="筛选章节标题…" autocomplete="off"></div>
+  <div id="bk-nav">
+    <div class="bk-nav-extra" style="margin-top:0;padding-top:0;border:none">
+      <a href="index.html#bk-cover"><b>—</b>扉页与目录</a>
+    </div>
+    <div class="bk-nav-ch" data-ch="1"><a class="bk-nav-ch-t" href="ch01.html#p1" style="--ac:#2563EB"><b>01</b><span>破冰</span><i>1</i></a><ul><li><a href="ch01.html#p2">开篇与导读</a></li><li><a href="ch01.html#p4">第 1 节 · 它们跟 ChatGPT 有啥不一样？</a></li><li><a href="ch01.html#p5">第 2 节 · 一个壳 + 一个大脑（全篇主线）</a></li><li><a href="ch01.html#p7">第 3 节 · 命令行编程 Agent</a></li><li><a href="ch01.html#p8">第 4 节 · 补全、Agent、AI 编辑器</a></li><li><a href="ch01.html#p9">第 5 节 · 大脑从哪来（云端）</a></li><li><a href="ch01.html#p11">第 6 节 · 自己搭大脑：本地运行大模型</a></li><li><a href="ch01.html#p14">第 7 节 · 一个壳，多个大脑</a></li><li><a href="ch01.html#p16">第 8 节 · 生活里的私人助理</a></li><li><a href="ch01.html#p17">第 9 节 · 办公 Agent 全景</a></li><li><a href="ch01.html#p18">第 10 节 · 全景图与怎么选</a></li><li><a href="ch01.html#p20">第 11 节 · 0 成本上手：免费资源地图</a></li><li><a href="ch01.html#p21">第 12 节 · 破冰行动：第一次上手 5 步</a></li><li><a href="ch01.html#p22">第 13 节 · 总结</a></li></ul></div>
+<div class="bk-nav-ch" data-ch="2"><a class="bk-nav-ch-t" href="ch02.html#p23" style="--ac:#0F766E"><b>02</b><span>前传</span><i>26</i></a><ul><li><a href="ch02.html#p24">开篇与导读</a></li><li><a href="ch02.html#p26">第 1 节 · 文字数字化</a></li><li><a href="ch02.html#p27">第 2 节 · 词的表示</a></li><li><a href="ch02.html#p29">第 3 节 · 语言模型任务</a></li><li><a href="ch02.html#p30">第 4 节 · 神经网络登场</a></li><li><a href="ch02.html#p31">第 5 节 · 序列问题</a></li><li><a href="ch02.html#p32">第 6 节 · 注意力机制</a></li><li><a href="ch02.html#p34">第 7 节 · Transformer</a></li><li><a href="ch02.html#p36">第 8 节 · 预训练与微调</a></li><li><a href="ch02.html#p38">第 9 节 · 规模</a></li><li><a href="ch02.html#p39">第 10 节 · 收束</a></li><li><a href="ch02.html#p40">附录 · 三个能跑的小实验</a></li></ul></div>
+<div class="bk-nav-ch" data-ch="3"><a class="bk-nav-ch-t" href="ch03.html#p42" style="--ac:#7C3AED"><b>03</b><span>机制</span><i>45</i></a><ul><li><a href="ch03.html#p43">导览 · 10 个困惑总览</a></li><li><a href="ch03.html#p45">第 1 节 · 它在搜答案吗</a></li><li><a href="ch03.html#p47">第 2 节 · 它凭什么会回答</a></li><li><a href="ch03.html#p51">第 3 节 · 它怎么"记得"</a></li><li><a href="ch03.html#p54">第 4 节 · 答案为何每次不同</a></li><li><a href="ch03.html#p55">第 5 节 · 一本正经地胡说</a></li><li><a href="ch03.html#p57">第 6 节 · 知道没学过的东西</a></li><li><a href="ch03.html#p59">第 7 节 · 动手干活</a></li><li><a href="ch03.html#p61">第 8 节 · 工具从哪来</a></li><li><a href="ch03.html#p64">第 9 节 · 给程序用上它</a></li><li><a href="ch03.html#p65">第 10 节 · 总结</a></li><li><a href="ch03.html#p66">附录 · 9 个可运行脚本</a></li></ul></div>
+<div class="bk-nav-ch" data-ch="4"><a class="bk-nav-ch-t" href="ch04.html#p67" style="--ac:#B45309"><b>04</b><span>开发</span><i>70</i></a><ul><li><a href="ch04.html#p68">开篇与导读</a></li><li><a href="ch04.html#p70">第 1 节 · 三条路线总览</a></li><li><a href="ch04.html#p72">第 2 节 · 直接调 API</a></li><li><a href="ch04.html#p73">第 3 节 · SDK 帮你省什么</a></li><li><a href="ch04.html#p74">第 4 节 · 手写 ReAct 主循环</a></li><li><a href="ch04.html#p75">第 5 节 · 框架化的 ReAct</a></li><li><a href="ch04.html#p76">第 6 节 · 两种范式对照</a></li><li><a href="ch04.html#p78">第 7 节 · LangGraph 把流程画成图</a></li><li><a href="ch04.html#p79">第 8 节 · 框架全景与选型</a></li><li><a href="ch04.html#p82">第 9 节 · 实战与 checklist</a></li><li><a href="ch04.html#p84">第 10 节 · 总结</a></li><li><a href="ch04.html#p85">附录 · 三个可运行脚本</a></li></ul></div>
+<div class="bk-nav-ch" data-ch="5"><a class="bk-nav-ch-t" href="ch05.html#p87" style="--ac:#0D9488"><b>05</b><span>工程化</span><i>90</i></a><ul>
+<li><a href="ch05.html#p88">本章要回答的问题与三模块总览</a></li>
+<li><a href="ch05.html#p91">模块 A：六大能力支柱</a></li>
+<li><a href="ch05.html#p99">模块 B：四层协议生态与 MCP</a></li>
+<li><a href="ch05.html#p106">模块 C：企业落地与成熟度五级</a></li>
+<li><a href="ch05.html#p111">总结与落地评估速查表</a></li>
+</ul></div>
+<div class="bk-nav-ch" data-ch="6"><a class="bk-nav-ch-t" href="ch06.html#p114" style="--ac:#4F46E5"><b>06</b><span>收束</span><i>117</i></a><ul>
+<li><a href="ch06.html#p115">本章定位与全篇地图</a></li>
+<li><a href="ch06.html#p117">序章 · 苦涩的教训</a></li>
+<li><a href="ch06.html#p123">Chat 的实现（回顾串讲）</a></li>
+<li><a href="ch06.html#p130">Agent 的实现（回顾串讲）</a></li>
+<li><a href="ch06.html#p136">终章 · 体验的时代</a></li>
+</ul></div>
+<div class="bk-nav-ch" data-ch="7"><a class="bk-nav-ch-t" href="#p142" style="--ac:#475569"><b>07</b><span>深造</span><i>145</i></a><ul>
+<li><a href="#p143">怎么读这份索引</a></li>
+<li><a href="#p145">第 1 组 · 大模型基础</a></li>
+<li><a href="#p146">第 2 组 · Agent 范式</a></li>
+<li><a href="#p148">第 3 组 · 工程架构</a></li>
+<li><a href="#p149">第 4 组 · 协议生态</a></li>
+<li><a href="#p150">第 5 组 · 落地实践</a></li>
+<li><a href="#p152">第 6 组 · 课程路径与总览</a></li>
+</ul></div>
+    <div class="bk-nav-extra">
+      <a href="appendix.html"><b>附</b>配套代码（17 个脚本）</a>
+    </div>
+  </div>
+</aside>
+
+<div id="bk-top">
+  <button id="bk-burger" title="收起 / 展开目录">☰</button>
+  <div id="bk-crumb"><b>扉页</b></div>
+  <div class="bk-tools">
+    <button onclick="bkPrint()">打印 / 导出 PDF</button>
+    <button onclick="bkAll(1)">展开全部代码</button>
+  </div>
+  <div id="bk-pageno"><b>—</b> / 153</div>
+</div>
+<div id="bk-bar"><i></i></div>
+
+<main id="bk-main"><div class="bk-wrap">
+<div class="bk-sheet bk-sheet-opener" id="p142" data-ch="7" data-page="142"><div class="bk-paper"><div class="bk-fit"><div class="bk-opener" style="--ac:#475569"><div class="bk-op-left"><div class="bk-op-cn">第 七 章</div><div class="bk-op-num">07</div><div class="bk-op-en">REFERENCE INDEX</div></div><div class="bk-op-right"><h1>深造<small>大模型与 AI Agent 权威资料索引</small></h1><p class="bk-op-lead">23 条一手资料分 6 组，每条只写一句「为什么值得读」。本章不解释内容，它是查阅用的参考文献表。</p><div class="bk-op-meta"><span>全员</span><span>12 页</span><span>本章 7 节</span></div><ul class="bk-op-secs"><li><span>怎么读这份索引</span><i></i><em>143</em></li><li><span>第 1 组 · 大模型基础</span><i></i><em>145</em></li><li><span>第 2 组 · Agent 范式</span><i></i><em>146</em></li><li><span>第 3 组 · 工程架构</span><i></i><em>148</em></li><li><span>第 4 组 · 协议生态</span><i></i><em>149</em></li><li><span>第 5 组 · 落地实践</span><i></i><em>150</em></li><li><span>第 6 组 · 课程路径与总览</span><i></i><em>152</em></li></ul></div></div></div></div><div class="bk-folio"><span>142</span></div></div>
+<div class="bk-sheet" id="p143" data-ch="7" data-page="143" data-title="大模型与 AI Agent 权威资料索引"><div class="bk-paper ch7"><div class="bk-fit"><section class="slide cover active">
+    <span class="grouptag">封面</span>
+    <div class="kicker">REFERENCE INDEX · 参考文献式资料目录</div>
+    <h1>大模型与 AI Agent<br>权威资料索引</h1>
+    <div class="subtitle">索引，不是教程 —— 每一条背后都有原文，按图索骥。</div>
+    <div class="fmtbox">
+      <div class="fmt-title">引用格式（全册统一，每条五行字段）</div>
+      <ul>
+        <li><b>编号</b>01、02、03 ……（按章内顺序连续编号）</li>
+        <li><b>出处</b>作者 / 机构：《标题》＋ 平台 / 类型标签</li>
+        <li><b>链接</b>精确 URL，直接使用，不搜索、不改写</li>
+        <li><b>导读</b>时间 ｜ 一句话说明"该读什么、为什么值得收进来"</li>
+      </ul>
+    </div>
+    <div class="audience">适用读者：懂基本 IT 技术、已了解 Agent 原理（ReAct 循环、工具调用、上下文循环）的技术人员与技术管理者。用途：学员按索引深挖原始出处；讲师复习与更新内容时快速定位来源。</div>
+    <span class="pageno">01 / 11</span>
+    <span class="brand">大模型与 AI Agent 权威资料索引</span>
+  </section></div></div><div class="bk-folio"><span>143</span><em>第七章 · 深造</em></div></div>
+<div class="bk-sheet" id="p144" data-ch="7" data-page="144" data-title="怎么读这份索引"><div class="bk-paper ch7"><div class="bk-fit"><section class="slide active">
+    <span class="grouptag">使用说明</span>
+    <div class="kicker-sm">HOW TO USE</div>
+    <h2 class="page-title">怎么读这份索引</h2>
+    <div class="title-rule"></div>
+    <div class="usage-cols">
+      <div class="usage-col">
+        <h3>三步查阅法</h3>
+        <ul>
+          <li><b>按组找</b> —— 六组主线：大模型基础 → Agent 范式 → 工程架构（Harness）→ 协议生态 → 落地实践 → 课程路径，先定位组，再定位条目。</li>
+          <li><b>按编号引</b> —— 全册 01～23 连续编号，讲义、讨论中直接引用编号即可互相对应。</li>
+          <li><b>点链接即达原文</b> —— 所有链接为精确 URL，放映时可直接点击打开原始出处。</li>
+        </ul>
+        <div class="usage-note">本册只做"一句话导读"，不解释资料内容：它是参考文献，不是教程。</div>
+      </div>
+      <div class="usage-col">
+        <h3>权威性标准</h3>
+        <ul>
+          <li><b>收录</b>：官方文档（厂商官方 / 标准组织）、正式论文与预印本（arxiv 等）、公认权威人物经典文章（Lilian Weng、Simon Willison、Andrej Karpathy、Rich Sutton）。</li>
+          <li><b>国内来源</b>：仅限厂商官方文档（如 DeepSeek、阿里云百炼官方帮助中心）。</li>
+          <li class="deny"><b>剔除</b>：个人微信 / 知乎 / 公众号文章、自媒体、民间课程笔记、个人技术博客、国内中转站、产品下载页、纯营销文章。</li>
+        </ul>
+      </div>
+    </div>
+    <span class="pageno">02 / 11</span>
+    <span class="brand">大模型与 AI Agent 权威资料索引</span>
+  </section></div></div><div class="bk-folio"><span>144</span><em>第七章 · 深造</em></div></div>
+<div class="bk-sheet" id="p145" data-ch="7" data-page="145" data-title="第1组 · 大模型基础"><div class="bk-paper ch7"><div class="bk-fit"><section class="slide active">
+    <span class="grouptag">第1组 · 大模型基础</span>
+    <div class="kicker-sm">GROUP 01 · FOUNDATIONS</div>
+    <h2 class="page-title">第1组 · 大模型基础</h2>
+    <div class="title-rule"></div>
+    <div class="refs">
+      <div class="ref">
+        <div class="ref-badge">01</div>
+        <div class="ref-body">
+          <div class="ref-line1"><b>Andrej Karpathy</b>：《build-nanogpt》<span class="plat">GitHub · 视频+代码课程</span></div>
+          <div class="ref-link"><a href="https://github.com/karpathy/build-nanogpt" target="_blank">https://github.com/karpathy/build-nanogpt</a></div>
+          <div class="ref-meta"><b>2024</b> ｜ 从零手搭 GPT，讲透 token → transformer → 训练全流程，本组核心</div>
+        </div>
+      </div>
+      <div class="ref">
+        <div class="ref-badge">02</div>
+        <div class="ref-body">
+          <div class="ref-line1"><b>fast.ai</b>：《Practical Deep Learning for Coders》<span class="plat">fast.ai 官方课程</span></div>
+          <div class="ref-link"><a href="https://course.fast.ai/" target="_blank">https://course.fast.ai/</a>　<span class="ll">（主页</span> <a href="https://www.fast.ai/" target="_blank">https://www.fast.ai/</a><span class="ll">）</span></div>
+          <div class="ref-meta"><b>2022</b> ｜ 代码向深度学习入门，给无 ML 基础者打地基</div>
+        </div>
+      </div>
+      <div class="ref">
+        <div class="ref-badge">03</div>
+        <div class="ref-body">
+          <div class="ref-line1"><b>Lilian Weng</b>：《Prompt Engineering》<span class="plat">Lil'Log</span></div>
+          <div class="ref-link"><a href="https://lilianweng.github.io/posts/2023-03-15-prompt-engineering/" target="_blank">https://lilianweng.github.io/posts/2023-03-15-prompt-engineering/</a></div>
+          <div class="ref-meta"><b>2023</b> ｜ 提示工程权威综述，讲清如何与模型有效对话</div>
+        </div>
+      </div>
+    </div>
+    <span class="pageno">03 / 11</span>
+    <span class="brand">大模型与 AI Agent 权威资料索引</span>
+  </section></div></div><div class="bk-folio"><span>145</span><em>第七章 · 深造</em></div></div>
+<div class="bk-sheet" id="p146" data-ch="7" data-page="146" data-title="第2组 · Agent 范式（上）"><div class="bk-paper ch7"><div class="bk-fit"><section class="slide active">
+    <span class="grouptag">第2组 · Agent 范式（上）</span>
+    <div class="kicker-sm">GROUP 02 · AGENT PARADIGMS</div>
+    <h2 class="page-title">第2组 · Agent 范式（上）</h2>
+    <div class="title-rule"></div>
+    <div class="refs">
+      <div class="ref">
+        <div class="ref-badge">04</div>
+        <div class="ref-body">
+          <div class="ref-line1"><b>Lilian Weng</b>：《LLM Powered Autonomous Agents》<span class="plat">Lil'Log</span></div>
+          <div class="ref-link"><a href="https://lilianweng.github.io/posts/2023-06-23-agent/" target="_blank">https://lilianweng.github.io/posts/2023-06-23-agent/</a></div>
+          <div class="ref-meta"><b>2023</b> ｜ Agent 全景综述，必读入门</div>
+        </div>
+      </div>
+      <div class="ref">
+        <div class="ref-badge">05</div>
+        <div class="ref-body">
+          <div class="ref-line1"><b>Anthropic</b>：《Building Effective AI Agents》<span class="plat">Anthropic 官方工程博客</span></div>
+          <div class="ref-link"><a href="https://www.anthropic.com/engineering/building-effective-agents" target="_blank">https://www.anthropic.com/engineering/building-effective-agents</a></div>
+          <div class="ref-meta"><b>2024-12</b> ｜ workflows vs agents，工程范式分水岭</div>
+        </div>
+      </div>
+      <div class="ref">
+        <div class="ref-badge">06</div>
+        <div class="ref-body">
+          <div class="ref-line1"><b>OpenAI</b>：《A practical guide to building agents》<span class="plat">OpenAI 官方</span></div>
+          <div class="ref-link"><a href="https://openai.com/business/guides-and-resources/a-practical-guide-to-building-ai-agents/" target="_blank">https://openai.com/business/guides-and-resources/a-practical-guide-to-building-ai-agents/</a></div>
+          <div class="ref-meta"><b>2025</b> ｜ 官方落地指南，从概念到实践的官方口径</div>
+        </div>
+      </div>
+    </div>
+    <span class="pageno">04 / 11</span>
+    <span class="brand">大模型与 AI Agent 权威资料索引</span>
+  </section></div></div><div class="bk-folio"><span>146</span><em>第七章 · 深造</em></div></div>
+<div class="bk-sheet" id="p147" data-ch="7" data-page="147" data-title="第2组 · Agent 范式（下）"><div class="bk-paper ch7"><div class="bk-fit"><section class="slide active">
+    <span class="grouptag">第2组 · Agent 范式（下）</span>
+    <div class="kicker-sm">GROUP 02 · AGENT PARADIGMS</div>
+    <h2 class="page-title">第2组 · Agent 范式（下）</h2>
+    <div class="title-rule"></div>
+    <div class="refs">
+      <div class="ref">
+        <div class="ref-badge">07</div>
+        <div class="ref-body">
+          <div class="ref-line1"><b>Shunyu Yao et al.</b>：《ReAct: Synergizing Reasoning and Acting in Language Models》<span class="plat">arxiv · 论文</span></div>
+          <div class="ref-link"><a href="https://arxiv.org/abs/2210.03629" target="_blank">https://arxiv.org/abs/2210.03629</a></div>
+          <div class="ref-meta"><b>2022-10</b> ｜ Agent 范式开山论文，思考与行动的协同</div>
+        </div>
+      </div>
+      <div class="ref">
+        <div class="ref-badge">08</div>
+        <div class="ref-body">
+          <div class="ref-line1"><b>Simon Willison</b>：《I think "agent" may finally have a widely enough agreed upon definition》<span class="plat">simonwillison.net</span></div>
+          <div class="ref-link"><a href="https://simonwillison.net/2025/Sep/18/agents/" target="_blank">https://simonwillison.net/2025/Sep/18/agents/</a></div>
+          <div class="ref-meta"><b>2025-09</b> ｜ 概念澄清，先立标准再谈别的</div>
+        </div>
+      </div>
+    </div>
+    <span class="pageno">05 / 11</span>
+    <span class="brand">大模型与 AI Agent 权威资料索引</span>
+  </section></div></div><div class="bk-folio"><span>147</span><em>第七章 · 深造</em></div></div>
+<div class="bk-sheet" id="p148" data-ch="7" data-page="148" data-title="第3组 · 工程架构（Harness）"><div class="bk-paper ch7"><div class="bk-fit"><section class="slide active">
+    <span class="grouptag">第3组 · 工程架构（Harness）</span>
+    <div class="kicker-sm">GROUP 03 · AGENT HARNESS</div>
+    <h2 class="page-title">第3组 · 工程架构（Harness）</h2>
+    <div class="title-rule"></div>
+    <div class="refs">
+      <div class="ref">
+        <div class="ref-badge">09</div>
+        <div class="ref-body">
+          <div class="ref-line1"><b>OpenAI</b>：《Harness engineering: leveraging Codex in an agent-first world》<span class="plat">OpenAI 官方</span></div>
+          <div class="ref-link"><a href="https://openai.com/index/harness-engineering/" target="_blank">https://openai.com/index/harness-engineering/</a></div>
+          <div class="ref-meta"><b>2026</b> ｜ "Agent 的装备就是架构"，官方视角</div>
+        </div>
+      </div>
+      <div class="ref">
+        <div class="ref-badge">10</div>
+        <div class="ref-body">
+          <div class="ref-line1"><b>LangChain</b>：《The Anatomy of an Agent Harness》<span class="plat">LangChain 官方博客</span></div>
+          <div class="ref-link"><a href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank">https://www.langchain.com/blog/the-anatomy-of-an-agent-harness</a></div>
+          <div class="ref-meta"><b>2025</b> ｜ 把 Agent 解剖成可讲的部件，本组核心</div>
+        </div>
+      </div>
+      <div class="ref">
+        <div class="ref-badge">11</div>
+        <div class="ref-body">
+          <div class="ref-line1"><b>《Agent Harness for Large Language Model Agents: A Survey》</b><span class="plat">Preprints.org · 预印本</span></div>
+          <div class="ref-link"><a href="https://www.preprints.org/manuscript/202604.0428" target="_blank">https://www.preprints.org/manuscript/202604.0428</a></div>
+          <div class="ref-meta"><b>2026</b> ｜ 全领域研究综述，挖深用</div>
+        </div>
+      </div>
+    </div>
+    <span class="pageno">06 / 11</span>
+    <span class="brand">大模型与 AI Agent 权威资料索引</span>
+  </section></div></div><div class="bk-folio"><span>148</span><em>第七章 · 深造</em></div></div>
+<div class="bk-sheet" id="p149" data-ch="7" data-page="149" data-title="第4组 · 协议生态"><div class="bk-paper ch7"><div class="bk-fit"><section class="slide active">
+    <span class="grouptag">第4组 · 协议生态</span>
+    <div class="kicker-sm">GROUP 04 · PROTOCOLS</div>
+    <h2 class="page-title">第4组 · 协议生态</h2>
+    <div class="title-rule" style="margin-bottom:18px"></div>
+    <div class="refs tight">
+      <div class="ref">
+        <div class="ref-badge">12</div>
+        <div class="ref-body">
+          <div class="ref-line1"><b>Model Context Protocol</b>：《Architecture overview》<span class="plat">modelcontextprotocol.io 官方文档</span></div>
+          <div class="ref-link"><a href="https://modelcontextprotocol.io/docs/learn/architecture" target="_blank">https://modelcontextprotocol.io/docs/learn/architecture</a></div>
+          <div class="ref-meta"><b>2024</b> ｜ Agent 与工具 / 数据源的统一接入协议</div>
+        </div>
+      </div>
+      <div class="ref">
+        <div class="ref-badge">13</div>
+        <div class="ref-body">
+          <div class="ref-line1"><b>Anthropic</b>：《Equipping agents for the real world with Agent Skills》<span class="plat">Anthropic 官方工程博客</span></div>
+          <div class="ref-link"><a href="https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills" target="_blank">https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills</a></div>
+          <div class="ref-meta"><b>2025</b> ｜ 把"一件事怎么干"打包成可复用技能</div>
+        </div>
+      </div>
+      <div class="ref">
+        <div class="ref-badge">14</div>
+        <div class="ref-body">
+          <div class="ref-line1"><b>Agent Skills</b>：《Specification》<span class="plat">agentskills.io · 开放规范</span></div>
+          <div class="ref-link"><a href="https://agentskills.io/specification" target="_blank">https://agentskills.io/specification</a></div>
+          <div class="ref-meta"><b>2025</b> ｜ Agent Skills 开放规范原文</div>
+        </div>
+      </div>
+      <div class="ref">
+        <div class="ref-badge">15</div>
+        <div class="ref-body">
+          <div class="ref-line1"><b>OpenAI</b>：《Function calling》<span class="plat">OpenAI 官方 API 文档</span></div>
+          <div class="ref-link"><a href="https://developers.openai.com/api/docs/guides/function-calling" target="_blank">https://developers.openai.com/api/docs/guides/function-calling</a></div>
+          <div class="ref-meta"><b>2024</b> ｜ 最底层的"模型请求调工具"机制</div>
+        </div>
+      </div>
+    </div>
+    <span class="pageno">07 / 11</span>
+    <span class="brand">大模型与 AI Agent 权威资料索引</span>
+  </section></div></div><div class="bk-folio"><span>149</span><em>第七章 · 深造</em></div></div>
+<div class="bk-sheet" id="p150" data-ch="7" data-page="150" data-title="第5组 · 落地实践（上）"><div class="bk-paper ch7"><div class="bk-fit"><section class="slide active">
+    <span class="grouptag">第5组 · 落地实践（上）</span>
+    <div class="kicker-sm">GROUP 05 · IN PRACTICE</div>
+    <h2 class="page-title">第5组 · 落地实践（上）</h2>
+    <div class="title-rule"></div>
+    <div class="refs">
+      <div class="ref">
+        <div class="ref-badge">16</div>
+        <div class="ref-body">
+          <div class="ref-line1"><b>Manus</b>：《AI 代理的上下文工程：构建 Manus 的经验教训》<span class="plat">Manus 官方博客</span></div>
+          <div class="ref-link"><a href="https://manus.im/zh-cn/blog/Context-Engineering-for-AI-Agents-Lessons-from-Building-Manus" target="_blank">https://manus.im/zh-cn/blog/Context-Engineering-for-AI-Agents-Lessons-from-Building-Manus</a></div>
+          <div class="ref-meta"><b>2026</b> ｜ 真实产品级上下文工程实战</div>
+        </div>
+      </div>
+      <div class="ref">
+        <div class="ref-badge">17</div>
+        <div class="ref-body">
+          <div class="ref-line1"><b>ByteDance</b>：《deer-flow》<span class="plat">GitHub · 开源框架</span></div>
+          <div class="ref-link"><a href="https://github.com/bytedance/deer-flow" target="_blank">https://github.com/bytedance/deer-flow</a></div>
+          <div class="ref-meta"><b>2025</b> ｜ 长时程 SuperAgent 框架，看全量能力怎么组装</div>
+        </div>
+      </div>
+      <div class="ref">
+        <div class="ref-badge">18</div>
+        <div class="ref-body">
+          <div class="ref-line1"><b>HuggingFace</b>：《smolagents》<span class="plat">GitHub · 开源框架</span></div>
+          <div class="ref-link"><a href="https://github.com/huggingface/smolagents" target="_blank">https://github.com/huggingface/smolagents</a></div>
+          <div class="ref-meta"><b>2024</b> ｜ 极简 agent 库，适合上手读代码</div>
+        </div>
+      </div>
+    </div>
+    <span class="pageno">08 / 11</span>
+    <span class="brand">大模型与 AI Agent 权威资料索引</span>
+  </section></div></div><div class="bk-folio"><span>150</span><em>第七章 · 深造</em></div></div>
+<div class="bk-sheet" id="p151" data-ch="7" data-page="151" data-title="第5组 · 落地实践（下）"><div class="bk-paper ch7"><div class="bk-fit"><section class="slide active">
+    <span class="grouptag">第5组 · 落地实践（下）</span>
+    <div class="kicker-sm">GROUP 05 · IN PRACTICE</div>
+    <h2 class="page-title">第5组 · 落地实践（下）</h2>
+    <div class="title-rule"></div>
+    <div class="refs">
+      <div class="ref">
+        <div class="ref-badge">19</div>
+        <div class="ref-body">
+          <div class="ref-line1"><b>《fast-agent》</b><span class="plat">fast-agent.ai 官方文档</span></div>
+          <div class="ref-link"><a href="https://fast-agent.ai/" target="_blank">https://fast-agent.ai/</a></div>
+          <div class="ref-meta"><b>2025</b> ｜ 编写 / 构建 / 评估 Agent 的开源工具</div>
+        </div>
+      </div>
+      <div class="ref">
+        <div class="ref-badge">20</div>
+        <div class="ref-body">
+          <div class="ref-line1"><b>模型服务官方文档（一组）</b><span class="plat">厂商官方文档 · 国内仅收官方</span></div>
+          <div class="ref-link"><span class="ll">DeepSeek API 文档（含思考模式）：</span><a href="https://api-docs.deepseek.com/zh-cn/api/create-chat-completion" target="_blank">https://api-docs.deepseek.com/zh-cn/api/create-chat-completion</a></div>
+          <div class="ref-link"><span class="ll">OpenRouter：</span><a href="https://openrouter.ai/" target="_blank">https://openrouter.ai/</a></div>
+          <div class="ref-link"><span class="ll">阿里云百炼帮助中心：</span><a href="https://help.aliyun.com/zh/model-studio/compatibility-with-openai-responses-api" target="_blank">https://help.aliyun.com/zh/model-studio/compatibility-with-openai-responses-api</a></div>
+          <div class="ref-link"><span class="ll">Hugging Face：</span><a href="https://huggingface.co/" target="_blank">https://huggingface.co/</a></div>
+          <div class="ref-meta"><b>2024-2026</b> ｜ 真正要跑通，按需选一个；国内仅收官方文档</div>
+        </div>
+      </div>
+    </div>
+    <span class="pageno">09 / 11</span>
+    <span class="brand">大模型与 AI Agent 权威资料索引</span>
+  </section></div></div><div class="bk-folio"><span>151</span><em>第七章 · 深造</em></div></div>
+<div class="bk-sheet" id="p152" data-ch="7" data-page="152" data-title="第6组 · 课程路径"><div class="bk-paper ch7"><div class="bk-fit"><section class="slide active">
+    <span class="grouptag">第6组 · 课程路径</span>
+    <div class="kicker-sm">GROUP 06 · LEARNING PATHS</div>
+    <h2 class="page-title">第6组 · 课程路径</h2>
+    <div class="title-rule"></div>
+    <div class="refs">
+      <div class="ref">
+        <div class="ref-badge">21</div>
+        <div class="ref-body">
+          <div class="ref-line1"><b>Google × Kaggle</b>：《5-Day AI Agents Intensive Course》<span class="plat">Kaggle 官方</span></div>
+          <div class="ref-link"><a href="https://www.kaggle.com/learn-guide/5-day-agents" target="_blank">https://www.kaggle.com/learn-guide/5-day-agents</a></div>
+          <div class="ref-meta"><b>2025</b> ｜ 最快上手路径</div>
+        </div>
+      </div>
+      <div class="ref">
+        <div class="ref-badge">22</div>
+        <div class="ref-body">
+          <div class="ref-line1"><b>DeepLearning.AI</b>：《Agentic AI》<span class="plat">DeepLearning.AI 官方课程</span></div>
+          <div class="ref-link"><a href="https://www.deeplearning.ai/courses/agentic-ai" target="_blank">https://www.deeplearning.ai/courses/agentic-ai</a></div>
+          <div class="ref-meta"><b>2025</b> ｜ 体系化课程</div>
+        </div>
+      </div>
+      <div class="ref">
+        <div class="ref-badge">23</div>
+        <div class="ref-body">
+          <div class="ref-line1"><b>Andrej Karpathy</b>：《LLM101n: Let's build a Storyteller》<span class="plat">GitHub · 免费课程</span></div>
+          <div class="ref-link"><a href="https://github.com/karpathy/LLM101n" target="_blank">https://github.com/karpathy/LLM101n</a></div>
+          <div class="ref-meta"><b>2025</b> ｜ 最新免费课，从零构建讲故事 AI，与第 01 条呼应</div>
+        </div>
+      </div>
+    </div>
+    <span class="pageno">10 / 11</span>
+    <span class="brand">大模型与 AI Agent 权威资料索引</span>
+  </section></div></div><div class="bk-folio"><span>152</span><em>第七章 · 深造</em></div></div>
+<div class="bk-sheet" id="p153" data-ch="7" data-page="153" data-title="编号总览（01～23）"><div class="bk-paper ch7"><div class="bk-fit"><section class="slide active">
+    <span class="grouptag">总览</span>
+    <div class="kicker-sm">INDEX AT A GLANCE</div>
+    <h2 class="page-title">编号总览（01～23）</h2>
+    <div class="title-rule" style="margin-bottom:14px"></div>
+    <div class="ov-wrap">
+      <div class="ov-col">
+        <table class="ov">
+          <tr><td class="no">01</td><td>Karpathy《build-nanogpt》</td><td class="g"><span class="gchip">基础</span></td></tr>
+          <tr><td class="no">02</td><td>fast.ai《Practical Deep Learning for Coders》</td><td class="g"><span class="gchip">基础</span></td></tr>
+          <tr><td class="no">03</td><td>Lilian Weng《Prompt Engineering》</td><td class="g"><span class="gchip">基础</span></td></tr>
+          <tr><td class="no">04</td><td>Lilian Weng《LLM Powered Autonomous Agents》</td><td class="g"><span class="gchip">范式</span></td></tr>
+          <tr><td class="no">05</td><td>Anthropic《Building Effective AI Agents》</td><td class="g"><span class="gchip">范式</span></td></tr>
+          <tr><td class="no">06</td><td>OpenAI《A practical guide to building agents》</td><td class="g"><span class="gchip">范式</span></td></tr>
+          <tr><td class="no">07</td><td>Shunyu Yao et al.《ReAct》</td><td class="g"><span class="gchip">范式</span></td></tr>
+          <tr><td class="no">08</td><td>Simon Willison《"agent" 定义》</td><td class="g"><span class="gchip">范式</span></td></tr>
+          <tr><td class="no">09</td><td>OpenAI《Harness engineering》</td><td class="g"><span class="gchip">架构</span></td></tr>
+          <tr><td class="no">10</td><td>LangChain《The Anatomy of an Agent Harness》</td><td class="g"><span class="gchip">架构</span></td></tr>
+          <tr><td class="no">11</td><td>《Agent Harness: A Survey》</td><td class="g"><span class="gchip">架构</span></td></tr>
+          <tr><td class="no">12</td><td>MCP《Architecture overview》</td><td class="g"><span class="gchip">协议</span></td></tr>
+        </table>
+      </div>
+      <div class="ov-col">
+        <table class="ov">
+          <tr><td class="no">13</td><td>Anthropic《Agent Skills》</td><td class="g"><span class="gchip">协议</span></td></tr>
+          <tr><td class="no">14</td><td>Agent Skills《Specification》</td><td class="g"><span class="gchip">协议</span></td></tr>
+          <tr><td class="no">15</td><td>OpenAI《Function calling》</td><td class="g"><span class="gchip">协议</span></td></tr>
+          <tr><td class="no">16</td><td>Manus《上下文工程经验教训》</td><td class="g"><span class="gchip">实践</span></td></tr>
+          <tr><td class="no">17</td><td>ByteDance《deer-flow》</td><td class="g"><span class="gchip">实践</span></td></tr>
+          <tr><td class="no">18</td><td>HuggingFace《smolagents》</td><td class="g"><span class="gchip">实践</span></td></tr>
+          <tr><td class="no">19</td><td>《fast-agent》</td><td class="g"><span class="gchip">实践</span></td></tr>
+          <tr><td class="no">20</td><td>模型服务官方文档（一组）</td><td class="g"><span class="gchip">实践</span></td></tr>
+          <tr><td class="no">21</td><td>Google × Kaggle《5-Day AI Agents》</td><td class="g"><span class="gchip">课程</span></td></tr>
+          <tr><td class="no">22</td><td>DeepLearning.AI《Agentic AI》</td><td class="g"><span class="gchip">课程</span></td></tr>
+          <tr><td class="no">23</td><td>Karpathy《LLM101n》</td><td class="g"><span class="gchip">课程</span></td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="closing" style="margin-top:4px">每一条背后都有原文，按图索骥。</div>
+    <div class="closing-sub">索引，不是教程 —— 想深挖，点链接，读原文。</div>
+    <span class="pageno">11 / 11</span>
+    <span class="brand">大模型与 AI Agent 权威资料索引</span>
+  </section></div></div><div class="bk-folio"><span>153</span><em>第七章 · 深造</em></div></div>
+<nav class="bk-pager">
+<a class="prev" href="ch06.html"><small>← 上一章</small><b>第 6 章 收束 — 通往 AGI 之路</b></a>
+<a class="next" href="appendix.html"><small>下一章 →</small><b>附录 · 配套代码</b></a>
+</nav>
+</div></main>
+
+<button id="bk-up" onclick="scrollTo({top:0,behavior:'smooth'})" title="回到顶部">↑</button>
+
+<script src="assets/book.js"></script>
+</body>
+</html>

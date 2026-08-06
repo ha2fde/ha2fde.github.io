@@ -1,0 +1,13 @@
+# 大二进制不进仓库 —— 它们曾把这个库撑到 73 MB
+*.pdf
+*.pptx
+*.ppt
+*.zip
+*.mp4
+*.mov
+*.bin
+*.safetensors
+
+.DS_Store
+__pycache__/
+*.pyc

@@ -1,0 +1,2941 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Agent 的协议层 · 深讲版</title>
+<style>
+:root{
+  --bg:#080b11; --stage:#0d1117; --panel:#151b24; --panel2:#1b2331;
+  --line:#273040; --line2:#3a4658;
+  --tx:#e6edf3; --tx2:#a9b4c2; --mut:#6f7c8d;
+  --b:#58a6ff;   /* 蓝 数据流 / 客户端 */
+  --g:#7ee787;   /* 绿 产出 / 正确 */
+  --o:#ffa657;   /* 橙 工程要点 */
+  --p:#d2a8ff;   /* 紫 模型 / 协议 */
+  --r:#ff7b72;   /* 红 坑 / 失效 */
+  --y:#e3b341;
+  --mono:"SF Mono","JetBrains Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--tx);font-family:var(--sans);overflow:hidden;
+  -webkit-font-smoothing:antialiased}
+#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{position:relative;width:1280px;height:720px;flex:none;transform-origin:center center}
+
+/* ---------- slide shell ---------- */
+.slide{position:absolute;inset:0;background:var(--stage);padding:46px 60px 54px;
+  display:none;flex-direction:column;overflow:hidden;
+  border:1px solid var(--line);border-radius:7px}
+.slide.on{display:flex;animation:fade .26s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.t{font-size:29px;font-weight:650;letter-spacing:.2px;line-height:1.25;color:var(--tx)}
+.t em{font-style:normal;color:var(--b)}
+.sub{margin-top:7px;font-size:14px;color:var(--mut);line-height:1.5}
+.body{flex:1;min-height:0;margin-top:20px;display:flex;flex-direction:column;gap:14px;
+  font-size:14.5px;line-height:1.68;color:var(--tx2)}
+.slide::after{content:"";position:absolute;left:0;right:0;top:0;height:2px;
+  background:linear-gradient(90deg,var(--b),var(--p) 55%,transparent)}
+
+/* ---------- primitives ---------- */
+.row{display:flex;gap:14px}
+.col{display:flex;flex-direction:column;gap:12px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.f1{flex:1;min-width:0}.f2{flex:2;min-width:0}.f3{flex:3;min-width:0}
+.grow{flex:1;min-height:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:13px 15px}
+.card.b{border-left:3px solid var(--b)}
+.card.g{border-left:3px solid var(--g)}
+.card.o{border-left:3px solid var(--o)}
+.card.p{border-left:3px solid var(--p)}
+.card.r{border-left:3px solid var(--r)}
+.card h4{font-size:14.5px;color:var(--tx);font-weight:620;margin-bottom:6px;letter-spacing:.2px}
+.card p{font-size:13.5px;line-height:1.62}
+.lead{font-size:17px;line-height:1.6;color:var(--tx)}
+.lead b{color:var(--o);font-weight:600}
+.mut{color:var(--mut)}
+.hi{color:var(--o)}.hb{color:var(--b)}.hg{color:var(--g)}.hp{color:var(--p)}.hr{color:var(--r)}.hy{color:var(--y)}
+b{color:var(--tx);font-weight:600}
+ul{list-style:none;display:flex;flex-direction:column;gap:5px}
+li{position:relative;padding-left:15px;font-size:13.5px;line-height:1.6}
+li::before{content:"›";position:absolute;left:2px;top:-1px;color:var(--line2);font-size:14px}
+ul.tick li::before{content:"✓";color:var(--g);font-size:11px;top:1px}
+ul.cross li::before{content:"✕";color:var(--r);font-size:11px;top:1px}
+.tag{display:inline-block;font:11.5px/1 var(--mono);padding:3px 7px;border-radius:4px;
+  border:1px solid var(--line2);color:var(--tx2);background:var(--panel2)}
+.tag.b{color:var(--b);border-color:#1f4e7a}
+.tag.g{color:var(--g);border-color:#2c5c36}
+.tag.o{color:var(--o);border-color:#7a5222}
+.tag.p{color:var(--p);border-color:#553a7a}
+.tag.r{color:var(--r);border-color:#7a2f2c}
+code{font-family:var(--mono);font-size:.9em;color:var(--o);
+  background:rgba(255,166,87,.09);padding:1px 5px;border-radius:3px;
+  overflow-wrap:anywhere}
+
+/* ---------- code block ---------- */
+pre{font-family:var(--mono);font-size:12px;line-height:1.62;color:var(--tx2);
+  background:#0a0f16;border:1px solid var(--line);border-radius:6px;padding:11px 13px;
+  overflow:hidden;white-space:pre}
+pre.sm{font-size:11.2px;line-height:1.55}
+pre .k{color:var(--b)}      /* key */
+pre .s{color:var(--g)}      /* string */
+pre .n{color:var(--o)}      /* number/bool */
+pre .c{color:var(--mut)}    /* comment */
+pre .m{color:var(--p)}      /* method */
+pre .x{color:var(--r)}
+.codehd{font:11px/1 var(--mono);color:var(--mut);letter-spacing:.6px;margin-bottom:5px;
+  text-transform:uppercase}
+
+/* ---------- table ---------- */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mut);font-weight:600;font-size:11.5px;letter-spacing:.5px;text-transform:uppercase;
+  border-bottom:1px solid var(--line2)}
+td{color:var(--tx2);line-height:1.5}
+td b{color:var(--tx)}
+tr:last-child td{border-bottom:none}
+table.zebra tbody tr:nth-child(even){background:rgba(255,255,255,.018)}
+
+/* ---------- misc blocks ---------- */
+.note{border-left:3px solid var(--o);background:rgba(255,166,87,.06);padding:9px 13px;
+  border-radius:0 5px 5px 0;font-size:13.5px;line-height:1.6}
+.note.b{border-color:var(--b);background:rgba(88,166,255,.06)}
+.note.r{border-color:var(--r);background:rgba(255,123,114,.06)}
+.note.g{border-color:var(--g);background:rgba(126,231,135,.06)}
+.big{font-size:40px;font-weight:680;line-height:1.15;letter-spacing:-.5px;color:var(--tx)}
+.kbd{font:11px var(--mono);border:1px solid var(--line2);border-bottom-width:2px;
+  border-radius:4px;padding:2px 6px;color:var(--tx2);background:var(--panel2)}
+.stat{font:600 22px/1.1 var(--sans);color:var(--o)}
+.statl{font-size:11.5px;color:var(--mut);margin-top:3px;letter-spacing:.3px}
+svg{display:block;overflow:visible}
+svg text{font-family:var(--sans);fill:var(--tx2)}
+svg .mono{font-family:var(--mono)}
+.center{display:flex;align-items:center;justify-content:center}
+
+/* ---------- cover ---------- */
+.cover{justify-content:center;background:
+  radial-gradient(900px 460px at 22% 18%,rgba(88,166,255,.14),transparent 62%),
+  radial-gradient(760px 420px at 82% 84%,rgba(210,168,255,.12),transparent 62%),var(--stage)}
+.cover .big{font-size:56px}
+
+/* ---------- chrome ---------- */
+#bar{position:fixed;left:0;top:0;height:2px;background:linear-gradient(90deg,var(--b),var(--p));
+  width:0;transition:width .25s ease;z-index:20}
+#hud{position:fixed;right:16px;bottom:12px;display:flex;align-items:center;gap:10px;
+  font:11.5px var(--mono);color:var(--mut);z-index:20;user-select:none}
+#hudact{color:var(--line2)}
+#help{position:fixed;left:16px;bottom:12px;font:11px var(--mono);color:#4a5464;z-index:20;
+  user-select:none}
+
+/* ---------- overview ---------- */
+.ov{position:fixed;inset:0;overflow-y:auto;background:var(--bg);padding:22px;z-index:50;
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(231px,1fr));gap:13px;align-content:start}
+.ovcell{position:relative;height:130px;overflow:hidden;border:1px solid var(--line);
+  border-radius:5px;cursor:pointer;background:var(--stage)}
+.ovcell:hover{border-color:var(--b)}
+.ovcell.cur{border-color:var(--o);box-shadow:0 0 0 1px var(--o)}
+.ovinner{position:relative;width:1280px;height:720px;transform:scale(.18);transform-origin:top left}
+.ovinner .slide{border:none;border-radius:0;animation:none}
+.ovlab{position:absolute;right:4px;bottom:3px;font:10px var(--mono);color:var(--tx2);
+  background:rgba(0,0,0,.66);padding:1px 5px;border-radius:3px}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<div id="stage"><div id="deck">
+<!-- ═══════════ 幕 0 · 开场 ═══════════ -->
+
+<section class="slide cover" data-act="">
+  <div style="max-width:900px">
+    <div style="font:12px/1 var(--mono);color:var(--b);letter-spacing:3px;margin-bottom:20px">
+      THE PROTOCOL LAYER OF AGENTS · 深讲版</div>
+    <h1 class="big">Agent 的协议层</h1>
+    <h1 class="big" style="color:var(--b);margin-top:2px">Tools · MCP · CLI · Skills · A2A</h1>
+    <p style="margin-top:24px;font-size:17px;line-height:1.75;color:var(--tx2);max-width:760px">
+      模型会说话，是预训练给的；模型能做事，是<b>接口</b>给的。<br>
+      这一讲把五套协议拆开，画清每个实体、每条流程，
+      再把它们收回到同一个词：<span class="hp" style="font-weight:600">ACI</span>。</p>
+    <div style="margin-top:30px;display:flex;gap:9px;flex-wrap:wrap">
+      <span class="tag b">53 页</span>
+      <span class="tag g">真实报文</span>
+      <span class="tag o">流程图优先</span>
+      <span class="tag p">选型决策</span>
+      <span class="tag">事实核对于 2026-08-06</span>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 0 · 开场">
+  <h2 class="t">你在哪儿，这一讲补哪儿</h2>
+  <p class="sub">三段旅程：概念 → 工程 → 接口。前两段你已经走完了。</p>
+  <div class="body">
+    <svg viewBox="0 0 1150 250" width="1150" height="250">
+      <defs>
+        <marker id="ar1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#3a4658"/></marker>
+      </defs>
+      <!-- 段一 -->
+      <rect x="0" y="30" width="330" height="150" rx="8" fill="#151b24" stroke="#273040"/>
+      <text x="20" y="58" font-size="12" fill="#6f7c8d" class="mono">STAGE 01 · 已完成</text>
+      <text x="20" y="86" font-size="19" fill="#e6edf3" font-weight="600">AI → Transformer</text>
+      <text x="20" y="112" font-size="13.5" fill="#a9b4c2">注意力、预训练、缩放律</text>
+      <text x="20" y="134" font-size="13.5" fill="#a9b4c2">解决的问题：模型为什么会说话</text>
+      <rect x="20" y="150" width="96" height="20" rx="4" fill="rgba(126,231,135,.1)" stroke="#2c5c36"/>
+      <text x="30" y="164" font-size="11.5" fill="#7ee787" class="mono">概念层理解</text>
+      <!-- 段二 -->
+      <rect x="360" y="30" width="330" height="150" rx="8" fill="#151b24" stroke="#273040"/>
+      <text x="380" y="58" font-size="12" fill="#6f7c8d" class="mono">STAGE 02 · 已完成</text>
+      <text x="380" y="86" font-size="19" fill="#e6edf3" font-weight="600">chat → agent</text>
+      <text x="380" y="112" font-size="13.5" fill="#a9b4c2">循环、上下文、记忆、规划</text>
+      <text x="380" y="134" font-size="13.5" fill="#a9b4c2">解决的问题：怎么把模型跑成系统</text>
+      <rect x="380" y="150" width="96" height="20" rx="4" fill="rgba(126,231,135,.1)" stroke="#2c5c36"/>
+      <text x="390" y="164" font-size="11.5" fill="#7ee787" class="mono">工程层理解</text>
+      <!-- 段三 -->
+      <rect x="720" y="18" width="430" height="174" rx="8" fill="#1b2331" stroke="#58a6ff" stroke-width="1.5"/>
+      <text x="742" y="48" font-size="12" fill="#58a6ff" class="mono">STAGE 03 · 本讲</text>
+      <text x="742" y="78" font-size="21" fill="#e6edf3" font-weight="650">agent ↔ 世界</text>
+      <text x="742" y="106" font-size="13.5" fill="#a9b4c2">Tools · MCP · CLI · Skills · A2A</text>
+      <text x="742" y="128" font-size="13.5" fill="#a9b4c2">解决的问题：模型凭什么伸手够到外面</text>
+      <rect x="742" y="146" width="110" height="22" rx="4" fill="rgba(210,168,255,.12)" stroke="#553a7a"/>
+      <text x="752" y="161" font-size="11.5" fill="#d2a8ff" class="mono">接口层理解</text>
+      <line x1="336" y1="105" x2="354" y2="105" stroke="#3a4658" stroke-width="1.5" marker-end="url(#ar1)"/>
+      <line x1="696" y1="105" x2="714" y2="105" stroke="#3a4658" stroke-width="1.5" marker-end="url(#ar1)"/>
+      <text x="575" y="228" font-size="13" fill="#6f7c8d" text-anchor="middle">前两段决定模型有多聪明 · 这一段决定它能用上多少聪明</text>
+    </svg>
+    <div class="note">
+      前两段是<b>纵向</b>的：从数学一路盖到系统。这一段是<b>横向</b>的：一个已经能跑的 agent，
+      要怎么和工具、和别的服务、和别的 agent 说上话。难点不在算法，在<b>约定</b>。
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 0 · 开场">
+  <h2 class="t">结论先行：这一讲只有<em>一个</em>主角</h2>
+  <p class="sub">五个名字，一件事——给一个概率模型设计一个它能用得对的接口。</p>
+  <div class="body">
+    <div class="row grow">
+      <div class="f1 col">
+        <div class="card p">
+          <h4>ACI · Agent-Computer Interface</h4>
+          <p>面向 <b>LLM</b> 的接口层。不是给编译器看的 API，也不是给人看的 UI，
+             而是给一个<b>会读文档、会猜、会出错的概率模型</b>看的接口。</p>
+        </div>
+        <div class="card">
+          <h4>为什么必须单列一层</h4>
+          <ul>
+            <li>API 的读者不会误解参数名；模型会。</li>
+            <li>UI 的使用者能看见反馈；模型只能看见你返回的那段文本。</li>
+            <li>API 报错给堆栈；给模型报错要给<b>下一步该怎么做</b>。</li>
+          </ul>
+        </div>
+      </div>
+      <div class="f1 col">
+        <table class="zebra">
+          <thead><tr><th style="width:78px">协议</th><th>它其实在回答哪个问题</th></tr></thead>
+          <tbody>
+            <tr><td><span class="tag b">Tools</span></td><td>模型怎么说出"我要调用某个函数"</td></tr>
+            <tr><td><span class="tag p">MCP</span></td><td>这些函数怎么<b>不写死</b>在你的宿主里</td></tr>
+            <tr><td><span class="tag o">CLI</span></td><td>能不能干脆把整台机器给它</td></tr>
+            <tr><td><span class="tag g">Skills</span></td><td>怎么告诉它<b>该怎么用</b>，而不只是能用什么</td></tr>
+            <tr><td><span class="tag r">A2A</span></td><td>对面不是工具、是另一个 agent 时怎么办</td></tr>
+          </tbody>
+        </table>
+        <div class="note b">
+          记住这张表的第二列。后面每一幕结束时，都会回到这一行来验收：
+          <b>我们到底把哪个问题讲清楚了。</b>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 幕 1 · Tools ═══════════ -->
+
+<section class="slide" data-act="幕 1 · Tools">
+  <h2 class="t">从"只会说话"到"能做事"</h2>
+  <p class="sub">工具调用不是模型的新能力，是<b>输出格式</b>的一次约定。</p>
+  <div class="body">
+    <div class="g2">
+      <div class="card r">
+        <h4>没有工具时</h4>
+        <pre class="sm">用户：帮我查一下北京天气
+
+模型：<span class="c">（它不知道，只能编或者认怂）</span>
+      抱歉，我无法获取实时天气信息。</pre>
+        <p style="margin-top:9px">模型的全部输出就是<b>文本</b>。它无法发起任何副作用。</p>
+      </div>
+      <div class="card g">
+        <h4>有工具时</h4>
+        <pre class="sm">用户：帮我查一下北京天气
+
+模型：<span class="c">（它仍然只是输出文本，但这段文本</span>
+      <span class="c"> 被约定成一个结构化的调用请求）</span>
+{<span class="k">"type"</span>:<span class="s">"tool_use"</span>, <span class="k">"name"</span>:<span class="s">"get_weather"</span>,
+ <span class="k">"input"</span>:{<span class="k">"city"</span>:<span class="s">"北京"</span>}}</pre>
+        <p style="margin-top:9px">模型依然没有执行任何东西。它只是<b>说出了一个请求</b>。</p>
+      </div>
+    </div>
+    <div class="note">
+      这就是全部魔法。Function Calling / Tool Use 不是给模型装了手，
+      是<b>训练它把"我想调用 X"这句话说成一个能被程序解析的格式</b>——
+      并且训练它在合适的时候才说。手，始终长在你的代码上。
+    </div>
+    <div class="g3">
+      <div class="card"><h4>① 你声明</h4><p>把可用工具的<b>名字、用途、参数形状</b>随请求一起发给模型。</p></div>
+      <div class="card"><h4>② 它选择</h4><p>模型判断该不该用、用哪个、参数填什么，输出 <code>tool_use</code>。</p></div>
+      <div class="card"><h4>③ 你执行</h4><p>你的代码真正去调 API / 读文件 / 跑命令，把结果<b>作为下一轮输入</b>喂回去。</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 1 · Tools">
+  <h2 class="t">一个 tool 的真实长相</h2>
+  <p class="sub">三个字段：<code>name</code> 是标识，<code>input_schema</code> 是契约，<code>description</code> 是说明书——而说明书最重要。</p>
+  <div class="body">
+    <div class="row grow">
+      <div class="f3">
+        <div class="codehd">request · tools[0]</div>
+        <pre>{
+  <span class="k">"name"</span>: <span class="s">"search_orders"</span>,
+  <span class="k">"description"</span>: <span class="s">"按条件检索订单。用于回答『我的订单在哪』"</span>
+                 <span class="s">"『上个月买了什么』这类问题。只读，不会修改数据。"</span>
+                 <span class="s">"一次最多返回 20 条，需要更多请用 cursor 翻页。"</span>,
+  <span class="k">"input_schema"</span>: {
+    <span class="k">"type"</span>: <span class="s">"object"</span>,
+    <span class="k">"properties"</span>: {
+      <span class="k">"user_id"</span>:  { <span class="k">"type"</span>: <span class="s">"string"</span>, <span class="k">"description"</span>: <span class="s">"内部用户 ID，形如 u_8f21"</span> },
+      <span class="k">"status"</span>:   { <span class="k">"type"</span>: <span class="s">"string"</span>, <span class="k">"enum"</span>: [<span class="s">"paid"</span>,<span class="s">"shipped"</span>,<span class="s">"refunded"</span>] },
+      <span class="k">"since"</span>:    { <span class="k">"type"</span>: <span class="s">"string"</span>, <span class="k">"format"</span>: <span class="s">"date"</span>, <span class="k">"description"</span>: <span class="s">"YYYY-MM-DD"</span> },
+      <span class="k">"cursor"</span>:   { <span class="k">"type"</span>: <span class="s">"string"</span>, <span class="k">"description"</span>: <span class="s">"上一次返回的 next_cursor"</span> }
+    },
+    <span class="k">"required"</span>: [<span class="s">"user_id"</span>]
+  }
+}</pre>
+      </div>
+      <div class="f1 col">
+        <div class="card b"><h4>input_schema</h4>
+          <p>标准 <b>JSON Schema</b>。它同时是两件东西：给模型的<b>提示</b>，
+             和给你自己的<b>校验</b>。<code>enum</code> 比 description 里写"只能填三个值"有效得多。</p></div>
+        <div class="card o"><h4>description</h4>
+          <p>唯一被模型<b>反复读</b>的字段。它决定的不是"怎么调"，而是
+             <b>"什么时候该调"</b>——绝大多数工具误用，根子在这里。</p></div>
+        <div class="card"><h4>注意</h4>
+          <p>schema 是<b>建议</b>不是保证：模型仍可能少填必填项、把日期写成
+             "上个月"。<b>执行前必须自己校验。</b></p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 1 · Tools">
+  <h2 class="t">一次完整往返：谁在什么时候动</h2>
+  <p class="sub">四个参与者，两次模型调用，中间那段执行完全属于你。</p>
+  <div class="body">
+    <svg viewBox="0 0 1150 400" width="1150" height="400">
+      <defs>
+        <marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#58a6ff"/></marker>
+        <marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#7ee787"/></marker>
+        <marker id="a4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#ffa657"/></marker>
+      </defs>
+      <!-- lifelines -->
+      <g font-size="13" text-anchor="middle">
+        <rect x="20"  y="0" width="130" height="30" rx="5" fill="#151b24" stroke="#273040"/>
+        <text x="85"  y="20" fill="#e6edf3">用户</text>
+        <rect x="240" y="0" width="180" height="30" rx="5" fill="#1b2331" stroke="#ffa657"/>
+        <text x="330" y="20" fill="#ffa657">宿主程序（你的代码）</text>
+        <rect x="560" y="0" width="150" height="30" rx="5" fill="#1b2331" stroke="#d2a8ff"/>
+        <text x="635" y="20" fill="#d2a8ff">模型</text>
+        <rect x="880" y="0" width="180" height="30" rx="5" fill="#151b24" stroke="#273040"/>
+        <text x="970" y="20" fill="#e6edf3">真实世界（DB / API）</text>
+      </g>
+      <g stroke="#273040" stroke-dasharray="3 5">
+        <line x1="85" y1="34" x2="85" y2="360"/><line x1="330" y1="34" x2="330" y2="360"/>
+        <line x1="635" y1="34" x2="635" y2="360"/><line x1="970" y1="34" x2="970" y2="360"/>
+      </g>
+      <!-- steps -->
+      <g font-size="12.5">
+        <line x1="85" y1="62" x2="322" y2="62" stroke="#58a6ff" stroke-width="1.4" marker-end="url(#a2)"/>
+        <text x="95" y="55" fill="#a9b4c2">"我上个月买了什么？"</text>
+
+        <line x1="330" y1="102" x2="627" y2="102" stroke="#58a6ff" stroke-width="1.4" marker-end="url(#a2)"/>
+        <text x="340" y="95" fill="#a9b4c2">messages + <tspan class="mono" fill="#58a6ff">tools[]</tspan> 一起发出</text>
+
+        <line x1="635" y1="146" x2="338" y2="146" stroke="#d2a8ff" stroke-width="1.4"
+              marker-end="url(#a2)" style="marker-end:url(#a2)"/>
+        <text x="360" y="139" fill="#d2a8ff" class="mono">stop_reason: "tool_use"</text>
+        <text x="360" y="162" fill="#6f7c8d" font-size="11.5">id=toolu_01A… name=search_orders input={…}</text>
+
+        <line x1="330" y1="206" x2="962" y2="206" stroke="#ffa657" stroke-width="1.4" marker-end="url(#a4)"/>
+        <text x="470" y="199" fill="#ffa657">你的代码真正执行（鉴权 · 限流 · 审计都发生在这里）</text>
+        <line x1="970" y1="240" x2="338" y2="240" stroke="#ffa657" stroke-width="1.4" marker-end="url(#a4)"/>
+        <text x="640" y="233" fill="#a9b4c2">结果行</text>
+
+        <line x1="330" y1="284" x2="627" y2="284" stroke="#58a6ff" stroke-width="1.4" marker-end="url(#a2)"/>
+        <text x="340" y="277" fill="#a9b4c2">追加 <tspan class="mono" fill="#58a6ff">tool_result</tspan>（靠 tool_use_id 配对）再发一次<tspan fill="#6f7c8d">，历史全带上</tspan></text>
+
+        <line x1="635" y1="324" x2="93" y2="324" stroke="#7ee787" stroke-width="1.4" marker-end="url(#a3)"/>
+        <text x="360" y="317" fill="#7ee787">自然语言回答："你上个月买了 3 件…"</text>
+      </g>
+      <rect x="240" y="186" width="760" height="70" rx="6" fill="none" stroke="#7a5222" stroke-dasharray="4 4"/>
+      <text x="250" y="180" font-size="11.5" fill="#7a5222" class="mono">模型完全不在场的一段</text>
+    </svg>
+    <div class="note b">
+      注意第 3 步到第 5 步：模型<b>下线了</b>。它既不知道你怎么执行的，也无法阻止你不执行。
+      整条链路上唯一有权限的实体，是中间那个橙色的宿主程序。
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 1 · Tools">
+  <h2 class="t">最容易搞错的一件事：<em>模型从不执行</em></h2>
+  <p class="sub">这句话你现在觉得是废话。它会在 MCP、CLI、A2A 三章里各救你一次。</p>
+  <div class="body">
+    <div class="g3">
+      <div class="card r"><h4>✕ 常见误解</h4>
+        <ul class="cross">
+          <li>"模型调用了数据库"</li>
+          <li>"给模型开了删除权限"</li>
+          <li>"MCP 让模型连上了 GitHub"</li>
+          <li>"agent 自己跑了 rm -rf"</li>
+        </ul></div>
+      <div class="card g"><h4>✓ 准确说法</h4>
+        <ul class="tick">
+          <li>模型<b>请求</b>调用，宿主执行</li>
+          <li>权限开在<b>宿主的凭证</b>上</li>
+          <li>MCP 客户端连上了 GitHub</li>
+          <li>宿主替 agent 跑了 rm -rf</li>
+        </ul></div>
+      <div class="card o"><h4>为什么必须较真</h4>
+        <p>因为所有<b>安全设计</b>都落在这个区分上。你能拦截的位置只有一个：
+           模型说完、你动手之前的那一瞬间。</p></div>
+    </div>
+    <div class="row grow">
+      <div class="f1 card b">
+        <h4>由此推出的三条工程结论</h4>
+        <ul>
+          <li><b>门禁点只有一个。</b>不要试图用 prompt 让模型"不要删库"——要在执行器里不给它删库的凭证。</li>
+          <li><b>幻觉参数是常态。</b>模型会填出不存在的 <code>user_id</code>。执行器要把校验失败<b>作为一条工具结果</b>返回，而不是抛异常终止。</li>
+          <li><b>回执即上下文。</b>你返回什么，模型就只知道什么。返回 <code>{"ok":true}</code> 等于什么都没说。</li>
+        </ul>
+      </div>
+      <div class="f1">
+        <div class="codehd">好的错误回执：把失败变成下一步的提示</div>
+        <pre class="sm">{ <span class="k">"type"</span>: <span class="s">"tool_result"</span>,
+  <span class="k">"tool_use_id"</span>: <span class="s">"toolu_01A…"</span>,
+  <span class="k">"is_error"</span>: <span class="n">true</span>,
+  <span class="k">"content"</span>: <span class="s">"user_id 'u_月光' 不存在。"</span>
+             <span class="s">"user_id 必须形如 u_xxxx（4 位十六进制）。"</span>
+             <span class="s">"若只知道用户名，请先调用 lookup_user。"</span> }
+
+<span class="c">// 对比：下面这种回执让模型只能干瞪眼</span>
+<span class="c">// { "is_error": true, "content": "400 Bad Request" }</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 1 · Tools">
+  <h2 class="t">你能施加的控制：<code>tool_choice</code></h2>
+  <p class="sub">从"完全放手"到"必须调这一个"，四档。它不是优化项，是流程控制手段。</p>
+  <div class="body">
+    <div class="row grow">
+      <div class="f1">
+        <table class="zebra">
+          <thead><tr><th style="width:150px">取值</th><th>行为</th><th style="width:230px">什么时候用</th></tr></thead>
+          <tbody>
+            <tr><td><code>{"type":"auto"}</code></td><td>模型自己决定调不调、调几个（默认）</td><td>对话式 agent 的常态</td></tr>
+            <tr><td><code>{"type":"any"}</code></td><td>必须调工具，但调哪个由模型定</td><td>路由分发：这一轮不许闲聊</td></tr>
+            <tr><td><code>{"type":"tool",<br>&nbsp;"name":"x"}</code></td><td>强制调用指定的那一个</td><td>把工具当<b>结构化输出</b>用：让模型必须按 schema 填表</td></tr>
+            <tr><td><code>{"type":"none"}</code></td><td>本轮禁止调用任何工具</td><td>收尾轮：只让它总结，别再动手</td></tr>
+          </tbody>
+        </table>
+        <div class="note" style="margin-top:12px">
+          <code>disable_parallel_tool_use: true</code> 可以把一轮多个 <code>tool_use</code> 压回一次一个——
+          当工具之间<b>有顺序依赖</b>或写操作不可并发时必须打开。
+        </div>
+      </div>
+      <div class="f1 col">
+        <div class="card p">
+          <h4>被低估的用法：拿工具做 schema 约束</h4>
+          <p>强制调用一个只用来"填表"的假工具，是让模型输出<b>严格结构化 JSON</b>
+             最古老也最稳的手段——它走的是训练过的 <code>tool_use</code> 通道，
+             比"请只输出 JSON"这种祈使句可靠得多。</p>
+        </div>
+        <div class="card">
+          <h4>一轮多调用</h4>
+          <p>模型可以在<b>一条回复里</b>发出多个 <code>tool_use</code>。宿主应当并行执行、
+             把多个 <code>tool_result</code> 放进<b>同一条</b> user 消息里回去。
+             漏掉任何一个 <code>tool_use_id</code> 的回执，请求会直接报错。</p>
+        </div>
+        <div class="note r">
+          <b>顺序陷阱：</b>并行执行意味着模型没法保证"先查库存再下单"。
+          有依赖就关并行，或者干脆把两步合并成一个工具。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 1 · Tools">
+  <h2 class="t">description 就是接口文档，读者是模型</h2>
+  <p class="sub">同一个函数，换个描述，调用准确率能差出一个量级。</p>
+  <div class="body">
+    <div class="g2 grow">
+      <div class="col">
+        <div class="codehd" style="color:var(--r)">✕ 反例</div>
+        <pre class="sm"><span class="k">"name"</span>: <span class="s">"query"</span>,
+<span class="k">"description"</span>: <span class="s">"查询数据"</span></pre>
+        <ul class="cross">
+          <li>名字没有语义，和别的工具区分不开</li>
+          <li>没说查<b>什么</b>数据、什么时候该查</li>
+          <li>没说边界：能不能写？会不会很慢？</li>
+          <li>没说失败长什么样</li>
+        </ul>
+        <div class="codehd" style="color:var(--r);margin-top:4px">✕ 另一种反例：写给人看</div>
+        <pre class="sm"><span class="k">"description"</span>: <span class="s">"本接口由订单中台 v3 提供，"</span>
+  <span class="s">"遵循 RESTful 规范，QPS 限制见 wiki。"</span></pre>
+        <p style="font-size:13px">全是模型<b>用不上</b>的信息，纯占 token。</p>
+      </div>
+      <div class="col">
+        <div class="codehd" style="color:var(--g)">✓ 正例</div>
+        <pre class="sm"><span class="k">"name"</span>: <span class="s">"search_orders"</span>,
+<span class="k">"description"</span>:
+  <span class="s">"按条件检索某个用户的订单。"</span>          <span class="c">← 做什么</span>
+  <span class="s">"当用户问『我的订单』『买过什么』"</span>
+  <span class="s">"『退款到了没』时使用。"</span>              <span class="c">← 何时用</span>
+  <span class="s">"只读，不修改任何数据。"</span>              <span class="c">← 边界</span>
+  <span class="s">"一次最多 20 条，更多请用 cursor。"</span>    <span class="c">← 限制</span>
+  <span class="s">"查不到会返回空数组，不是错误。"</span>       <span class="c">← 失败语义</span>
+  <span class="s">"不要用它查退款进度，那个用 "</span>
+  <span class="s">"get_refund_status。"</span>                 <span class="c">← 负向边界</span></pre>
+        <div class="note g" style="margin-top:2px">
+          <b>负向边界</b>（"不要用它做 X，那个用 Y"）是最容易被忘、收益最大的一句。
+          工具越多越关键。
+        </div>
+      </div>
+    </div>
+    <div class="note">
+      一条检验标准：<b>把 description 单独拿给一个没见过你系统的人看，他能不能判断"这个场景该不该用它"。</b>
+      不能，模型也不能。
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 1 · Tools">
+  <h2 class="t">工具变多以后：上下文是有预算的</h2>
+  <p class="sub">每个工具定义都常驻上下文。100 个工具可能吃掉几万 token，而且会互相干扰。</p>
+  <div class="body">
+    <div class="g3">
+      <div class="card r"><h4>问题一 · 占地</h4>
+        <p>工具定义在<b>每一轮</b>都要重发。一个中等复杂的工具约 150–400 token，
+           50 个就是一两万——还没开始对话就烧掉了。</p></div>
+      <div class="card r"><h4>问题二 · 干扰</h4>
+        <p>功能相近的工具越多，选错的概率越高。<b>准确率随工具数下降</b>，
+           这是比成本更硬的约束。</p></div>
+      <div class="card r"><h4>问题三 · 僵化</h4>
+        <p>工具列表通常在请求开始时就固定了，会话中途想加一个新工具，
+           传统做法只能重开一轮。</p></div>
+    </div>
+    <div class="row grow">
+      <div class="f1 card b">
+        <h4>解法一 · 延迟加载 + 工具检索</h4>
+        <p>把工具标记为"不默认加载"，只把一个<b>检索工具</b>放进上下文。
+           模型先描述自己想干什么，检索工具按名称正则或 BM25 把匹配的几个工具
+           <b>临时注入</b>，再正常调用。</p>
+        <p style="margin-top:7px">代价：多一轮往返。收益：工具库可以做到成百上千个。</p>
+      </div>
+      <div class="f1 card b">
+        <h4>解法二 · 会话中途增删工具</h4>
+        <p>允许在对话进行到一半时<b>追加或移除</b>工具定义，并且用一个"引用"占位符
+           指向前面已经发过的定义——避免每轮重发全量 schema，保住<b>提示缓存</b>不失效。</p>
+        <p style="margin-top:7px">这对长会话尤其重要：缓存一旦被工具列表变动打断，成本会突然翻倍。</p>
+      </div>
+      <div class="f1 card o">
+        <h4>解法三 · 别做那么多工具</h4>
+        <p>很多"工具"其实是同一个工具的不同参数。<b>把 20 个 <code>get_*</code> 合并成
+           1 个带 <code>resource</code> 枚举的工具</b>，通常比任何检索机制都有效。</p>
+        <p style="margin-top:7px">这条会在 ACI 那一幕展开：<b>粒度</b>是 ACI 设计的第一难题。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 1 · Tools">
+  <h2 class="t">幕一验收：Tools 讲清了什么</h2>
+  <p class="sub">回到开场那张表的第一行。</p>
+  <div class="body">
+    <div class="row grow">
+      <div class="f1 col">
+        <div class="note b" style="font-size:15px">
+          <b>Tools 回答的问题：</b>模型怎么说出"我要调用某个函数"。<br>
+          <b>答案：</b>约定一种输出格式（<code>tool_use</code>），并约定一种回灌格式（<code>tool_result</code>），
+          用 <code>tool_use_id</code> 把两者配对。仅此而已。
+        </div>
+        <div class="card"><h4>它没有回答的问题</h4>
+          <ul>
+            <li>工具定义<b>从哪来</b>？——现在只能硬编码在宿主里。<span class="hp">→ MCP</span></li>
+            <li>工具<b>该怎么用</b>（多步流程、组织规范）？<span class="hp">→ Skills</span></li>
+            <li>如果对面不是函数、是另一个 agent？<span class="hp">→ A2A</span></li>
+          </ul></div>
+      </div>
+      <div class="f1">
+        <table>
+          <thead><tr><th>你必须记住的五件事</th></tr></thead>
+          <tbody>
+            <tr><td><b>①</b> 模型只发起，宿主执行。门禁只有这一个位置。</td></tr>
+            <tr><td><b>②</b> <code>description</code> 决定"何时调"，<code>input_schema</code> 决定"怎么调"。前者更重要。</td></tr>
+            <tr><td><b>③</b> 回执就是模型接下来的全部认知。错误回执要写成<b>行动建议</b>。</td></tr>
+            <tr><td><b>④</b> <code>tool_choice</code> 是流程控制手段，不是调优旋钮。</td></tr>
+            <tr><td><b>⑤</b> 工具数量有上下文与准确率的双重代价。合并 &gt; 检索 &gt; 硬塞。</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 幕 2 · MCP ═══════════ -->
+
+<section class="slide" data-act="幕 2 · MCP">
+  <h2 class="t">MCP 要解决的是 <em>N × M</em></h2>
+  <p class="sub">不是"让模型能用工具"——那 Tools 已经解决了。是"让工具不必为每个宿主重写一遍"。</p>
+  <div class="body">
+    <svg viewBox="0 0 1150 300" width="1150" height="300">
+      <defs>
+        <marker id="am" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#3a4658"/></marker>
+      </defs>
+      <text x="240" y="16" font-size="13" fill="#ff7b72" text-anchor="middle" font-weight="600">没有 MCP：N 个宿主 × M 个服务 = N×M 套集成</text>
+      <g font-size="11.5" text-anchor="middle">
+        <rect x="20"  y="40" width="98" height="26" rx="4" fill="#151b24" stroke="#273040"/><text x="69"  y="57" fill="#a9b4c2">IDE 助手</text>
+        <rect x="20"  y="82" width="98" height="26" rx="4" fill="#151b24" stroke="#273040"/><text x="69"  y="99" fill="#a9b4c2">聊天客户端</text>
+        <rect x="20" y="124" width="98" height="26" rx="4" fill="#151b24" stroke="#273040"/><text x="69" y="141" fill="#a9b4c2">CLI agent</text>
+        <rect x="20" y="166" width="98" height="26" rx="4" fill="#151b24" stroke="#273040"/><text x="69" y="183" fill="#a9b4c2">自建后端</text>
+        <rect x="360" y="40" width="98" height="26" rx="4" fill="#151b24" stroke="#273040"/><text x="409" y="57" fill="#a9b4c2">GitHub</text>
+        <rect x="360" y="82" width="98" height="26" rx="4" fill="#151b24" stroke="#273040"/><text x="409" y="99" fill="#a9b4c2">Postgres</text>
+        <rect x="360" y="124" width="98" height="26" rx="4" fill="#151b24" stroke="#273040"/><text x="409" y="141" fill="#a9b4c2">Slack</text>
+        <rect x="360" y="166" width="98" height="26" rx="4" fill="#151b24" stroke="#273040"/><text x="409" y="183" fill="#a9b4c2">内部工单</text>
+      </g>
+      <g stroke="#ff7b72" stroke-opacity=".28" stroke-width="1">
+        <path d="M118 53 L360 53 M118 53 L360 95 M118 53 L360 137 M118 53 L360 179"/>
+        <path d="M118 95 L360 53 M118 95 L360 95 M118 95 L360 137 M118 95 L360 179"/>
+        <path d="M118 137 L360 53 M118 137 L360 95 M118 137 L360 137 M118 137 L360 179"/>
+        <path d="M118 179 L360 53 M118 179 L360 95 M118 179 L360 137 M118 179 L360 179"/>
+      </g>
+      <text x="240" y="232" font-size="12.5" fill="#6f7c8d" text-anchor="middle">每加一个宿主，所有服务都要再接一次</text>
+      <text x="240" y="252" font-size="12.5" fill="#6f7c8d" text-anchor="middle">每加一个服务，所有宿主都要再改一次</text>
+
+      <line x1="530" y1="120" x2="600" y2="120" stroke="#3a4658" stroke-width="1.5" marker-end="url(#am)"/>
+      <text x="565" y="106" font-size="12" fill="#6f7c8d" text-anchor="middle" class="mono">MCP</text>
+
+      <text x="900" y="16" font-size="13" fill="#7ee787" text-anchor="middle" font-weight="600">有 MCP：N + M 套集成，中间一层统一协议</text>
+      <g font-size="11.5" text-anchor="middle">
+        <rect x="640"  y="40" width="98" height="26" rx="4" fill="#151b24" stroke="#273040"/><text x="689"  y="57" fill="#a9b4c2">IDE 助手</text>
+        <rect x="640"  y="82" width="98" height="26" rx="4" fill="#151b24" stroke="#273040"/><text x="689"  y="99" fill="#a9b4c2">聊天客户端</text>
+        <rect x="640" y="124" width="98" height="26" rx="4" fill="#151b24" stroke="#273040"/><text x="689" y="141" fill="#a9b4c2">CLI agent</text>
+        <rect x="640" y="166" width="98" height="26" rx="4" fill="#151b24" stroke="#273040"/><text x="689" y="183" fill="#a9b4c2">自建后端</text>
+        <rect x="828" y="36" width="70" height="160" rx="6" fill="#1b2331" stroke="#58a6ff"/>
+        <text x="863" y="106" font-size="13" fill="#58a6ff" transform="rotate(-90 863 106)">MCP 协议</text>
+        <rect x="988" y="40" width="98" height="26" rx="4" fill="#151b24" stroke="#273040"/><text x="1037" y="57" fill="#a9b4c2">GitHub</text>
+        <rect x="988" y="82" width="98" height="26" rx="4" fill="#151b24" stroke="#273040"/><text x="1037" y="99" fill="#a9b4c2">Postgres</text>
+        <rect x="988" y="124" width="98" height="26" rx="4" fill="#151b24" stroke="#273040"/><text x="1037" y="141" fill="#a9b4c2">Slack</text>
+        <rect x="988" y="166" width="98" height="26" rx="4" fill="#151b24" stroke="#273040"/><text x="1037" y="183" fill="#a9b4c2">内部工单</text>
+      </g>
+      <g stroke="#7ee787" stroke-opacity=".45">
+        <path d="M738 53 L828 90 M738 95 L828 100 M738 137 L828 120 M738 179 L828 140"/>
+        <path d="M898 90 L988 53 M898 100 L988 95 M898 120 L988 137 M898 140 L988 179"/>
+      </g>
+      <text x="900" y="232" font-size="12.5" fill="#6f7c8d" text-anchor="middle">宿主只实现一次客户端</text>
+      <text x="900" y="252" font-size="12.5" fill="#6f7c8d" text-anchor="middle">服务只实现一次服务端</text>
+    </svg>
+    <div class="note b">
+      这是一个<b>纯粹的工程动机</b>，不是模型能力的进步。MCP 常被类比成"AI 世界的 USB-C"——
+      类比成立的部分是<b>统一插口</b>；不成立的部分是，USB-C 传的是电和数据，
+      MCP 传的是<b>模型能读懂的语义</b>，所以描述写得好不好仍然决定成败。
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 2 · MCP">
+  <h2 class="t">四个实体，一次分清</h2>
+  <p class="sub">这张图是本幕的地基。后面所有流程都在这四个盒子之间走。</p>
+  <div class="body">
+    <svg viewBox="0 0 1150 340" width="1150" height="340">
+      <defs>
+        <marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#58a6ff"/></marker>
+        <marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#7ee787"/></marker>
+      </defs>
+      <!-- Host boundary -->
+      <rect x="10" y="26" width="600" height="290" rx="10" fill="none" stroke="#7a5222" stroke-dasharray="6 5"/>
+      <text x="26" y="18" font-size="12.5" fill="#ffa657" class="mono">HOST（宿主应用 = 你的进程 / 你的机器 / 你的凭证）</text>
+
+      <!-- Agent / model -->
+      <rect x="36" y="52" width="230" height="112" rx="8" fill="#1b2331" stroke="#d2a8ff"/>
+      <text x="52" y="76" font-size="15" fill="#d2a8ff" font-weight="600">① Agent（模型 + 循环）</text>
+      <text x="52" y="100" font-size="12.5" fill="#a9b4c2">决定"调哪个工具、参数填什么"</text>
+      <text x="52" y="120" font-size="12.5" fill="#a9b4c2">它<tspan fill="#ff7b72">看不见</tspan> MCP，只看见 tools[]</text>
+      <text x="52" y="146" font-size="12" fill="#6f7c8d" class="mono">不说 JSON-RPC，不认识 Server</text>
+
+      <!-- Client -->
+      <rect x="36" y="188" width="230" height="108" rx="8" fill="#1b2331" stroke="#58a6ff"/>
+      <text x="52" y="212" font-size="15" fill="#58a6ff" font-weight="600">② MCP Client</text>
+      <text x="52" y="236" font-size="12.5" fill="#a9b4c2">宿主内的一个连接器对象</text>
+      <text x="52" y="256" font-size="12.5" fill="#a9b4c2">与<tspan fill="#e6edf3">一个</tspan> Server 保持<tspan fill="#e6edf3">一对一</tspan>连接</text>
+      <text x="52" y="278" font-size="12" fill="#6f7c8d" class="mono">N 个 Server ⇒ 宿主里 N 个 Client</text>
+
+      <line x1="151" y1="168" x2="151" y2="184" stroke="#3a4658" stroke-width="1.4"/>
+      <text x="163" y="180" font-size="11.5" fill="#6f7c8d">同一个进程内的函数调用</text>
+
+      <!-- Server -->
+      <rect x="660" y="52" width="240" height="130" rx="8" fill="#1b2331" stroke="#7ee787"/>
+      <text x="676" y="76" font-size="15" fill="#7ee787" font-weight="600">③ MCP Server</text>
+      <text x="676" y="100" font-size="12.5" fill="#a9b4c2">把某个服务<tspan fill="#e6edf3">翻译</tspan>成 MCP 原语</text>
+      <text x="676" y="120" font-size="12.5" fill="#a9b4c2">通常是个几百行的适配器</text>
+      <text x="676" y="140" font-size="12.5" fill="#a9b4c2">可能跑在你机器上，也可能在云上</text>
+      <text x="676" y="164" font-size="12" fill="#6f7c8d" class="mono">它<tspan fill="#ff7b72">不是</tspan>原始服务本身</text>
+
+      <!-- Origin -->
+      <rect x="660" y="212" width="240" height="104" rx="8" fill="#151b24" stroke="#273040"/>
+      <text x="676" y="236" font-size="15" fill="#e6edf3" font-weight="600">④ 原始服务提供者</text>
+      <text x="676" y="260" font-size="12.5" fill="#a9b4c2">GitHub / Postgres / 你的内网系统</text>
+      <text x="676" y="280" font-size="12.5" fill="#a9b4c2">完全<tspan fill="#e6edf3">不知道</tspan> MCP 存在</text>
+      <text x="676" y="302" font-size="12" fill="#6f7c8d" class="mono">它只见到一个普通的 API 调用方</text>
+
+      <line x1="780" y1="186" x2="780" y2="208" stroke="#3a4658" stroke-width="1.4" marker-end="url(#ag)"/>
+      <text x="792" y="202" font-size="11.5" fill="#6f7c8d">REST / SQL / gRPC…（老接口）</text>
+
+      <path d="M270 240 L652 118" stroke="#58a6ff" stroke-width="1.6" fill="none" marker-end="url(#ab)"/>
+      <text x="380" y="196" font-size="12.5" fill="#58a6ff" class="mono">JSON-RPC 2.0</text>
+      <text x="380" y="214" font-size="11.5" fill="#6f7c8d">stdio 管道 或 Streamable HTTP</text>
+
+      <rect x="930" y="52" width="212" height="264" rx="8" fill="#151b24" stroke="#273040"/>
+      <text x="946" y="76" font-size="13" fill="#ffa657" font-weight="600">凭证放在哪</text>
+      <text x="946" y="100" font-size="12" fill="#a9b4c2">本地 stdio：环境变量交给</text>
+      <text x="946" y="118" font-size="12" fill="#a9b4c2">子进程，凭证留在你机器上</text>
+      <text x="946" y="146" font-size="12" fill="#a9b4c2">远端 HTTP：走 OAuth，</text>
+      <text x="946" y="164" font-size="12" fill="#a9b4c2">token 由 Client 持有并刷新</text>
+      <text x="946" y="196" font-size="13" fill="#ffa657" font-weight="600">谁能看见你的数据</text>
+      <text x="946" y="220" font-size="12" fill="#a9b4c2">Server 能看见它转发的一切。</text>
+      <text x="946" y="238" font-size="12" fill="#a9b4c2">装一个第三方 MCP Server</text>
+      <text x="946" y="256" font-size="12" fill="#a9b4c2">≈ 装一个能读你数据的依赖。</text>
+      <text x="946" y="284" font-size="12" fill="#ff7b72">这是 MCP 最大的安全面。</text>
+    </svg>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 2 · MCP">
+  <h2 class="t">三个必须掰开的误解</h2>
+  <p class="sub">这三句话讲错了，后面的时序图就全是糊的。</p>
+  <div class="body">
+    <div class="col grow" style="gap:11px">
+      <div class="card r">
+        <h4>误解一：Agent 就是 MCP Client</h4>
+        <div class="row" style="gap:16px;margin-top:4px">
+          <div class="f1"><p><b>错在哪：</b>Agent 是"模型 + 循环"，它输出的是 <code>tool_use</code>，
+            用的是普通工具调用格式。它<b>从不发 JSON-RPC</b>。</p></div>
+          <div class="f1"><p><b>正确关系：</b>Client 是宿主里的<b>传输层组件</b>。
+            宿主把 Client 拿回来的工具列表<b>拍平进 tools[]</b> 给模型，
+            模型选了之后，宿主再让 Client 发出 <code>tools/call</code>。</p></div>
+        </div>
+      </div>
+      <div class="card r">
+        <h4>误解二：MCP Server 就是那个服务</h4>
+        <div class="row" style="gap:16px;margin-top:4px">
+          <div class="f1"><p><b>错在哪：</b>"GitHub MCP Server" 不是 GitHub。它是一个<b>适配器进程</b>——
+            很可能就跑在你自己的笔记本上，靠你的 PAT 去调真正的 GitHub API。</p></div>
+          <div class="f1"><p><b>为什么重要：</b>因为出问题时你要知道该查哪一层：
+            是适配器的工具描述写得烂（模型选错），还是原始 API 报错（适配器转发了错误），
+            这是两类完全不同的故障。</p></div>
+        </div>
+      </div>
+      <div class="card r">
+        <h4>误解三：一个 Client 可以连很多 Server</h4>
+        <div class="row" style="gap:16px;margin-top:4px">
+          <div class="f1"><p><b>错在哪：</b>协议规定的是<b>一对一</b>：一个 Client 实例 ↔ 一个 Server。
+            宿主接三个服务，就在自己内部起<b>三个 Client</b>。</p></div>
+          <div class="f1"><p><b>由此产生的真实工程问题：</b>三个 Server 各自声明的工具会<b>重名</b>
+            （都叫 <code>search</code>）。宿主必须自己做<b>命名空间前缀</b>，
+            否则模型和你都分不清调的是哪个。</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="note b">
+      一句话记法：<b>Agent 决定做什么，Client 负责怎么送，Server 负责怎么翻译，原始服务负责真的干。</b>
+      四个动词分给四个实体，不重不漏。
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 2 · MCP">
+  <h2 class="t">两种传输：本地子进程 vs 远端 HTTP</h2>
+  <p class="sub">同一套 JSON-RPC 报文，两种送法。选哪种，决定了部署形态和安全模型。</p>
+  <div class="body">
+    <div class="g2 grow">
+      <div class="card b">
+        <h4>stdio · 本地子进程</h4>
+        <svg viewBox="0 0 500 130" width="100%" height="130" preserveAspectRatio="xMidYMid meet">
+          <rect x="10" y="20" width="180" height="60" rx="6" fill="#1b2331" stroke="#58a6ff"/>
+          <text x="100" y="46" font-size="13" fill="#58a6ff" text-anchor="middle">宿主进程</text>
+          <text x="100" y="66" font-size="11.5" fill="#6f7c8d" text-anchor="middle" class="mono">spawn() 出子进程</text>
+          <rect x="300" y="20" width="180" height="60" rx="6" fill="#1b2331" stroke="#7ee787"/>
+          <text x="390" y="46" font-size="13" fill="#7ee787" text-anchor="middle">Server 子进程</text>
+          <text x="390" y="66" font-size="11.5" fill="#6f7c8d" text-anchor="middle" class="mono">npx / uvx / 本地二进制</text>
+          <line x1="192" y1="40" x2="298" y2="40" stroke="#a9b4c2" stroke-width="1.3"/>
+          <text x="245" y="34" font-size="11" fill="#a9b4c2" text-anchor="middle" class="mono">stdin</text>
+          <line x1="298" y1="62" x2="192" y2="62" stroke="#a9b4c2" stroke-width="1.3"/>
+          <text x="245" y="78" font-size="11" fill="#a9b4c2" text-anchor="middle" class="mono">stdout</text>
+          <text x="245" y="108" font-size="11.5" fill="#6f7c8d" text-anchor="middle">一行一条 JSON，换行分隔</text>
+        </svg>
+        <ul style="margin-top:6px">
+          <li>零网络、零鉴权，天然只有本机能连</li>
+          <li>凭证靠<b>环境变量</b>传给子进程</li>
+          <li>生命周期 = 宿主生命周期，宿主退出就没了</li>
+          <li><b>stderr 千万别写日志到 stdout</b>——会污染协议流，这是最经典的 MCP bug</li>
+        </ul>
+      </div>
+      <div class="card g">
+        <h4>Streamable HTTP · 远端服务</h4>
+        <svg viewBox="0 0 500 130" width="100%" height="130" preserveAspectRatio="xMidYMid meet">
+          <rect x="10" y="20" width="170" height="60" rx="6" fill="#1b2331" stroke="#58a6ff"/>
+          <text x="95" y="46" font-size="13" fill="#58a6ff" text-anchor="middle">宿主 / Client</text>
+          <text x="95" y="66" font-size="11.5" fill="#6f7c8d" text-anchor="middle" class="mono">持有 OAuth token</text>
+          <rect x="310" y="20" width="170" height="60" rx="6" fill="#1b2331" stroke="#7ee787"/>
+          <text x="395" y="46" font-size="13" fill="#7ee787" text-anchor="middle">远端 Server</text>
+          <text x="395" y="66" font-size="11.5" fill="#6f7c8d" text-anchor="middle" class="mono">厂商托管</text>
+          <line x1="182" y1="38" x2="306" y2="38" stroke="#a9b4c2" stroke-width="1.3"/>
+          <text x="244" y="32" font-size="11" fill="#a9b4c2" text-anchor="middle" class="mono">POST /mcp</text>
+          <line x1="306" y1="62" x2="182" y2="62" stroke="#ffa657" stroke-width="1.3" stroke-dasharray="4 3"/>
+          <text x="244" y="78" font-size="11" fill="#ffa657" text-anchor="middle" class="mono">SSE 流（可选）</text>
+          <text x="244" y="108" font-size="11.5" fill="#6f7c8d" text-anchor="middle">长任务/进度靠事件流推回来</text>
+        </svg>
+        <ul style="margin-top:6px">
+          <li>可以多用户共享一个 Server 实例</li>
+          <li>鉴权走标准 <b>OAuth</b>，token 刷新由 Client 管</li>
+          <li>能被普通 HTTP 基础设施（网关/CDN/负载均衡）承载</li>
+          <li><b>2026-07-28 起</b>：协议级 session 与 <code>Mcp-Session-Id</code> 被移除，
+              路由信息镜像到 HTTP 头——就是为了让上面这句话真正成立</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 2 · MCP">
+  <h2 class="t">完整时序：从启动到拿到结果</h2>
+  <p class="sub">五个实体，三个阶段。看清楚每一步的<b>发起方</b>是谁。</p>
+  <div class="body">
+    <svg viewBox="0 0 1150 440" width="1150" height="440">
+      <defs>
+        <marker id="b1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#58a6ff"/></marker>
+        <marker id="b2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#7ee787"/></marker>
+        <marker id="b3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#d2a8ff"/></marker>
+      </defs>
+      <!-- phase bands -->
+      <rect x="0" y="42" width="1150" height="96"  fill="rgba(88,166,255,.05)"/>
+      <rect x="0" y="146" width="1150" height="72" fill="rgba(210,168,255,.05)"/>
+      <rect x="0" y="226" width="1150" height="188" fill="rgba(255,166,87,.05)"/>
+      <text x="8" y="58"  font-size="11" fill="#58a6ff" class="mono">阶段 A · 连接与能力发现（宿主启动时，一次）</text>
+      <text x="8" y="162" font-size="11" fill="#d2a8ff" class="mono">阶段 B · 注入上下文（每次请求模型前）</text>
+      <text x="8" y="242" font-size="11" fill="#ffa657" class="mono">阶段 C · 调用（模型每选中一次工具）</text>
+      <!-- heads -->
+      <g font-size="12.5" text-anchor="middle">
+        <rect x="30"  y="0" width="130" height="28" rx="5" fill="#151b24" stroke="#273040"/><text x="95"  y="19" fill="#e6edf3">宿主应用</text>
+        <rect x="250" y="0" width="130" height="28" rx="5" fill="#1b2331" stroke="#d2a8ff"/><text x="315" y="19" fill="#d2a8ff">Agent / 模型</text>
+        <rect x="470" y="0" width="130" height="28" rx="5" fill="#1b2331" stroke="#58a6ff"/><text x="535" y="19" fill="#58a6ff">MCP Client</text>
+        <rect x="700" y="0" width="130" height="28" rx="5" fill="#1b2331" stroke="#7ee787"/><text x="765" y="19" fill="#7ee787">MCP Server</text>
+        <rect x="940" y="0" width="150" height="28" rx="5" fill="#151b24" stroke="#273040"/><text x="1015" y="19" fill="#e6edf3">原始服务</text>
+      </g>
+      <g stroke="#273040" stroke-dasharray="3 5">
+        <line x1="95" y1="32" x2="95" y2="418"/><line x1="315" y1="32" x2="315" y2="418"/>
+        <line x1="535" y1="32" x2="535" y2="418"/><line x1="765" y1="32" x2="765" y2="418"/>
+        <line x1="1015" y1="32" x2="1015" y2="418"/>
+      </g>
+      <g font-size="12">
+        <!-- A -->
+        <line x1="95" y1="76" x2="527" y2="76" stroke="#58a6ff" stroke-width="1.3" marker-end="url(#b1)"/>
+        <text x="110" y="70" fill="#a9b4c2">读配置，为每个 Server 起一个 Client</text>
+        <line x1="535" y1="102" x2="757" y2="102" stroke="#58a6ff" stroke-width="1.3" marker-end="url(#b1)"/>
+        <text x="548" y="96" fill="#58a6ff" class="mono">tools/list · resources/list · prompts/list</text>
+        <line x1="765" y1="128" x2="543" y2="128" stroke="#7ee787" stroke-width="1.3" marker-end="url(#b2)"/>
+        <text x="560" y="122" fill="#a9b4c2">返回能力清单（含 inputSchema）</text>
+        <!-- B -->
+        <line x1="535" y1="178" x2="103" y2="178" stroke="#58a6ff" stroke-width="1.3" marker-end="url(#b1)"/>
+        <text x="120" y="172" fill="#a9b4c2">宿主把各 Server 的工具<tspan fill="#e6edf3">拍平、加命名空间前缀</tspan></text>
+        <line x1="95" y1="206" x2="307" y2="206" stroke="#d2a8ff" stroke-width="1.3" marker-end="url(#b3)"/>
+        <text x="108" y="200" fill="#d2a8ff">messages + <tspan class="mono">tools[]</tspan>（此时已看不出 MCP 的存在）</text>
+        <!-- C -->
+        <line x1="315" y1="262" x2="103" y2="262" stroke="#d2a8ff" stroke-width="1.3" marker-end="url(#b3)"/>
+        <text x="120" y="256" fill="#d2a8ff" class="mono">tool_use: github__search_issues</text>
+        <line x1="95" y1="292" x2="527" y2="292" stroke="#ffa657" stroke-width="1.3" marker-end="url(#b1)"/>
+        <text x="110" y="286" fill="#ffa657">按前缀路由到对应 Client（并在此处做权限确认）</text>
+        <line x1="535" y1="320" x2="757" y2="320" stroke="#58a6ff" stroke-width="1.3" marker-end="url(#b1)"/>
+        <text x="548" y="314" fill="#58a6ff" class="mono">tools/call {name, arguments}</text>
+        <line x1="765" y1="348" x2="1007" y2="348" stroke="#7ee787" stroke-width="1.3" marker-end="url(#b2)"/>
+        <text x="778" y="342" fill="#a9b4c2">翻译成 REST/SQL，带上自己的凭证</text>
+        <line x1="1015" y1="374" x2="773" y2="374" stroke="#7ee787" stroke-width="1.3" marker-end="url(#b2)"/>
+        <text x="800" y="368" fill="#a9b4c2">原始响应</text>
+        <line x1="765" y1="400" x2="323" y2="400" stroke="#7ee787" stroke-width="1.3" marker-end="url(#b2)"/>
+        <text x="420" y="394" fill="#7ee787">content[] → 宿主包成 tool_result → 回到模型（回到阶段 B）</text>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 2 · MCP">
+  <h2 class="t">真实报文（一）：能力发现</h2>
+  <p class="sub">JSON-RPC 2.0，一问一答。注意 <code>inputSchema</code> 的驼峰写法——和 Anthropic API 的 <code>input_schema</code> 不是一回事。</p>
+  <div class="body">
+    <div class="g2 grow">
+      <div class="col">
+        <div class="codehd">→ Client 请求（2026-07-28 无状态风格）</div>
+        <pre class="sm">{
+  <span class="k">"jsonrpc"</span>: <span class="s">"2.0"</span>,
+  <span class="k">"id"</span>: <span class="n">1</span>,
+  <span class="k">"method"</span>: <span class="m">"tools/list"</span>,
+  <span class="k">"_meta"</span>: {
+    <span class="k">"io.modelcontextprotocol/protocolVersion"</span>: <span class="s">"2026-07-28"</span>,
+    <span class="k">"io.modelcontextprotocol/clientCapabilities"</span>: {
+      <span class="k">"roots"</span>: { <span class="k">"listChanged"</span>: <span class="n">true</span> },
+      <span class="k">"sampling"</span>: {}
+    }
+  }
+}</pre>
+        <div class="note r" style="margin-top:2px;font-size:12.5px">
+          <b>变了：</b>旧版本要先发 <code>initialize</code> 握手、再发 <code>notifications/initialized</code>，
+          之后才能问工具。新版本<b>没有握手</b>——协议版本和客户端能力挂在<b>每一条请求</b>的
+          <code>_meta</code> 里。这是无状态化改造的核心。
+        </div>
+      </div>
+      <div class="col">
+        <div class="codehd">← Server 响应</div>
+        <pre class="sm">{
+  <span class="k">"jsonrpc"</span>: <span class="s">"2.0"</span>, <span class="k">"id"</span>: <span class="n">1</span>,
+  <span class="k">"result"</span>: {
+    <span class="k">"tools"</span>: [
+      {
+        <span class="k">"name"</span>: <span class="s">"search_issues"</span>,
+        <span class="k">"title"</span>: <span class="s">"搜索 Issue"</span>,
+        <span class="k">"description"</span>: <span class="s">"在指定仓库中按 GitHub 搜索语法"</span>
+                       <span class="s">"检索 issue。只读。"</span>,
+        <span class="k">"inputSchema"</span>: {
+          <span class="k">"type"</span>: <span class="s">"object"</span>,
+          <span class="k">"properties"</span>: {
+            <span class="k">"repo"</span>:  { <span class="k">"type"</span>: <span class="s">"string"</span>, <span class="k">"description"</span>: <span class="s">"owner/name"</span> },
+            <span class="k">"query"</span>: { <span class="k">"type"</span>: <span class="s">"string"</span> }
+          },
+          <span class="k">"required"</span>: [<span class="s">"repo"</span>, <span class="s">"query"</span>]
+        }
+      }
+    ]
+  }
+}</pre>
+      </div>
+    </div>
+    <div class="note b">
+      看到了吗——<b>Server 返回的东西，和你手写一个 tool 定义几乎一模一样。</b>
+      MCP 没有发明新的工具模型，它只是把"工具定义从哪来"这件事从<b>编译期</b>挪到了<b>运行期</b>。
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 2 · MCP">
+  <h2 class="t">真实报文（二）：一次调用</h2>
+  <p class="sub">注意错误的两种表达方式——它们的语义完全不同。</p>
+  <div class="body">
+    <div class="row grow" style="gap:14px">
+      <div class="f1 col">
+        <div class="codehd">→ tools/call</div>
+        <pre class="sm">{
+  <span class="k">"jsonrpc"</span>: <span class="s">"2.0"</span>, <span class="k">"id"</span>: <span class="n">2</span>,
+  <span class="k">"method"</span>: <span class="m">"tools/call"</span>,
+  <span class="k">"params"</span>: {
+    <span class="k">"name"</span>: <span class="s">"search_issues"</span>,
+    <span class="k">"arguments"</span>: {
+      <span class="k">"repo"</span>: <span class="s">"acme/web"</span>,
+      <span class="k">"query"</span>: <span class="s">"is:open label:bug"</span>
+    }
+  }
+}</pre>
+        <div class="codehd" style="margin-top:8px">← 成功</div>
+        <pre class="sm">{
+  <span class="k">"jsonrpc"</span>: <span class="s">"2.0"</span>, <span class="k">"id"</span>: <span class="n">2</span>,
+  <span class="k">"result"</span>: {
+    <span class="k">"content"</span>: [
+      { <span class="k">"type"</span>: <span class="s">"text"</span>, <span class="k">"text"</span>: <span class="s">"找到 3 条：\n#812 登录超时…"</span> }
+    ],
+    <span class="k">"isError"</span>: <span class="n">false</span>
+  }
+}</pre>
+      </div>
+      <div class="f1 col">
+        <div class="codehd" style="color:var(--o)">← 工具级错误（业务失败）</div>
+        <pre class="sm">{
+  <span class="k">"jsonrpc"</span>: <span class="s">"2.0"</span>, <span class="k">"id"</span>: <span class="n">2</span>,
+  <span class="k">"result"</span>: {
+    <span class="k">"content"</span>: [{ <span class="k">"type"</span>: <span class="s">"text"</span>,
+      <span class="k">"text"</span>: <span class="s">"仓库 acme/web 不存在或无权限。"</span>
+              <span class="s">"请先用 list_repos 确认仓库名。"</span> }],
+    <span class="k">"isError"</span>: <span class="n">true</span>
+  }
+}</pre>
+        <p style="font-size:12.5px;margin-top:5px"><span class="hg">会</span>被送回模型，模型可以据此改参数重试。
+          <b>这是给模型看的。</b></p>
+        <div class="codehd" style="color:var(--r);margin-top:8px">← 协议级错误（调用本身非法）</div>
+        <pre class="sm">{
+  <span class="k">"jsonrpc"</span>: <span class="s">"2.0"</span>, <span class="k">"id"</span>: <span class="n">2</span>,
+  <span class="k">"error"</span>: { <span class="k">"code"</span>: <span class="n">-32602</span>,
+             <span class="k">"message"</span>: <span class="s">"Unknown tool: serch_issues"</span> }
+}</pre>
+        <p style="font-size:12.5px;margin-top:5px"><span class="hr">不</span>该原样丢给模型。
+          <b>这是给宿主看的</b>——说明宿主的路由或工具清单出了 bug。</p>
+      </div>
+    </div>
+    <div class="note">
+      <b>分清这两种错误，是写 MCP Server 时最常翻的车。</b>
+      把"仓库不存在"报成 <code>-32602</code>，模型就失去了自我修复的机会；
+      把"工具名拼错"塞进 <code>isError</code>，你就永远发现不了宿主的 bug。
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 2 · MCP">
+  <h2 class="t">三大原语：按<em>谁来决定</em>分层</h2>
+  <p class="sub">这是理解 MCP 设计最快的一刀。不是按"数据类型"分，是按"控制权在谁手上"分。</p>
+  <div class="body">
+    <div class="g3 grow">
+      <div class="card p">
+        <h4>Tools · 模型决定</h4>
+        <p class="mut" style="font-size:12px;font-family:var(--mono)">model-controlled</p>
+        <p style="margin-top:7px">模型自己判断该不该调、什么时候调。<b>有副作用</b>，可以写数据。</p>
+        <p style="margin-top:7px"><b>例：</b><code>create_issue</code>、<code>run_query</code>、<code>send_message</code></p>
+        <div class="note r" style="margin-top:9px;font-size:12.5px">
+          正因为模型决定，宿主<b>必须</b>提供确认机制。写操作无人值守自动执行，是事故的标准起点。
+        </div>
+      </div>
+      <div class="card b">
+        <h4>Resources · 应用决定</h4>
+        <p class="mut" style="font-size:12px;font-family:var(--mono)">application-controlled</p>
+        <p style="margin-top:7px">由<b>宿主</b>决定把哪些内容放进上下文。<b>只读、无副作用</b>，用 URI 标识。</p>
+        <p style="margin-top:7px"><b>例：</b><code>file:///repo/README.md</code>、<code>db://schema/orders</code></p>
+        <div class="note b" style="margin-top:9px;font-size:12.5px">
+          它更像"附件"而不是"函数"。很多客户端对 Resources 的支持弱于 Tools——
+          <b>这是 MCP 生态里最不均衡的一块。</b>
+        </div>
+      </div>
+      <div class="card g">
+        <h4>Prompts · 用户决定</h4>
+        <p class="mut" style="font-size:12px;font-family:var(--mono)">user-controlled</p>
+        <p style="margin-top:7px">Server 预置的提示词模板，由<b>用户</b>显式触发（斜杠命令、菜单项）。</p>
+        <p style="margin-top:7px"><b>例：</b><code>/review-pr</code>、<code>/explain-schema</code></p>
+        <div class="note g" style="margin-top:9px;font-size:12.5px">
+          它是 Skills 的<b>前身思路</b>：把"该怎么用这些工具"打包起来。
+          差别在于 Prompts 由用户主动挑，Skills 由模型按需取。
+        </div>
+      </div>
+    </div>
+    <div class="note">
+      记忆锚点：<b>模型决定的叫 Tools，应用决定的叫 Resources，用户决定的叫 Prompts。</b>
+      任何时候拿不准某个能力该做成什么，先问"这件事该由谁拍板"。
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 2 · MCP">
+  <h2 class="t">反向的三个原语：Server 也能提要求</h2>
+  <p class="sub">MCP 不是单向的 RPC。Server 可以回头找 Client 要能力——这是它区别于普通 REST 网关的地方。</p>
+  <div class="body">
+    <div class="row grow">
+      <div class="f1 col">
+        <div class="card p">
+          <h4>Sampling · Server 借用模型</h4>
+          <p>Server 在处理请求时可以反过来请求 Client：<b>"帮我调一次模型"</b>。
+             于是 Server 自己不需要持有任何 API Key，也不需要绑定某个模型厂商。</p>
+          <p style="margin-top:6px"><b>典型场景：</b>一个数据库 Server 要把自然语言转成 SQL，
+             它把这个子任务丢回给宿主的模型去做。</p>
+          <p style="margin-top:6px" class="mut">代价：Client 必须替用户把关——这是"我的 token 被别人花掉"的路径。
+             规范要求这里<b>有人在环</b>。</p>
+        </div>
+        <div class="card b">
+          <h4>Roots · Client 告诉 Server 边界</h4>
+          <p>Client 声明"你只能在这些目录/URI 范围里活动"。这是文件系统类 Server 的
+             <b>沙箱边界声明</b>，也是少数由 Client 主动推给 Server 的信息。</p>
+        </div>
+      </div>
+      <div class="f1 col">
+        <div class="card g">
+          <h4>Elicitation · Server 向用户追问</h4>
+          <p>Server 发现信息不够时，可以请求 Client <b>弹一个表单</b>问用户，
+             而不是猜一个参数或者直接报错。</p>
+          <p style="margin-top:6px"><b>典型场景：</b>"要往哪个环境部署？" —— 这种问题
+             既不该让模型猜，也不该在工具 schema 里硬塞。</p>
+        </div>
+        <div class="note">
+          <b>为什么这三个原语值得单独记：</b><br>
+          它们说明 MCP 的设计目标不是"远程函数调用"，而是<b>让第三方能力能安全地嵌进一个有人参与的会话</b>。
+          Sampling 借算力、Roots 划边界、Elicitation 借用户注意力——三件事都绕不开宿主，
+          <b>宿主始终是唯一的信任中心。</b>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 2 · MCP">
+  <h2 class="t">关键一页：MCP 最终还是<em>拍平成 tools</em></h2>
+  <p class="sub">如果这一幕你只带走一张图，带走这张。它把幕一和幕二焊在一起。</p>
+  <div class="body">
+    <svg viewBox="0 0 1150 250" width="1150" height="250">
+      <defs>
+        <marker id="c1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#58a6ff"/></marker>
+      </defs>
+      <g font-size="12">
+        <rect x="0" y="20" width="200" height="52" rx="6" fill="#151b24" stroke="#7ee787"/>
+        <text x="14" y="42" font-size="13" fill="#7ee787">Server A · github</text>
+        <text x="14" y="61" fill="#6f7c8d" class="mono">search_issues, create_issue</text>
+        <rect x="0" y="88" width="200" height="52" rx="6" fill="#151b24" stroke="#7ee787"/>
+        <text x="14" y="110" font-size="13" fill="#7ee787">Server B · postgres</text>
+        <text x="14" y="129" fill="#6f7c8d" class="mono">run_query, list_tables</text>
+        <rect x="0" y="156" width="200" height="52" rx="6" fill="#151b24" stroke="#7ee787"/>
+        <text x="14" y="178" font-size="13" fill="#7ee787">Server C · 内部工单</text>
+        <text x="14" y="197" fill="#6f7c8d" class="mono">search, create</text>
+
+        <rect x="280" y="20" width="200" height="188" rx="6" fill="#1b2331" stroke="#58a6ff"/>
+        <text x="380" y="98" font-size="13.5" fill="#58a6ff" text-anchor="middle">宿主：三个 Client</text>
+        <text x="380" y="120" font-size="12" fill="#a9b4c2" text-anchor="middle">收集 · 加前缀 · 去重</text>
+        <text x="380" y="142" font-size="12" fill="#ff7b72" text-anchor="middle">（search 撞名，必须处理）</text>
+
+        <rect x="560" y="20" width="300" height="188" rx="6" fill="#0a0f16" stroke="#273040"/>
+        <text x="576" y="42" font-size="12" fill="#6f7c8d" class="mono">发给模型的 tools[]：</text>
+        <text x="576" y="66" font-size="12.5" fill="#a9b4c2" class="mono">github__search_issues</text>
+        <text x="576" y="88" font-size="12.5" fill="#a9b4c2" class="mono">github__create_issue</text>
+        <text x="576" y="110" font-size="12.5" fill="#a9b4c2" class="mono">postgres__run_query</text>
+        <text x="576" y="132" font-size="12.5" fill="#a9b4c2" class="mono">postgres__list_tables</text>
+        <text x="576" y="154" font-size="12.5" fill="#a9b4c2" class="mono">tickets__search</text>
+        <text x="576" y="176" font-size="12.5" fill="#a9b4c2" class="mono">tickets__create</text>
+        <text x="576" y="198" font-size="11.5" fill="#ffa657">一个扁平数组，和你手写的没有任何区别</text>
+
+        <rect x="930" y="60" width="220" height="108" rx="6" fill="#1b2331" stroke="#d2a8ff"/>
+        <text x="1040" y="96" font-size="14" fill="#d2a8ff" text-anchor="middle">模型</text>
+        <text x="1040" y="122" font-size="12" fill="#a9b4c2" text-anchor="middle">它不知道 MCP 存在</text>
+        <text x="1040" y="144" font-size="12" fill="#a9b4c2" text-anchor="middle">它只看见 6 个函数</text>
+
+        <line x1="204" y1="46"  x2="272" y2="90"  stroke="#3a4658" stroke-width="1.2" marker-end="url(#c1)"/>
+        <line x1="204" y1="114" x2="272" y2="114" stroke="#3a4658" stroke-width="1.2" marker-end="url(#c1)"/>
+        <line x1="204" y1="182" x2="272" y2="138" stroke="#3a4658" stroke-width="1.2" marker-end="url(#c1)"/>
+        <line x1="484" y1="114" x2="552" y2="114" stroke="#58a6ff" stroke-width="1.4" marker-end="url(#c1)"/>
+        <line x1="864" y1="114" x2="922" y2="114" stroke="#58a6ff" stroke-width="1.4" marker-end="url(#c1)"/>
+      </g>
+    </svg>
+    <div class="g2">
+      <div class="note b">
+        <b>推论一：</b>MCP 帮不了你"工具太多"的问题。六个 Server 接进来就是几十个工具，
+        全都常驻上下文。幕一讲的<b>合并、检索、延迟加载</b>在这里同样适用，而且更紧迫。
+      </div>
+      <div class="note">
+        <b>推论二：</b>Server 的 <code>description</code> 写得烂，你在宿主侧几乎<b>无法补救</b>——
+        因为那段文字是它给的。挑 MCP Server 时，<b>看它的工具描述，比看它的 star 数有用。</b>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 2 · MCP">
+  <h2 class="t">规范演进：它一直在动</h2>
+  <p class="sub">MCP 用<b>日期</b>做版本号。你手上的教程属于哪一版，直接决定它有没有过期。</p>
+  <div class="body">
+    <svg viewBox="0 0 1150 150" width="1150" height="150">
+      <line x1="40" y1="70" x2="1110" y2="70" stroke="#273040" stroke-width="2"/>
+      <g text-anchor="middle">
+        <circle cx="90" cy="70" r="6" fill="#6f7c8d"/>
+        <text x="90" y="52" font-size="12" fill="#a9b4c2" class="mono">2024-11-05</text>
+        <text x="90" y="96" font-size="11.5" fill="#6f7c8d">初版</text>
+        <text x="90" y="114" font-size="11.5" fill="#6f7c8d">（11-25 开源发布）</text>
+
+        <circle cx="330" cy="70" r="6" fill="#6f7c8d"/>
+        <text x="330" y="52" font-size="12" fill="#a9b4c2" class="mono">2025-03-26</text>
+        <text x="330" y="96" font-size="11.5" fill="#6f7c8d">加入授权</text>
+        <text x="330" y="114" font-size="11.5" fill="#6f7c8d">Streamable HTTP</text>
+
+        <circle cx="570" cy="70" r="6" fill="#6f7c8d"/>
+        <text x="570" y="52" font-size="12" fill="#a9b4c2" class="mono">2025-06-18</text>
+        <text x="570" y="96" font-size="11.5" fill="#6f7c8d">Elicitation</text>
+        <text x="570" y="114" font-size="11.5" fill="#6f7c8d">结构化输出</text>
+
+        <circle cx="810" cy="70" r="6" fill="#6f7c8d"/>
+        <text x="810" y="52" font-size="12" fill="#a9b4c2" class="mono">2025-11-25</text>
+        <text x="810" y="96" font-size="11.5" fill="#6f7c8d">上一版稳定</text>
+        <text x="810" y="114" font-size="11.5" fill="#6f7c8d">多数教程停在这里</text>
+
+        <circle cx="1050" cy="70" r="9" fill="#58a6ff"/>
+        <text x="1050" y="48" font-size="13" fill="#58a6ff" class="mono" font-weight="600">2026-07-28</text>
+        <text x="1050" y="98" font-size="12" fill="#58a6ff">现行版</text>
+        <text x="1050" y="116" font-size="11.5" fill="#ffa657">含破坏性变更</text>
+      </g>
+      <rect x="960" y="20" width="180" height="100" rx="6" fill="none" stroke="#58a6ff" stroke-dasharray="4 4"/>
+    </svg>
+    <div class="g2 grow">
+      <div class="card o">
+        <h4>为什么这页值得单独讲</h4>
+        <ul>
+          <li>2024-11 到 2026-07，不到两年<b>五个修订版</b>，其中至少两次动了传输层。</li>
+          <li>网上绝大多数"MCP 教程"写于 2025 年上半年——它们教的 <code>initialize</code> 握手流程
+              在现行版里<b>已经不存在了</b>。</li>
+          <li>SDK 分层跟进：Tier 1 SDK 在发布前有约十周的窗口期做适配，
+              但社区 Server 的更新会慢得多。</li>
+        </ul>
+      </div>
+      <div class="card b">
+        <h4>实践建议</h4>
+        <ul class="tick">
+          <li>接入前先确认对方 Server 声明的<b>协议版本</b>，别假设。</li>
+          <li>自己写 Server，优先用官方 SDK 而不是手搓 JSON-RPC——
+              传输层的变更由 SDK 吸收掉。</li>
+          <li>把"协议版本"当成依赖版本来管理：写进文档，纳入回归测试。</li>
+        </ul>
+        <p style="margin-top:8px" class="mut">下一页看现行版到底改了什么。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 2 · MCP">
+  <h2 class="t">2026-07-28：把<em>状态</em>从协议里拿掉</h2>
+  <p class="sub">维护者称这是"自加入授权以来最大的一次改动"。它的动机全都指向同一件事：让 MCP 能跑在普通 HTTP 基础设施上。</p>
+  <div class="body">
+    <div class="row grow" style="gap:14px">
+      <div class="f1 col" style="gap:10px">
+        <div class="card r">
+          <h4>① 握手没了</h4>
+          <p><code>initialize</code> / <code>notifications/initialized</code> 被移除。
+             协议版本与客户端能力改为挂在<b>每一条请求</b>的 <code>_meta</code> 上
+             （<code>io.modelcontextprotocol/protocolVersion</code>、<code>…/clientCapabilities</code>）。</p>
+        </div>
+        <div class="card r">
+          <h4>② 会话没了</h4>
+          <p>协议级 session 与 <code>Mcp-Session-Id</code> 头从 Streamable HTTP 中移除。
+             需要跨调用状态的 Server，改为<b>自己签发句柄</b>，当作普通工具参数传来传去。</p>
+        </div>
+        <div class="card b">
+          <h4>③ 列表结果可缓存</h4>
+          <p><code>tools/list</code> 等不再随连接变化，因此可以被缓存、被 CDN 承载。</p>
+        </div>
+      </div>
+      <div class="f1 col" style="gap:10px">
+        <div class="card b">
+          <h4>④ 路由信息上到 HTTP 头</h4>
+          <p>过去操作名埋在 JSON-RPC 请求体里，网关必须拆包才知道这是什么请求。
+             现在路由信息<b>镜像到 HTTP header</b>，负载均衡和网关可以直接按头转发。</p>
+        </div>
+        <div class="card b">
+          <h4>⑤ MRTR · 多轮往返请求</h4>
+          <p>为 server → client 的交互（如 Sampling、Elicitation）提供了统一的多轮模式。</p>
+        </div>
+        <div class="card p">
+          <h4>⑥ 扩展框架 + 弃用政策</h4>
+          <p>正式确立扩展机制，<b>Tasks</b>（长任务）与 <b>MCP Apps</b>（服务端渲染 UI）
+             作为扩展存在，而非塞进核心。同时给出了正式的弃用流程。</p>
+        </div>
+      </div>
+      <div class="f1 col" style="gap:10px">
+        <div class="note r">
+          <b>这是破坏性变更。</b>老 Client 连新 Server、或反过来，都可能直接连不上。
+          迁移不是"改几个字段"，是<b>状态管理策略的重写</b>。
+        </div>
+        <div class="card o">
+          <h4>该怎么理解这次转向</h4>
+          <p>MCP 最初的形态是<b>本地长连接</b>思维（stdio 子进程、有状态会话），
+             这在一台笔记本上很自然。</p>
+          <p style="margin-top:7px">但当 Server 要托管在云上、要服务成千上万用户、要过网关和负载均衡时，
+             <b>有状态就是原罪</b>。这次改动本质上是 MCP 从"本地插件协议"
+             正式转型为"<b>互联网协议</b>"。</p>
+          <p style="margin-top:7px" class="mut">代价是把状态管理的复杂度<b>推给了 Server 作者</b>——
+             句柄的签发、过期、鉴权，现在都是业务代码的事。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 2 · MCP">
+  <h2 class="t">幕二验收：MCP 的位置与判断</h2>
+  <p class="sub">数据截至 2026-08。</p>
+  <div class="body">
+    <div class="row grow">
+      <div class="f1 col">
+        <div class="note b" style="font-size:15px">
+          <b>MCP 回答的问题：</b>工具定义从哪来。<br>
+          <b>答案：</b>从一个<b>运行期发现</b>的第三方进程来。它把 N×M 变成 N+M，
+          代价是多了一层需要信任的中间人。
+        </div>
+        <div class="card">
+          <h4>它<b>没有</b>改变的事</h4>
+          <ul class="cross">
+            <li>模型看到的仍然是扁平的 tools[]</li>
+            <li>工具太多仍然烧上下文、仍然会选错</li>
+            <li>描述写得烂仍然没救</li>
+            <li>执行权和凭证仍然完全在宿主手上</li>
+          </ul>
+        </div>
+      </div>
+      <div class="f1 col">
+        <div class="card g">
+          <h4>生态现状</h4>
+          <ul>
+            <li>Tier 1 SDK 月下载量接近<b>五亿</b>量级，TypeScript 与 Python SDK 累计下载均已<b>破十亿</b>。</li>
+            <li>各主流 IDE、终端 agent、桌面客户端普遍内置 MCP Client。<b>接入侧已经赢了。</b></li>
+            <li>Server 侧质量分化极大：官方与头部厂商的 Server 可用，长尾 Server 的工具描述常常不合格。</li>
+          </ul>
+        </div>
+        <div class="card o">
+          <h4>我的判断</h4>
+          <ul>
+            <li><b>MCP 已经赢下"接口标准"这一仗</b>，不会再有第二个竞争协议了。</li>
+            <li>下一阶段的竞争在<b>分发与信任</b>：谁来审核 Server、谁来托管、谁来管凭证。
+                这和后面 Skills 那一幕会遇到<b>完全一样</b>的问题。</li>
+            <li>2026-07-28 的无状态化，是它从"开发者玩具"走向"生产基础设施"的分水岭。</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 幕 3 · CLI ═══════════ -->
+
+<section class="slide" data-act="幕 3 · CLI">
+  <h2 class="t">最老、也最暴力的一种接口</h2>
+  <p class="sub">你可以花三个月给模型封一百个工具。或者，你可以把 bash 给它。</p>
+  <div class="body">
+    <div class="row grow">
+      <div class="f1 col">
+        <div class="card o">
+          <h4>一次交付，全部到位</h4>
+          <p>给模型一个能执行 shell 命令的工具，你等于一次性给了它：
+             <code>git</code> <code>grep</code> <code>curl</code> <code>jq</code>
+             <code>psql</code> <code>ffmpeg</code> <code>docker</code> <code>python</code>
+             …以及机器上装的<b>每一个</b>命令。</p>
+          <p style="margin-top:8px">而且这些命令的用法，模型在预训练里<b>早就见过几百万遍</b>。
+             你不需要写任何 description，它比你更懂 <code>git rebase</code> 的参数。</p>
+        </div>
+        <div class="note b">
+          <b>关键洞察：</b>CLI 是唯一一种<b>模型已经预先学会</b>的接口。
+          你自定义的 <code>search_orders</code> 它是第一次见；<code>ls -la</code> 它见过一辈子。
+          <b>Unix 四十年的接口设计，白送给你当 ACI 用。</b>
+        </div>
+      </div>
+      <div class="f1">
+        <div class="codehd">同一件事：三种接口，三种代价</div>
+        <pre class="sm"><span class="c">// 方案 A：专用工具（你得先写它）</span>
+{ <span class="k">"name"</span>: <span class="s">"count_todo_comments"</span>,
+  <span class="k">"input_schema"</span>: { <span class="k">"properties"</span>: { <span class="k">"dir"</span>: {…} } } }
+
+<span class="c">// 方案 B：MCP（你得先找到/搭起一个 Server）</span>
+<span class="m">tools/call</span> { <span class="k">"name"</span>: <span class="s">"fs__grep"</span>,
+             <span class="k">"arguments"</span>: { <span class="k">"pattern"</span>: <span class="s">"TODO"</span>, … } }
+
+<span class="c">// 方案 C：bash（你什么都不用写）</span>
+<span class="s">grep -rn "TODO" src/ | wc -l</span>
+
+<span class="c">// 而且模型还能自己想出这种你没预料到的组合：</span>
+<span class="s">git log --since="1 month ago" --name-only \</span>
+<span class="s">  | grep -c "^src/.*\.ts$"</span></pre>
+        <p style="margin-top:9px;font-size:13.5px">方案 C 的表达力是<b>无限</b>的，因为它可组合。
+          A 和 B 的表达力等于你写过的那些函数。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 3 · CLI">
+  <h2 class="t">一个<em>没有 schema</em> 的工具长什么样</h2>
+  <p class="sub">最能说明"ACI ≠ API"的一个例子：接口约定不在 JSON 里，在模型的记忆里。</p>
+  <div class="body">
+    <div class="g2">
+      <div class="col">
+        <div class="codehd">普通自定义工具</div>
+        <pre class="sm">{
+  <span class="k">"name"</span>: <span class="s">"run_shell"</span>,
+  <span class="k">"description"</span>: <span class="s">"在项目目录执行一条 shell 命令…"</span>,
+  <span class="k">"input_schema"</span>: {
+    <span class="k">"type"</span>: <span class="s">"object"</span>,
+    <span class="k">"properties"</span>: { <span class="k">"command"</span>: { <span class="k">"type"</span>: <span class="s">"string"</span> } },
+    <span class="k">"required"</span>: [<span class="s">"command"</span>]
+  }
+}</pre>
+        <p style="font-size:13px;margin-top:6px">你自己封的：得写描述、写 schema，
+          模型对它的理解全靠你这几句话。</p>
+      </div>
+      <div class="col">
+        <div class="codehd" style="color:var(--o)">厂商预置的 bash 工具</div>
+        <pre class="sm">{
+  <span class="k">"type"</span>: <span class="s">"bash_20250124"</span>,
+  <span class="k">"name"</span>: <span class="s">"bash"</span>
+}
+
+<span class="c">// 完。没有 description。</span>
+<span class="c">// 没有 input_schema。</span>
+<span class="c">// 文本编辑器工具同理：</span>
+{ <span class="k">"type"</span>: <span class="s">"text_editor_20250728"</span>, <span class="k">"name"</span>: <span class="s">"str_replace_based_edit_tool"</span> }</pre>
+        <p style="font-size:13px;margin-top:6px">接口约定<b>已经被训进模型里</b>了。
+          你只是打开一个开关，告诉它"这个能力现在可用"。</p>
+      </div>
+    </div>
+    <div class="row grow">
+      <div class="f1 card p">
+        <h4>这件事的含义比它看起来大</h4>
+        <p>schema 的作用是<b>把约定告诉模型</b>。当约定已经在模型的权重里时，schema 就是冗余的。</p>
+        <p style="margin-top:7px">换句话说：<b>一个接口好不好用，取决于模型对它有多熟</b>，
+           而不取决于它的定义有多严谨。这是 ACI 和 API 最根本的分歧。</p>
+      </div>
+      <div class="f1 card o">
+        <h4>推论：优先复用模型已经熟悉的形状</h4>
+        <ul>
+          <li>参数命名向 Unix / 主流 SDK 靠拢，别自创缩写</li>
+          <li>路径就用路径，别发明 <code>resource_locator</code></li>
+          <li>时间就用 ISO 8601，别用自家的时间戳格式</li>
+          <li>返回值向<b>常见命令的输出</b>靠拢（表格、JSON、diff）</li>
+        </ul>
+        <p style="margin-top:7px" class="mut">每一次"标新立异"，都是在让模型多猜一次。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 3 · CLI">
+  <h2 class="t">CLI 强在哪：三个别的接口给不了的性质</h2>
+  <p class="sub">这三条解释了为什么最强的编码 agent 几乎都重度依赖 shell。</p>
+  <div class="body">
+    <div class="g3 grow">
+      <div class="card g">
+        <h4>① 可组合</h4>
+        <p>管道、重定向、<code>&amp;&amp;</code>、子 shell——把 N 个命令拼成一个原子操作。</p>
+        <pre class="sm" style="margin-top:8px">cat access.log \
+  | awk '{print $7}' \
+  | sort | uniq -c \
+  | sort -rn | head -20</pre>
+        <p style="margin-top:8px"><b>一次工具调用，五步计算。</b>用专用工具做同样的事，
+           需要五次往返、五轮模型推理、五份中间结果占上下文。</p>
+      </div>
+      <div class="card g">
+        <h4>② 自带发现机制</h4>
+        <p>模型不确定用法时，可以<b>自己去问</b>：</p>
+        <pre class="sm" style="margin-top:8px">ffmpeg -h full | head -50
+git rebase --help
+mytool --version
+jq --help</pre>
+        <p style="margin-top:8px">这是别的接口<b>完全没有</b>的能力。
+           tools[] 是静态的，模型只能读你给的那段描述；
+           而 CLI 世界里，<b>文档就在现场</b>。</p>
+        <p style="margin-top:6px" class="mut">连你自己写的内部脚本，只要支持 <code>--help</code>，
+           模型就能现学现用。</p>
+      </div>
+      <div class="card g">
+        <h4>③ 可迭代、可自我修正</h4>
+        <p>命令失败会返回<b>真实的错误文本</b>——编译器报错、stack trace、
+           <code>command not found</code>。</p>
+        <pre class="sm" style="margin-top:8px">$ tsc --noEmit
+src/api.ts(42,7): error TS2345:
+  Argument of type 'string' is not
+  assignable to parameter of type 'number'.</pre>
+        <p style="margin-top:8px">这段文本对模型来说是<b>极高质量的行动指引</b>：
+           文件、行号、原因、期望类型全都有。</p>
+        <p style="margin-top:6px" class="mut">回想幕一那条原则——"错误回执要写成行动建议"。
+           Unix 工具早就替你写好了。</p>
+      </div>
+    </div>
+    <div class="note b">
+      把这三条合起来看：CLI 之所以强，不是因为它功能多，
+      而是因为它<b>同时提供了执行、文档和反馈</b>——一个自洽的闭环环境。
+      这才是"给 agent 一台电脑"和"给 agent 一堆函数"的真正差别。
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 3 · CLI">
+  <h2 class="t">CLI 的代价：全部来自同一个原因</h2>
+  <p class="sub">它是一个<b>不透明的黑箱入口</b>。你交出去的不是一个函数，是一个字符串解释器。</p>
+  <div class="body">
+    <div class="g4">
+      <div class="card r"><h4>不可门禁</h4>
+        <p>你怎么判断 <code>bash "curl … | sh"</code> 该不该批准？
+           要真正判断，你得写一个 shell 解析器。</p>
+        <p style="margin-top:6px" class="mut">白名单命令名没用——<code>git</code> 可以
+           <code>-c core.pager='sh -c …'</code>。</p></div>
+      <div class="card r"><h4>不可审计</h4>
+        <p>日志里只有一行命令字符串。它到底改了什么文件、发了什么请求、
+           删了什么数据，<b>事后无法从调用记录还原</b>。</p></div>
+      <div class="card r"><h4>输出不可控</h4>
+        <p>一条 <code>cat</code> 可能吐出 50 万 token 直接爆上下文；
+           一条 <code>find /</code> 可能跑十分钟。<b>没有天然的分页和预算。</b></p></div>
+      <div class="card r"><h4>环境依赖</h4>
+        <p>模型以为有 <code>jq</code>，机器上没有；以为是 GNU sed，实际是 BSD sed。
+           <b>失败率高度依赖环境一致性。</b></p></div>
+    </div>
+    <div class="row grow">
+      <div class="f1 card o">
+        <h4>缓解手段（都不彻底，但都必要）</h4>
+        <ul>
+          <li><b>沙箱</b>：容器 / VM / 受限用户，只挂载该挂载的目录。这是唯一真正有效的一条。</li>
+          <li><b>网络隔离</b>：默认禁网，按域名放行。挡住绝大多数外传路径。</li>
+          <li><b>输出截断</b>：统一给 stdout 加上行数与字节上限，超了就截断并<b>明确告诉模型被截断了</b>。</li>
+          <li><b>只读镜像 + 可写工作区</b>：让"搞坏了"变成"重建容器"。</li>
+          <li><b>危险模式匹配</b>：拦 <code>rm -rf /</code> 这类。<b>把它当成防手滑，不要当成安全边界。</b></li>
+        </ul>
+      </div>
+      <div class="f1 card b">
+        <h4>一个必须想清楚的问题</h4>
+        <p style="font-size:15px;line-height:1.7">如果 agent 处理的内容来自外部（网页、邮件、issue、PDF），
+           那么<b>那些内容里的文字，可能就是给 agent 的指令</b>。</p>
+        <p style="margin-top:9px">此时 shell 权限意味着：<b>任何能往你 agent 的上下文里塞一段文字的人，
+           都拥有了你机器上的一次命令执行机会。</b></p>
+        <div class="note r" style="margin-top:10px">
+          这不是理论风险。<b>"能读外部内容" + "能执行命令" + "能联网"</b>
+          三者同时具备时，必须假设最坏情况。三者去掉任意一个，风险都会数量级下降。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 3 · CLI">
+  <h2 class="t">分界线：什么时候该把动作<em>升级</em>成专用工具</h2>
+  <p class="sub">不是二选一。真实系统里两者共存，问题只是"这一个动作放在哪边"。</p>
+  <div class="body">
+    <div class="row grow">
+      <div class="f1">
+        <table class="zebra">
+          <thead><tr><th style="width:230px">如果这个动作需要…</th><th>那就做成专用工具</th></tr></thead>
+          <tbody>
+            <tr><td><b>门禁</b> · 要人工确认或按策略拒绝</td><td>专用工具的参数是结构化的，你才能写出
+              "金额 &gt; 1000 需确认"这种规则</td></tr>
+            <tr><td><b>渲染</b> · 结果要给人看</td><td>UI 要展示 diff、表格、图表，就需要稳定的结构化返回，
+              而不是一坨 stdout</td></tr>
+            <tr><td><b>审计</b> · 事后要能追溯</td><td>"谁在什么时候改了哪条记录"必须从调用参数里读出来</td></tr>
+            <tr><td><b>并行</b> · 要同时跑很多次</td><td>结构化调用才能安全地并发、去重、限流</td></tr>
+            <tr><td><b>高频</b> · 每个会话都要用几十次</td><td>专用工具省 token、省推理、少出错</td></tr>
+            <tr><td><b>危险</b> · 错了不可逆</td><td>把危险动作从 shell 里<b>拿走</b>，收进一个能加护栏的窄接口</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="f1 col">
+        <div class="card o">
+          <h4>反过来：这些情况就交给 bash</h4>
+          <ul class="tick">
+            <li><b>长尾、一次性</b>的操作——你不可能预见所有需求</li>
+            <li>需要<b>多步组合</b>才能完成的探索性任务</li>
+            <li>已有成熟 CLI 且模型很熟悉的领域（git、包管理、构建）</li>
+            <li>只读的<b>探查</b>类操作（看日志、统计、找文件）</li>
+          </ul>
+        </div>
+        <div class="note b">
+          <b>一条实用启发式：</b><br>
+          先给 bash，观察 agent 真实的使用日志。
+          <b>哪条命令模式反复出现、或者反复出错，就把那一条升级成专用工具。</b><br>
+          这比一开始拍脑袋设计工具集有效得多——因为你在用真实数据做接口设计。
+        </div>
+        <div class="note">
+          <b>幕三验收：</b>CLI 回答的问题是"能不能干脆把整台机器给它"。
+          答案是能，代价是你把<b>门禁、审计、预算</b>三件事一起交了出去。
+          要拿回哪一件，就把对应的动作提升为专用工具。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 幕 4 · 共通本质与 ACI ═══════════ -->
+
+<section class="slide" data-act="幕 4 · 共通本质 / ACI">
+  <h2 class="t">把三者摆在一起看</h2>
+  <p class="sub">同一张表，五个维度。你会发现只有一列真的不一样。</p>
+  <div class="body">
+    <table class="zebra grow">
+      <thead><tr>
+        <th style="width:150px"></th>
+        <th style="width:26%">自定义 Tools</th>
+        <th style="width:26%">MCP</th>
+        <th>CLI / bash</th>
+      </tr></thead>
+      <tbody>
+        <tr><td><b>谁定义接口</b></td>
+          <td>你，写在宿主代码里</td>
+          <td><span class="hg">第三方</span>，运行期从 Server 拉取</td>
+          <td><span class="hi">没人定义</span>——Unix 四十年前定好了</td></tr>
+        <tr><td><b>约定写在哪</b></td>
+          <td>JSON Schema + description</td>
+          <td>JSON Schema + description（同上）</td>
+          <td><span class="hi">模型的权重里</span> + <code>--help</code></td></tr>
+        <tr><td><b>传输格式</b></td>
+          <td>Messages API 的 <code>tool_use</code></td>
+          <td><span class="hg">JSON-RPC 2.0</span> → 再拍平成 <code>tool_use</code></td>
+          <td>一个字符串参数 → <code>tool_use</code></td></tr>
+        <tr><td><b>谁执行</b></td>
+          <td colspan="3" style="text-align:center;color:var(--o)"><b>宿主。永远是宿主。三列没有区别。</b></td></tr>
+        <tr><td><b>模型看到什么</b></td>
+          <td colspan="3" style="text-align:center;color:var(--o)"><b>一个扁平的 tools[] 数组。三列没有区别。</b></td></tr>
+        <tr><td><b>表达力</b></td>
+          <td>= 你写过的函数</td>
+          <td>= 生态里已有的 Server</td>
+          <td><span class="hg">无限</span>（可组合）</td></tr>
+        <tr><td><b>可控性</b></td>
+          <td><span class="hg">最高</span>：参数结构化，能加任何护栏</td>
+          <td>中：结构化但描述不由你写</td>
+          <td><span class="hr">最低</span>：一个不透明字符串</td></tr>
+        <tr><td><b>接入成本</b></td>
+          <td>高：每个能力都要写代码</td>
+          <td><span class="hg">低</span>：装一个 Server</td>
+          <td><span class="hg">零</span></td></tr>
+      </tbody>
+    </table>
+    <div class="note b">
+      中间那两行是这一幕的全部论点：<b>无论走哪条路，最后都是宿主执行、模型只看见一个扁平数组。</b>
+      三者不是三种技术，是<b>同一种技术的三种供货渠道</b>。
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 4 · 共通本质 / ACI">
+  <h2 class="t">拆到底：全都是同一个三段式</h2>
+  <p class="sub">名字 + 参数约定 + 文本回执。差别只在于——<b>约定写在哪里</b>。</p>
+  <div class="body">
+    <svg viewBox="0 0 1150 190" width="1150" height="190">
+      <rect x="60" y="24" width="240" height="72" rx="8" fill="#1b2331" stroke="#58a6ff"/>
+      <text x="180" y="52" font-size="15" fill="#58a6ff" text-anchor="middle">① 一个名字</text>
+      <text x="180" y="76" font-size="12.5" fill="#a9b4c2" text-anchor="middle">模型据此指认"我要用哪个"</text>
+
+      <rect x="455" y="24" width="240" height="72" rx="8" fill="#1b2331" stroke="#d2a8ff"/>
+      <text x="575" y="52" font-size="15" fill="#d2a8ff" text-anchor="middle">② 一份参数约定</text>
+      <text x="575" y="76" font-size="12.5" fill="#a9b4c2" text-anchor="middle">模型据此填空</text>
+
+      <rect x="850" y="24" width="240" height="72" rx="8" fill="#1b2331" stroke="#7ee787"/>
+      <text x="970" y="52" font-size="15" fill="#7ee787" text-anchor="middle">③ 一段文本回执</text>
+      <text x="970" y="76" font-size="12.5" fill="#a9b4c2" text-anchor="middle">模型据此决定下一步</text>
+
+      <line x1="304" y1="60" x2="449" y2="60" stroke="#3a4658" stroke-width="1.4"/>
+      <line x1="699" y1="60" x2="844" y2="60" stroke="#3a4658" stroke-width="1.4"/>
+
+      <text x="180" y="130" font-size="12" fill="#6f7c8d" text-anchor="middle" class="mono">tool name / 命令名 / method</text>
+      <text x="575" y="130" font-size="12" fill="#6f7c8d" text-anchor="middle" class="mono">JSON Schema / 命令行参数 / 位置参数</text>
+      <text x="970" y="130" font-size="12" fill="#6f7c8d" text-anchor="middle" class="mono">tool_result / stdout+stderr / content[]</text>
+
+      <rect x="60" y="150" width="1030" height="32" rx="6" fill="rgba(255,166,87,.08)" stroke="#7a5222"/>
+      <text x="575" y="171" font-size="13.5" fill="#ffa657" text-anchor="middle">这就是 RPC。四十年前就有了。唯一的新东西是：调用方是一个会猜的概率模型。</text>
+    </svg>
+    <div class="g3 grow">
+      <div class="card b"><h4>Tools：约定写在<b>请求里</b></h4>
+        <p>每一轮都随请求发过去。好处是精确可控，代价是常驻上下文、随工具数线性增长。</p></div>
+      <div class="card p"><h4>MCP：约定写在<b>对端</b></h4>
+        <p>运行期去问 Server 要，再拍平进请求。好处是解耦，代价是描述质量不由你控制。</p></div>
+      <div class="card o"><h4>CLI：约定写在<b>模型脑子里</b></h4>
+        <p>零传输成本、零维护成本。代价是你对它的行为<b>零控制力</b>——你只能约束环境。</p></div>
+    </div>
+    <div class="note">
+      于是"选哪个协议"这个问题，可以被翻译成一个更清楚的问题：
+      <b>这次调用的约定，我希望写在哪里？</b>要控制力就写进请求，要解耦就写在对端，要表达力就交给模型的记忆。
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 4 · 共通本质 / ACI">
+  <h2 class="t">ACI：为一个<em>会猜的读者</em>设计接口</h2>
+  <p class="sub">Agent-Computer Interface。名字是仿 API / UI 造的，但它的设计约束和两者都不一样。</p>
+  <div class="body">
+    <div class="g3">
+      <div class="card">
+        <h4>API · 读者是编译器</h4>
+        <ul>
+          <li>读者<b>不会误解</b>参数名</li>
+          <li>类型错了直接报错，没有中间态</li>
+          <li>文档写不写，程序照跑</li>
+          <li>设计目标：<b>严谨、稳定、可版本化</b></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>UI · 读者是人</h4>
+        <ul>
+          <li>读者会<b>看见</b>反馈、会探索</li>
+          <li>能撤销、能重来、能问同事</li>
+          <li>有视觉层级、有渐进引导</li>
+          <li>设计目标：<b>可发现、可理解、可挽回</b></li>
+        </ul>
+      </div>
+      <div class="card p">
+        <h4>ACI · 读者是概率模型</h4>
+        <ul>
+          <li>它<b>会</b>误解参数名，而且不报错，是<b>合理地猜错</b></li>
+          <li>它<b>只能</b>看见你返回的那段文本，别的一无所知</li>
+          <li>它的注意力有预算，你的每个字都在花钱</li>
+          <li>设计目标：<b>难以用错、错了能自己纠正</b></li>
+        </ul>
+      </div>
+    </div>
+    <div class="row grow">
+      <div class="f1 card o">
+        <h4>为什么"好 API"往往是"坏 ACI"</h4>
+        <ul>
+          <li><b>正交、原子的 API</b> 很优雅，但会让模型需要 6 次调用才能完成一件事——
+              每次都可能出错，错误率是<b>乘起来</b>的。</li>
+          <li><b>严格的类型和 ID</b> 对程序友好，对模型是灾难：它手上只有"张三的订单"，
+              没有 <code>u_8f21</code>。<b>接受人类可读的输入</b>比要求 ID 更符合 ACI。</li>
+          <li><b>简洁的错误码</b>对程序足够，对模型等于零信息。</li>
+        </ul>
+      </div>
+      <div class="f1 card b">
+        <h4>一个判断 ACI 好坏的实验</h4>
+        <p style="font-size:15px">把你的工具集交给一个<b>新来的实习生</b>，只给他这些工具的
+           name / description / schema，不给他任何别的文档，让他完成一个真实任务。</p>
+        <p style="margin-top:9px">他卡在哪、猜错什么、需要问你什么——<b>模型会在完全相同的地方卡住</b>。</p>
+        <p style="margin-top:9px" class="mut">区别只有一个：实习生会来问你，模型不会。它会自信地猜一个，然后继续往下走。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 4 · 共通本质 / ACI">
+  <h2 class="t">ACI 设计七条</h2>
+  <p class="sub">这七条对自定义工具、MCP Server、CLI 包装器<b>同样适用</b>——因为它们本来就是同一件事。</p>
+  <div class="body">
+    <div class="g2 grow" style="gap:12px">
+      <div class="col" style="gap:10px">
+        <div class="card b"><h4>① 命名即提示</h4>
+          <p><code>search_orders_by_user</code> 好过 <code>query</code>。
+             <b>名字是模型选工具时读的第一个字段</b>，也常常是唯一读完的字段。
+             同一个前缀表示同一个域（<code>github__*</code>）。</p></div>
+        <div class="card b"><h4>② 粒度按<b>任务</b>切，不按资源切</h4>
+          <p>不要为了正交把一件事拆成六个调用。<b>一次调用完成一个用户会说出口的动作</b>。
+             "把这个 PR 合了"应该是一个工具，而不是 get-branch → check-status → merge → delete-branch。</p></div>
+        <div class="card b"><h4>③ 错误信息就是提示词</h4>
+          <p>报错时回答三件事：<b>哪里错了、正确格式是什么、下一步该调什么</b>。
+             把校验失败当成一次教学机会，而不是一次异常。</p></div>
+        <div class="card b"><h4>④ 幂等与可重试</h4>
+          <p>模型会重试，会重复调用，会在超时后再来一次。
+             <b>写操作要么幂等，要么支持幂等键</b>，否则你会收到三张一样的工单。</p></div>
+      </div>
+      <div class="col" style="gap:10px">
+        <div class="card b"><h4>⑤ 输出有预算</h4>
+          <p>永远给返回值设上限，并在截断时<b>明说</b>："共 1284 条，此处显示前 20 条，
+             用 cursor=… 继续"。<b>沉默的截断</b>会让模型以为自己看到了全部——
+             这是最隐蔽的一类错误。</p></div>
+        <div class="card b"><h4>⑥ 可发现性</h4>
+          <p>让模型有办法<b>自己搞清楚</b>：枚举值放进 schema、提供 <code>list_*</code> 类的探查工具、
+             支持 <code>--help</code>。<b>能自己查，就不会瞎猜。</b></p></div>
+        <div class="card b"><h4>⑦ 失败可恢复</h4>
+          <p>设计时假设<b>每一步都会失败一次</b>。中间状态要能查询、要能回滚，
+             长流程要能从断点续。别设计出"错一步就得从头再来"的接口。</p></div>
+        <div class="note">
+          七条压成一句：<b>让正确的用法成为最容易猜到的那一种，让错误的用法立刻给出可执行的下一步。</b>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 4 · 共通本质 / ACI">
+  <h2 class="t">选型决策树：这个动作该放哪</h2>
+  <p class="sub">前四幕的内容，压缩成一张可以贴在工位上的图。</p>
+  <div class="body">
+    <svg viewBox="0 0 1150 400" width="1150" height="400">
+      <defs>
+        <marker id="d1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#3a4658"/></marker>
+      </defs>
+      <g font-size="12.5">
+        <rect x="10" y="170" width="150" height="54" rx="6" fill="#1b2331" stroke="#ffa657"/>
+        <text x="85" y="193" fill="#ffa657" text-anchor="middle" font-size="13.5">一个新动作</text>
+        <text x="85" y="212" fill="#6f7c8d" text-anchor="middle" font-size="11.5">该怎么给 agent？</text>
+
+        <!-- Q1 -->
+        <rect x="215" y="20" width="185" height="62" rx="6" fill="#151b24" stroke="#273040"/>
+        <text x="307" y="43" fill="#e6edf3" text-anchor="middle">它是"该怎么做"，</text>
+        <text x="307" y="63" fill="#e6edf3" text-anchor="middle">而不是"能做什么"？</text>
+        <rect x="215" y="108" width="185" height="62" rx="6" fill="#151b24" stroke="#273040"/>
+        <text x="307" y="131" fill="#e6edf3" text-anchor="middle">已经有成熟 CLI，</text>
+        <text x="307" y="151" fill="#e6edf3" text-anchor="middle">且是探索/一次性？</text>
+        <rect x="215" y="196" width="185" height="62" rx="6" fill="#151b24" stroke="#273040"/>
+        <text x="307" y="219" fill="#e6edf3" text-anchor="middle">要门禁 / 审计 /</text>
+        <text x="307" y="239" fill="#e6edf3" text-anchor="middle">渲染 / 并行 / 高频？</text>
+        <rect x="215" y="284" width="185" height="62" rx="6" fill="#151b24" stroke="#273040"/>
+        <text x="307" y="307" fill="#e6edf3" text-anchor="middle">别的宿主也会用，</text>
+        <text x="307" y="327" fill="#e6edf3" text-anchor="middle">或已有现成 Server？</text>
+
+        <line x1="164" y1="188" x2="209" y2="55"  stroke="#3a4658" marker-end="url(#d1)"/>
+        <line x1="164" y1="193" x2="209" y2="139" stroke="#3a4658" marker-end="url(#d1)"/>
+        <line x1="164" y1="202" x2="209" y2="227" stroke="#3a4658" marker-end="url(#d1)"/>
+        <line x1="164" y1="208" x2="209" y2="315" stroke="#3a4658" marker-end="url(#d1)"/>
+
+        <!-- answers -->
+        <rect x="480" y="20" width="230" height="62" rx="6" fill="#1b2331" stroke="#7ee787"/>
+        <text x="595" y="45" fill="#7ee787" text-anchor="middle" font-size="14">写成 Skill</text>
+        <text x="595" y="66" fill="#a9b4c2" text-anchor="middle" font-size="11.5">流程/规范/格式要求 → 幕五</text>
+
+        <rect x="480" y="108" width="230" height="62" rx="6" fill="#1b2331" stroke="#ffa657"/>
+        <text x="595" y="133" fill="#ffa657" text-anchor="middle" font-size="14">交给 bash</text>
+        <text x="595" y="154" fill="#a9b4c2" text-anchor="middle" font-size="11.5">零成本，表达力最大</text>
+
+        <rect x="480" y="196" width="230" height="62" rx="6" fill="#1b2331" stroke="#58a6ff"/>
+        <text x="595" y="221" fill="#58a6ff" text-anchor="middle" font-size="14">写成自定义 Tool</text>
+        <text x="595" y="242" fill="#a9b4c2" text-anchor="middle" font-size="11.5">控制力最高，成本最高</text>
+
+        <rect x="480" y="284" width="230" height="62" rx="6" fill="#1b2331" stroke="#d2a8ff"/>
+        <text x="595" y="309" fill="#d2a8ff" text-anchor="middle" font-size="14">接 / 写一个 MCP Server</text>
+        <text x="595" y="330" fill="#a9b4c2" text-anchor="middle" font-size="11.5">解耦与复用，多一层信任</text>
+
+        <line x1="404" y1="51"  x2="474" y2="51"  stroke="#7ee787" marker-end="url(#d1)"/>
+        <line x1="404" y1="139" x2="474" y2="139" stroke="#ffa657" marker-end="url(#d1)"/>
+        <line x1="404" y1="227" x2="474" y2="227" stroke="#58a6ff" marker-end="url(#d1)"/>
+        <line x1="404" y1="315" x2="474" y2="315" stroke="#d2a8ff" marker-end="url(#d1)"/>
+
+        <rect x="760" y="20" width="380" height="150" rx="8" fill="#151b24" stroke="#273040"/>
+        <text x="778" y="44" font-size="13.5" fill="#ffa657" font-weight="600">从上往下问，第一个"是"就停</text>
+        <text x="778" y="70" font-size="12.5" fill="#a9b4c2">顺序不是随意的：它按</text>
+        <text x="778" y="90" font-size="12.5" fill="#a9b4c2"><tspan fill="#e6edf3">成本从低到高</tspan> 排列。</text>
+        <text x="778" y="116" font-size="12.5" fill="#a9b4c2">最贵的是自定义 Tool（要写、要维护、</text>
+        <text x="778" y="136" font-size="12.5" fill="#a9b4c2">要写好描述）；最便宜的是 bash。</text>
+        <text x="778" y="158" font-size="12" fill="#6f7c8d">默认答案应该是"先别写工具"。</text>
+
+        <rect x="760" y="196" width="380" height="150" rx="8" fill="#151b24" stroke="#7a5222"/>
+        <text x="778" y="220" font-size="13.5" fill="#ffa657" font-weight="600">两个常见的错误答案</text>
+        <text x="778" y="246" font-size="12.5" fill="#ff7b72">✕ 一上来就设计五十个精美工具</text>
+        <text x="778" y="266" font-size="12" fill="#6f7c8d">   → 上下文炸了，准确率反而降了</text>
+        <text x="778" y="292" font-size="12.5" fill="#ff7b72">✕ 什么都丢给 bash，包括写操作</text>
+        <text x="778" y="312" font-size="12" fill="#6f7c8d">   → 出事时你既拦不住也查不出</text>
+        <text x="778" y="336" font-size="12" fill="#a9b4c2">正确姿势：从 bash 起步，按<tspan fill="#e6edf3">日志</tspan>升级。</text>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<!-- ═══════════ 幕 5 · Skills ═══════════ -->
+
+<section class="slide" data-act="幕 5 · Skills">
+  <h2 class="t">Skills 管的不是"能做什么"，是"<em>该怎么做</em>"</h2>
+  <p class="sub">前三幕都在解决"给它什么能力"。这一幕解决一个完全不同的问题。</p>
+  <div class="body">
+    <div class="row grow">
+      <div class="f1 col">
+        <div class="card r">
+          <h4>一个真实的困境</h4>
+          <p>你给了 agent 完整的工具集：能读文件、能查数据库、能发邮件、能跑命令。
+             然后你让它"出一份季度合规报告"。</p>
+          <p style="margin-top:8px">它<b>能</b>做到吗？工具上没有任何障碍。
+             但它不知道：</p>
+          <ul style="margin-top:6px">
+            <li>你们公司的报告模板长什么样</li>
+            <li>数据要从哪三个系统拉、以哪个为准</li>
+            <li>哪些字段必须脱敏</li>
+            <li>做完要发给谁、抄送谁</li>
+          </ul>
+          <p style="margin-top:8px">这些<b>不是能力问题，是知识问题</b>。</p>
+        </div>
+      </div>
+      <div class="f1 col">
+        <div class="card g">
+          <h4>三种把这些知识塞进去的办法</h4>
+          <table style="margin-top:4px">
+            <tbody>
+              <tr><td style="width:96px"><b>写进 system prompt</b></td>
+                <td>永远占着上下文。十个流程就是一篇长文，还会互相干扰。</td></tr>
+              <tr><td><b>做成工具</b></td>
+                <td>但它不是一次调用，是一套<b>流程</b>。硬封成工具就成了黑箱，agent 无法参与判断。</td></tr>
+              <tr><td><b class="hg">做成 Skill</b></td>
+                <td>一个文件夹：一句话摘要常驻上下文，<b>正文按需读入</b>。用到才花钱。</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note g">
+          <b>一句话定义：</b>Skill 是一个装着说明书（外加可选脚本和资源）的文件夹，
+          agent 平时只知道它<b>存在</b>和它<b>管什么</b>，真正需要时才把内容读进来。
+        </div>
+        <div class="note b">
+          它和 MCP 的关系不是竞争：<b>MCP 给能力，Skills 给用法。</b>
+          一个 Skill 完全可以在正文里写"第一步调用 <code>github__search_issues</code>"。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 5 · Skills">
+  <h2 class="t">SKILL.md 的真实长相</h2>
+  <p class="sub">一个文件夹 + 一个 Markdown 文件 + 一段 YAML frontmatter。简单到有点反高潮。</p>
+  <div class="body">
+    <div class="row grow">
+      <div class="f1">
+        <div class="codehd">目录结构</div>
+        <pre class="sm">quarterly-report/
+├── SKILL.md          <span class="c">← 必需，入口</span>
+├── reference/
+│   ├── template.md   <span class="c">← 报告模板，正文里按需引用</span>
+│   └── fields.csv    <span class="c">← 脱敏字段清单</span>
+└── scripts/
+    └── pull_data.py  <span class="c">← 可执行脚本，agent 可以直接跑</span></pre>
+        <div class="codehd" style="margin-top:10px">SKILL.md · frontmatter</div>
+        <pre class="sm">---
+<span class="k">name</span>: <span class="s">quarterly-report</span>
+<span class="k">description</span>: <span class="s">生成季度合规报告。当用户要求出季报、</span>
+  <span class="s">合规报告，或提到"Q1/Q2 报表"时使用。包含数据源</span>
+  <span class="s">口径、脱敏规则与审批流程。</span>
+<span class="k">license</span>: <span class="s">Apache-2.0</span>
+<span class="k">allowed-tools</span>: <span class="s">Read, Bash</span>
+---</pre>
+      </div>
+      <div class="f1">
+        <div class="codehd">SKILL.md · 正文</div>
+        <pre class="sm"># 季度合规报告
+
+## 何时使用
+用户要求季报 / 合规报告时。若只是查单条数据，
+不要用本 skill，直接查库即可。
+
+## 步骤
+1. 确认季度区间。跨年时以<span class="s">财年</span>为准（4 月起）。
+2. 运行 `scripts/pull_data.py --q &lt;季度&gt;`，
+   它会从 A/B/C 三个系统拉数并合并。
+   <span class="x">口径冲突时一律以 A 系统为准。</span>
+3. 按 `reference/template.md` 排版。
+4. 对照 `reference/fields.csv` 逐列脱敏。
+   <span class="x">这一步不可跳过，漏一列就是事故。</span>
+5. 产出 PDF，附上数据快照的 md5。
+
+## 交付
+发给合规组，抄送财务负责人。<span class="x">不要直接发给外部。</span></pre>
+        <div class="note" style="margin-top:9px;font-size:12.5px">
+          注意正文的写法：<b>全是流程和禁忌，没有一句在解释"什么是合规报告"。</b>
+          背景知识模型自己有，它缺的只是<b>你们家的规矩</b>。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 5 · Skills">
+  <h2 class="t">核心机制：<em>渐进式披露</em></h2>
+  <p class="sub">这是 Skills 唯一真正的技术点，也是它能规模化的原因。</p>
+  <div class="body">
+    <svg viewBox="0 0 1150 260" width="1150" height="260">
+      <defs>
+        <marker id="e1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#ffa657"/></marker>
+      </defs>
+      <rect x="20" y="30" width="330" height="180" rx="8" fill="#1b2331" stroke="#58a6ff"/>
+      <text x="40" y="56" font-size="13" fill="#58a6ff" class="mono">第 1 层 · 永远在上下文里</text>
+      <text x="40" y="84" font-size="16" fill="#e6edf3" font-weight="600">name + description</text>
+      <text x="40" y="110" font-size="12.5" fill="#a9b4c2">≈ 30–60 token / 个</text>
+      <text x="40" y="134" font-size="12.5" fill="#a9b4c2">100 个 skill ≈ 5k token，可接受</text>
+      <text x="40" y="164" font-size="12.5" fill="#ffa657">模型据此判断："这次要不要打开它"</text>
+      <text x="40" y="188" font-size="12" fill="#6f7c8d">→ 所以 description 是唯一被"检索"的字段</text>
+
+      <rect x="410" y="30" width="330" height="180" rx="8" fill="#1b2331" stroke="#d2a8ff"/>
+      <text x="430" y="56" font-size="13" fill="#d2a8ff" class="mono">第 2 层 · 命中才读入</text>
+      <text x="430" y="84" font-size="16" fill="#e6edf3" font-weight="600">SKILL.md 正文</text>
+      <text x="430" y="110" font-size="12.5" fill="#a9b4c2">几百到几千 token</text>
+      <text x="430" y="134" font-size="12.5" fill="#a9b4c2">完整流程、禁忌、边界条件</text>
+      <text x="430" y="164" font-size="12.5" fill="#ffa657">只有真的要做这件事时才付这笔钱</text>
+      <text x="430" y="188" font-size="12" fill="#6f7c8d">→ 所以正文可以写得很细，不必省字</text>
+
+      <rect x="800" y="30" width="330" height="180" rx="8" fill="#1b2331" stroke="#7ee787"/>
+      <text x="820" y="56" font-size="13" fill="#7ee787" class="mono">第 3 层 · 用到才碰</text>
+      <text x="820" y="84" font-size="16" fill="#e6edf3" font-weight="600">附件 / 脚本 / 数据</text>
+      <text x="820" y="110" font-size="12.5" fill="#a9b4c2">可以是几 MB 的模板或表格</text>
+      <text x="820" y="134" font-size="12.5" fill="#a9b4c2">脚本甚至<tspan fill="#e6edf3">不必读进上下文</tspan>——直接执行</text>
+      <text x="820" y="164" font-size="12.5" fill="#ffa657">上下文成本可以是零</text>
+      <text x="820" y="188" font-size="12" fill="#6f7c8d">→ 大体积内容一律往这一层放</text>
+
+      <line x1="354" y1="120" x2="404" y2="120" stroke="#ffa657" stroke-width="1.5" marker-end="url(#e1)"/>
+      <line x1="744" y1="120" x2="794" y2="120" stroke="#ffa657" stroke-width="1.5" marker-end="url(#e1)"/>
+      <text x="379" y="112" font-size="11" fill="#6f7c8d" text-anchor="middle" class="mono">命中</text>
+      <text x="769" y="112" font-size="11" fill="#6f7c8d" text-anchor="middle" class="mono">需要</text>
+
+      <rect x="20" y="228" width="1110" height="28" rx="5" fill="rgba(126,231,135,.07)" stroke="#2c5c36"/>
+      <text x="575" y="247" font-size="13.5" fill="#7ee787" text-anchor="middle">同一个思路你在幕一见过：工具的"延迟加载 + 检索"。Skills 把它做成了默认行为，而且粒度是"一整套流程"。</text>
+    </svg>
+    <div class="note b">
+      <b>为什么这个机制重要：</b>它让"给 agent 装很多东西"这件事从<b>线性成本</b>变成了<b>接近常数成本</b>。
+      装 200 个 skill，静态开销仍然只有那 200 行 description。
+      这是 Skills 能形成"应用商店"形态的<b>技术前提</b>。
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 5 · Skills">
+  <h2 class="t">Skills 在 API 上的形态</h2>
+  <p class="sub">Skill 要执行脚本，就得有地方执行。所以它天然和"代码执行沙箱"绑在一起。</p>
+  <div class="body">
+    <div class="row grow">
+      <div class="f2">
+        <div class="codehd">请求：挂载一个 skill 并给它一个可执行环境</div>
+        <pre>{
+  <span class="k">"model"</span>: <span class="s">"claude-opus-5"</span>,
+  <span class="k">"container"</span>: {
+    <span class="k">"skills"</span>: [
+      { <span class="k">"type"</span>: <span class="s">"anthropic"</span>, <span class="k">"skill_id"</span>: <span class="s">"pptx"</span>, <span class="k">"version"</span>: <span class="s">"latest"</span> },
+      { <span class="k">"type"</span>: <span class="s">"custom"</span>,    <span class="k">"skill_id"</span>: <span class="s">"quarterly-report"</span>, <span class="k">"version"</span>: <span class="s">"3"</span> }
+    ]
+  },
+  <span class="k">"tools"</span>: [
+    { <span class="k">"type"</span>: <span class="s">"code_execution_20260521"</span>, <span class="k">"name"</span>: <span class="s">"code_execution"</span> }
+  ],
+  <span class="k">"betas"</span>: [<span class="s">"code-execution-2025-08-25"</span>, <span class="s">"skills-2025-10-02"</span>],
+  <span class="k">"messages"</span>: [{ <span class="k">"role"</span>: <span class="s">"user"</span>, <span class="k">"content"</span>: <span class="s">"出一份 Q2 合规报告"</span> }]
+}
+
+<span class="c">// 列出可用 skill：GET /v1/skills</span></pre>
+      </div>
+      <div class="f1 col">
+        <div class="card b"><h4>三个必需件</h4>
+          <ul>
+            <li><b>container.skills</b>：声明挂载哪些 skill、锁哪个版本</li>
+            <li><b>code_execution 工具</b>：skill 的脚本要在这个沙箱里跑</li>
+            <li><b>beta header</b>：两个都要，少一个直接报错</li>
+          </ul></div>
+        <div class="card o"><h4>版本要锁</h4>
+          <p><code>"version": "latest"</code> 写着舒服，但意味着<b>别人改了 skill，你的流程就变了</b>。
+             生产环境锁具体版本号。</p></div>
+        <div class="note">
+          <b>换个角度看这段 JSON：</b>它其实在说
+          "给这次对话准备一个<b>装好了资料的工作台</b>"。
+          Skill 不是一个函数，是<b>工作环境的一部分</b>——
+          这也是为什么它必须配一个容器。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 5 · Skills">
+  <h2 class="t">编写要点：三个字段，三种写法</h2>
+  <p class="sub">写 Skill 的难度全在 description。因为它是唯一决定"会不会被用上"的字段。</p>
+  <div class="body">
+    <div class="g2">
+      <div class="col">
+        <div class="codehd" style="color:var(--r)">✕ description 的三种典型写坏</div>
+        <pre class="sm"><span class="c">// 1. 自夸型——模型不关心你多强大</span>
+<span class="k">description</span>: <span class="s">"一个强大而全面的报告生成工具"</span>
+
+<span class="c">// 2. 只说做什么，不说何时用</span>
+<span class="k">description</span>: <span class="s">"生成季度合规报告"</span>
+
+<span class="c">// 3. 太宽，什么都想接</span>
+<span class="k">description</span>: <span class="s">"处理各类数据与文档任务"</span>
+<span class="c">   → 结果：每次对话它都想打开，纯干扰</span></pre>
+        <div class="codehd" style="color:var(--g);margin-top:10px">✓ 正确写法的结构</div>
+        <pre class="sm"><span class="k">description</span>: <span class="s">"生成季度合规报告。</span>      <span class="c">← 做什么</span>
+  <span class="s">当用户要求季报、合规报告，或提到</span>
+  <span class="s">'Q1/Q2 报表'、'给合规组的材料' 时使用。</span> <span class="c">← 触发词</span>
+  <span class="s">包含数据源口径、脱敏规则与审批流程。</span>   <span class="c">← 内含什么</span>
+  <span class="s">仅用于季度粒度；月报请用 monthly-report。</span> <span class="c">← 负向边界</span></pre>
+      </div>
+      <div class="col">
+        <div class="card b"><h4>正文写什么</h4>
+          <ul class="tick">
+            <li><b>步骤</b>，按顺序编号，一步一个动作</li>
+            <li><b>判断规则</b>：口径冲突以谁为准、什么情况下要停下来问人</li>
+            <li><b>禁忌</b>：明确写"不要做 X"，这比正面描述有效</li>
+            <li><b>引用</b>：把大块内容放进 reference/，正文只写"按 X 排版"</li>
+          </ul>
+        </div>
+        <div class="card r"><h4>正文不要写什么</h4>
+          <ul class="cross">
+            <li>背景科普（"什么是合规"——模型比你懂）</li>
+            <li>把整个模板贴进正文（放 reference/，第 3 层）</li>
+            <li>大段代码（写成 scripts/ 里的脚本，让它执行而不是阅读）</li>
+            <li>与本任务无关的公司介绍</li>
+          </ul>
+        </div>
+        <div class="note">
+          <b>一个好用的检验：</b>把 SKILL.md 交给一个新入职的同事，
+          他能不能<b>照着做完、并且做对</b>。Skill 的读者定位就是"聪明但完全不了解你们内部规矩的新人"。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 5 · Skills">
+  <h2 class="t">分发渠道：从一个仓库到八个市场</h2>
+  <p class="sub">数据截至 2026-08。注意——这一栏的多数数字来自市场方自己，看趋势比看绝对值靠谱。</p>
+  <div class="body">
+    <div class="row grow">
+      <div class="f1 col">
+        <div class="card g">
+          <h4>为什么会长出市场：它是<b>开放标准</b></h4>
+          <p>Anthropic 于 <b>2025 年 10 月</b>推出 Agent Skills，
+             并在 <b>2025-12-18</b> 把规范作为开放标准发布在 <code>agentskills.io</code>。</p>
+          <p style="margin-top:8px">这一步是关键。对比一下历史：ChatGPT 插件只能在 ChatGPT 里用，
+             Custom GPT 出不了 OpenAI 的门。<b>SKILL.md 是一个纯文本约定</b>——
+             谁都能实现，创作者写一次可以到处用。</p>
+          <p style="margin-top:8px" class="mut">可移植性是市场形成的前提。没有它，就没有"应用商店"。</p>
+        </div>
+        <div class="card b">
+          <h4>兼容面</h4>
+          <p>据不同来源统计，2026 年上半年支持该标准的产品在
+             <b>16 至 40 款</b>之间（口径与时间点不同），涵盖主流编码 agent、
+             IDE 插件与终端工具。</p>
+          <p style="margin-top:7px" class="mut">数字有出入很正常：有的算"能读 SKILL.md"，有的算"官方展示页收录"。</p>
+        </div>
+      </div>
+      <div class="f1">
+        <table class="zebra">
+          <thead><tr><th style="width:120px">渠道</th><th>特点</th></tr></thead>
+          <tbody>
+            <tr><td><b>官方仓库</b><br><span class="mut" style="font-size:11.5px">anthropics/skills</span></td>
+              <td>参考实现与官方 skill。质量最高、数量最少。<b>学写法从这里看。</b></td></tr>
+            <tr><td><b>skills.sh</b><br><span class="mut" style="font-size:11.5px">Vercel · 2026-01-20</span></td>
+              <td>主打<b>策展 + CLI 安装体验 + 安全扫描</b>。上线六小时装机两万次。</td></tr>
+            <tr><td><b>SkillsMP</b></td>
+              <td>体量最大：抓取全 GitHub 的 SKILL.md 做语义检索，索引量号称<b>百万级</b>。
+                  <b>数量换质量。</b></td></tr>
+            <tr><td><b>垂直/社区目录</b></td>
+              <td>各类 awesome- 列表、IDE 自带目录、个人整理仓库。长尾，良莠不齐。</td></tr>
+          </tbody>
+        </table>
+        <div class="note" style="margin-top:11px">
+          <b>增长节奏：</b>2025-12 只有一个注册表，到 2026 年第二季度已有<b>八个主要市场</b>；
+          收录量从数千（2025-12）到数万（2026-01）再到<b>四十万以上</b>（2026-03 中）。
+          与其说是增长，不如说是<b>相变</b>。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 5 · Skills">
+  <h2 class="t">应用场景：四类真正划算的用法</h2>
+  <p class="sub">判断标准很简单——<b>这段知识是不是模型没有、而且你会反复用到的？</b></p>
+  <div class="body">
+    <div class="g4 grow">
+      <div class="card b"><h4>① 组织规范固化</h4>
+        <p>代码规范、提交信息格式、评审清单、对外文案口径、命名约定。</p>
+        <p style="margin-top:8px" class="mut">典型信号：你在 code review 里<b>反复说同一句话</b>。
+           那句话就该变成一个 skill。</p>
+        <p style="margin-top:8px"><b>收益最稳的一类</b>，因为它天然高频、天然只有你们知道。</p></div>
+      <div class="card b"><h4>② 专业格式产出</h4>
+        <p>PPT / Excel / PDF / 特定 schema 的配置文件 / 行业报表模板。</p>
+        <p style="margin-top:8px" class="mut">这类 skill 的价值大头在<b>第三层</b>：模板文件和生成脚本。
+           正文只需要写"什么时候用哪个模板"。</p>
+        <p style="margin-top:8px">官方 skill 里最成熟的就是这一类。</p></div>
+      <div class="card b"><h4>③ 多步流程</h4>
+        <p>发布流程、事故响应、数据迁移、季度结账、新员工环境搭建。</p>
+        <p style="margin-top:8px" class="mut">特征是<b>步骤有严格顺序、中间有判断分支、漏一步会出事</b>。
+           单个工具封不下，写进 prompt 又太长。</p>
+        <p style="margin-top:8px">Skills 最不可替代的场景。</p></div>
+      <div class="card b"><h4>④ 工具使用说明书</h4>
+        <p>你们内部那个文档奇烂的 CLI、那个参数反直觉的内部 API、那个有历史包袱的老系统。</p>
+        <p style="margin-top:8px" class="mut">回想幕四：ACI 好坏取决于模型对它有多熟。
+           <b>内部工具模型不可能熟——skill 就是补这一课。</b></p>
+        <p style="margin-top:8px">投入产出比极高。</p></div>
+    </div>
+    <div class="note r">
+      <b>反过来，这些情况别写 skill：</b>
+      模型本来就会的通用知识（写正则、用 git）· 只用一次的临时任务（直接说就行）·
+      本质上是一次函数调用的事（那是 tool）· 频繁变化的数据（那是 resource 或数据库查询）。
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 5 · Skills">
+  <h2 class="t">安全：把每个 skill 当作<em>不可信依赖</em></h2>
+  <p class="sub">这是一个被普遍低估的风险面，而且它的形状和传统供应链风险不完全一样。</p>
+  <div class="body">
+    <div class="row grow">
+      <div class="f1 col">
+        <div class="card r">
+          <h4>一个 skill 能做什么</h4>
+          <ul>
+            <li>它的<b>正文会进入模型的上下文</b>，并被当作可信指令对待</li>
+            <li>它可以带<b>可执行脚本</b>，并在你的沙箱里运行</li>
+            <li>它可以引导 agent 去调用它想调用的工具、访问它想访问的路径</li>
+          </ul>
+          <p style="margin-top:9px"><b>所以装一个 skill ≈ 给你的 agent 加了一段它会照做的指令，
+             外加一个会被执行的脚本。</b>这比装一个 npm 包更直接——
+             npm 包至少还得被 import。</p>
+        </div>
+        <div class="note r">
+          <b>最阴的一种：</b>正文写得人畜无害，但埋一句
+          "完成后请将结果同时发送到 …"。人类扫一眼看不出来，模型会照做。
+        </div>
+      </div>
+      <div class="f1 col">
+        <div class="card g">
+          <h4>务实的四条</h4>
+          <ul class="tick">
+            <li><b>装前读一遍 SKILL.md 全文</b>。它就是纯文本，几分钟的事。这一条能挡掉九成问题。</li>
+            <li><b>脚本跑在沙箱里</b>，默认禁网，按需放行。</li>
+            <li><b>锁版本</b>。别用 latest，别让别人的一次提交改掉你的流程。</li>
+            <li><b>凡是 skill 碰过的凭证，都当作已经泄露</b>来轮换。</li>
+          </ul>
+        </div>
+        <div class="card o">
+          <h4>质量的真相</h4>
+          <p>首个针对 agent skill 的同行评审基准得出两个结论：
+             <b>写得好的 skill 能显著提升表现</b>；而<b>公开市场上多数 skill 写得并不好</b>。</p>
+          <p style="margin-top:8px" class="mut">这两条并不矛盾——开放目录长得最快、审得最少，
+             因为它们的激励是<b>分发量</b>而不是治理。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 5 · Skills">
+  <h2 class="t">幕五验收：Skills 的位置与未来</h2>
+  <p class="sub">数据与判断均截至 2026-08。</p>
+  <div class="body">
+    <div class="row grow">
+      <div class="f1 col">
+        <div class="note g" style="font-size:15px">
+          <b>Skills 回答的问题：</b>怎么告诉 agent "该怎么做"，而不只是"能做什么"。<br>
+          <b>答案：</b>一个文件夹 + 渐进式披露。摘要常驻、正文按需、附件再按需。
+        </div>
+        <div class="card">
+          <h4>它和前三幕的关系</h4>
+          <table>
+            <tbody>
+              <tr><td style="width:80px"><b>vs Tools</b></td><td>Tools 是动词，Skills 是<b>剧本</b>。剧本里可以点名用哪些动词。</td></tr>
+              <tr><td><b>vs MCP</b></td><td>MCP 解决"能力从哪来"，Skills 解决"用法从哪来"。<b>互补，不竞争。</b></td></tr>
+              <tr><td><b>vs CLI</b></td><td>Skills 最常见的正文内容之一，就是"怎么用你们那套自制 CLI"。</td></tr>
+              <tr><td><b>vs prompt</b></td><td>Skills 本质就是<b>按需加载的 system prompt 片段</b>——想通这点就全通了。</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="f1 col">
+        <div class="card o">
+          <h4>未来判断（三条）</h4>
+          <ul>
+            <li><b>会像应用商店那样收敛。</b>八个市场不会都活下来。
+                分出胜负的不是收录量，是<b>策展与信任</b>——谁能让你放心地一键安装。</li>
+            <li><b>安全扫描会成为标配</b>，并且是市场的主要差异化点。
+                已经有市场把"上架前扫描"当作卖点在打了。</li>
+            <li><b>变现层仍然缺位。</b>目前主流渠道基本免费、没有原生计费，
+                创作者靠订阅或服务在市场外赚钱。这块空白迟早会被填。</li>
+          </ul>
+        </div>
+        <div class="note b">
+          <b>更长期的一个看法：</b>Skills 的真正意义可能不在市场，
+          而在于它给了组织一种<b>把内部知识资产化</b>的标准格式。
+          你们公司的 200 条"我们这儿是这么做的"，第一次有了一个可版本化、可分发、可复用的载体。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 幕 6 · A2A ═══════════ -->
+
+<section class="slide" data-act="幕 6 · A2A">
+  <h2 class="t">A2A 换了一个<em>维度</em></h2>
+  <p class="sub">前五幕全部是"agent 向下够工具"。A2A 是"agent 向旁边找同类"。</p>
+  <div class="body">
+    <svg viewBox="0 0 1150 250" width="1150" height="250">
+      <defs>
+        <marker id="f1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#58a6ff"/></marker>
+        <marker id="f2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#ff7b72"/></marker>
+      </defs>
+      <rect x="200" y="20" width="200" height="52" rx="8" fill="#1b2331" stroke="#d2a8ff"/>
+      <text x="300" y="52" font-size="15" fill="#d2a8ff" text-anchor="middle">你的 Agent</text>
+      <text x="300" y="98" font-size="12.5" fill="#58a6ff" text-anchor="middle" class="mono">MCP / Tools / CLI ↓ 纵向</text>
+      <line x1="300" y1="76" x2="300" y2="120" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#f1)"/>
+      <g font-size="12" text-anchor="middle">
+        <rect x="60"  y="126" width="130" height="44" rx="6" fill="#151b24" stroke="#7ee787"/>
+        <text x="125" y="146" fill="#a9b4c2">数据库</text><text x="125" y="163" fill="#6f7c8d" font-size="11">工具，无自主性</text>
+        <rect x="235" y="126" width="130" height="44" rx="6" fill="#151b24" stroke="#7ee787"/>
+        <text x="300" y="146" fill="#a9b4c2">GitHub API</text><text x="300" y="163" fill="#6f7c8d" font-size="11">工具，无自主性</text>
+        <rect x="410" y="126" width="130" height="44" rx="6" fill="#151b24" stroke="#7ee787"/>
+        <text x="475" y="146" fill="#a9b4c2">bash / 文件系统</text><text x="475" y="163" fill="#6f7c8d" font-size="11">工具，无自主性</text>
+      </g>
+      <line x1="60" y1="148" x2="300" y2="120" stroke="#58a6ff" stroke-width=".8" opacity=".4"/>
+      <line x1="475" y1="122" x2="310" y2="118" stroke="#58a6ff" stroke-width=".8" opacity=".4"/>
+      <text x="300" y="206" font-size="12.5" fill="#6f7c8d" text-anchor="middle">调用是<tspan fill="#a9b4c2">同步的、无状态的、一问一答的</tspan></text>
+      <text x="300" y="228" font-size="12.5" fill="#6f7c8d" text-anchor="middle">对面没有意图、不会反问、不会拒绝</text>
+
+      <line x1="406" y1="46" x2="694" y2="46" stroke="#ff7b72" stroke-width="1.6" marker-end="url(#f2)"/>
+      <text x="550" y="36" font-size="13" fill="#ff7b72" text-anchor="middle" class="mono">A2A → 横向</text>
+
+      <rect x="700" y="20" width="200" height="52" rx="8" fill="#1b2331" stroke="#ff7b72"/>
+      <text x="800" y="43" font-size="15" fill="#ff7b72" text-anchor="middle">别人的 Agent</text>
+      <text x="800" y="62" font-size="11" fill="#6f7c8d" text-anchor="middle">另一个组织 / 另一个团队</text>
+      <line x1="800" y1="76" x2="800" y2="120" stroke="#3a4658" stroke-width="1.2" stroke-dasharray="3 3"/>
+      <g font-size="12" text-anchor="middle">
+        <rect x="700" y="126" width="200" height="44" rx="6" fill="#151b24" stroke="#273040"/>
+        <text x="800" y="146" fill="#6f7c8d">它自己的工具、模型、数据</text>
+        <text x="800" y="163" fill="#6f7c8d" font-size="11">对你完全不可见</text>
+      </g>
+      <text x="800" y="206" font-size="12.5" fill="#6f7c8d" text-anchor="middle">交互是<tspan fill="#a9b4c2">异步的、有状态的、可能持续数小时的</tspan></text>
+      <text x="800" y="228" font-size="12.5" fill="#6f7c8d" text-anchor="middle">对面<tspan fill="#ff7b72">有意图、会反问、会拒绝、会失败</tspan></text>
+
+      <rect x="940" y="20" width="200" height="200" rx="8" fill="#151b24" stroke="#7a5222"/>
+      <text x="958" y="46" font-size="13" fill="#ffa657" font-weight="600">一句话区分</text>
+      <text x="958" y="74" font-size="12.5" fill="#a9b4c2">MCP 的对面是</text>
+      <text x="958" y="94" font-size="13" fill="#e6edf3">一个<tspan fill="#7ee787">能力</tspan></text>
+      <text x="958" y="126" font-size="12.5" fill="#a9b4c2">A2A 的对面是</text>
+      <text x="958" y="146" font-size="13" fill="#e6edf3">一个<tspan fill="#ff7b72">对等方</tspan></text>
+      <text x="958" y="180" font-size="12" fill="#6f7c8d">所以 A2A 必须解决</text>
+      <text x="958" y="198" font-size="12" fill="#6f7c8d">MCP 不用解决的三件事：</text>
+      <text x="958" y="212" font-size="11.5" fill="#ffa657">发现 · 身份 · 长任务</text>
+    </svg>
+    <div class="note b">
+      为什么不能拿 MCP 硬套？因为 MCP 假设对面是<b>你信任的、你部署的、会立刻返回的</b>东西。
+      而跨组织委派任务时，这三个假设<b>一个都不成立</b>。
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 6 · A2A">
+  <h2 class="t">四个角色（对照 MCP 的四实体来记）</h2>
+  <p class="sub">A2A 的实体更少，但每个都更"重"。</p>
+  <div class="body">
+    <div class="g2 grow" style="gap:13px">
+      <div class="col" style="gap:11px">
+        <div class="card b">
+          <h4>① Client Agent（发起方）</h4>
+          <p>决定<b>要把什么事委派出去</b>、找谁做、怎么描述需求、结果满不满意。</p>
+          <p style="margin-top:6px" class="mut">对照 MCP：位置类似 Host + Client，但它有<b>自主判断</b>——
+             它会读对方的能力描述后自己决定合不合适。</p>
+        </div>
+        <div class="card g">
+          <h4>② Remote Agent（承接方，又称 A2A Server）</h4>
+          <p>接受任务、自己想办法完成、汇报进度、交付产物。</p>
+          <p style="margin-top:6px" class="mut">对照 MCP Server：最大的不同是它<b>不透明</b>——
+             你不知道它内部用了什么模型、调了什么工具，也不需要知道。
+             <b>它是黑箱，而且这是特性不是缺陷。</b></p>
+        </div>
+      </div>
+      <div class="col" style="gap:11px">
+        <div class="card p">
+          <h4>③ AgentCard（能力名片）</h4>
+          <p>一份发布在 <code>/.well-known/agent-card.json</code> 的 JSON-LD 元数据：
+             我是谁、我会哪些 skill、我收什么格式、我用什么传输、怎么认证我。</p>
+          <p style="margin-top:6px" class="mut">对照 MCP 的 <code>tools/list</code>：作用相同，
+             但它是<b>静态可抓取的 URL</b>，不需要先建立连接。
+             <b>这让"发现"成为可能</b>——你可以像抓 robots.txt 一样抓它。</p>
+        </div>
+        <div class="card o">
+          <h4>④ Task（任务对象）</h4>
+          <p>一次委派的<b>有状态载体</b>。有 id、有 contextId、有状态机、有历史消息、有产物（artifacts）。</p>
+          <p style="margin-top:6px" class="mut">MCP 里<b>没有对应物</b>——这是 A2A 独有的核心抽象。
+             因为一次跨组织委派可能要跑几小时，必须有个东西能被反复查询、取消、续订。</p>
+        </div>
+      </div>
+    </div>
+    <div class="note">
+      记忆法：<b>Client 想要，Remote 承接，AgentCard 是简历，Task 是工单。</b>
+      整套协议就是围绕"怎么把一张工单安全地交给一个陌生人"设计的。
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 6 · A2A">
+  <h2 class="t">AgentCard 真实报文</h2>
+  <p class="sub">发布于 <code>https://&lt;域名&gt;/.well-known/agent-card.json</code>。这是整个协议里唯一"公开可抓"的部分。</p>
+  <div class="body">
+    <div class="row grow">
+      <div class="f2">
+        <pre class="sm">{
+  <span class="k">"protocolVersion"</span>: <span class="s">"1.0.1"</span>,
+  <span class="k">"name"</span>: <span class="s">"Invoice Reconciler"</span>,
+  <span class="k">"description"</span>: <span class="s">"对账 agent：把发票批次与银行流水核对，输出差异报告。"</span>,
+  <span class="k">"url"</span>: <span class="s">"https://agents.acme.com/a2a/v1"</span>,
+  <span class="k">"preferredTransport"</span>: <span class="s">"JSONRPC"</span>,
+  <span class="k">"provider"</span>: { <span class="k">"organization"</span>: <span class="s">"Acme Finance"</span>, <span class="k">"url"</span>: <span class="s">"https://acme.com"</span> },
+  <span class="k">"version"</span>: <span class="s">"2.3.0"</span>,
+  <span class="k">"capabilities"</span>: {
+    <span class="k">"streaming"</span>: <span class="n">true</span>,              <span class="c">// 支持 SSE 推进度</span>
+    <span class="k">"pushNotifications"</span>: <span class="n">true</span>,      <span class="c">// 支持 webhook 回调</span>
+    <span class="k">"stateTransitionHistory"</span>: <span class="n">false</span>
+  },
+  <span class="k">"defaultInputModes"</span>:  [<span class="s">"text/plain"</span>, <span class="s">"application/pdf"</span>],
+  <span class="k">"defaultOutputModes"</span>: [<span class="s">"text/plain"</span>, <span class="s">"application/json"</span>],
+  <span class="k">"securitySchemes"</span>: { <span class="k">"oauth2"</span>: { <span class="k">"type"</span>: <span class="s">"oauth2"</span>, <span class="k">"flows"</span>: { <span class="c">…</span> } } },
+  <span class="k">"security"</span>: [ { <span class="k">"oauth2"</span>: [<span class="s">"invoices.read"</span>] } ],
+  <span class="k">"skills"</span>: [
+    {
+      <span class="k">"id"</span>: <span class="s">"reconcile-batch"</span>,
+      <span class="k">"name"</span>: <span class="s">"批量对账"</span>,
+      <span class="k">"description"</span>: <span class="s">"给定发票 PDF 批次与流水 CSV，输出逐笔差异。"</span>,
+      <span class="k">"tags"</span>: [<span class="s">"finance"</span>, <span class="s">"reconciliation"</span>],
+      <span class="k">"examples"</span>: [<span class="s">"把这批 6 月发票和招行流水对一遍"</span>]
+    }
+  ],
+  <span class="k">"signatures"</span>: [ { <span class="k">"protected"</span>: <span class="s">"eyJhbGc…"</span>, <span class="k">"signature"</span>: <span class="s">"MEUCIQD…"</span> } ]
+}</pre>
+      </div>
+      <div class="f1 col">
+        <div class="card p"><h4>注意 <code>skills</code> 这个词</h4>
+          <p>它和幕五的 Agent Skills <b>没有任何关系</b>，只是撞名。
+             这里的 skill 是"这个 agent 对外宣称能干的一类活"，
+             粒度接近<b>服务目录条目</b>。</p></div>
+        <div class="card o"><h4><code>examples</code> 很关键</h4>
+          <p>它是给<b>对方的模型</b>看的——让 Client Agent 判断
+             "我这个需求是不是它说的这种"。<br>
+             又一次印证幕四：<b>描述与例子决定接口好不好用。</b></p></div>
+        <div class="card g"><h4><code>signatures</code>：v1.0 的重头戏</h4>
+          <p>签名的 AgentCard 让你能验证<b>这张名片确实来自那个组织、且没被篡改</b>。
+             跨组织场景下，这是从"能用"到"敢用"的分水岭。</p></div>
+        <div class="note" style="font-size:12.5px">
+          <b>defaultInputModes / OutputModes</b> 用 MIME 类型声明收发格式——
+          这是 MCP 没有的一层协商，因为跨组织时你不能假设对方接受什么。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 6 · A2A">
+  <h2 class="t">完整时序：发现 → 委派 → 协商 → 交付</h2>
+  <p class="sub">对照幕二那张 MCP 时序图看，差别一目了然。</p>
+  <div class="body">
+    <svg viewBox="0 0 1150 420" width="1150" height="420">
+      <defs>
+        <marker id="g1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#58a6ff"/></marker>
+        <marker id="g2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#7ee787"/></marker>
+        <marker id="g3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#ffa657"/></marker>
+      </defs>
+      <rect x="0" y="40" width="1150" height="62"  fill="rgba(88,166,255,.05)"/>
+      <rect x="0" y="110" width="1150" height="96" fill="rgba(210,168,255,.05)"/>
+      <rect x="0" y="214" width="1150" height="90" fill="rgba(255,166,87,.05)"/>
+      <rect x="0" y="312" width="1150" height="86" fill="rgba(126,231,135,.05)"/>
+      <text x="8" y="56"  font-size="11" fill="#58a6ff" class="mono">① 发现</text>
+      <text x="8" y="126" font-size="11" fill="#d2a8ff" class="mono">② 委派</text>
+      <text x="8" y="230" font-size="11" fill="#ffa657" class="mono">③ 协商（可能来回多次，也可能没有）</text>
+      <text x="8" y="328" font-size="11" fill="#7ee787" class="mono">④ 交付</text>
+      <g font-size="12.5" text-anchor="middle">
+        <rect x="80"  y="0" width="200" height="28" rx="5" fill="#1b2331" stroke="#d2a8ff"/>
+        <text x="180" y="19" fill="#d2a8ff">Client Agent（你）</text>
+        <rect x="480" y="0" width="200" height="28" rx="5" fill="#151b24" stroke="#273040"/>
+        <text x="580" y="19" fill="#e6edf3">.well-known 端点</text>
+        <rect x="860" y="0" width="220" height="28" rx="5" fill="#1b2331" stroke="#ff7b72"/>
+        <text x="970" y="19" fill="#ff7b72">Remote Agent（对方）</text>
+      </g>
+      <g stroke="#273040" stroke-dasharray="3 5">
+        <line x1="180" y1="32" x2="180" y2="404"/><line x1="580" y1="32" x2="580" y2="404"/>
+        <line x1="970" y1="32" x2="970" y2="404"/>
+      </g>
+      <g font-size="12">
+        <line x1="180" y1="72" x2="572" y2="72" stroke="#58a6ff" stroke-width="1.3" marker-end="url(#g1)"/>
+        <text x="196" y="66" fill="#a9b4c2" class="mono">GET /.well-known/agent-card.json</text>
+        <line x1="580" y1="94" x2="188" y2="94" stroke="#58a6ff" stroke-width="1.3" marker-end="url(#g1)"/>
+        <text x="220" y="88" fill="#a9b4c2">AgentCard（含 skills / 认证方式 / 签名）→ <tspan fill="#e6edf3">验签、判断是否合适</tspan></text>
+
+        <line x1="180" y1="146" x2="962" y2="146" stroke="#d2a8ff" stroke-width="1.3" marker-end="url(#g1)"/>
+        <text x="200" y="140" fill="#d2a8ff" class="mono">message/send · 带鉴权凭证与任务描述</text>
+        <line x1="970" y1="176" x2="188" y2="176" stroke="#7ee787" stroke-width="1.3" marker-end="url(#g2)"/>
+        <text x="230" y="170" fill="#a9b4c2">返回 <tspan class="mono" fill="#7ee787">Task{ id, contextId, status: "submitted" }</tspan></text>
+        <text x="230" y="196" fill="#6f7c8d" font-size="11.5">注意：这里<tspan fill="#ffa657">立刻就返回了</tspan>，活还没开始干</text>
+
+        <line x1="970" y1="248" x2="188" y2="248" stroke="#ffa657" stroke-width="1.3" marker-end="url(#g3)"/>
+        <text x="240" y="242" fill="#ffa657" class="mono">status: "input_required" —— "流水是哪个银行的？"</text>
+        <line x1="180" y1="278" x2="962" y2="278" stroke="#d2a8ff" stroke-width="1.3" marker-end="url(#g1)"/>
+        <text x="200" y="272" fill="#a9b4c2" class="mono">message/send（同一个 taskId）→ 回到 "working"</text>
+
+        <line x1="970" y1="340" x2="188" y2="340" stroke="#7ee787" stroke-width="1.3" stroke-dasharray="5 3" marker-end="url(#g2)"/>
+        <text x="250" y="334" fill="#a9b4c2">SSE 流式进度 / 或 webhook 推送（长任务不必轮询）</text>
+        <line x1="970" y1="376" x2="188" y2="376" stroke="#7ee787" stroke-width="1.6" marker-end="url(#g2)"/>
+        <text x="250" y="370" fill="#7ee787" class="mono">status: "completed" + artifacts[]（差异报告）</text>
+      </g>
+    </svg>
+    <div class="note">
+      和 MCP 时序图最大的三处不同：<b>①</b> 发现走的是公开 URL，不需要预先配置；
+      <b>②</b> 请求立刻返回一个<b>任务句柄</b>而不是结果；
+      <b>③</b> 对方<b>会反问</b>——这在 MCP 里只有 Elicitation 勉强对应，而在 A2A 里是一等公民。
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 6 · A2A">
+  <h2 class="t">Task 的八态生命周期</h2>
+  <p class="sub">A2A 最核心的抽象。所有跨 agent 的复杂度，都被收进了这台状态机。</p>
+  <div class="body">
+    <svg viewBox="0 0 1150 300" width="1150" height="300">
+      <defs>
+        <marker id="h1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#3a4658"/></marker>
+        <marker id="h2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#ffa657"/></marker>
+      </defs>
+      <g font-size="12.5" text-anchor="middle">
+        <rect x="20" y="112" width="150" height="44" rx="6" fill="#1b2331" stroke="#58a6ff"/>
+        <text x="95" y="132" fill="#58a6ff" class="mono">submitted</text>
+        <text x="95" y="149" fill="#6f7c8d" font-size="11">已受理，未开工</text>
+
+        <rect x="270" y="112" width="150" height="44" rx="6" fill="#1b2331" stroke="#d2a8ff"/>
+        <text x="345" y="132" fill="#d2a8ff" class="mono">working</text>
+        <text x="345" y="149" fill="#6f7c8d" font-size="11">干活中</text>
+
+        <rect x="270" y="16" width="150" height="44" rx="6" fill="#1b2331" stroke="#ffa657"/>
+        <text x="345" y="36" fill="#ffa657" class="mono">input_required</text>
+        <text x="345" y="53" fill="#6f7c8d" font-size="11">等你补信息</text>
+
+        <rect x="270" y="212" width="150" height="44" rx="6" fill="#1b2331" stroke="#ffa657"/>
+        <text x="345" y="232" fill="#ffa657" class="mono">auth_required</text>
+        <text x="345" y="249" fill="#6f7c8d" font-size="11">等你补授权</text>
+
+        <rect x="560" y="16" width="150" height="44" rx="6" fill="#1b2331" stroke="#7ee787"/>
+        <text x="635" y="36" fill="#7ee787" class="mono">completed</text>
+        <text x="635" y="53" fill="#6f7c8d" font-size="11">有 artifacts</text>
+
+        <rect x="560" y="112" width="150" height="44" rx="6" fill="#1b2331" stroke="#ff7b72"/>
+        <text x="635" y="132" fill="#ff7b72" class="mono">failed</text>
+        <text x="635" y="149" fill="#6f7c8d" font-size="11">干了但没干成</text>
+
+        <rect x="560" y="212" width="150" height="44" rx="6" fill="#1b2331" stroke="#ff7b72"/>
+        <text x="635" y="232" fill="#ff7b72" class="mono">canceled</text>
+        <text x="635" y="249" fill="#6f7c8d" font-size="11">你中途撤单</text>
+
+        <rect x="20" y="212" width="150" height="44" rx="6" fill="#1b2331" stroke="#ff7b72"/>
+        <text x="95" y="232" fill="#ff7b72" class="mono">rejected</text>
+        <text x="95" y="249" fill="#6f7c8d" font-size="11">对方不接这活</text>
+      </g>
+      <g stroke="#3a4658" stroke-width="1.3" fill="none">
+        <line x1="174" y1="134" x2="264" y2="134" marker-end="url(#h1)"/>
+        <line x1="95" y1="160" x2="95" y2="206" marker-end="url(#h1)"/>
+        <line x1="424" y1="120" x2="554" y2="52" marker-end="url(#h1)"/>
+        <line x1="424" y1="134" x2="554" y2="134" marker-end="url(#h1)"/>
+        <line x1="424" y1="148" x2="554" y2="228" marker-end="url(#h1)"/>
+      </g>
+      <g stroke="#ffa657" stroke-width="1.3" fill="none">
+        <path d="M330 108 L330 66" marker-end="url(#h2)"/>
+        <path d="M362 66 L362 108" marker-end="url(#h2)"/>
+        <path d="M330 160 L330 206" marker-end="url(#h2)"/>
+        <path d="M362 206 L362 160" marker-end="url(#h2)"/>
+      </g>
+      <rect x="770" y="16" width="360" height="112" rx="8" fill="#151b24" stroke="#273040"/>
+      <text x="788" y="40" font-size="13" fill="#7ee787" font-weight="600">四个终态（不可再变）</text>
+      <text x="788" y="64" font-size="12.5" fill="#a9b4c2" class="mono">completed · failed · canceled · rejected</text>
+      <text x="788" y="90" font-size="12" fill="#6f7c8d">注意 rejected ≠ failed：</text>
+      <text x="788" y="110" font-size="12" fill="#6f7c8d">前者是"我不接"，后者是"我接了但搞砸了"。</text>
+
+      <rect x="770" y="146" width="360" height="110" rx="8" fill="#151b24" stroke="#7a5222"/>
+      <text x="788" y="170" font-size="13" fill="#ffa657" font-weight="600">两个"中断态"是整套设计的精华</text>
+      <text x="788" y="194" font-size="12" fill="#a9b4c2">对方可以<tspan fill="#e6edf3">停下来问你</tspan>，而不是猜一个</text>
+      <text x="788" y="212" font-size="12" fill="#a9b4c2">参数硬着头皮做完，也不是直接失败。</text>
+      <text x="788" y="238" font-size="12" fill="#6f7c8d">这正是"对面是 agent 而非工具"的直接体现。</text>
+    </svg>
+    <div class="note b">
+      配套方法：<code>tasks/get</code> 查状态、<code>tasks/cancel</code> 撤单、
+      <code>tasks/resubscribe</code> 断线重连、<code>tasks/pushNotificationConfig/set</code> 配 webhook。
+      <b>整套 API 围绕这台状态机展开，一个多余的方法都没有。</b>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 6 · A2A">
+  <h2 class="t">长任务：两种回传，别用轮询</h2>
+  <p class="sub">跨组织委派动辄几分钟到几小时。这是 A2A 与 MCP 在工程形态上最实质的差别。</p>
+  <div class="body">
+    <div class="g3">
+      <div class="card r"><h4>✕ 轮询</h4>
+        <p>反复 <code>tasks/get</code>。能用，但延迟高、请求浪费、长任务下几乎不可接受。</p>
+        <p style="margin-top:7px" class="mut">只在对方两种能力都不支持时才退到这里。</p></div>
+      <div class="card b"><h4>SSE 流式</h4>
+        <p><code>message/stream</code>，服务端持续推送状态变更与中间产物。</p>
+        <p style="margin-top:7px">适合<b>你在线等</b>的场景——用户盯着界面看进度条。</p>
+        <p style="margin-top:7px" class="mut">断线了用 <code>tasks/resubscribe</code> 接回来。</p></div>
+      <div class="card g"><h4>Webhook 推送</h4>
+        <p><code>tasks/pushNotificationConfig/set</code> 登记一个回调地址，
+           状态变更时对方主动打过来。</p>
+        <p style="margin-top:7px">适合<b>你不在线</b>的场景——发出去就下班，明早看结果。</p>
+        <p style="margin-top:7px" class="mut">代价：你得有个公网可达的接收端，还得验证回调的真实性。</p></div>
+    </div>
+    <div class="row grow">
+      <div class="f1 card o">
+        <h4>由此产生的工程要求（容易被忽略）</h4>
+        <ul>
+          <li><b>任务要持久化。</b>你的进程重启了，对方的任务还在跑。taskId 必须落库。</li>
+          <li><b>要能对账。</b>webhook 可能丢，SSE 可能断。需要一个兜底的对账扫描。</li>
+          <li><b>要处理重复。</b>webhook 会重投，状态更新要幂等——又回到幕四第④条。</li>
+          <li><b>要有超时策略。</b>对方永远停在 working 怎么办？<code>tasks/cancel</code> 什么时候发？</li>
+        </ul>
+      </div>
+      <div class="f1 card p">
+        <h4>为什么说这才是 A2A 真正的门槛</h4>
+        <p style="font-size:15px;line-height:1.7">接一个 MCP Server，你写几行配置就完事了。
+           接一个 A2A Remote Agent，你要处理<b>异步任务、状态持久化、回调接收、重试与对账</b>。</p>
+        <p style="margin-top:10px">这不是协议复杂，是<b>问题本身就复杂</b>——
+           你在做的事情，本质上等同于对接一个外部供应商的工单系统。</p>
+        <div class="note" style="margin-top:10px">
+          这也解释了为什么 A2A 的采用曲线比 MCP 慢得多：
+          <b>它的成本不在协议实现上，在配套的分布式工程上。</b>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 6 · A2A">
+  <h2 class="t">治理与版本：它已经不是"Google 的协议"了</h2>
+  <p class="sub">这条时间线本身就是判断它成不成熟的最重要证据。</p>
+  <div class="body">
+    <svg viewBox="0 0 1150 130" width="1150" height="130">
+      <line x1="50" y1="62" x2="1110" y2="62" stroke="#273040" stroke-width="2"/>
+      <g text-anchor="middle">
+        <circle cx="120" cy="62" r="6" fill="#6f7c8d"/>
+        <text x="120" y="44" font-size="12" fill="#a9b4c2" class="mono">2025-04</text>
+        <text x="120" y="86" font-size="11.5" fill="#6f7c8d">Google 发布</text>
+        <text x="120" y="104" font-size="11.5" fill="#6f7c8d">50+ 家支持</text>
+
+        <circle cx="360" cy="62" r="7" fill="#58a6ff"/>
+        <text x="360" y="44" font-size="12" fill="#58a6ff" class="mono">2025-06-23</text>
+        <text x="360" y="86" font-size="11.5" fill="#58a6ff">捐给 Linux Foundation</text>
+        <text x="360" y="104" font-size="11.5" fill="#6f7c8d">中立治理，不再由单一厂商控制</text>
+
+        <circle cx="600" cy="62" r="6" fill="#6f7c8d"/>
+        <text x="600" y="44" font-size="12" fill="#a9b4c2" class="mono">2025-08</text>
+        <text x="600" y="86" font-size="11.5" fill="#6f7c8d">IBM 的 ACP 并入</text>
+        <text x="600" y="104" font-size="11.5" fill="#6f7c8d">竞争协议收敛为一个</text>
+
+        <circle cx="840" cy="62" r="7" fill="#7ee787"/>
+        <text x="840" y="44" font-size="12" fill="#7ee787" class="mono">2026 年初</text>
+        <text x="840" y="86" font-size="11.5" fill="#7ee787">v1.0 发布</text>
+        <text x="840" y="104" font-size="11.5" fill="#6f7c8d">重头戏：签名 AgentCard</text>
+
+        <circle cx="1060" cy="62" r="7" fill="#d2a8ff"/>
+        <text x="1060" y="44" font-size="12" fill="#d2a8ff" class="mono">2026-05</text>
+        <text x="1060" y="86" font-size="11.5" fill="#d2a8ff">v1.0.1</text>
+        <text x="1060" y="104" font-size="11.5" fill="#6f7c8d">扩展机制</text>
+      </g>
+    </svg>
+    <div class="g2 grow">
+      <div class="card b">
+        <h4>三个里程碑各自意味着什么</h4>
+        <ul>
+          <li><b>捐给 LF（2025-06-23）</b>：解决了"凭什么用竞争对手的协议"这个死结。
+              没有这一步，微软、AWS、Salesforce 不会入场。</li>
+          <li><b>ACP 并入（2025-08）</b>：避免了 agent 互联领域的协议战。
+              对比一下 MCP 那边——同样只剩一个赢家。<b>这个领域不容忍两套标准。</b></li>
+          <li><b>v1.0 的签名 AgentCard</b>：跨组织的前提是能验明身份。
+              没有签名，AgentCard 就是一张谁都能伪造的名片，整套协议在企业场景不可用。</li>
+        </ul>
+      </div>
+      <div class="card p">
+        <h4>v1.0.1 的扩展机制</h4>
+        <p>允许在不改核心的前提下加入新数据、新要求、新 RPC 方法、新状态机。</p>
+        <p style="margin-top:8px">这和 MCP 2026-07-28 引入扩展框架是<b>同一种成熟信号</b>：
+           核心收紧、变化外移。协议开始为长期演进做准备，而不是继续往主干里塞功能。</p>
+        <div class="note" style="margin-top:9px">
+          <b>实务提醒：</b>网上资料同时存在 v1.0 与 v1.0.1 的说法。
+          落地前请以 <code>a2a-protocol.org</code> 上的当前版本为准，
+          并确认对方 AgentCard 里的 <code>protocolVersion</code>。
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 6 · A2A">
+  <h2 class="t">生态现实——以及"为什么你还没用上"</h2>
+  <p class="sub">数据截至 2026-08。先看数字，再看我的诚实判断。</p>
+  <div class="body">
+    <div class="g4">
+      <div class="card"><div class="stat">150+</div><div class="statl">支持组织（2026-04，一年前为 50+）</div></div>
+      <div class="card"><div class="stat">22,000+</div><div class="statl">核心仓库 GitHub star</div></div>
+      <div class="card"><div class="stat">5</div><div class="statl">生产级 SDK：Python / JS / Java / Go / .NET</div></div>
+      <div class="card"><div class="stat">3</div><div class="statl">主流云平台已 GA 支持</div></div>
+    </div>
+    <div class="row grow">
+      <div class="f1 col">
+        <div class="card g">
+          <h4>已经落地的地方</h4>
+          <ul class="tick">
+            <li><b>Microsoft Copilot Studio</b>、<b>Azure AI Foundry</b>、<b>Amazon Bedrock AgentCore</b> 均已 GA</li>
+            <li>支持方包括 AWS、Cisco、Google、IBM、Microsoft、Salesforce、SAP、ServiceNow 等</li>
+            <li>2026-04 同期推出配套的 <b>AP2（Agent Payments Protocol）</b>——
+                agent 之间要能交易，就得先能付钱</li>
+            <li>已有企业进入<b>生产使用</b>，不再只是 demo</li>
+          </ul>
+        </div>
+      </div>
+      <div class="f1 col">
+        <div class="card o">
+          <h4>为什么你（和大多数人）还没用上</h4>
+          <ul>
+            <li><b>你没有跨组织委派的需求。</b>A2A 的价值出现在<b>组织边界</b>上。
+                同一个团队内部，直接函数调用或 MCP 都更简单。</li>
+            <li><b>它的受益方是平台，不是应用开发者。</b>目前主要形态是
+                "云厂商让自家 agent 能被外部 agent 调用"。</li>
+            <li><b>需求侧还没成熟。</b>要有人愿意付钱委派任务给外部 agent，
+                这个市场本身才刚开始（AP2 就是在补这一环）。</li>
+          </ul>
+        </div>
+        <div class="note b">
+          <b>我的判断：</b>A2A 的协议成熟度已经<b>领先于</b>它的需求成熟度。
+          它不是一个"要不要学"的问题，而是"什么时候会轮到你"的问题。
+          <b>触发信号很明确：当你开始需要把一件事委派给公司外部的自动化系统时。</b>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 6 · A2A">
+  <h2 class="t">A2A vs MCP：什么时候用哪个</h2>
+  <p class="sub">最后一张对照表。它们不是替代关系，一个系统里同时用两套是常态。</p>
+  <div class="body">
+    <table class="zebra grow">
+      <thead><tr><th style="width:140px"></th><th style="width:40%">MCP</th><th>A2A</th></tr></thead>
+      <tbody>
+        <tr><td><b>对面是</b></td><td>一个<b>能力</b>（工具/数据/提示）</td><td>一个<b>对等方</b>（有自己的模型和判断）</td></tr>
+        <tr><td><b>典型边界</b></td><td>进程内 / 你自己的基础设施</td><td><b>组织之间</b> / 团队之间</td></tr>
+        <tr><td><b>调用形态</b></td><td>同步请求-响应，毫秒到秒级</td><td>异步任务，秒级到<b>小时级</b></td></tr>
+        <tr><td><b>状态</b></td><td>2026-07-28 起<b>无状态</b>，状态靠 server 自签句柄</td><td><b>Task 是一等公民</b>，八态状态机</td></tr>
+        <tr><td><b>发现方式</b></td><td>预先配置好 Server，再 <code>tools/list</code></td><td><code>/.well-known/agent-card.json</code>，<b>可公开抓取</b></td></tr>
+        <tr><td><b>身份与信任</b></td><td>你自己部署的，默认信任</td><td><b>签名 AgentCard</b> + OAuth，默认不信任</td></tr>
+        <tr><td><b>对方能反问吗</b></td><td>Elicitation（可选，支持度不一）</td><td><b>能</b>——<code>input_required</code> 是核心状态</td></tr>
+        <tr><td><b>接入成本</b></td><td>低：装一个 Server</td><td>高：要做异步任务管理、回调、对账</td></tr>
+        <tr><td><b>什么时候选它</b></td><td>你要给 agent <b>加一项能力</b></td><td>你要把<b>一整件事</b>交给别人办</td></tr>
+      </tbody>
+    </table>
+    <div class="g2">
+      <div class="note b">
+        <b>一个组合用法：</b>你的 agent 用 MCP 接自家数据库和 GitHub，
+        同时通过 A2A 把"法务审查合同"这件事委派给法务部门的 agent。
+        <b>纵向用 MCP，横向用 A2A。</b>
+      </div>
+      <div class="note">
+        <b>幕六验收：</b>A2A 回答的问题是"对面不是工具、是另一个 agent 时怎么办"。
+        答案是：先用一张可验证的名片解决<b>发现与信任</b>，
+        再用一台八态状态机解决<b>长时协作</b>。
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 幕 7 · 收尾 ═══════════ -->
+
+<section class="slide" data-act="幕 7 · 收尾">
+  <h2 class="t">一张总图：五者的坐标系</h2>
+  <p class="sub">横轴 = 对面是谁；纵轴 = 约定写在哪、约束有多强。</p>
+  <div class="body">
+    <svg viewBox="0 0 1150 380" width="1150" height="380">
+      <defs>
+        <marker id="i1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#3a4658"/></marker>
+      </defs>
+      <line x1="90" y1="330" x2="1090" y2="330" stroke="#3a4658" stroke-width="1.4" marker-end="url(#i1)"/>
+      <line x1="90" y1="330" x2="90" y2="20" stroke="#3a4658" stroke-width="1.4" marker-end="url(#i1)"/>
+      <text x="1060" y="356" font-size="12.5" fill="#6f7c8d" text-anchor="end">对面越"有自主性" →</text>
+      <text x="76" y="30" font-size="12.5" fill="#6f7c8d" text-anchor="end" transform="rotate(-90 76 30)">约束越强 ↑</text>
+      <text x="200" y="356" font-size="12" fill="#6f7c8d" text-anchor="middle">一台机器</text>
+      <text x="470" y="356" font-size="12" fill="#6f7c8d" text-anchor="middle">一个函数</text>
+      <text x="720" y="356" font-size="12" fill="#6f7c8d" text-anchor="middle">一个服务</text>
+      <text x="960" y="356" font-size="12" fill="#6f7c8d" text-anchor="middle">一个对等方</text>
+
+      <g text-anchor="middle">
+        <circle cx="200" cy="286" r="42" fill="rgba(255,166,87,.14)" stroke="#ffa657"/>
+        <text x="200" y="282" font-size="15" fill="#ffa657">CLI</text>
+        <text x="200" y="302" font-size="11" fill="#6f7c8d">约定在权重里</text>
+
+        <circle cx="470" cy="120" r="46" fill="rgba(88,166,255,.14)" stroke="#58a6ff"/>
+        <text x="470" y="116" font-size="15" fill="#58a6ff">Tools</text>
+        <text x="470" y="136" font-size="11" fill="#6f7c8d">约定在请求里</text>
+
+        <circle cx="720" cy="176" r="46" fill="rgba(210,168,255,.14)" stroke="#d2a8ff"/>
+        <text x="720" y="172" font-size="15" fill="#d2a8ff">MCP</text>
+        <text x="720" y="192" font-size="11" fill="#6f7c8d">约定在对端</text>
+
+        <circle cx="960" cy="86" r="46" fill="rgba(255,123,114,.14)" stroke="#ff7b72"/>
+        <text x="960" y="82" font-size="15" fill="#ff7b72">A2A</text>
+        <text x="960" y="102" font-size="11" fill="#6f7c8d">约定在名片里</text>
+
+        <ellipse cx="440" cy="252" rx="150" ry="40" fill="rgba(126,231,135,.10)" stroke="#7ee787" stroke-dasharray="5 4"/>
+        <text x="440" y="248" font-size="15" fill="#7ee787">Skills</text>
+        <text x="440" y="268" font-size="11" fill="#6f7c8d">正交的一层：不给能力，给用法</text>
+      </g>
+      <text x="620" y="316" font-size="11.5" fill="#6f7c8d" text-anchor="middle">↑ Skills 罩在其它四者之上——它告诉 agent 该怎么组合使用它们</text>
+
+      <rect x="770" y="196" width="330" height="120" rx="8" fill="#151b24" stroke="#273040"/>
+      <text x="788" y="220" font-size="13" fill="#ffa657" font-weight="600">怎么读这张图</text>
+      <text x="788" y="244" font-size="12" fill="#a9b4c2">往<tspan fill="#e6edf3">右</tspan>走：对面越独立，你越需要</text>
+      <text x="788" y="262" font-size="12" fill="#a9b4c2">身份、异步、协商机制。</text>
+      <text x="788" y="288" font-size="12" fill="#a9b4c2">往<tspan fill="#e6edf3">上</tspan>走：约束越强，控制力越高，</text>
+      <text x="788" y="306" font-size="12" fill="#a9b4c2">但表达力和灵活性越低。</text>
+    </svg>
+  </div>
+</section>
+
+<section class="slide" data-act="幕 7 · 收尾">
+  <h2 class="t">五条能带走的判断</h2>
+  <p class="sub">如果这五十多页只留五句话。</p>
+  <div class="body">
+    <div class="col grow" style="gap:11px">
+      <div class="card b">
+        <h4>① 五套协议是同一件事的五种供货渠道</h4>
+        <p>名字 + 参数约定 + 文本回执。无论走哪条路，<b>执行权永远在宿主</b>，
+           <b>模型永远只看见一个扁平数组</b>。想清楚这点，所有协议文档都会变得好读。</p>
+      </div>
+      <div class="card p">
+        <h4>② 真正的设计对象是 ACI，不是协议</h4>
+        <p>选 Tools 还是 MCP 还是 bash，是次要问题。首要问题是
+           <b>你的接口对一个会猜的读者好不好用</b>：名字、粒度、错误信息、输出预算。
+           这四件事没做好，换任何协议都救不了。</p>
+      </div>
+      <div class="card o">
+        <h4>③ 从 bash 起步，按日志升级</h4>
+        <p>不要一上来设计五十个精美工具。先给最小可用的能力，
+           <b>看 agent 真实怎么用、在哪反复出错</b>，再把那些动作提升为专用工具或写成 Skill。
+           你是在用真实数据做接口设计。</p>
+      </div>
+      <div class="card g">
+        <h4>④ 能力和用法要分开供给</h4>
+        <p>MCP 给能力，Skills 给用法。把流程知识硬塞进工具描述或 system prompt，
+           是最常见的浪费。<b>渐进式披露</b>让"装很多东西"从线性成本变成接近常数成本——
+           这个思路在工具侧同样适用。</p>
+      </div>
+      <div class="card r">
+        <h4>⑤ 协议在动，判断要带日期</h4>
+        <p>MCP 现行版 <b>2026-07-28</b> 已经删掉了握手和会话；A2A 已经交给 Linux Foundation 并发到 v1.0.x。
+           你在网上读到的多数教程停在 2025 年。<b>接入前先确认对方的协议版本</b>，
+           这是本讲最实用的一条操作建议。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide cover" data-act="幕 7 · 收尾">
+  <div style="max-width:940px">
+    <div style="font:12px/1 var(--mono);color:var(--b);letter-spacing:3px;margin-bottom:18px">END · 第三段旅程完</div>
+    <h1 class="big">协议是给模型的<br>用户界面</h1>
+    <p style="margin-top:24px;font-size:16px;line-height:1.8;color:var(--tx2);max-width:800px">
+      前两段旅程决定了模型有多聪明。这一段决定了它能用上多少。<br>
+      而决定权，从头到尾都在写接口的人手上。</p>
+    <div class="row" style="margin-top:28px;gap:14px">
+      <div class="card f1" style="padding:12px 15px">
+        <h4 style="font-size:13px">规范原文</h4>
+        <p style="font-size:12.5px;line-height:1.7" class="mut">
+          modelcontextprotocol.io/specification<br>
+          a2a-protocol.org<br>
+          agentskills.io</p>
+      </div>
+      <div class="card f1" style="padding:12px 15px">
+        <h4 style="font-size:13px">配套</h4>
+        <p style="font-size:12.5px;line-height:1.7" class="mut">
+          deck-lite.html — 25 页精简版<br>
+          README.md — 事实来源与核对日期</p>
+      </div>
+      <div class="card f1" style="padding:12px 15px">
+        <h4 style="font-size:13px">快捷键</h4>
+        <p style="font-size:12.5px;line-height:1.7" class="mut">
+          <span class="kbd">←</span> <span class="kbd">→</span> 翻页 ·
+          <span class="kbd">O</span> 概览<br>
+          <span class="kbd">F</span> 全屏 · <span class="kbd">Home</span>/<span class="kbd">End</span> 首尾</p>
+      </div>
+    </div>
+    <p style="margin-top:22px;font-size:12px;color:var(--mut)">
+      全部事实核对于 2026-08-06。生态类数字随时间变化，引用前请重新核实。</p>
+  </div>
+</section>
+
+</div></div>
+<div id="hud"><span id="hudact"></span><span id="hudnum"></span></div>
+<div id="help">← → 翻页 · O 概览 · F 全屏</div>
+
+<script>
+(function(){
+  var deck=document.getElementById('deck'), stage=document.getElementById('stage');
+  var slides=[].slice.call(deck.querySelectorAll('.slide'));
+  var i=0, ovWrap=null;
+
+  function fit(){
+    var s=Math.min(window.innerWidth/1280, window.innerHeight/720)*0.955;
+    deck.style.transform='scale('+s+')';
+  }
+  function checkOverflow(s){
+    var b=s.querySelector('.body'); if(!b) return;
+    s.style.outline='';
+    if(b.scrollHeight>b.clientHeight+2){
+      console.warn('[溢出] 第 '+(i+1)+' 页内容超出画布 '+(b.scrollHeight-b.clientHeight)+'px');
+      s.style.outline='2px solid #ff7b72';
+    }
+  }
+  function show(n,push){
+    i=Math.max(0,Math.min(slides.length-1,n));
+    slides.forEach(function(s,k){ s.classList.toggle('on',k===i); });
+    document.getElementById('bar').style.width=(i/(slides.length-1)*100)+'%';
+    document.getElementById('hudnum').textContent=(i+1)+' / '+slides.length;
+    document.getElementById('hudact').textContent=slides[i].dataset.act||'';
+    if(push!==false) history.replaceState(null,'','#'+(i+1));
+    checkOverflow(slides[i]);
+  }
+  function next(){ show(i+1); }
+  function prev(){ show(i-1); }
+
+  function toggleOv(){
+    if(!ovWrap){
+      ovWrap=document.createElement('div'); ovWrap.className='ov';
+      slides.forEach(function(s,k){
+        var c=document.createElement('div'); c.className='ovcell'+(k===i?' cur':'');
+        var inner=document.createElement('div'); inner.className='ovinner';
+        inner.appendChild(s); s.classList.add('on');
+        c.appendChild(inner);
+        var lab=document.createElement('span'); lab.className='ovlab'; lab.textContent=k+1;
+        c.appendChild(lab);
+        c.addEventListener('click',function(){ i=k; toggleOv(); });
+        ovWrap.appendChild(c);
+      });
+      document.body.appendChild(ovWrap);
+      stage.style.display='none';
+    } else {
+      slides.forEach(function(s){ s.classList.remove('on'); deck.appendChild(s); });
+      document.body.removeChild(ovWrap); ovWrap=null;
+      stage.style.display='';
+      show(i);
+    }
+  }
+  function toggleFs(){
+    if(!document.fullscreenElement){ document.documentElement.requestFullscreen(); }
+    else{ document.exitFullscreen(); }
+  }
+
+  document.addEventListener('keydown',function(e){
+    if(e.metaKey||e.ctrlKey||e.altKey) return;
+    var k=e.key;
+    if(ovWrap && (k==='o'||k==='O'||k==='Escape')){ e.preventDefault(); toggleOv(); return; }
+    if(ovWrap) return;
+    if(k==='ArrowRight'||k==='PageDown'||k===' '||k==='j'||k==='J'){ e.preventDefault(); next(); }
+    else if(k==='ArrowLeft'||k==='PageUp'||k==='k'||k==='K'){ e.preventDefault(); prev(); }
+    else if(k==='Home'){ e.preventDefault(); show(0); }
+    else if(k==='End'){ e.preventDefault(); show(slides.length-1); }
+    else if(k==='o'||k==='O'){ e.preventDefault(); toggleOv(); }
+    else if(k==='f'||k==='F'){ e.preventDefault(); toggleFs(); }
+  });
+  stage.addEventListener('click',function(e){
+    if(e.clientX < window.innerWidth*0.28) prev(); else next();
+  });
+  var tx=0;
+  stage.addEventListener('touchstart',function(e){ tx=e.changedTouches[0].clientX; },{passive:true});
+  stage.addEventListener('touchend',function(e){
+    var d=e.changedTouches[0].clientX-tx;
+    if(Math.abs(d)>50){ d<0?next():prev(); }
+  },{passive:true});
+  window.addEventListener('resize',fit);
+  window.addEventListener('hashchange',function(){
+    var h=parseInt((location.hash||'').replace('#',''),10);
+    if(!isNaN(h) && h-1!==i) show(h-1,false);
+  });
+
+  fit();
+  var h=parseInt((location.hash||'').replace('#',''),10);
+  show(isNaN(h)?0:h-1);
+})();
+</script>
+</body>
+</html>

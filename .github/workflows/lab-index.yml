@@ -1,0 +1,44 @@
+name: 重建归档索引
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'lab/**'
+      - 'tools/gen_lab_index.py'
+  workflow_dispatch:
+
+# 需要 Settings → Actions → General → Workflow permissions 选 "Read and write"
+permissions:
+  contents: write
+
+concurrency:
+  group: lab-index
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # gen_lab_index.py 用 git log 取每个归档的最后改动日期
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: 生成 lab/index.html
+        run: python tools/gen_lab_index.py
+
+      - name: 有变化才提交
+        run: |
+          if git diff --quiet; then
+            echo "索引无变化，跳过提交"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lab/
+          git commit -m "lab: 重建索引 [skip ci]"
+          git push

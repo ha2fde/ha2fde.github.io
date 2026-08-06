@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>配套脚本索引 · AI Agent 系列培训</title>
+<style>
+  :root{
+    --blue:#2563EB; --blue-dark:#1D4ED8; --panel:#EFF6FF;
+    --ink:#1F2937; --gray:#6B7280; --faint:#9CA3AF;
+    --line:#E2E8F0; --bg:#E8EDF4; --codebg:#F8FAFC;
+    --font:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif;
+    --mono:Consolas,"Cascadia Mono","Courier New",monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--font);color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;line-height:1.6}
+  .wrap{max-width:1060px;margin:0 auto;padding:44px 32px 64px}
+  .back{font-size:14px;color:var(--blue);text-decoration:none;font-weight:600}
+  .back:hover{text-decoration:underline}
+  h1{font-size:32px;font-weight:800;margin:14px 0 6px}
+  .sub{font-size:15px;color:var(--gray);margin-bottom:22px}
+
+  .env{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin-bottom:28px}
+  .env h3{font-size:15px;margin-bottom:8px}
+  .env pre{font-family:var(--mono);font-size:13px;background:var(--codebg);border:1px solid var(--line);border-radius:8px;padding:10px 14px;overflow-x:auto}
+  .env p{font-size:13.5px;color:var(--gray);margin-top:8px}
+
+  h2.group{font-size:20px;font-weight:700;margin:30px 0 4px;color:var(--blue-dark)}
+  .group-sub{font-size:13.5px;color:var(--faint);margin-bottom:12px}
+  table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  th,td{text-align:left;padding:10px 14px;font-size:13.5px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:#F8FAFC;font-weight:600;color:var(--gray);font-size:12.5px;letter-spacing:.04em}
+  tr:last-child td{border-bottom:none}
+  td.name{font-family:var(--mono);font-size:12.5px;white-space:nowrap;font-weight:700;color:var(--ink)}
+  td.run{font-family:var(--mono);font-size:12px;color:var(--blue-dark);white-space:nowrap}
+  td.dep{font-size:12.5px;color:var(--gray);white-space:nowrap}
+  .note{font-size:13px;color:var(--gray);margin-top:8px}
+  footer{margin-top:36px;font-size:12.5px;color:var(--faint);border-top:1px solid var(--line);padding-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="../index.html">☰ 返回目录</a>
+  <h1>配套脚本索引</h1>
+  <p class="sub">第 2 / 3 / 4 讲的可运行演示，共 17 个脚本 + 1 个 Skill 示例。全部为教学用途的最小实现，纯 CPU 可跑。</p>
+
+  <div class="env">
+    <h3>环境准备（一次装好）</h3>
+    <pre>pip install torch transformers sentence-transformers mcp fastapi uvicorn requests openai langgraph langchain-openai</pre>
+    <p>Python 3.12+。模型首次运行自动下载（Qwen2.5-0.5B 约 1.5GB，BGE 向量模型约 100MB）；国内网络可取消脚本顶部 <b>HF_ENDPOINT = "https://hf-mirror.com"</b> 一行的注释。第 4 讲脚本需在顶部 CONFIG 区填 BASE_URL / API_KEY / MODEL（兼容任何 Chat Completions 接口，云端或本地均可）。</p>
+  </div>
+
+  <h2 class="group">第 2 讲 · 从计算机到 GPT（3 个）</h2>
+  <p class="group-sub">目录：<code>scripts/lecture2/</code> ｜ 演示"机器如何一步步学会语言"的三个最小实验</p>
+  <table>
+    <tr><th>脚本</th><th>对应内容</th><th>演示什么</th><th>运行</th></tr>
+    <tr><td class="name">embedding_demo.py</td><td>embedding：词义 = 向量</td><td>统计每个词"身边常出现哪些词"（共现向量）：上下文相似的词，向量自动相似——不用人教</td><td class="run">python embedding_demo.py</td></tr>
+    <tr><td class="name">ngram_demo.py</td><td>从 n-gram 起步</td><td>统计"前 N-1 个字之后最常接哪个字"，生成时不断查表——得到"模仿腔"文本，看清 n-gram 的天花板</td><td class="run">python ngram_demo.py</td></tr>
+    <tr><td class="name">tiny_lm_train_demo.py</td><td>神经网络学规律</td><td>字 → embedding → 加权变换 → 预测下一个字；错了算 loss、调权重，重复几千次——亲手训一个微型 LM</td><td class="run">python tiny_lm_train_demo.py</td></tr>
+  </table>
+
+  <h2 class="group">第 3 讲 · ChatGPT 是怎么工作的（10 个 + 1 个 Skill 示例）</h2>
+  <p class="group-sub">目录：<code>scripts/lecture3/</code> ｜ 把每一章亲手跑一遍（详细说明见该目录 README.md）</p>
+  <table>
+    <tr><th>脚本</th><th>章节</th><th>演示什么</th><th>运行</th></tr>
+    <tr><td class="name">tokenizer_demo.py</td><td>1</td><td>token 切分列表、数量、半句续写</td><td class="run">python tokenizer_demo.py "今天天气真"</td></tr>
+    <tr><td class="name">training_stages_demo.py</td><td>2</td><td>base 续写 vs instruct 问答，同题对比</td><td class="run">python training_stages_demo.py "怎么煮咖啡?"</td></tr>
+    <tr><td class="name">chat_context_demo.py</td><td>3</td><td>6 轮历史拼接、模板渲染、超长截断（system 保留）</td><td class="run">python chat_context_demo.py</td></tr>
+    <tr><td class="name">sampling_demo.py</td><td>4</td><td>temperature=0 与 0.9 各生成 3 次对比</td><td class="run">python sampling_demo.py</td></tr>
+    <tr><td class="name">cot_demo.py</td><td>5</td><td>直接答 vs "请一步一步思考"</td><td class="run">python cot_demo.py</td></tr>
+    <tr><td class="name">rag_demo.py</td><td>6</td><td>切块 → 向量化 → Top-2 检索 → 拼上下文 → 回答</td><td class="run">python rag_demo.py "报销上限是多少?"</td></tr>
+    <tr><td class="name">agent_tool_demo.py</td><td>7</td><td>calc / date 工具 + ReAct 循环（上限 5 轮防死循环）</td><td class="run">python agent_tool_demo.py "38乘27加100?"</td></tr>
+    <tr><td class="name">mcp_skills_demo.py</td><td>8</td><td>MCP 协议发现/调用工具 + skill 手册流程执行（配套 mcp_server.py 与 skills/expense_report/ 示例）</td><td class="run">python mcp_skills_demo.py</td></tr>
+    <tr><td class="name">api_server.py</td><td>9</td><td>本地 Chat Completions 兼容服务（SSE 流式），README 附 curl 示例</td><td class="run">python api_server.py</td></tr>
+    <tr><td class="name">train_sft.py</td><td>2 · 新增</td><td>QLoRA 实战：4GB 显存微调对话模型（Unsloth + 4-bit + Belle），对应新增页"实战"</td><td class="run">python train_sft.py</td></tr>
+  </table>
+  <p class="note">备注：0.5B 小模型旨在演示<b>机制</b>，生成质量有限；脚本中把 MODEL 换成 Qwen2.5-1.5B-Instruct 或更大，效果会明显变好。CoT 与 ReAct 对格式遵循较敏感，小模型可能需多试一两次。</p>
+
+  <h2 class="group">第 4 讲 · 开发 Agent（3 个）</h2>
+  <p class="group-sub">目录：<code>scripts/lecture4/</code> ｜ 同一能力、三层写法；顶部 CONFIG 区填接口信息</p>
+  <table>
+    <tr><th>脚本</th><th>章节</th><th>演示什么</th><th>依赖</th></tr>
+    <tr><td class="name">direct_api_demo.py</td><td>2</td><td>只用 requests 调 Chat Completions，打印原始返回——看清 API 真面目</td><td class="dep">requests</td></tr>
+    <tr><td class="name">sdk_react_demo.py</td><td>4</td><td>SDK 手写 ReAct 循环 + 计算器工具，逐轮打印"调哪个工具 → 参数 → 结果"</td><td class="dep">openai</td></tr>
+    <tr><td class="name">langgraph_plan_demo.py</td><td>7</td><td>LangGraph 3 节点 Plan-and-Execute 图（plan → act → sum），打印节点流转；换 checkpointer 即得断点恢复</td><td class="dep">langgraph / langchain-openai</td></tr>
+  </table>
+
+  <footer>建议顺序：先跑通 direct_api 看清 POST，再跑 sdk_react 看清循环，最后跑 langgraph_plan 看清图——三层就都长在手上了。 ｜ 整合版 v1</footer>
+</div>
+</body>
+</html>

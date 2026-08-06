@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第 1 章 破冰 — 装上你的第一个 Agent · AI Agent 实战手册</title>
+<link rel="stylesheet" href="assets/book.css">
+</head>
+<body>
+
+<aside id="bk-side">
+  <div class="bk-brand">
+    <div class="bk-b-k">AI AGENT 系列培训</div>
+    <h1>AI Agent 实战手册</h1>
+    <p>从装上第一个 Agent，到把它送进生产</p>
+  </div>
+  <div class="bk-search"><input id="bk-q" type="search" placeholder="筛选章节标题…" autocomplete="off"></div>
+  <div id="bk-nav">
+    <div class="bk-nav-extra" style="margin-top:0;padding-top:0;border:none">
+      <a href="index.html#bk-cover"><b>—</b>扉页与目录</a>
+    </div>
+    <div class="bk-nav-ch" data-ch="1"><a class="bk-nav-ch-t" href="#p1" style="--ac:#2563EB"><b>01</b><span>破冰</span><i>1</i></a><ul><li><a href="#p2">开篇与导读</a></li><li><a href="#p4">第 1 节 · 它们跟 ChatGPT 有啥不一样？</a></li><li><a href="#p5">第 2 节 · 一个壳 + 一个大脑（全篇主线）</a></li><li><a href="#p7">第 3 节 · 命令行编程 Agent</a></li><li><a href="#p8">第 4 节 · 补全、Agent、AI 编辑器</a></li><li><a href="#p9">第 5 节 · 大脑从哪来（云端）</a></li><li><a href="#p11">第 6 节 · 自己搭大脑：本地运行大模型</a></li><li><a href="#p14">第 7 节 · 一个壳，多个大脑</a></li><li><a href="#p16">第 8 节 · 生活里的私人助理</a></li><li><a href="#p17">第 9 节 · 办公 Agent 全景</a></li><li><a href="#p18">第 10 节 · 全景图与怎么选</a></li><li><a href="#p20">第 11 节 · 0 成本上手：免费资源地图</a></li><li><a href="#p21">第 12 节 · 破冰行动：第一次上手 5 步</a></li><li><a href="#p22">第 13 节 · 总结</a></li></ul></div>
+<div class="bk-nav-ch" data-ch="2"><a class="bk-nav-ch-t" href="ch02.html#p23" style="--ac:#0F766E"><b>02</b><span>前传</span><i>26</i></a><ul><li><a href="ch02.html#p24">开篇与导读</a></li><li><a href="ch02.html#p26">第 1 节 · 文字数字化</a></li><li><a href="ch02.html#p27">第 2 节 · 词的表示</a></li><li><a href="ch02.html#p29">第 3 节 · 语言模型任务</a></li><li><a href="ch02.html#p30">第 4 节 · 神经网络登场</a></li><li><a href="ch02.html#p31">第 5 节 · 序列问题</a></li><li><a href="ch02.html#p32">第 6 节 · 注意力机制</a></li><li><a href="ch02.html#p34">第 7 节 · Transformer</a></li><li><a href="ch02.html#p36">第 8 节 · 预训练与微调</a></li><li><a href="ch02.html#p38">第 9 节 · 规模</a></li><li><a href="ch02.html#p39">第 10 节 · 收束</a></li><li><a href="ch02.html#p40">附录 · 三个能跑的小实验</a></li></ul></div>
+<div class="bk-nav-ch" data-ch="3"><a class="bk-nav-ch-t" href="ch03.html#p42" style="--ac:#7C3AED"><b>03</b><span>机制</span><i>45</i></a><ul><li><a href="ch03.html#p43">导览 · 10 个困惑总览</a></li><li><a href="ch03.html#p45">第 1 节 · 它在搜答案吗</a></li><li><a href="ch03.html#p47">第 2 节 · 它凭什么会回答</a></li><li><a href="ch03.html#p51">第 3 节 · 它怎么"记得"</a></li><li><a href="ch03.html#p54">第 4 节 · 答案为何每次不同</a></li><li><a href="ch03.html#p55">第 5 节 · 一本正经地胡说</a></li><li><a href="ch03.html#p57">第 6 节 · 知道没学过的东西</a></li><li><a href="ch03.html#p59">第 7 节 · 动手干活</a></li><li><a href="ch03.html#p61">第 8 节 · 工具从哪来</a></li><li><a href="ch03.html#p64">第 9 节 · 给程序用上它</a></li><li><a href="ch03.html#p65">第 10 节 · 总结</a></li><li><a href="ch03.html#p66">附录 · 9 个可运行脚本</a></li></ul></div>
+<div class="bk-nav-ch" data-ch="4"><a class="bk-nav-ch-t" href="ch04.html#p67" style="--ac:#B45309"><b>04</b><span>开发</span><i>70</i></a><ul><li><a href="ch04.html#p68">开篇与导读</a></li><li><a href="ch04.html#p70">第 1 节 · 三条路线总览</a></li><li><a href="ch04.html#p72">第 2 节 · 直接调 API</a></li><li><a href="ch04.html#p73">第 3 节 · SDK 帮你省什么</a></li><li><a href="ch04.html#p74">第 4 节 · 手写 ReAct 主循环</a></li><li><a href="ch04.html#p75">第 5 节 · 框架化的 ReAct</a></li><li><a href="ch04.html#p76">第 6 节 · 两种范式对照</a></li><li><a href="ch04.html#p78">第 7 节 · LangGraph 把流程画成图</a></li><li><a href="ch04.html#p79">第 8 节 · 框架全景与选型</a></li><li><a href="ch04.html#p82">第 9 节 · 实战与 checklist</a></li><li><a href="ch04.html#p84">第 10 节 · 总结</a></li><li><a href="ch04.html#p85">附录 · 三个可运行脚本</a></li></ul></div>
+<div class="bk-nav-ch" data-ch="5"><a class="bk-nav-ch-t" href="ch05.html#p87" style="--ac:#0D9488"><b>05</b><span>工程化</span><i>90</i></a><ul>
+<li><a href="ch05.html#p88">本章要回答的问题与三模块总览</a></li>
+<li><a href="ch05.html#p91">模块 A：六大能力支柱</a></li>
+<li><a href="ch05.html#p99">模块 B：四层协议生态与 MCP</a></li>
+<li><a href="ch05.html#p106">模块 C：企业落地与成熟度五级</a></li>
+<li><a href="ch05.html#p111">总结与落地评估速查表</a></li>
+</ul></div>
+<div class="bk-nav-ch" data-ch="6"><a class="bk-nav-ch-t" href="ch06.html#p114" style="--ac:#4F46E5"><b>06</b><span>收束</span><i>117</i></a><ul>
+<li><a href="ch06.html#p115">本章定位与全篇地图</a></li>
+<li><a href="ch06.html#p117">序章 · 苦涩的教训</a></li>
+<li><a href="ch06.html#p123">Chat 的实现（回顾串讲）</a></li>
+<li><a href="ch06.html#p130">Agent 的实现（回顾串讲）</a></li>
+<li><a href="ch06.html#p136">终章 · 体验的时代</a></li>
+</ul></div>
+<div class="bk-nav-ch" data-ch="7"><a class="bk-nav-ch-t" href="ch07.html#p142" style="--ac:#475569"><b>07</b><span>深造</span><i>145</i></a><ul>
+<li><a href="ch07.html#p143">怎么读这份索引</a></li>
+<li><a href="ch07.html#p145">第 1 组 · 大模型基础</a></li>
+<li><a href="ch07.html#p146">第 2 组 · Agent 范式</a></li>
+<li><a href="ch07.html#p148">第 3 组 · 工程架构</a></li>
+<li><a href="ch07.html#p149">第 4 组 · 协议生态</a></li>
+<li><a href="ch07.html#p150">第 5 组 · 落地实践</a></li>
+<li><a href="ch07.html#p152">第 6 组 · 课程路径与总览</a></li>
+</ul></div>
+    <div class="bk-nav-extra">
+      <a href="appendix.html"><b>附</b>配套代码（17 个脚本）</a>
+    </div>
+  </div>
+</aside>
+
+<div id="bk-top">
+  <button id="bk-burger" title="收起 / 展开目录">☰</button>
+  <div id="bk-crumb"><b>扉页</b></div>
+  <div class="bk-tools">
+    <button onclick="bkPrint()">打印 / 导出 PDF</button>
+    <button onclick="bkAll(1)">展开全部代码</button>
+  </div>
+  <div id="bk-pageno"><b>—</b> / 153</div>
+</div>
+<div id="bk-bar"><i></i></div>
+
+<main id="bk-main"><div class="bk-wrap">
+<div class="bk-sheet bk-sheet-opener" id="p1" data-ch="1" data-page="1"><div class="bk-paper"><div class="bk-fit"><div class="bk-opener" style="--ac:#2563EB"><div class="bk-op-left"><div class="bk-op-cn">第 一 章</div><div class="bk-op-num">01</div><div class="bk-op-en">GETTING STARTED</div></div><div class="bk-op-right"><h1>破冰<small>装上你的第一个 Agent</small></h1><p class="bk-op-lead">不讲原理，先让你今晚就能在自己电脑上跑起一个能干活的 Agent。壳（工具）和大脑（模型）是两回事——搞清这一点，剩下的都是配置问题。</p><div class="bk-op-meta"><span>全员 · 零基础</span><span>22 页</span><span>本章 13 节</span></div><ul class="bk-op-secs"><li><span>开篇与导读</span><i></i><em>2</em></li><li><span>第 1 节 · 它们跟 ChatGPT 有啥不一样？</span><i></i><em>4</em></li><li><span>第 2 节 · 一个壳 + 一个大脑（全篇主线）</span><i></i><em>5</em></li><li><span>第 3 节 · 命令行编程 Agent</span><i></i><em>7</em></li><li><span>第 4 节 · 补全、Agent、AI 编辑器</span><i></i><em>8</em></li><li><span>第 5 节 · 大脑从哪来（云端）</span><i></i><em>9</em></li><li><span>第 6 节 · 自己搭大脑：本地运行大模型</span><i></i><em>11</em></li><li><span>第 7 节 · 一个壳，多个大脑</span><i></i><em>14</em></li><li><span>第 8 节 · 生活里的私人助理</span><i></i><em>16</em></li><li><span>第 9 节 · 办公 Agent 全景</span><i></i><em>17</em></li><li><span>第 10 节 · 全景图与怎么选</span><i></i><em>18</em></li><li><span>第 11 节 · 0 成本上手：免费资源地图</span><i></i><em>20</em></li><li><span>第 12 节 · 破冰行动：第一次上手 5 步</span><i></i><em>21</em></li><li><span>第 13 节 · 总结</span><i></i><em>22</em></li></ul></div></div></div></div><div class="bk-folio"><span>1</span></div></div>
+<div class="bk-sheet" id="p2" data-ch="1" data-page="2" data-title="AI Agent 破冰指南"><div class="bk-paper ch1"><div class="bk-fit"><section class="slide active">
+  <div class="topbar"></div>
+  <div class="cover">
+    <h1>AI Agent 破冰指南</h1>
+    <h2>从"听说过"到"装一个试试"</h2>
+    <p class="tagline">不讲原理，只回答四个问题：<br>这是什么？要不要钱？我装哪个？第一步干嘛？</p>
+    <div class="pill">全程 0 成本也能玩起来</div>
+    <p class="aud">适合：懂基本 IT、从未装过任何 AI Agent 工具的你</p>
+  </div>
+  <span class="pagenum">01 / 28</span>
+</section></div></div><div class="bk-folio"><span>2</span><em>第一章 · 破冰</em></div></div>
+<div class="bk-sheet" id="p3" data-ch="1" data-page="3" data-title="这份 PPT 怎么读：跟着你脑子里的问题走"><div class="bk-paper ch1"><div class="bk-fit"><section class="slide active">
+  <a href="index.html#bk-toc" class="chip amber" style="cursor:pointer;text-decoration:none">导读 · 点此看目录 ↩</a>
+  <h1 class="title">这份 PPT 怎么读：跟着你脑子里的问题走</h1>
+  <div class="question">💬 入门者原话：<em>"我听说过 Claude Code、OpenClaw、WorkBuddy……但它们到底是什么？"</em></div>
+  <div class="answer"><b>直接回答：</b>章节按"你会问的问题"排列，不用按顺序看，跳到你最好奇的那章即可。</div>
+  <div class="grid4" id="toc"></div>
+  <span class="pagenum">02 / 28</span>
+</section></div></div><div class="bk-folio"><span>3</span><em>第一章 · 破冰</em></div></div>
+<div class="bk-sheet" id="p4" data-ch="1" data-page="4" data-title="破误解：Agent 是&quot;干活&quot;，不是&quot;回答&quot;"><div class="bk-paper ch1"><div class="bk-fit"><section class="slide active">
+  <div class="chip">第 1 节 · 它们跟 ChatGPT 有啥不一样？</div>
+  <h1 class="title">破误解：Agent 是"干活"，不是"回答"</h1>
+  <div class="question">💬 入门者原话：<em>"我用过 ChatGPT，这些 Agent 不就是更强的聊天机器人吗？"</em></div>
+  <div class="answer"><b>直接回答：</b>不是。ChatGPT 给你一段"回答"，Agent 替你"把活干完"——读文件、改代码、跑命令、调工具，从头做到尾。</div>
+  <table class="t">
+    <tr><th style="width:16%"></th><th style="width:38%">聊天机器人（ChatGPT 类）</th><th>AI Agent（Claude Code 类）</th></tr>
+    <tr><td><b>你给它</b></td><td>一个问题</td><td>一个任务</td></tr>
+    <tr><td><b>它给你</b></td><td>一段文字回答</td><td>干完的结果（文件改好了 / 命令跑完了）</td></tr>
+    <tr><td><b>🧠 脑</b></td><td colspan="2" style="text-align:center">都有，而且常常是同一批大模型——差别不在这儿</td></tr>
+    <tr><td><b>✋ 手</b></td><td>没有，只能说</td><td>有：读写文件、跑命令、调工具</td></tr>
+    <tr><td><b>🔁 循环</b></td><td>没有，一问一答就结束</td><td>思考→行动→看结果→再思考，循环到干完</td></tr>
+    <tr><td><b>一句话</b></td><td>顾问</td><td><b>实习生</b></td></tr>
+  </table>
+  <p class="note" style="margin-top:10px">三个字记住：<b>脑</b>（大模型，负责想）、<b>手</b>（工具，负责动）、<b>循环</b>（干一步看一步，直到干完）。聊天机器人只有脑，三样齐全才叫 Agent。</p>
+  <span class="pagenum">03 / 28</span>
+</section></div></div><div class="bk-folio"><span>4</span><em>第一章 · 破冰</em></div></div>
+<div class="bk-sheet" id="p5" data-ch="1" data-page="5" data-title="通用架构：所有 Agent 工具都是同一张图"><div class="bk-paper ch1"><div class="bk-fit"><section class="slide active">
+  <div class="chip">第 2 节 · 一个壳 + 一个大脑（全篇主线）</div>
+  <h1 class="title">通用架构：所有 Agent 工具都是同一张图</h1>
+  <div class="question">💬 入门者原话：<em>"Claude Code、opencode、WorkBuddy……这么多工具，要一个个学吗？"</em></div>
+  <div class="answer"><b>直接回答：</b>不用。结构一模一样：一个"壳"（装在电脑上的工具）+ 一个"大脑"（大模型）。学会这张图就懂了全部。</div>
+  <div style="display:grid; grid-template-columns:1.4fr 1fr; gap:24px; align-items:center">
+    <div class="flow">
+      <div class="fbox gray" style="width:80%"><h4 style="color:var(--ink); font-size:15px">你（说人话：我要什么）</h4></div>
+      <div class="farrow">↓</div>
+      <div class="fbox" style="width:80%"><h4>工具壳</h4><p>Claude Code / opencode / Cline / WorkBuddy …<br>装在电脑上，大多是开源工具</p></div>
+      <div class="farrow">↓</div>
+      <div class="fbox amber" style="width:80%"><h4>大脑（大模型）</h4><p>云端 API（按量计费）或 本地模型（自己跑）</p></div>
+      <div class="farrow">↓</div>
+      <div class="fbox gray" style="width:80%"><h4 style="color:var(--ink); font-size:14px">壳去执行：读文件 / 写文件 / 跑命令 / 调工具</h4></div>
+    </div>
+    <div class="card" style="border:1.5px dashed var(--green); background:#fff">
+      <h3 style="color:var(--green)">↺ 循环</h3>
+      <p>壳说："我现在能做什么"<br>大脑回："下一步做这件事"<br><b>执行结果喂回大脑，再想下一步，直到干完为止</b></p>
+      <p class="sub" style="margin-top:10px">对照上一页：<b>壳＝手＋循环</b>，<b>大脑＝脑</b>。所以壳可以随便换，大脑也可以随便接。</p>
+    </div>
+  </div>
+  <span class="pagenum">05 / 28</span>
+</section></div></div><div class="bk-folio"><span>5</span><em>第一章 · 破冰</em></div></div>
+<div class="bk-sheet" id="p6" data-ch="1" data-page="6" data-title="钱花在哪：大脑按字数收费，今天的真实价目表"><div class="bk-paper ch1"><div class="bk-fit"><section class="slide active">
+  <div class="chip">第 2 节 · 一个壳 + 一个大脑（全篇主线）</div>
+  <h1 class="title">钱花在哪：壳不要钱，大脑按字数收费</h1>
+  <div class="answer" style="margin-bottom:12px"><b>先记住计价单位：</b>大脑按 <b>token</b> 收费，报价都写成"每 100 万 token 多少钱"（≈ 60~70 万汉字）。<b>输入和输出分开算，输出普遍贵 2~5 倍</b>；同一家还分三档，最贵和最便宜能差十几倍。壳本身几乎都是开源免费的。</div>
+  <table class="t xs" style="margin-bottom:10px">
+    <tr><th style="width:11%">厂商</th><th style="width:20%">平价档 输入/输出</th><th style="width:20%">中间档 输入/输出</th><th style="width:19%">旗舰档 输入/输出</th><th>缓存命中后的输入价</th></tr>
+    <tr><td><b>DeepSeek</b></td><td>V4-Flash　¥1 / 2</td><td>—　只有两档</td><td>V4-Pro　¥3 / 6</td><td><b>¥0.02 / ¥0.025</b>，低到 1/50~1/120</td></tr>
+    <tr><td><b>智谱 GLM</b></td><td>GLM-4.7-Flash　<b>免费</b></td><td>GLM-4.7　¥2 / 8</td><td>GLM-5.2　¥8 / 28</td><td>¥0.4 / ¥2，约 1/4~1/5</td></tr>
+    <tr><td><b>Kimi</b></td><td>K2.6　¥6.5 / 27</td><td>K2.7 Code　¥6.5 / 27</td><td>K3　¥20 / 100</td><td>¥1.1 / ¥2，约 1/6~1/10</td></tr>
+    <tr><td><b>OpenAI</b></td><td>GPT-5.6 Luna　$0.2 / 1.2</td><td>GPT-5.6 Terra　$2 / 12</td><td>GPT-5.6 Sol　$5 / 30</td><td>输入价的 1/10；写入另收 1.25 倍</td></tr>
+    <tr><td><b>Claude</b></td><td>Haiku 4.5　$1 / 5</td><td>Sonnet 5　$3 / 15</td><td>Opus 5　$5 / 25</td><td>输入价的 1/10；需手动标记</td></tr>
+  </table>
+  <div class="grid2" style="margin-bottom:10px">
+    <div class="card gray">
+      <h3>"缓存命中"是什么？五家都有这一档价</h3>
+      <p>多轮对话每问一次，都要把系统提示和全部历史<b>原样重发一遍</b>，开头那一大段永远相同。服务器把算过的开头存着直接复用，省下的是真算力，所以敢便宜卖。<span class="sub">只是叫法不同：国内叫上下文缓存，OpenAI 叫 cached input，Claude 叫 prompt caching。国产三家和 OpenAI 自动命中，Claude 要在请求里手动标；OpenAI、Claude 写入缓存还要另加钱。</span></p>
+    </div>
+    <div class="card">
+      <h3>同一个 Claude，两种账单</h3>
+      <p><b>填 API Key</b>：按 token 扣钱，用多少扣多少，无上限、可并行开好几个。<b>用订阅号登录</b>（Pro $20、Max $100 / $200 每月）：交固定月费，按"每 5 小时一个窗口 + 每周额度"限量，<b>不按 token 算</b>。<span class="sub">坑：机器上若留着 ANTHROPIC_API_KEY，会优先走按量计费，订阅白买。国产同款：智谱 GLM Coding Plan ¥49/月起。</span></p>
+    </div>
+  </div>
+  <p class="note">还有这些加减项：批量/异步接口普遍<b>五折</b>；智谱同一型号还按输入长度再分档（GLM-4.7 超 3.2 万 token 涨到 ¥4/16）；OpenAI 超 27 万 token 的长请求输入 ×2、输出 ×1.5；DeepSeek 已公告高峰时段（9–12 点、14–18 点）加价、尚未生效；模型"思考"的字也算输出。<b>以上为 2026 年 8 月各家官网公开价</b>，调价频繁，请以官方页面为准。</p>
+  <span class="pagenum">06 / 28</span>
+</section></div></div><div class="bk-folio"><span>6</span><em>第一章 · 破冰</em></div></div>
+<div class="bk-sheet" id="p7" data-ch="1" data-page="7" data-title="命令行编程 Agent：Claude Code / Codex / opencode"><div class="bk-paper ch1"><div class="bk-fit"><section class="slide active">
+  <div class="chip">第 3 节 · 命令行编程 Agent</div>
+  <h1 class="title">命令行编程 Agent：Claude Code / Codex / opencode</h1>
+  <div class="question">💬 入门者原话：<em>"程序员朋友圈里刷屏的 Claude Code 到底是个啥？"</em></div>
+  <div class="answer"><b>直接回答：</b>一类<b>自己动手干活</b>的编程 Agent——你说要做什么，它直接改代码、跑命令、看报错、再修，循环到搞定。三家都从<b>终端（命令行，CLI）</b>起家，但今天都不止终端了：<b>桌面应用、编辑器（IDE）扩展、网页版</b>各家齐备，同一个账号、同一套配置，换界面不换工具。</div>
+  <table class="t sm" style="margin-top:14px">
+    <tr><th style="width:16%">工具</th><th style="width:24%">开源情况（看许可证）</th><th style="width:37%">今天有哪些界面</th><th>最擅长啥</th></tr>
+    <tr><td><b>Claude Code</b><br><span style="font-size:11px">Anthropic</span></td><td>闭源（专有软件）</td><td>命令行 · 桌面应用（macOS / Windows）· VS Code 与 JetBrains 扩展 · 网页版 claude.ai/code · 手机 App</td><td>复杂工程任务，配套生态最成熟</td></tr>
+    <tr><td><b>Codex</b><br><span style="font-size:11px">OpenAI</span></td><td><b style="color:var(--green)">命令行部分开源</b>（Apache-2.0，仓库 openai/codex）；<b>桌面应用不开源</b></td><td>命令行 · 桌面应用（macOS / Windows）· VS Code 扩展 · ChatGPT 里的云端 Codex</td><td>和 ChatGPT 生态联动，云端跑长任务</td></tr>
+    <tr><td><b>opencode</b><br><span style="font-size:11px">Anomaly（原 SST）</span></td><td><b style="color:var(--green)">全部开源</b>（MIT，仓库 anomalyco/opencode）</td><td>命令行 TUI · 桌面应用（macOS / Windows / Linux）· IDE 扩展 · <span class="kbd">opencode web</span> 本机网页</td><td>自由换大脑，不绑定任何一家</td></tr>
+  </table>
+  <p class="note" style="margin-top:12px"><b>术语对照：</b><b>CLI</b>（命令行）＝在终端里敲命令；<b>TUI</b>＝在终端里画出来的图形界面；<b>IDE 扩展</b>＝装进 VS Code、JetBrains 这类编辑器的插件；<b>桌面应用</b>＝独立安装的图形程序。<b>"开源"看的是许可证</b>：Apache-2.0、MIT 都允许自由查看、修改、商用，闭源则只给你装好的程序。<b>常见误传</b>：Codex 不是整个闭源——开源的是命令行，桌面应用没开源。</p>
+  <span class="pagenum">07 / 28</span>
+</section></div></div><div class="bk-folio"><span>7</span><em>第一章 · 破冰</em></div></div>
+<div class="bk-sheet" id="p8" data-ch="1" data-page="8" data-title="补全、编程 Agent、AI 编辑器：三回事，别混"><div class="bk-paper ch1"><div class="bk-fit"><section class="slide active">
+  <div class="chip">第 4 节 · 补全、Agent、AI 编辑器</div>
+  <h1 class="title">补全、编程 Agent、AI 编辑器：三回事，别混</h1>
+  <div class="question">💬 入门者原话：<em>"Copilot、Cursor、Cline 名字都像，到底哪个是哪个？"</em></div>
+  <div class="answer"><b>直接回答：</b>先分清你装的是<b>什么</b>，别按"黑窗口还是图形界面"分。<b>代码补全</b>是你打字它猜下一行；<b>编程 Agent</b> 是你给目标它自己干完；<b>AI 编辑器</b>是整个编辑器换掉、补全和 Agent 都自带。Cline 属于中间那类——<b>它是个 Agent，寄住在编辑器里，本身不是编辑器</b>。</div>
+  <table class="t xs" style="margin-top:8px">
+    <tr><th style="width:12%"></th><th style="width:22%">代码补全</th><th style="width:36%">编程 Agent</th><th>AI 编辑器</th></tr>
+    <tr><td><b>它是什么</b></td><td>编辑器插件，猜你下一行要写什么</td><td>一个会自己干活的程序，寄在编辑器或终端里</td><td>一整个编辑器，多是 VS Code 改的</td></tr>
+    <tr><td><b>你怎么用</b></td><td>照常敲代码，按 Tab 接受</td><td>说清目标，它自己读文件、改代码、跑命令、看报错、再修</td><td>换掉你现在用的编辑器</td></tr>
+    <tr><td><b>谁是代表</b></td><td>Copilot 起家的那个形态</td><td><b>命令行出身</b>：Claude Code / Codex / opencode<br><b>插件出身</b>：Cline / Kilo Code</td><td>Cursor · Windsurf · Antigravity<br>VS Code 现在也内置了 Agent</td></tr>
+    <tr><td><b>要换工具吗</b></td><td>不用</td><td>不用，装个插件或装个命令行程序</td><td>要，整个编辑器换</td></tr>
+  </table>
+  <div class="grid2" style="margin-top:8px">
+    <div class="card"><h3>那 Cline 和 Claude Code 差在哪？</h3><p>同是编程 Agent，<b>今天两边界面都补齐了</b>——Cline 有命令行版，Claude Code 有桌面版和 IDE 扩展。真正的差别是<b>改动怎么摆到你面前</b>：插件出身的在代码上高亮、一块块点接受；命令行出身的在终端里滚文本、整批接受。<span class="sub">省钱技巧：Cline 的 Plan 和 Act 可配不同的大脑——Plan 用旗舰档、Act 用平价档，账单差好几倍。</span></p></div>
+    <div class="card gray"><h3>插件这一派正在收缩，别照老教程装</h3><p>2026 年洗牌很凶：<b>Roo Code 已归档停更</b>（5 月），<b>Continue 收官转只读</b>（6 月）。还在活跃维护的开源货主要剩 <b>Cline</b>（Apache-2.0）和 <b>Kilo Code</b>（MIT）。<span class="sub">另注：Cline 的 VS Code 版、命令行版、SDK 开源，但官方说 JetBrains 插件不开源。</span></p></div>
+  </div>
+  <span class="pagenum">08 / 28</span>
+</section></div></div><div class="bk-folio"><span>8</span><em>第一章 · 破冰</em></div></div>
+<div class="bk-sheet" id="p9" data-ch="1" data-page="9" data-title="云端的三种&quot;买脑&quot;方式：专卖店 / 超市 / 全球代购"><div class="bk-paper ch1"><div class="bk-fit"><section class="slide active">
+  <div class="chip">第 5 节 · 大脑从哪来（云端）</div>
+  <h1 class="title">云端的三种"买脑"方式：专卖店 / 超市 / 全球代购</h1>
+  <div class="question">💬 入门者原话：<em>"都说要配 API，API 到底去哪买？"</em></div>
+  <div class="answer"><b>直接回答：</b>云端大脑有三个"货架"，区别不在"国内 / 国外"四个字，而在<b>你能买到什么模型、谁开票合规、网络稳不稳</b>：① 厂商直供＝单点直连、最透明；② 国内云聚合＝一个 Key 买齐多家国产模型；③ 全球中转网关＝一个 Key 用上 Claude / GPT / Llama 等全球模型。</div>
+  <div class="grid3" style="margin-bottom:14px">
+    <div class="card">
+      <h3>形态一 · 厂商直供（专卖店）</h3>
+      <p class="sub">单点直连，一家一个 Key</p>
+      <ul><li>DeepSeek / Kimi（月之暗面）</li><li>GLM（智谱）/ MiniMax …</li><li>每家用各家的 Key</li><li>最透明、最可控、可精挑模型</li></ul>
+    </div>
+    <div class="card">
+      <h3>形态二 · 国内云聚合（超市）</h3>
+      <p class="sub">一个 Key 买齐多家国产模型</p>
+      <ul><li>火山引擎方舟（字节）</li><li>阿里云百炼（通义）</li><li>统一接口、一个 Key 管多种</li><li>合规稳、国内网络快，但仍是国产模型</li></ul>
+    </div>
+    <div class="card">
+      <h3>形态三 · 全球中转网关（代购）</h3>
+      <p class="sub">一个 Key 接全球几百个模型</p>
+      <ul><li>OpenRouter 等</li><li>能用上国内拿不到的 Claude/GPT/Llama</li><li>统一计费、自动路由</li><li>代价：走中转、延迟与合规要权衡</li></ul>
+    </div>
+  </div>
+  <div class="banner amber">三家都有入门额度可以先试。记住：形态二 ≠ 形态三——前者只聚国产模型，后者才通向全球模型。</div>
+  <span class="pagenum">09 / 28</span>
+</section></div></div><div class="bk-folio"><span>9</span><em>第一章 · 破冰</em></div></div>
+<div class="bk-sheet" id="p10" data-ch="1" data-page="10" data-title="三个名词：API Key、Base URL、模型名"><div class="bk-paper ch1"><div class="bk-fit"><section class="slide active">
+  <div class="chip">第 5 节 · 大脑从哪来（云端）</div>
+  <h1 class="title">三个名词：API Key、Base URL、模型名</h1>
+  <div class="question">💬 入门者原话：<em>"教程里老出现 API Key、Base URL，都是啥意思？"</em></div>
+  <div class="answer"><b>直接回答：</b>记住三句话：API Key 是付款凭证，Base URL 是接口地址，模型名是选哪个大脑。把用云端大脑想成"打电话叫外援"。</div>
+  <div class="grid3" style="margin-bottom:16px">
+    <div class="card"><h3>📞 Base URL</h3><p><b>= 电话号码</b>（打给哪家平台）</p><p class="sub" style="margin-top:6px">厂商的 / 云平台的 / OpenRouter 的，各不一样</p></div>
+    <div class="card"><h3>🔑 API Key</h3><p><b>= 话费账户</b>（付款凭证）</p><p class="sub" style="margin-top:6px">谁拿到都能花你的钱 → 别泄露、别发群聊</p></div>
+    <div class="card"><h3>🧠 模型名</h3><p><b>= 点名要哪个大脑</b>接电话</p><p class="sub" style="margin-top:6px">同一家店里也有很多模型可选</p></div>
+  </div>
+  <div class="banner gray">⇒ 任何 Agent 工具配置云端大脑，填的都是这三样。看到教程先找这三个词，找到就看得懂。</div>
+  <span class="pagenum">10 / 28</span>
+</section></div></div><div class="bk-folio"><span>10</span><em>第一章 · 破冰</em></div></div>
+<div class="bk-sheet" id="p11" data-ch="1" data-page="11" data-title="把大脑装在自己电脑上：为什么有人要这么干"><div class="bk-paper ch1"><div class="bk-fit"><section class="slide active">
+  <div class="chip">第 6 节 · 自己搭大脑：本地运行大模型（重点）</div>
+  <h1 class="title">把大脑装在自己电脑上：为什么有人要这么干</h1>
+  <div class="question">💬 入门者原话：<em>"模型还能装在我自己电脑上？图什么？"</em></div>
+  <div class="answer" style="margin-bottom:11px"><b>直接回答：</b>本地跑模型 = 把大脑下载到自己电脑上运行——免费、离线、数据不出本机；代价是吃硬件，能力一般弱于云端旗舰。</div>
+  <table class="t sm">
+    <tr><th style="width:50%">本地跑的好处</th><th>要付的代价</th></tr>
+    <tr><td><b>隐私</b>：数据不出本机</td><td>要硬件：内存 / 显存决定能跑多大的模型</td></tr>
+    <tr><td><b>免费</b>：没有按量计费，随便用</td><td>能力一般弱于云端旗舰模型</td></tr>
+    <tr><td><b>离线</b>：断网也能用</td><td>模型文件占硬盘（几个 GB 起）</td></tr>
+  </table>
+  <div class="col-title" style="margin-top:8px">代价里说的"吃硬件"，就是这三个数</div>
+  <table class="t xs">
+    <tr><th style="width:15%">这个数</th><th style="width:43%">是什么</th><th>决定什么</th></tr>
+    <tr><td><b>多少 B</b></td><td>参数量。B = billion，8B 就是 80 亿个"旋钮"，越多越聪明也越占地方</td><td>模型的<b>聪明程度</b>，以及<b>体积多大</b></td></tr>
+    <tr><td><b>显存 / 内存</b></td><td>模型跑起来时住的地方。Mac 的"统一内存"是 CPU/GPU 共用，买多大就有多大显存，但系统自己要吃掉几 GB</td><td><b>能不能跑</b>——必须整个装进去，装不下就报错或慢十倍</td></tr>
+    <tr><td><b>带宽</b></td><td>每秒能从内存搬多少 GB。模型每吐一个字都要把参数完整读一遍（MoE 只读被叫醒的那部分），所以带宽就是速度本身</td><td><b>跑得多快</b>——10 字/秒勉强跟得上阅读，20 以上才舒服</td></tr>
+  </table>
+  <span class="pagenum">11 / 28</span>
+</section></div></div><div class="bk-folio"><span>11</span><em>第一章 · 破冰</em></div></div>
+<div class="bk-sheet" id="p12" data-ch="1" data-page="12" data-title="配置三档对号入座 + 在哪下、怎么装"><div class="bk-paper ch1"><div class="bk-fit"><section class="slide active">
+  <div class="chip">第 6 节 · 自己搭大脑：本地运行大模型（重点）</div>
+  <h1 class="title">配置对号入座 + 在哪下、怎么装</h1>
+  <div class="question">💬 入门者原话：<em>"我这台电脑跑得动吗？要去哪下模型？"</em></div>
+  <div class="answer" style="margin-bottom:9px"><b>直接回答：</b>看两个数：<b>容量</b>决定能不能跑，<b>带宽</b>决定跑得快不快。下面按容量分档；同一档里型号越新、带宽越高，速度也越快。</div>
+  <div class="grid2">
+    <div>
+      <div class="col-title">① 对号入座（2026 年 8 月的模型，换代快，用前上 ollama.com 热门榜核一眼）</div>
+      <table class="t xs">
+        <tr><th style="width:26%">容量（代表型号）</th><th style="width:50%">跑得动什么（括号是下载体积）</th><th>大概速度</th></tr>
+        <tr><td><b>12~16GB 显存</b><br><span style="font-size:11px">3060 12G / 4060Ti 16G</span></td><td>qwen3.5:9b（6.6GB）、gemma4:12b（7.6GB）</td><td>20~35 字/秒</td></tr>
+        <tr><td><b>24GB 显存</b><br><span style="font-size:11px">3090 / 4090</span></td><td>qwen3.6:27b（17GB）★ 单卡最优；要更快选 gemma4:26b（18GB）</td><td>约 35 字/秒</td></tr>
+        <tr><td><b>32GB 显存</b><br><span style="font-size:11px">5090</span></td><td>qwen3.6:35b（24GB）——个人单卡能跑的最强一档</td><td>100+ 字/秒</td></tr>
+        <tr><td><b>Mac 统一内存</b><br><span style="font-size:11px">32 / 64 / 128GB</span></td><td>32G 跑 27b；64G 跑 35b；128G 才够 qwen3.5:122b（81GB）</td><td>5~40 字/秒</td></tr>
+        <tr><td><b>8GB 显存 或纯 CPU</b></td><td>只有 qwen3.5:2b / 4b（2.7 / 3.4GB），能力有限</td><td>15~40 字/秒</td></tr>
+      </table>
+      <p class="note" style="margin-top:8px">两条心算公式：<b>体积(GB) ≈ 参数量的三分之二</b>（Q4 量化版，精度掉一点、体积砍到三分之一），实际占用再加 2~3GB 给上下文；<b>速度(字/秒) ≈ 带宽(GB/s) ÷ 体积(GB) × 0.6</b>。</p>
+    </div>
+    <div>
+      <div class="col-title">② 下载渠道与安装方式</div>
+      <table class="t xs">
+        <tr><th style="width:24%">用什么</th><th>一句话 / 怎么用</th></tr>
+        <tr><td><b>Ollama</b><br><span style="font-size:11px">★ 新手就用它</span></td><td>装完在终端敲 <span class="kbd">ollama run 模型名</span>，自动下载并跑起来。Win/Mac 下安装包，Linux 一条命令</td></tr>
+        <tr><td><b>LM Studio</b></td><td>不想碰终端就用它：图形界面 + 内置模型商店，点鼠标搜、点鼠标下、点鼠标聊。官网下安装包</td></tr>
+        <tr><td><b>魔搭 ModelScope</b></td><td>阿里的国内模型仓库。Ollama 拉不动时不用换工具，把地址换成它即可：<span class="kbd">ollama run modelscope.cn/仓库名</span></td></tr>
+        <tr><td><b>MLX 版</b><br><span style="font-size:11px">Mac 专用</span></td><td>Mac 用户把标签换成 <b>-mlx</b> 的，如 <span class="kbd">qwen3.5:27b-mlx</span>。MLX 是苹果自家的推理框架，直吃统一内存和 Metal，比通用版快三成左右</td></tr>
+      </table>
+      <p class="note" style="margin-top:9px"><b>怎么查自己有多少：</b>Windows 按 Ctrl+Shift+Esc 开任务管理器 → 性能 → GPU → 看"专用 GPU 内存"；Mac 点左上角苹果标 → 关于本机 → 看"内存"。</p>
+      <p class="note" style="margin-top:8px">带宽算速度举例：4090 带宽 1008GB/s，跑 17GB 的模型约 35 字/秒；纯 CPU 内存只有 70GB/s，同样的模型不到 3 字/秒——不是装不下，是慢到没法用。</p>
+    </div>
+  </div>
+  <span class="pagenum">12 / 28</span>
+</section></div></div><div class="bk-folio"><span>12</span><em>第一章 · 破冰</em></div></div>
+<div class="bk-sheet" id="p13" data-ch="1" data-page="13" data-title="个人可选模型清单 + 本地大脑接进壳里"><div class="bk-paper ch1"><div class="bk-fit"><section class="slide active">
+  <div class="chip">第 6 节 · 自己搭大脑：本地运行大模型（重点）</div>
+  <h1 class="title">个人可选模型清单 + 本地大脑接进壳里</h1>
+  <div class="question">💬 入门者原话：<em>"模型名字一大堆，我下哪个？本地大脑能给那些 Agent 工具用吗？"</em></div>
+  <div class="answer" style="margin-bottom:8px"><b>直接回答：</b>中文和写代码都先选通义千问（Qwen3.5/3.6），机器特别小或想要多语言再看 Gemma 4。本地模型能直接当壳的大脑，完全离线。</div>
+  <div style="display:grid; grid-template-columns:1.5fr 1fr; gap:24px; align-items:start">
+    <div>
+    <table class="t xs">
+      <tr><th style="width:22%">模型</th><th style="width:11%">出身</th><th>一句话</th><th style="width:29%">本地能下到的规模</th></tr>
+      <tr><td><b>Qwen3.5</b> ★</td><td>阿里</td><td>中文最强之一，尺寸最全且都带看图，手机到工作站都覆盖</td><td>0.8B / 2B / 4B / 9B / 27B / 35B / 122B</td></tr>
+      <tr><td><b>Qwen3.6</b> ★</td><td>阿里</td><td>3.5 的升级版，主攻写代码和跑 Agent</td><td>27B（稠密）/ 35B（MoE）</td></tr>
+      <tr><td><b>Gemma 4</b></td><td>谷歌</td><td>Ollama 上下载量第一，多语言，E 系列小到能上手机</td><td>E2B / E4B / 12B / 26B / 31B</td></tr>
+      <tr><td><b>DeepSeek-R1 蒸馏版</b></td><td>DeepSeek</td><td>推理强；但已是 2025 年的模型，正被上面两家追上</td><td>1.5B ~ 70B</td></tr>
+      <tr><td><b>Llama</b>（了解即可）</td><td>Meta</td><td>曾经的开源标杆，一年多没出新的本地版本了</td><td>llama3.3:70b / llama4</td></tr>
+    </table>
+    <p class="note" style="margin-top:8px"><b>MoE（混合专家）</b>：Qwen3.6 的 35B、Gemma 4 的 26B 都是这种——模型拆成很多"专家"，每次只叫醒一小撮干活，于是<b>容量按 35B 算</b>（得全装进显存，因为不知道下次叫谁），<b>速度却按 3B 算</b>，比同体积的稠密模型快好几倍。<br><b>旗舰只有云端</b>：新闻里的 GLM-5.2（744B）、Kimi K3（2.8 万亿）、DeepSeek V4 Pro（1.6 万亿），在 Ollama 上都只挂着 cloud 标签，压根没有本地权重可下——不是你机器不行，是它们本来就不给你在本机跑。</p>
+    </div>
+    <div class="flow">
+      <div class="fbox" style="width:100%"><h4 style="font-size:14px">工具壳（opencode / Cline 等）</h4><p>配置指向 localhost（本机地址）</p></div>
+      <div class="farrow">↓</div>
+      <div class="fbox amber" style="width:100%"><h4 style="font-size:14px">Ollama（本机运行）</h4><p>本地模型：qwen3.5:9b / qwen3.6:27b 等</p></div>
+      <div class="fbox green" style="width:100%"><h4 style="font-size:13px">全程离线 · 数据不出本机 · 0 费用</h4><p>换模型只要改一行配置</p></div>
+    </div>
+  </div>
+  <span class="pagenum">13 / 28</span>
+</section></div></div><div class="bk-folio"><span>13</span><em>第一章 · 破冰</em></div></div>
+<div class="bk-sheet" id="p14" data-ch="1" data-page="14" data-title="换模型两条路：改环境变量 vs 路由工具"><div class="bk-paper ch1"><div class="bk-fit"><section class="slide active">
+  <div class="chip">第 7 节 · 一个壳，多个大脑</div>
+  <h1 class="title">换模型两条路：改环境变量 vs 路由工具</h1>
+  <div class="question">💬 入门者原话：<em>"我装好了一个工具，但不想用它默认的模型，能换吗？"</em></div>
+  <div class="answer"><b>直接回答：</b>能，而且这是常态。简单的直接改环境变量；想随时切换多家，用路由工具 CC Switch。</div>
+  <div class="grid2">
+    <div class="card">
+      <h3>路线 A · 改环境变量（直连）</h3>
+      <p>例：Claude Code 设两个变量即指向别家</p>
+      <p class="sub" style="font-family:var(--mono); font-size:12.5px; margin-top:6px">ANTHROPIC_BASE_URL = 新大脑地址<br>ANTHROPIC_AUTH_TOKEN = 新 Key</p>
+      <p style="margin-top:10px"><b>适合：只换一家、换完不常动</b></p>
+    </div>
+    <div class="card amber">
+      <h3>路线 B · CC Switch 本地路由</h3>
+      <p>有的工具"语言不通"——如 Codex 原生只认 Responses 协议，需要一个"翻译"。</p>
+      <p style="margin-top:6px">CC Switch 在本机做协议翻译，并在多个供应商之间一键切换。</p>
+      <p style="margin-top:10px"><b>适合：手里有好几个 Key，想随时换着用</b></p>
+    </div>
+  </div>
+  <span class="pagenum">14 / 28</span>
+</section></div></div><div class="bk-folio"><span>14</span><em>第一章 · 破冰</em></div></div>
+<div class="bk-sheet" id="p15" data-ch="1" data-page="15" data-title="全局关系：云端/本地是&quot;货源&quot;，CC Switch 是&quot;操作面板&quot;"><div class="bk-paper ch1"><div class="bk-fit"><section class="slide active">
+  <div class="chip">第 7 节 · 一个壳，多个大脑</div>
+  <h1 class="title">全局关系：云端/本地是"货源"，CC Switch 是"操作面板"</h1>
+  <div class="question">💬 入门者原话：<em>"云平台、本地模型、CC Switch……它们到底啥关系？"</em></div>
+  <div class="answer"><b>直接回答：</b>一句话——云端三形态和本地自跑是"大脑的货源"，CC Switch 是"换大脑的操作面板"。</div>
+  <div class="grid2" style="margin-bottom:4px">
+    <div class="card"><h3>云端货源</h3><p class="sub">厂商直供 / 云聚合平台 / 中转站<br>按量付费，有赠送和免费模型</p></div>
+    <div class="card"><h3>本地货源</h3><p class="sub">Ollama 自跑<br>免费、离线、隐私</p></div>
+  </div>
+  <div class="flow">
+    <div class="farrow" style="color:var(--amber-line)">↓　　↓</div>
+    <div class="fbox amber" style="width:64%"><h4>CC Switch：操作面板</h4><p>协议翻译 + 一键切换 —— "今天用哪个大脑？"</p></div>
+    <div class="farrow">↓</div>
+    <div class="fbox gray" style="width:64%"><h4 style="color:var(--ink); font-size:15px">工具壳（随便哪个） → 你</h4></div>
+  </div>
+  <span class="pagenum">15 / 28</span>
+</section></div></div><div class="bk-folio"><span>15</span><em>第一章 · 破冰</em></div></div>
+<div class="bk-sheet" id="p16" data-ch="1" data-page="16" data-title="不住在终端，住在你消息里的 Agent：Hermes / OpenClaw"><div class="bk-paper ch1"><div class="bk-fit"><section class="slide active">
+  <div class="chip">第 8 节 · 生活里的私人助理</div>
+  <h1 class="title">不住在终端，住在你消息里的 Agent：Hermes / OpenClaw</h1>
+  <div class="question">💬 入门者原话：<em>"我不写代码，Agent 跟我有啥关系？"</em></div>
+  <div class="answer"><b>直接回答：</b>有一类 Agent 专为日常生活设计——后台常驻，挂在微信 / 飞书 / Telegram 等渠道里，有记忆、会技能、能定时干活。</div>
+  <table class="t">
+    <tr><th style="width:12%">工具</th><th style="width:30%">一句话定位</th><th style="width:10%">开源？</th><th style="width:18%">在哪跑</th><th>最擅长啥</th></tr>
+    <tr><td><b>Hermes</b></td><td>开源个人助理框架（Nous Research）</td><td><b style="color:var(--green)">开源</b></td><td>本地 / 自己的服务器</td><td>记忆、技能、定时任务、多端渠道</td></tr>
+    <tr><td><b>OpenClaw</b></td><td>开源后台常驻私人助理</td><td><b style="color:var(--green)">开源</b></td><td>本地 / 自己的服务器</td><td>微信 / 飞书 / Slack / Telegram 多渠道，有技能市场</td></tr>
+  </table>
+  <p class="note" style="margin-top:12px">和编程 Agent 的区别：不写代码也能用——它帮你记事、定时、跑腿、回消息，像个 7×24 的私人助理。</p>
+  <span class="pagenum">16 / 28</span>
+</section></div></div><div class="bk-folio"><span>16</span><em>第一章 · 破冰</em></div></div>
+<div class="bk-sheet" id="p17" data-ch="1" data-page="17" data-title="办公 Agent：WorkBuddy 与核心竞品"><div class="bk-paper ch1"><div class="bk-fit"><section class="slide active">
+  <div class="chip" style="margin-bottom:8px">第 9 节 · 办公 Agent 全景</div>
+  <h1 class="title" style="margin-bottom:6px">办公 Agent：WorkBuddy 与核心竞品</h1>
+  <div class="question" style="margin-bottom:6px">💬 入门者原话：<em>"我每天泡在 Word、Excel、微信/钉钉/飞书里，有帮我干办公活的 Agent 吗？"</em></div>
+  <div class="answer" style="margin-bottom:8px"><b>直接回答：</b>有，一整片战场。选型第一步不是比功能，而是看你的办公生态在哪家。</div>
+  <table class="t sm" style="line-height:1.35">
+    <tr><th style="width:20%">工具</th><th style="width:8%">出身</th><th style="width:45%">一句话定位</th><th>适合谁</th></tr>
+    <tr><td><b>WorkBuddy</b> ★</td><td>腾讯</td><td>全场景 AI 工作台，多专家协作，打通微信 / 企微 / 钉钉 / 飞书</td><td>办公场景杂、渠道多、想要一站式的人</td></tr>
+    <tr><td><b>豆包企业版</b></td><td>字节</td><td>飞书内嵌 + 独立 App（2026-07 飞书团队并入豆包）</td><td>飞书深度用户</td></tr>
+    <tr><td><b>千问办公</b></td><td>阿里</td><td>QoderWork + 悟空 + MuleRun 三合一，2026-08 公测；钉钉侧边栏可调</td><td>钉钉组织</td></tr>
+    <tr><td><b>WPS AI</b></td><td>金山</td><td>长在 WPS 里的办公 AI</td><td>WPS 全家桶用户</td></tr>
+    <tr><td><b>Kimi Work</b></td><td>月之暗面</td><td>长文本能力强</td><td>经常啃长文档的人</td></tr>
+    <tr><td><b>Microsoft 365 Copilot</b></td><td>微软</td><td>Word、Excel、Outlook 里的 AI</td><td>Office 生态用户</td></tr>
+    <tr><td><b>Google Workspace Gemini</b></td><td>谷歌</td><td>Gmail、Docs、Sheets 里的 AI</td><td>谷歌全家桶用户</td></tr>
+  </table>
+  <div class="card" style="margin-top:8px">
+    <h3>选型法则（一句话）：先别看功能列表，先看你的办公生态在哪家</h3>
+    <p style="font-size:14.5px; margin-top:6px">微信/企微 → <b>WorkBuddy</b> ｜ 飞书 → <b>豆包企业版</b> ｜ 钉钉 → <b>千问办公</b> ｜ WPS → <b>WPS AI</b> ｜ Office → <b>Copilot</b> ｜ 谷歌系 → <b>Gemini</b></p><p class="note" style="margin-top:7px">2026 年 7～8 月三家同时收网（腾讯并 QClaw、字节并飞书、阿里三合一）——入口在收敛、名字还会变，记生态比记产品名管用。</p>
+  </div>
+  <span class="pagenum">17 / 28</span>
+</section></div></div><div class="bk-folio"><span>17</span><em>第一章 · 破冰</em></div></div>
+<div class="bk-sheet" id="p18" data-ch="1" data-page="18" data-title="一张总表：所有工具，一页看全"><div class="bk-paper ch1"><div class="bk-fit"><section class="slide active">
+  <div class="chip">第 10 节 · 全景图与怎么选</div>
+  <h1 class="title">一张总表：所有工具，一页看全</h1>
+  <div class="question">💬 入门者原话：<em>"讲了这么多，有没有一张表能全看清楚？"</em></div>
+  <div class="answer"><b>直接回答：</b>有，就是这页。</div>
+  <table class="t xs">
+    <tr><th>工具</th><th>类型</th><th>开源？</th><th>在哪跑</th><th>擅长</th><th>适合谁</th></tr>
+    <tr><td><b>Claude Code</b></td><td>命令行 Agent</td><td>闭源</td><td>终端·桌面·IDE·网页</td><td>编程生态最成熟</td><td>开发者</td></tr>
+    <tr><td><b>Codex</b></td><td>命令行 Agent</td><td><b style="color:var(--green)">命令行开源</b></td><td>终端·桌面·IDE·云端</td><td>长任务、云端跑</td><td>OpenAI 用户</td></tr>
+    <tr><td><b>opencode</b></td><td>命令行 Agent</td><td><b style="color:var(--green)">开源</b></td><td>终端·桌面·IDE</td><td>自由换模型</td><td>想折腾的开发者</td></tr>
+    <tr><td><b>Cline</b></td><td>插件 Agent</td><td><b style="color:var(--green)">开源</b></td><td>VS Code·JetBrains·终端</td><td>一块块点接受改动</td><td>想看着代码被改的人</td></tr>
+    <tr><td><b>Cursor / Windsurf</b></td><td>AI 编辑器</td><td>闭源</td><td>独立编辑器</td><td>补全 + Agent 一体</td><td>想一个软件全包的人</td></tr>
+    <tr><td><b>GitHub Copilot</b></td><td>代码补全</td><td>闭源</td><td>VS Code·JetBrains 等</td><td>Tab 补全，现也带 Agent</td><td>只想要补全的人</td></tr>
+    <tr><td><b>Hermes</b></td><td>个人助理</td><td><b style="color:var(--green)">开源</b></td><td>本地 / 服务器</td><td>记忆 / 技能 / 定时</td><td>折腾型玩家</td></tr>
+    <tr><td><b>OpenClaw</b></td><td>个人助理</td><td><b style="color:var(--green)">开源</b></td><td>本地 / 服务器</td><td>多渠道常驻助理</td><td>想要生活助理的人</td></tr>
+    <tr><td><b>WorkBuddy</b></td><td>办公</td><td>闭源</td><td>全平台</td><td>多专家办公协作</td><td>办公人群</td></tr>
+    <tr><td><b>M365 Copilot 等</b></td><td>办公</td><td>闭源</td><td>各家生态</td><td>绑定自家办公套件</td><td>对应生态用户</td></tr>
+  </table>
+  <span class="pagenum">19 / 28</span>
+</section></div></div><div class="bk-folio"><span>18</span><em>第一章 · 破冰</em></div></div>
+<div class="bk-sheet" id="p19" data-ch="1" data-page="19" data-title="按角色对号入座 + 一句话法则"><div class="bk-paper ch1"><div class="bk-fit"><section class="slide active">
+  <div class="chip">第 10 节 · 全景图与怎么选</div>
+  <h1 class="title">按角色对号入座 + 一句话法则</h1>
+  <div class="question">💬 入门者原话：<em>"给我一个直接答案：我到底装哪个？"</em></div>
+  <div class="answer"><b>直接回答：</b>看你是哪种人，对号入座。</div>
+  <table class="t" style="margin-bottom:14px">
+    <tr><th style="width:26%">如果你是</th><th style="width:36%">第一个装</th><th>配什么大脑</th></tr>
+    <tr><td>写代码、爱折腾</td><td><b>opencode</b></td><td>免费额度 / 本地 Ollama</td></tr>
+    <tr><td>写代码、想盯着每处改动</td><td><b>Cline</b>（编辑器插件）</td><td>同上</td></tr>
+    <tr><td>不碰代码的办公族</td><td><b>WorkBuddy</b>（或你生态对应款）</td><td>公测赠送 / 试用，或本地模型</td></tr>
+    <tr><td>想要生活小助理</td><td><b>OpenClaw</b></td><td>本地 Ollama，隐私拉满</td></tr>
+    <tr><td>纯好奇先看看</td><td>先装 <b>Ollama</b> 本地跑个 Qwen</td><td>不花钱，先感受"大脑"</td></tr>
+  </table>
+  <div class="banner amber">一句话法则：壳随便挑一个顺手的，大脑先用免费的跑通——跑通第一件小活，比选对工具重要一百倍。</div>
+  <span class="pagenum">20 / 28</span>
+</section></div></div><div class="bk-folio"><span>19</span><em>第一章 · 破冰</em></div></div>
+<div class="bk-sheet" id="p20" data-ch="1" data-page="20" data-title="四类免费资源，拼出完整 0 成本方案"><div class="bk-paper ch1"><div class="bk-fit"><section class="slide active">
+  <div class="chip">第 11 节 · 0 成本上手：免费资源地图</div>
+  <h1 class="title">四类免费资源，拼出完整 0 成本方案</h1>
+  <div class="question">💬 入门者原话：<em>"说了一堆免费，到底哪些真免费？"</em></div>
+  <div class="answer"><b>直接回答：</b>四类拼起来就是完整 0 成本方案：免费的壳 + 免费的云端大脑 + 本地自跑 + 办公试用。</div>
+  <div class="grid2">
+    <div class="card"><h3>🧰 免费的壳（开源随便装）</h3><ul><li>opencode：命令行编程 Agent</li><li>Cline：编辑器插件 Agent</li><li>Hermes / OpenClaw：私人助理</li><li>CC Switch：换大脑面板</li></ul></div>
+    <div class="card"><h3>☁️ 免费的云端大脑</h3><ul><li>厂商 / 云平台：注册赠送、新客福利</li><li>OpenRouter：常年有免费模型</li><li>赠送额度会变化，以官方为准</li></ul></div>
+    <div class="card"><h3>💻 免费的本地大脑</h3><ul><li>Ollama 自跑：一次下载永久免费</li><li>离线可用、数据不出本机</li><li>Qwen3.5 / Gemma 4 / DeepSeek 蒸馏版全免费</li></ul></div>
+    <div class="card"><h3>🏢 办公 Agent 试用</h3><ul><li>WorkBuddy：公测期有赠送</li><li>千问办公：公测中，注册送积分</li><li>其余各家也多有大促 / 试用，以官方为准</li></ul></div>
+  </div>
+  <p class="note" style="margin-top:10px">用免费资源留三个心眼：赠送额度用完会停或转付费，留意用量提醒；注册时看清有没有勾自动续费，能不绑卡就不绑；免费层的模型不是最强那档，尝鲜够用，重活再考虑付费或本地大模型。</p>
+  <span class="pagenum">21 / 28</span>
+</section></div></div><div class="bk-folio"><span>20</span><em>第一章 · 破冰</em></div></div>
+<div class="bk-sheet" id="p21" data-ch="1" data-page="21" data-title="第一句话跟它说什么 + 安全底线三件事"><div class="bk-paper ch1"><div class="bk-fit"><section class="slide active">
+  <div class="chip">第 12 节 · 破冰行动：第一次上手 5 步</div>
+  <h1 class="title" style="margin-bottom:6px">第一句话跟它说什么 + 安全底线三件事</h1>
+  <div class="question" style="margin-bottom:6px">💬 入门者原话：<em>"装好之后，第一句话跟它说什么？"</em></div>
+  <div class="answer" style="margin-bottom:8px"><b>直接回答：</b>派一件"搞砸了也无所谓"的真小活。下面三条按你的工具挑一条，直接复制。</div>
+  <div class="banner gray" style="margin-bottom:10px; font-size:14px">五步照做：① 挑一个→ ② 装好它 → ③ 配大脑（先走免费额度）→ ④ 干件小活（下面挑一条）→ ⑤ 守住底线（见文末）</div>
+  <div class="card" style="margin-bottom:6px"><h3 style="font-size:14px">编程类 · opencode / Claude Code / Cline</h3><p style="font-size:14px">"在当前文件夹写一个 Python 脚本：统计这个文件夹里每种后缀名的文件各有多少个，结果存成 report.txt。"</p></div>
+  <div class="card" style="margin-bottom:6px"><h3 style="font-size:14px">办公类 · WorkBuddy 等</h3><p style="font-size:14px">"帮我把这段会议纪要整理成三条待办，每条一行，标出负责人和截止时间：（贴一段你的纪要）"</p></div>
+  <div class="card" style="margin-bottom:8px"><h3 style="font-size:14px">助理类 · OpenClaw / Hermes</h3><p style="font-size:14px">"每天早上 8 点提醒我喝水，并给我一句今日天气提示。"</p></div>
+  <table class="t xs">
+    <tr><th style="width:32%">底线</th><th>具体做法</th></tr>
+    <tr><td><b>最小权限 ｜ 看清再批准 ｜ 设上限+备份</b></td><td>不开"全自动放行"，重要目录别给写权限；它要跑命令前会给你看——看不懂就问"这条命令干什么"；云端设消费上限，改文件前先备份一份</td></tr>
+  </table>
+  <span class="pagenum">24 / 28</span>
+</section></div></div><div class="bk-folio"><span>21</span><em>第一章 · 破冰</em></div></div>
+<div class="bk-sheet" id="p22" data-ch="1" data-page="22" data-title="一张图回顾 + 一句话带走"><div class="bk-paper ch1"><div class="bk-fit"><section class="slide active">
+  <div class="chip">第 13 节 · 总结</div>
+  <h1 class="title">一张图回顾 + 一句话带走</h1>
+  <div class="question">💬 入门者原话：<em>"等等，能一句话总结吗？"</em></div>
+  <div class="answer"><b>直接回答：</b>工具是壳、模型是脑、大脑能买也能自己造；先装一个，0 成本跑通第一件小活，你就破冰了。</div>
+  <div>
+    <div class="flow">
+      <div class="fbox gray" style="width:58%"><h4 style="color:var(--ink); font-size:14px">你（一个任务）</h4></div>
+      <div class="farrow">↓</div>
+      <div class="fbox" style="width:58%"><h4 style="font-size:15px">壳：随便挑，很多开源免费</h4><p>终端 / 编辑器 / 助理 / 办公</p></div>
+      <div class="farrow">↓</div>
+      <div class="fbox amber" style="width:58%"><h4 style="font-size:15px">大脑：能买，也能自己造</h4><p>云端三形态（有免费额度 / 免费模型）｜ 本地 Ollama 自跑（免费离线）｜ 更换：环境变量 / CC Switch</p></div>
+      <div class="farrow">↓</div>
+      <div class="fbox green" style="width:58%"><h4 style="font-size:13.5px">思考→行动→看结果→再思考 → 第一件小活干完 = 破冰 ✅</h4></div>
+    </div>
+  </div>
+  <span class="pagenum">25 / 28</span>
+</section></div></div><div class="bk-folio"><span>22</span><em>第一章 · 破冰</em></div></div>
+<nav class="bk-pager">
+<a class="prev" href="index.html"><small>← 上一章</small><b>扉页与目录</b></a>
+<a class="next" href="ch02.html"><small>下一章 →</small><b>第 2 章 前传 — 大模型是怎么一步步长出来的</b></a>
+</nav>
+</div></main>
+
+<button id="bk-up" onclick="scrollTo({top:0,behavior:'smooth'})" title="回到顶部">↑</button>
+
+<script src="assets/book.js"></script>
+</body>
+</html>
