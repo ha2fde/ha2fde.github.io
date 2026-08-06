@@ -429,26 +429,6 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
 </section>
 
 <section class="slide" data-act="工具调用">
-  <div class="hd"><h2>关键一页：ReAct 和工具调用不是同一层</h2></div>
-  <div class="bd">
-    <div class="lead">把它们排成「ReAct → 工具调用」的先后顺序，很容易读成<b class="red">后者取代了前者</b>。这个理解是错的，而且会直接影响你后面怎么设计系统。</div>
-    <table class="tbl mt">
-      <tr><th style="width:20%"></th><th style="width:40%">ReAct</th><th style="width:40%">工具调用</th></tr>
-      <tr><td>它是什么</td><td><b>一种推理范式</b>——规定「思考和行动交替进行」这个流程</td><td><b>一种接口机制</b>——规定「调用意图怎么表达和传递」</td></tr>
-      <tr><td>它住在哪</td><td class="purple">提示词里。纯靠约定，模型配不配合看它自觉</td><td class="green">训练里 + 接口里。是模型的能力，也是协议的一部分</td></tr>
-      <tr><td>它回答的问题</td><td>「下一步该想还是该做」</td><td>「要做的话，这个请求长什么样」</td></tr>
-      <tr><td>能不能替代对方</td><td class="red">不能——它不解决表达和解析问题</td><td class="red">不能——它不规定该在什么时候调、调完怎么接着推</td></tr>
-    </table>
-    <div class="g2 mt2">
-      <div class="card t-green"><div class="t green">真实系统里，两者是叠着用的</div>
-        <div class="cap">今天一个典型 Agent 的循环，<b>骨架仍然是 ReAct 那一套</b>：想一下 → 决定要做什么 → 做 → 看结果 → 再想。<br><br>变的只是「决定要做什么」这一步的<b>表达方式</b>——从写一行文本，换成了输出一个结构化的调用意图。</div></div>
-      <div class="note b-orange"><div class="t orange">为什么这个区分值得单占一页</div>
-        <div class="cap">因为把它们看成替代关系，会导出两个错误结论：<br>· 「有了工具调用就不用管推理流程了」——于是模型乱调一气，没人管它什么时候该停<br>· 「ReAct 已经过时了」——于是看不懂现在各种编排方式其实都是它的变体<br><br><b>一个是流程，一个是接口。分清这两层，后面的东西才排得进去。</b></div></div>
-    </div>
-  </div>
-</section>
-
-<section class="slide" data-act="工具调用">
   <div class="hd"><h2>一次完整往返，谁在做什么</h2></div>
   <div class="bd">
     <svg viewBox="0 0 1160 460" width="100%" height="460" style="display:block">
@@ -586,7 +566,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
           <li>说清一个只会预测下一个词的架构，是<b>被哪五个具体缺陷推着</b>变成会干活的系统的</li>
           <li>解释「对话」为什么本质上是宿主拼字符串拼出来的，以及为什么对话模板换错了模型会变差</li>
           <li>解释思维链为什么有效——<b>它增加的是可用计算量，不是聪明程度</b></li>
-          <li>分清 <b>ReAct 是推理范式、工具调用是接口机制</b>，两者是叠着用的</li>
+          <li>说清工具调用把 ReAct 靠自觉维持的那套，<b>落进了训练和接口里</b>——但循环本身没变</li>
           <li>说出模型和宿主的那条边界：<b>模型只输出调用意图，执行的永远是宿主</b></li>
         </ul>
       </div>
