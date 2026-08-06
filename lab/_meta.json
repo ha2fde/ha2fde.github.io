@@ -7,13 +7,13 @@
     "desc": "Agent 协议层（tools / MCP / CLI / Skills / A2A / ACI）双版 PPT，深讲版 + 精简版",
     "src": "~/agent-protocol-ppt/"
   },
-  "llm-to-agent-ppt": {
-    "desc": "从预训练到 Agent 的工程链路双版 PPT：预训练 → 对齐 → CoT → ReAct → tool call",
-    "src": "~/llm-to-agent-ppt/"
-  },
   "ai-agent-training": {
     "desc": "AI Agent 系列培训七讲（第一代，2026-08 前）。PDF/PPTX 已剥离，可由 slides/ 本地再生",
     "src": "原站点根目录 /ai-agent-training/"
+  },
+  "blog-posts": {
+    "desc": "2026-07 之前的 9 篇技术笔记，原来列在首页。index.html 保留了原来的分类过滤器",
+    "src": "原站点 posts/*.html"
   },
   "ha2fde-book": {
     "desc": "AI Agent 实战手册七章（第二代）。站上曾发布的成品版 ch01–ch07 + 附录",
@@ -22,6 +22,14 @@
   "ha2fde-book-src": {
     "desc": "上面那本手册的构建源：单文件 book.html + build_book.py 生成器 + 18 个脚本",
     "src": "~/ha2fde-book/"
+  },
+  "llm-evolution": {
+    "desc": "从语言模型到通用智能体：十篇论文拆解 AGI 工程路线图，11 篇成套",
+    "src": "原站点 posts/llm-evolution/"
+  },
+  "llm-to-agent-ppt": {
+    "desc": "从预训练到 Agent 的工程链路双版 PPT：预训练 → 对齐 → CoT → ReAct → tool call",
+    "src": "~/llm-to-agent-ppt/"
   },
   "workbuddy": {
     "desc": "WorkBuddy 每日自动产出（按时间戳分目录）：成本计算器、Tailscale SSH 脚本、预训练到 Agent 初稿、协议栈初稿",
