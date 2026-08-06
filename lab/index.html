@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>归档 · Lab</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans SC', sans-serif;
+    background: #f8f9fa; color: #333; line-height: 1.7;
+}
+.container { max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem; }
+header { padding: 2.5rem 0 1.5rem; border-bottom: 1px solid #eee; margin-bottom: 1.2rem; }
+header h1 { font-size: 2rem; color: #1a1a2e; }
+header p { color: #666; margin-top: 0.3rem; }
+.badge {
+    display: inline-block; font-size: 0.75rem; font-weight: 600; padding: 0.15rem 0.5rem;
+    border-radius: 4px; background: #fff3e0; color: #e67e22; margin-left: 0.5rem;
+    vertical-align: middle;
+}
+#q {
+    width: 100%; padding: 0.65rem 0.9rem; font-size: 1rem; border: 1px solid #ddd;
+    border-radius: 8px; background: #fff; margin-bottom: 0.5rem; font-family: inherit;
+}
+#q:focus { outline: none; border-color: #3498db; }
+.count { font-size: 0.85rem; color: #999; margin-bottom: 1rem; }
+
+.post { padding: 1.4rem 0; border-bottom: 1px solid #eee; }
+.post:last-child { border-bottom: none; }
+.post-title { font-size: 1.25rem; font-weight: 600; }
+.post-title a { color: #1a1a2e; text-decoration: none; }
+.post-title a:hover { color: #3498db; }
+.post-title span.noentry { color: #1a1a2e; }
+.post-meta { font-size: 0.85rem; color: #999; margin-top: 0.3rem; }
+.post-desc { font-size: 0.95rem; color: #555; margin-top: 0.5rem; }
+.hidden { display: none !important; }
+
+details { margin-top: 0.6rem; }
+summary {
+    font-size: 0.85rem; color: #3498db; cursor: pointer; user-select: none;
+    list-style: none; display: inline-block;
+}
+summary::-webkit-details-marker { display: none; }
+summary::before { content: '▸ '; }
+details[open] summary::before { content: '▾ '; }
+.files { margin-top: 0.5rem; font-size: 0.85rem; }
+.files a { display: block; color: #555; text-decoration: none; padding: 0.15rem 0; word-break: break-all; }
+.files a:hover { color: #3498db; text-decoration: underline; }
+.files .sz { color: #bbb; font-size: 0.78rem; margin-left: 0.4rem; }
+
+footer { text-align: center; padding: 2rem; color: #999; font-size: 0.85rem; }
+
+@media (max-width: 600px) {
+    .container { padding: 1.2rem 1rem; }
+    header { padding: 1.5rem 0 1rem; }
+    header h1 { font-size: 1.5rem; }
+    .post-title { font-size: 1.1rem; }
+}
+</style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>归档<span class="badge">不对外索引</span></h1>
+      <p>中间过程、半成品、旧版本。首页不链接这里，搜索引擎不收录。</p>
+    </header>
+
+    <input id="q" type="search" placeholder="搜索归档名、说明、文件名…" autocomplete="off">
+    <div class="count" id="count"></div>
+
+      <div class="post" data-search="workbuddy workbuddy 每日自动产出（按时间戳分目录）：成本计算器、tailscale ssh 脚本、预训练到 agent 初稿、协议栈初稿 ~/workbuddy/（不含 .workbuddy/ 工作记忆） 2026-08-04-15-03-15/claude_api_cost_calculator.html 2026-08-05-21-13-05/enable_tailscale_ssh.sh 2026-08-05-21-40-59/from-pretrain-to-agent.html 2026-08-06-09-15-54/agent-protocol-stack.html">
+        <div class="post-title"><span class="noentry">workbuddy</span></div>
+        <div class="post-meta">2026-08-06 · 4 个文件 · 138K · 来源 ~/WorkBuddy/（不含 .workbuddy/ 工作记忆）</div>
+        <div class="post-desc">WorkBuddy 每日自动产出（按时间戳分目录）：成本计算器、Tailscale SSH 脚本、预训练到 Agent 初稿、协议栈初稿</div>
+        <details>
+          <summary>展开全部文件</summary>
+          <div class="files">
+          <a href="workbuddy/2026-08-04-15-03-15/claude_api_cost_calculator.html">2026-08-04-15-03-15/claude_api_cost_calculator.html<span class="sz">8.6K</span></a>
+          <a href="workbuddy/2026-08-05-21-13-05/enable_tailscale_ssh.sh">2026-08-05-21-13-05/enable_tailscale_ssh.sh<span class="sz">1.1K</span></a>
+          <a href="workbuddy/2026-08-05-21-40-59/from-pretrain-to-agent.html">2026-08-05-21-40-59/from-pretrain-to-agent.html<span class="sz">58K</span></a>
+          <a href="workbuddy/2026-08-06-09-15-54/agent-protocol-stack.html">2026-08-06-09-15-54/agent-protocol-stack.html<span class="sz">70K</span></a>
+          </div>
+        </details>
+      </div>
+      <div class="post" data-search="llm-to-agent-ppt 从预训练到 agent 的工程链路双版 ppt：预训练 → 对齐 → cot → react → tool call ~/llm-to-agent-ppt/ deck-deep.html deck-lite.html">
+        <div class="post-title"><span class="noentry">llm-to-agent-ppt</span></div>
+        <div class="post-meta">2026-08-06 · 2 个文件 · 288K · 来源 ~/llm-to-agent-ppt/</div>
+        <div class="post-desc">从预训练到 Agent 的工程链路双版 PPT：预训练 → 对齐 → CoT → ReAct → tool call</div>
+        <details>
+          <summary>展开全部文件</summary>
+          <div class="files">
+          <a href="llm-to-agent-ppt/deck-deep.html">deck-deep.html<span class="sz">195K</span></a>
+          <a href="llm-to-agent-ppt/deck-lite.html">deck-lite.html<span class="sz">93K</span></a>
+          </div>
+        </details>
+      </div>
+      <div class="post" data-search="ha2fde-book-src 上面那本手册的构建源：单文件 book.html + build_book.py 生成器 + 18 个脚本 ~/ha2fde-book/ readme.md book.html build_book.py scripts/lecture2/embedding_demo.py scripts/lecture2/ngram_demo.py scripts/lecture2/tiny_lm_train_demo.py scripts/lecture3/readme.md scripts/lecture3/agent_tool_demo.py scripts/lecture3/api_server.py scripts/lecture3/chat_context_demo.py scripts/lecture3/cot_demo.py scripts/lecture3/mcp_server.py scripts/lecture3/mcp_skills_demo.py scripts/lecture3/rag_demo.py scripts/lecture3/sampling_demo.py scripts/lecture3/skills/expense_report/skill.md scripts/lecture3/skills/expense_report/scripts/fill.py scripts/lecture3/tokenizer_demo.py scripts/lecture3/train_sft.py scripts/lecture3/training_stages_demo.py scripts/lecture4/direct_api_demo.py scripts/lecture4/langgraph_plan_demo.py scripts/lecture4/sdk_react_demo.py">
+        <div class="post-title"><a href="ha2fde-book-src/book.html">ha2fde-book-src</a></div>
+        <div class="post-meta">2026-08-06 · 23 个文件 · 580K · 来源 ~/ha2fde-book/</div>
+        <div class="post-desc">上面那本手册的构建源：单文件 book.html + build_book.py 生成器 + 18 个脚本</div>
+        <details>
+          <summary>展开全部文件</summary>
+          <div class="files">
+          <a href="ha2fde-book-src/README.md">README.md<span class="sz">675B</span></a>
+          <a href="ha2fde-book-src/book.html">book.html<span class="sz">480K</span></a>
+          <a href="ha2fde-book-src/build_book.py">build_book.py<span class="sz">44K</span></a>
+          <a href="ha2fde-book-src/scripts/lecture2/embedding_demo.py">scripts/lecture2/embedding_demo.py<span class="sz">4.0K</span></a>
+          <a href="ha2fde-book-src/scripts/lecture2/ngram_demo.py">scripts/lecture2/ngram_demo.py<span class="sz">3.2K</span></a>
+          <a href="ha2fde-book-src/scripts/lecture2/tiny_lm_train_demo.py">scripts/lecture2/tiny_lm_train_demo.py<span class="sz">4.9K</span></a>
+          <a href="ha2fde-book-src/scripts/lecture3/README.md">scripts/lecture3/README.md<span class="sz">3.2K</span></a>
+          <a href="ha2fde-book-src/scripts/lecture3/agent_tool_demo.py">scripts/lecture3/agent_tool_demo.py<span class="sz">4.8K</span></a>
+          <a href="ha2fde-book-src/scripts/lecture3/api_server.py">scripts/lecture3/api_server.py<span class="sz">4.0K</span></a>
+          <a href="ha2fde-book-src/scripts/lecture3/chat_context_demo.py">scripts/lecture3/chat_context_demo.py<span class="sz">2.7K</span></a>
+          <a href="ha2fde-book-src/scripts/lecture3/cot_demo.py">scripts/lecture3/cot_demo.py<span class="sz">1.6K</span></a>
+          <a href="ha2fde-book-src/scripts/lecture3/mcp_server.py">scripts/lecture3/mcp_server.py<span class="sz">1.5K</span></a>
+          <a href="ha2fde-book-src/scripts/lecture3/mcp_skills_demo.py">scripts/lecture3/mcp_skills_demo.py<span class="sz">2.5K</span></a>
+          <a href="ha2fde-book-src/scripts/lecture3/rag_demo.py">scripts/lecture3/rag_demo.py<span class="sz">4.2K</span></a>
+          <a href="ha2fde-book-src/scripts/lecture3/sampling_demo.py">scripts/lecture3/sampling_demo.py<span class="sz">1.5K</span></a>
+          <a href="ha2fde-book-src/scripts/lecture3/skills/expense_report/SKILL.md">scripts/lecture3/skills/expense_report/SKILL.md<span class="sz">1.0K</span></a>
+          <a href="ha2fde-book-src/scripts/lecture3/skills/expense_report/scripts/fill.py">scripts/lecture3/skills/expense_report/scripts/fill.py<span class="sz">1.7K</span></a>
+          <a href="ha2fde-book-src/scripts/lecture3/tokenizer_demo.py">scripts/lecture3/tokenizer_demo.py<span class="sz">1.5K</span></a>
+          <a href="ha2fde-book-src/scripts/lecture3/train_sft.py">scripts/lecture3/train_sft.py<span class="sz">4.1K</span></a>
+          <a href="ha2fde-book-src/scripts/lecture3/training_stages_demo.py">scripts/lecture3/training_stages_demo.py<span class="sz">1.6K</span></a>
+          <a href="ha2fde-book-src/scripts/lecture4/direct_api_demo.py">scripts/lecture4/direct_api_demo.py<span class="sz">2.1K</span></a>
+          <a href="ha2fde-book-src/scripts/lecture4/langgraph_plan_demo.py">scripts/lecture4/langgraph_plan_demo.py<span class="sz">3.5K</span></a>
+          <a href="ha2fde-book-src/scripts/lecture4/sdk_react_demo.py">scripts/lecture4/sdk_react_demo.py<span class="sz">2.9K</span></a>
+          </div>
+        </details>
+      </div>
+      <div class="post" data-search="ha2fde-book ai agent 实战手册七章（第二代）。站上曾发布的成品版 ch01–ch07 + 附录 原站点根目录 /ha2fde-book/ appendix.html assets/book.css assets/book.js book.html ch01.html ch02.html ch03.html ch04.html ch05.html ch06.html ch07.html index.html">
+        <div class="post-title"><a href="ha2fde-book/index.html">ha2fde-book</a></div>
+        <div class="post-meta">2026-08-06 · 12 个文件 · 564K · 来源 原站点根目录 /ha2fde-book/</div>
+        <div class="post-desc">AI Agent 实战手册七章（第二代）。站上曾发布的成品版 ch01–ch07 + 附录</div>
+        <details>
+          <summary>展开全部文件</summary>
+          <div class="files">
+          <a href="ha2fde-book/appendix.html">appendix.html<span class="sz">114K</span></a>
+          <a href="ha2fde-book/assets/book.css">assets/book.css<span class="sz">76K</span></a>
+          <a href="ha2fde-book/assets/book.js">assets/book.js<span class="sz">9.6K</span></a>
+          <a href="ha2fde-book/book.html">book.html<span class="sz">349B</span></a>
+          <a href="ha2fde-book/ch01.html">ch01.html<span class="sz">54K</span></a>
+          <a href="ha2fde-book/ch02.html">ch02.html<span class="sz">44K</span></a>
+          <a href="ha2fde-book/ch03.html">ch03.html<span class="sz">57K</span></a>
+          <a href="ha2fde-book/ch04.html">ch04.html<span class="sz">65K</span></a>
+          <a href="ha2fde-book/ch05.html">ch05.html<span class="sz">52K</span></a>
+          <a href="ha2fde-book/ch06.html">ch06.html<span class="sz">39K</span></a>
+          <a href="ha2fde-book/ch07.html">ch07.html<span class="sz">34K</span></a>
+          <a href="ha2fde-book/index.html">index.html<span class="sz">18K</span></a>
+          </div>
+        </details>
+      </div>
+      <div class="post" data-search="ai-agent-training ai agent 系列培训七讲（第一代，2026-08 前）。pdf/pptx 已剥离，可由 slides/ 本地再生 原站点根目录 /ai-agent-training/ readme.md book.html build_book.py docs/第1讲-破冰指南-大纲.md docs/第3讲-chatgpt工作原理-大纲.md docs/第4讲-开发agent-大纲.md docs/第5讲-工程化全景-大纲.md docs/第5讲-落地评估速查表.html docs/第6讲-agi之路-原版本记录.md downloads.html export_pdf.py index.html pdf_to_pptx.py scripts/index.html scripts/lecture2/embedding_demo.py scripts/lecture2/ngram_demo.py scripts/lecture2/tiny_lm_train_demo.py scripts/lecture3/readme.md scripts/lecture3/agent_tool_demo.py scripts/lecture3/api_server.py scripts/lecture3/chat_context_demo.py scripts/lecture3/cot_demo.py scripts/lecture3/mcp_server.py scripts/lecture3/mcp_skills_demo.py scripts/lecture3/rag_demo.py scripts/lecture3/sampling_demo.py scripts/lecture3/skills/expense_report/skill.md scripts/lecture3/skills/expense_report/scripts/fill.py scripts/lecture3/tokenizer_demo.py scripts/lecture3/train_sft.py scripts/lecture3/training_stages_demo.py scripts/lecture4/direct_api_demo.py scripts/lecture4/langgraph_plan_demo.py scripts/lecture4/sdk_react_demo.py slides/01-破冰指南.html slides/02-从计算机到gpt.html slides/03-chatgpt是怎么工作的.html slides/04-开发agent.html slides/05-agent工程化全景.html slides/06-通往agi之路.html slides/07-资料索引.html">
+        <div class="post-title"><a href="ai-agent-training/index.html">ai-agent-training</a></div>
+        <div class="post-meta">2026-08-06 · 41 个文件 · 1.1M · 来源 原站点根目录 /ai-agent-training/</div>
+        <div class="post-desc">AI Agent 系列培训七讲（第一代，2026-08 前）。PDF/PPTX 已剥离，可由 slides/ 本地再生</div>
+        <details>
+          <summary>展开全部文件</summary>
+          <div class="files">
+          <a href="ai-agent-training/README.md">README.md<span class="sz">2.3K</span></a>
+          <a href="ai-agent-training/book.html">book.html<span class="sz">480K</span></a>
+          <a href="ai-agent-training/build_book.py">build_book.py<span class="sz">44K</span></a>
+          <a href="ai-agent-training/docs/第1讲-破冰指南-大纲.md">docs/第1讲-破冰指南-大纲.md<span class="sz">32K</span></a>
+          <a href="ai-agent-training/docs/第3讲-ChatGPT工作原理-大纲.md">docs/第3讲-ChatGPT工作原理-大纲.md<span class="sz">34K</span></a>
+          <a href="ai-agent-training/docs/第4讲-开发Agent-大纲.md">docs/第4讲-开发Agent-大纲.md<span class="sz">23K</span></a>
+          <a href="ai-agent-training/docs/第5讲-工程化全景-大纲.md">docs/第5讲-工程化全景-大纲.md<span class="sz">38K</span></a>
+          <a href="ai-agent-training/docs/第5讲-落地评估速查表.html">docs/第5讲-落地评估速查表.html<span class="sz">8.6K</span></a>
+          <a href="ai-agent-training/docs/第6讲-AGI之路-原版本记录.md">docs/第6讲-AGI之路-原版本记录.md<span class="sz">1.8K</span></a>
+          <a href="ai-agent-training/downloads.html">downloads.html<span class="sz">8.7K</span></a>
+          <a href="ai-agent-training/export_pdf.py">export_pdf.py<span class="sz">1.2K</span></a>
+          <a href="ai-agent-training/index.html">index.html<span class="sz">9.6K</span></a>
+          <a href="ai-agent-training/pdf_to_pptx.py">pdf_to_pptx.py<span class="sz">1.2K</span></a>
+          <a href="ai-agent-training/scripts/index.html">scripts/index.html<span class="sz">7.8K</span></a>
+          <a href="ai-agent-training/scripts/lecture2/embedding_demo.py">scripts/lecture2/embedding_demo.py<span class="sz">4.0K</span></a>
+          <a href="ai-agent-training/scripts/lecture2/ngram_demo.py">scripts/lecture2/ngram_demo.py<span class="sz">3.2K</span></a>
+          <a href="ai-agent-training/scripts/lecture2/tiny_lm_train_demo.py">scripts/lecture2/tiny_lm_train_demo.py<span class="sz">4.9K</span></a>
+          <a href="ai-agent-training/scripts/lecture3/README.md">scripts/lecture3/README.md<span class="sz">3.2K</span></a>
+          <a href="ai-agent-training/scripts/lecture3/agent_tool_demo.py">scripts/lecture3/agent_tool_demo.py<span class="sz">4.8K</span></a>
+          <a href="ai-agent-training/scripts/lecture3/api_server.py">scripts/lecture3/api_server.py<span class="sz">4.0K</span></a>
+          <a href="ai-agent-training/scripts/lecture3/chat_context_demo.py">scripts/lecture3/chat_context_demo.py<span class="sz">2.7K</span></a>
+          <a href="ai-agent-training/scripts/lecture3/cot_demo.py">scripts/lecture3/cot_demo.py<span class="sz">1.6K</span></a>
+          <a href="ai-agent-training/scripts/lecture3/mcp_server.py">scripts/lecture3/mcp_server.py<span class="sz">1.5K</span></a>
+          <a href="ai-agent-training/scripts/lecture3/mcp_skills_demo.py">scripts/lecture3/mcp_skills_demo.py<span class="sz">2.5K</span></a>
+          <a href="ai-agent-training/scripts/lecture3/rag_demo.py">scripts/lecture3/rag_demo.py<span class="sz">4.2K</span></a>
+          <a href="ai-agent-training/scripts/lecture3/sampling_demo.py">scripts/lecture3/sampling_demo.py<span class="sz">1.5K</span></a>
+          <a href="ai-agent-training/scripts/lecture3/skills/expense_report/SKILL.md">scripts/lecture3/skills/expense_report/SKILL.md<span class="sz">1.0K</span></a>
+          <a href="ai-agent-training/scripts/lecture3/skills/expense_report/scripts/fill.py">scripts/lecture3/skills/expense_report/scripts/fill.py<span class="sz">1.7K</span></a>
+          <a href="ai-agent-training/scripts/lecture3/tokenizer_demo.py">scripts/lecture3/tokenizer_demo.py<span class="sz">1.5K</span></a>
+          <a href="ai-agent-training/scripts/lecture3/train_sft.py">scripts/lecture3/train_sft.py<span class="sz">4.1K</span></a>
+          <a href="ai-agent-training/scripts/lecture3/training_stages_demo.py">scripts/lecture3/training_stages_demo.py<span class="sz">1.6K</span></a>
+          <a href="ai-agent-training/scripts/lecture4/direct_api_demo.py">scripts/lecture4/direct_api_demo.py<span class="sz">2.1K</span></a>
+          <a href="ai-agent-training/scripts/lecture4/langgraph_plan_demo.py">scripts/lecture4/langgraph_plan_demo.py<span class="sz">3.5K</span></a>
+          <a href="ai-agent-training/scripts/lecture4/sdk_react_demo.py">scripts/lecture4/sdk_react_demo.py<span class="sz">2.9K</span></a>
+          <a href="ai-agent-training/slides/01-破冰指南.html">slides/01-破冰指南.html<span class="sz">55K</span></a>
+          <a href="ai-agent-training/slides/02-从计算机到GPT.html">slides/02-从计算机到GPT.html<span class="sz">40K</span></a>
+          <a href="ai-agent-training/slides/03-ChatGPT是怎么工作的.html">slides/03-ChatGPT是怎么工作的.html<span class="sz">54K</span></a>
+          <a href="ai-agent-training/slides/04-开发Agent.html">slides/04-开发Agent.html<span class="sz">67K</span></a>
+          <a href="ai-agent-training/slides/05-Agent工程化全景.html">slides/05-Agent工程化全景.html<span class="sz">57K</span></a>
+          <a href="ai-agent-training/slides/06-通往AGI之路.html">slides/06-通往AGI之路.html<span class="sz">44K</span></a>
+          <a href="ai-agent-training/slides/07-资料索引.html">slides/07-资料索引.html<span class="sz">37K</span></a>
+          </div>
+        </details>
+      </div>
+      <div class="post" data-search="agent-protocol-ppt agent 协议层（tools / mcp / cli / skills / a2a / aci）双版 ppt，深讲版 + 精简版 ~/agent-protocol-ppt/ readme.md deck-deep.html deck-lite.html">
+        <div class="post-title"><span class="noentry">agent-protocol-ppt</span></div>
+        <div class="post-meta">2026-08-06 · 3 个文件 · 269K · 来源 ~/agent-protocol-ppt/</div>
+        <div class="post-desc">Agent 协议层（tools / MCP / CLI / Skills / A2A / ACI）双版 PPT，深讲版 + 精简版</div>
+        <details>
+          <summary>展开全部文件</summary>
+          <div class="files">
+          <a href="agent-protocol-ppt/README.md">README.md<span class="sz">6.4K</span></a>
+          <a href="agent-protocol-ppt/deck-deep.html">deck-deep.html<span class="sz">177K</span></a>
+          <a href="agent-protocol-ppt/deck-lite.html">deck-lite.html<span class="sz">85K</span></a>
+          </div>
+        </details>
+      </div>
+      <div class="post" data-search="agent-principles-src 《agent 原理与实践》六章的创作过程：提示词定稿（约 15 轮打磨）+ 溢出检测脚本 + 建章模板 ~/agent-ppt-prompts.md + ~/agent-principles-ppt/ agent-ppt-prompts.md audit.py newchapter.py">
+        <div class="post-title"><span class="noentry">agent-principles-src</span></div>
+        <div class="post-meta">2026-08-06 · 3 个文件 · 20K · 来源 ~/agent-ppt-prompts.md + ~/agent-principles-ppt/</div>
+        <div class="post-desc">《Agent 原理与实践》六章的创作过程：提示词定稿（约 15 轮打磨）+ 溢出检测脚本 + 建章模板</div>
+        <details>
+          <summary>展开全部文件</summary>
+          <div class="files">
+          <a href="agent-principles-src/agent-ppt-prompts.md">agent-ppt-prompts.md<span class="sz">16K</span></a>
+          <a href="agent-principles-src/audit.py">audit.py<span class="sz">3.2K</span></a>
+          <a href="agent-principles-src/newchapter.py">newchapter.py<span class="sz">648B</span></a>
+          </div>
+        </details>
+      </div>
+
+  </div>
+  <footer>本页由 tools/gen_lab_index.py 生成，请勿手改</footer>
+  <script>
+(function () {
+    var q = document.getElementById('q');
+    var cards = Array.prototype.slice.call(document.querySelectorAll('.post'));
+    var out = document.getElementById('count');
+    function run() {
+        var k = q.value.trim().toLowerCase();
+        var n = 0;
+        cards.forEach(function (c) {
+            var hit = !k || c.dataset.search.indexOf(k) >= 0;
+            c.classList.toggle('hidden', !hit);
+            if (hit) n++;
+        });
+        out.textContent = k ? (n + ' / ' + cards.length + ' 项') : (cards.length + ' 项归档');
+    }
+    q.addEventListener('input', run);
+    run();
+})();
+</script>
+</body>
+</html>
