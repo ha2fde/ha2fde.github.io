@@ -33,12 +33,13 @@ jobs:
 
       - name: 有变化才提交
         run: |
-          if git diff --quiet; then
+          git add lab/
+          # 必须比 --cached：git diff 看不见未跟踪文件，索引首次生成时会被误判成"无变化"
+          if git diff --cached --quiet; then
             echo "索引无变化，跳过提交"
             exit 0
           fi
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add lab/
           git commit -m "lab: 重建索引 [skip ci]"
           git push
