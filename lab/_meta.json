@@ -32,7 +32,7 @@
     "src": "~/llm-to-agent-ppt/"
   },
   "workbuddy": {
-    "desc": "WorkBuddy 每日自动产出（按时间戳分目录）：成本计算器、Tailscale SSH 脚本、预训练到 Agent 初稿、协议栈初稿",
+    "desc": "WorkBuddy 每日自动产出（按时间戳分目录）：预训练到 Agent 初稿、协议栈初稿",
     "src": "~/WorkBuddy/（不含 .workbuddy/ 工作记忆）"
   }
 }
