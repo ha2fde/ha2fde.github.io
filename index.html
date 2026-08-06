@@ -12,32 +12,14 @@
         }
         .container { max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem; }
         header { padding: 3rem 0 2rem; border-bottom: 1px solid #eee; margin-bottom: 2rem; }
-        header h1 { font-size: 2rem; color: #1a1a2e; }
-        header p { color: #666; margin-top: 0.3rem; }
-        header .nav { margin-top: 0.8rem; }
-        header .nav a { color: #3498db; text-decoration: none; font-size: 0.95rem; }
-        header .nav a:hover { text-decoration: underline; }
+        h1 { font-size: 2rem; color: #1a1a2e; }
 
-
-        .post {
-            padding: 1.5rem 0; border-bottom: 1px solid #eee;
-            display: flex; gap: 1.5rem; align-items: flex-start;
-        }
-        .post:last-child { border-bottom: none; }
-        .post-cat {
-            display: inline-block; font-size: 0.75rem; padding: 0.1rem 0.4rem;
-            border-radius: 3px; margin-bottom: 0.3rem; font-weight: 600;
-        }
-        .post-cat.agent { background: #eef6ff; color: #0984e3; }
-        .post-cat.milestone { background: #fff3e0; color: #e67e22; }
-        .post-cat.paper { background: #fff9e6; color: #d4a017; }
-        .post-cat.evolution { background: #fce4ec; color: #e84393; }
+        .post { display: flex; gap: 1.5rem; align-items: flex-start; }
         .post-thumb {
             width: 100px; height: 100px; border-radius: 8px; flex-shrink: 0;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 2.5rem;
+            background: #eef6ff; display: flex; align-items: center;
+            justify-content: center; font-size: 2.5rem;
         }
-        .post-content { flex: 1; }
         .post-title { font-size: 1.3rem; font-weight: 600; }
         .post-title a { color: #1a1a2e; text-decoration: none; }
         .post-title a:hover { color: #3498db; }
@@ -46,39 +28,28 @@
 
         footer { text-align: center; padding: 2rem; color: #999; font-size: 0.85rem; }
 
-        .section-h {
-            font-size: 0.8rem; font-weight: 600; letter-spacing: 0.1em; color: #aaa;
-            margin: 0.5rem 0 0.8rem;
+        @media (max-width: 600px) {
+            .container { padding: 1.5rem 1rem; }
+            header { padding: 2rem 0 1.5rem; }
+            .post { gap: 1rem; }
+            .post-thumb { width: 64px; height: 64px; font-size: 1.8rem; }
         }
-        .post.work {
-            border-bottom: none; background: #fff; border: 1px solid #e6edf5;
-            border-radius: 10px; padding: 1.5rem; margin-bottom: 2rem;
-        }
-        .post.work:hover { border-color: #cfe1f5; }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>Ha2fde's Blog</h1>
-            <p>记录技术学习笔记</p>
-            <div class="nav">
-                <a href="posts/agent-principles/">Agent 原理与实践</a>
-                <a href="https://github.com/ha2fde">GitHub</a>
-            </div>
         </header>
 
-        <div class="section-h">作品</div>
-        <div class="post work">
-            <div class="post-thumb" style="background:#eef6ff; font-size: 2rem;">🧭</div>
-            <div class="post-content">
-                <div class="post-cat agent">六章 · 幻灯片</div>
-                <div class="post-title"><a href="posts/agent-principles/index.html">Agent 原理与实践</a></div>
+        <div class="post">
+            <div class="post-thumb">🧭</div>
+            <div>
+                <div class="post-title"><a href="posts/agent-principles/">Agent 原理与实践</a></div>
                 <div class="post-meta">6 章 · 约 150 分钟 · 2026-08-06</div>
-                <div class="post-desc">从装上第一个 Agent 讲到 AGI 的五条路线：客户端与模型怎么组合、Transformer 为什么管用、续写模型怎么变成会干活的东西、tools 与 MCP 各自解决什么、上线前必须答上来的问题。键盘翻页，浏览器直接看。</div>
+                <div class="post-desc">从装上第一个 Agent 讲到 AGI 的五条路线：客户端与模型怎么组合、Transformer 为什么管用、续写模型怎么变成会干活的东西、tools 与 MCP 各自解决什么、上线前必须答上来的问题。</div>
             </div>
         </div>
-
     </div>
 
     <footer>&copy; 2026 Ha2fde</footer>
