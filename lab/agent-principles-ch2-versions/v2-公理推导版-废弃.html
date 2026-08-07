@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第二章 · 从一句话推出 Transformer（公理推导版 · 废弃）</title>
+<style>
+:root{
+  --bg:#e9edf3; --slide:#fff; --panel:#f4f7fb; --line:#e2e8f0;
+  --ink:#1f2937; --sub:#5b6675; --faint:#94a3b8;
+  --blue:#2563eb; --green:#0e9f6e; --orange:#c2410c; --purple:#7c3aed; --red:#dc2626;
+  --tblue:#eff6ff; --tgreen:#ecfdf5; --torange:#fff7ed; --tpurple:#f5f3ff; --tred:#fef2f2;
+  --font:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);font-family:var(--font);color:var(--ink);overflow:hidden;-webkit-font-smoothing:antialiased}
+#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;flex:none;position:relative;transform-origin:center center;
+      background:var(--slide);border-radius:6px;overflow:hidden;box-shadow:0 18px 60px rgba(15,23,42,.16)}
+#bar{position:absolute;top:0;left:0;height:2px;background:var(--blue);opacity:.55;z-index:5;width:0}
+
+/* ── 页眉 72 / 正文 608 / 页脚 40 ───────────────────────── */
+.slide{position:absolute;inset:0;display:none;flex-direction:column;padding:0 56px}
+.slide.on{display:flex;animation:fi .15s ease}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+.hd{height:72px;flex:none;display:flex;align-items:flex-end;justify-content:space-between;
+    gap:24px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.hd h2{font-size:30px;font-weight:600;line-height:1.2;letter-spacing:-.01em}
+.hd b{font-size:13px;font-weight:500;color:var(--faint);letter-spacing:.08em;white-space:nowrap;padding-bottom:5px}
+.bd{flex:1;min-height:0;overflow:hidden;padding:24px 0 0}
+.ft{height:40px;flex:none;display:flex;align-items:center;justify-content:flex-end}
+.pg{font-size:13px;color:var(--faint);letter-spacing:.04em}
+
+/* ── 文字层级：字号 + 字重 + 颜色三者一起做 ─────────────── */
+.lead{font-size:21px;font-weight:600;line-height:1.5;margin-bottom:14px}
+.p{font-size:18px;line-height:1.6}
+.p+.p{margin-top:10px}
+.sub{font-size:15px;line-height:1.6;color:var(--sub)}
+.cap{font-size:13px;line-height:1.55;color:var(--faint)}
+.h3{font-size:21px;font-weight:600;margin-bottom:8px}
+.mt{margin-top:16px}.mt2{margin-top:24px}.mb{margin-bottom:12px}
+b,strong{font-weight:600}
+em{font-style:normal;font-weight:600}
+.ul{list-style:none}
+.ul li{font-size:18px;line-height:1.55;padding-left:20px;position:relative;margin-bottom:9px}
+.ul li:before{content:"";position:absolute;left:2px;top:11px;width:6px;height:6px;border-radius:50%;background:var(--faint)}
+.ul.s li{font-size:15px;line-height:1.55;margin-bottom:6px;color:var(--sub)}
+.ul.s li:before{top:9px;width:4px;height:4px}
+.ol{counter-reset:n;list-style:none}
+.ol li{font-size:18px;line-height:1.55;padding-left:30px;position:relative;margin-bottom:10px;counter-increment:n}
+.ol li:before{content:counter(n);position:absolute;left:0;top:2px;width:21px;height:21px;border-radius:50%;
+  background:var(--panel);color:var(--sub);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center}
+
+/* ── 组件 ──────────────────────────────────────────────── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.g23{display:grid;grid-template-columns:2fr 3fr;gap:22px}
+.g32{display:grid;grid-template-columns:3fr 2fr;gap:22px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px 18px}
+.card .t{font-size:16px;font-weight:600;margin-bottom:7px}
+.card .p,.card .sub{font-size:15px;line-height:1.55}
+.card.w{background:#fff}
+.note{border-left:3px solid var(--faint);padding:2px 0 2px 16px}
+.note .t{font-size:15px;font-weight:600;margin-bottom:4px}
+.tbl{width:100%;border-collapse:collapse;font-size:15px;line-height:1.45}
+.tbl th{font-size:13px;font-weight:600;color:var(--faint);text-align:left;
+        padding:0 12px 7px;border-bottom:1.5px solid var(--line);letter-spacing:.03em}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl td:first-child{font-weight:600}
+.tbl.s{font-size:14px}.tbl.s td{padding:7px 10px}
+.code{font-family:var(--mono);font-size:13.5px;line-height:1.6;background:var(--panel);
+      border:1px solid var(--line);border-radius:6px;padding:12px 14px;white-space:pre;overflow:hidden}
+.code .c{color:var(--faint)}
+.kbd{font-family:var(--mono);font-size:13px;background:var(--panel);border:1px solid var(--line);
+     border-radius:4px;padding:1px 6px}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:11px;
+     background:var(--panel);color:var(--sub);letter-spacing:.02em}
+.num{font-size:34px;font-weight:600;line-height:1.1;letter-spacing:-.02em}
+.src{font-size:12px;color:var(--faint);line-height:1.5}
+.src a{color:var(--faint)}
+a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,.3)}
+
+.blue{color:var(--blue)}.green{color:var(--green)}.orange{color:var(--orange)}
+.purple{color:var(--purple)}.red{color:var(--red)}.dim{color:var(--sub)}
+.b-blue{border-left-color:var(--blue)}.b-green{border-left-color:var(--green)}
+.b-orange{border-left-color:var(--orange)}.b-purple{border-left-color:var(--purple)}
+.b-red{border-left-color:var(--red)}
+.t-blue{background:var(--tblue);border-color:#dbeafe}.t-green{background:var(--tgreen);border-color:#d1fae5}
+.t-orange{background:var(--torange);border-color:#fed7aa}.t-purple{background:var(--tpurple);border-color:#ede9fe}
+.t-red{background:var(--tred);border-color:#fecaca}
+
+/* ── 封面 ──────────────────────────────────────────────── */
+.slide.cover{padding:0 96px;justify-content:center}
+.cover .ser{font-size:15px;font-weight:600;color:var(--faint);letter-spacing:.22em;margin-bottom:22px}
+.cover h1{font-size:44px;font-weight:600;line-height:1.25;letter-spacing:-.02em}
+.cover .sl{font-size:21px;color:var(--sub);line-height:1.6;margin-top:18px;max-width:820px}
+.cover .rule{width:64px;height:3px;background:var(--blue);margin:26px 0;opacity:.7}
+.cover .meta{font-size:13px;color:var(--faint);letter-spacing:.04em}
+
+/* ── 概览网格 ──────────────────────────────────────────── */
+#ov{position:fixed;inset:0;background:rgba(233,237,243,.97);z-index:20;display:none;
+    overflow-y:auto;padding:28px 32px}
+#ov.on{display:block}
+#ovg{display:grid;grid-template-columns:repeat(5,218px);gap:16px;justify-content:center}
+.ovc{position:relative;width:218px;height:123px;overflow:hidden;background:#fff;cursor:pointer;
+     border:1px solid var(--line);border-radius:4px}
+.ovc:hover{border-color:var(--blue)}
+.ovi{position:absolute;top:0;left:0;width:1280px;height:720px;transform:scale(.17);transform-origin:top left}
+.ovi .slide{display:flex}
+.ovn{position:absolute;right:4px;bottom:3px;font-size:11px;color:var(--faint);background:rgba(255,255,255,.9);
+     padding:0 4px;border-radius:3px}
+</style>
+</head>
+<body>
+<div id="stage"><div id="deck"><div id="bar"></div>
+<main id="slides">
+
+<section class="slide cover">
+  <div class="ser">AGENT 原理与实践 · 第二章</div>
+  <h1>把 Transformer 推导一遍</h1>
+  <div class="rule"></div>
+  <div class="sl">它不是被发明出来的。<br><b>给定三条公理、四条约束，它的每一个零件都是唯一解。</b></div>
+  <div class="meta" style="margin-top:34px">推导课 · 零公式 · 每一步都给反证 · 术语一律点名</div>
+  <div class="meta" style="margin-top:10px">← → 翻页　·　O 概览　·　F 全屏</div>
+</section>
+
+<section class="slide" data-act="读法">
+  <div class="hd"><h2>这一章是一道推导题，不是一段历史</h2></div>
+  <div class="bd">
+    <div class="lead">大部分讲 Transformer 的东西是这么写的：「当时遇到了什么问题，后来有人想了个办法，这个办法叫 X。」<b>听完你知道了 X，但你没法追问「为什么不能是别的」——一追问就散了。</b></div>
+    <div class="p mt">这一章换个走法。先把机器<b>唯一会做的三件事</b>摆出来，再把现实提的<b>四条要求</b>摆出来，然后一步一步推。每一步只回答一个问题：</div>
+    <div class="note b-blue mt"><div class="t" style="font-size:17px">走到这一步，还剩几条路能走？——答案每次都是「一条」。</div></div>
+    <div class="g3 mt2">
+      <div class="card t-purple"><div class="t purple">推导长什么样</div>
+        <div class="cap">每一步三件东西：<b>由哪条逼出来</b> → <b>只能得到什么</b> → <b>不这样会崩成什么样</b>。<br>第三件是关键。看不出反例，就等于没推。</div></div>
+      <div class="card t-orange"><div class="t orange">历史去哪了</div>
+        <div class="cap">降级成<b>反例</b>。专家系统是违反公理三的对照，卷积网络是违反约束二的对照，RNN 是违反约束三的对照。<br>它们不占主线，但一个都不少，术语照点。</div></div>
+      <div class="card t-green"><div class="t green">怎么算读懂了</div>
+        <div class="cap">倒数第三页有一张<b>消融表</b>：拿掉任何一个零件，会崩成什么样。<br><b>那一列你能自己答出来，才算推过一遍。</b>答不出就回去找那一步。</div></div>
+    </div>
+    <div class="note b-purple mt2"><div class="t purple">关于公式和术语</div>
+      <div class="cap"><b>全章一个公式都不推</b>——推导用的是「只能这样，否则会怎样」，不是符号变形。<b>但术语一个都不藏</b>：注意力、Query/Key/Value、多头、位置编码、残差、层归一化、反向传播……都在它被推出来的那一刻正式点名，点完立刻用一句大白话跟上。</div></div>
+  </div>
+</section>
+
+<section class="slide" data-act="公理">
+  <div class="hd"><h2>先定第一件事：本事是「写」进去的，还是「学」出来的</h2></div>
+  <div class="bd">
+    <div class="lead">推导要有起点。起点只有两个候选，而其中一个已经被三十年时间否掉了。</div>
+    <div class="g2 mt">
+      <div class="card t-orange"><div class="t orange">候选一 · 人把规则写给机器</div>
+        <div class="cap">这一派叫 <b>符号主义</b>，高峰是 <b>专家系统</b>：请专家把判断写成成千上万条「如果……那么……」。它<b>真的能用</b>，八十年代在企业里省过钱。<br><br>但它撞上两堵墙：<br><b>一 · 常识写不完。</b>水是湿的、松手会掉、不知道就该说不知道——这类没人会专门说出口的东西，至今没有人写完过。<br><b>二 · 写得进去的，恰恰不是最关键的。</b>老医生一眼看出不对劲，你问他依据，他说「就是感觉」。<b>最值钱的本事，正是他讲不出来的那部分。</b>当年这件事就有正式名字：<b class="purple">知识获取瓶颈</b>。</div></div>
+      <div>
+        <div class="card t-blue"><div class="t blue">候选二 · 不写规则，给例子</div>
+          <div class="cap">把大量「输入 + 正确答案」摆在机器面前，让它自己找规律。这条路叫 <b>机器学习</b>。<br>它绕开了两堵墙：<b>常识不用写，从海量文本里自己长；专家讲不清，那就不问他，把他做过的事当例子喂进去。</b></div></div>
+        <div class="note b-red mt"><div class="t red">但候选二欠了一笔，全章都在还</div>
+          <div class="cap">候选一至少<b>说得清自己为什么这么判断</b>——每条规则都摆在那儿。候选二说不清：本事散在几千亿个数里，没有一条能读出来。<br><b>可解释性从此没了</b>，一直没了到今天。</div></div>
+        <div class="note b-purple mt"><div class="t purple">这一页定下的东西</div>
+          <div class="cap">从下一页起，「机器有本事」<b>只能</b>指一件事：<b>它内部有一大堆可以调的数，这些数被例子调成了对的样子。</b>不存在任何一行代码写着「猫有胡须」。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="公理">
+  <div class="hd"><h2>三条公理：机器唯一会做的三件事</h2></div>
+  <div class="bd">
+    <div class="p mb">这三条是全章的<b>全部工具</b>。后面十步推导，不会再引入任何第四样东西——凡是推出来的零件，都只能用这三条搭出来。</div>
+    <div class="g23">
+      <div>
+        <svg viewBox="0 0 480 270" width="100%" height="270" style="display:block">
+          <g font-family="PingFang SC,Hiragino Sans GB,-apple-system,sans-serif">
+            <rect x="90" y="8" width="260" height="44" rx="6" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
+            <text x="220" y="36" font-size="14" fill="#1f2937" text-anchor="middle">喂进去一个例子</text>
+            <line x1="220" y1="52" x2="220" y2="66" stroke="#94a3b8" stroke-width="1.5"/>
+            <polygon points="220,76 215,64 225,64" fill="#94a3b8"/>
+            <rect x="90" y="76" width="260" height="44" rx="6" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+            <text x="220" y="104" font-size="14" fill="#1f2937" text-anchor="middle">机器算出一个答案</text>
+            <line x1="220" y1="120" x2="220" y2="134" stroke="#94a3b8" stroke-width="1.5"/>
+            <polygon points="220,144 215,132 225,132" fill="#94a3b8"/>
+            <rect x="90" y="144" width="260" height="44" rx="6" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
+            <text x="220" y="172" font-size="14" fill="#1f2937" text-anchor="middle">和正确答案差多少</text>
+            <line x1="220" y1="188" x2="220" y2="202" stroke="#94a3b8" stroke-width="1.5"/>
+            <polygon points="220,212 215,200 225,200" fill="#94a3b8"/>
+            <rect x="50" y="212" width="340" height="50" rx="6" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+            <text x="220" y="233" font-size="13.5" fill="#1f2937" text-anchor="middle">倒推每个参数该往哪边挪，</text>
+            <text x="220" y="252" font-size="13.5" fill="#1f2937" text-anchor="middle">各挪一点点</text>
+            <path d="M390 237 H420 Q430 237 430 227 V40 Q430 30 420 30 H358" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+            <polygon points="350,30 360,25 360,35" fill="#7c3aed"/>
+            <text x="450" y="135" font-size="12" fill="#7c3aed" text-anchor="middle" transform="rotate(90 450 135)">换下一个例子，再来一遍</text>
+          </g>
+        </svg>
+        <div class="cap mt">这个循环叫 <b>训练</b>。「差多少」叫 <b>损失</b>，「倒推该往哪挪」叫 <b>反向传播</b>，「各挪一点点」叫 <b>梯度下降</b>，一次挪多少叫 <b>学习率</b>。</div>
+      </div>
+      <div>
+        <div class="card t-blue"><div class="t blue">A1 · 它只会加权求和，再过一道非线性</div>
+          <div class="cap">拿一堆数，各乘一个系数，加起来，再过一个极简单的弯折函数。<b>就这一个动作。</b>把它叠很多层，就是 <b>神经网络</b>；层数多就叫 <b>深度学习</b>。<span class="dim">（叠层的理由：一层只能在图上划一条直线，划不出复杂的形状。）</span></div></div>
+        <div class="card t-green mt"><div class="t green">A2 · 那些系数可以调</div>
+          <div class="cap">这些可调的数就是 <b>参数</b>。今天一个大模型有几千亿个。<b>机器的全部本事就装在这里，没有别的地方。</b></div></div>
+        <div class="card t-orange mt"><div class="t orange">A3 · 调的方向靠「差多少」倒推</div>
+          <div class="cap">答错了，从最后一层往前一层层分摊责任，算出每个参数该往哪边挪。<br><b class="red">代价条款：能被倒推的前提是「处处连续可调」。任何非黑即白的硬判断，都算不出该往哪挪。</b><span class="dim">这一条后面会用到三次。</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="公理">
+  <div class="hd"><h2>插一句：这三条公理，纸上写完是 1986，真能跑是 2012</h2></div>
+  <div class="bd">
+    <div class="lead">A1 到 A3 在 1986 年就齐了，理论上什么都能学。<b>可它整整二十六年跑不起来。</b>隔的不是灵感，是三个条件——这一页值得单独看，因为它留下的判断力全章通用。</div>
+    <div class="g3 mt">
+      <div class="card t-red"><div class="t red">A3 传不动</div>
+        <div class="cap">层一多，「该往哪挪」的信号从后往前越传越弱，前几层几乎归零，学不到东西。术语：<b>梯度消失</b>。<br><span class="green">解法：把每层之间那个压信号的弯折函数（<b>激活函数</b>）换成几乎不衰减的版本——<b>ReLU</b>。改动小得可笑。</span></div></div>
+      <div class="card t-red"><div class="t red">A2 没东西可调</div>
+        <div class="cap">「给例子让它自己调」，前提是<b>真有海量例子</b>。1986 年上哪找几百万张标好的图？<br><span class="green">解法：互联网普及之后才攒得出 <b>ImageNet</b>——一千个类别、一百多万张图。它不是算法，是<b>燃料</b>。</span></div></div>
+      <div class="card t-red"><div class="t red">A1 算不过来</div>
+        <div class="cap">加权求和要做天文数字次，CPU 一个一个算，跑到天荒地老。<br><span class="green">解法：<b>显卡（GPU）</b>。它本是给游戏渲染画面的，天生擅长「同一种简单运算，成千上万份一起做」——<b>而这恰好就是 A1 的全部内容</b>。</span></div></div>
+    </div>
+    <div class="note b-green mt2"><div class="t green">2012 · 三样同时到齐</div>
+      <div class="cap">一个叫 <b>AlexNet</b> 的模型用上 ReLU + ImageNet + 两块显卡，把图像识别错误率一次拉低近十个百分点。它属于 <b>卷积网络（CNN）</b>：拿一个小窗口在整张图上滑着扫，从边缘色块一层层拼成猫脸。<br><b class="orange">记住它的一个性质，后面第 7 页要用：几十万个像素是一次性全铺开算的，谁也不用等谁。</b></div></div>
+    <div class="note b-orange mt"><div class="t orange">这一页留下的判断力</div>
+      <div class="cap"><b>正确的方法 ≠ 现在就能起作用的方法。</b>以后看见一个新想法，除了问它新不新，还要问：<b>它需要的条件，到齐了没有。</b></div></div>
+  </div>
+</section>
+
+<section class="slide" data-act="题目">
+  <div class="hd"><h2>题目：给一句话，求每个词「在这句话里」的含义</h2></div>
+  <div class="bd">
+    <div class="g2">
+      <div>
+        <div class="card t-blue"><div class="t blue">输入怎么进来</div>
+          <div class="cap">A1 说机器只会算数，可「猫」不是数。所以第一步必须把词变成一串数。<br><br>做法不是人为编号（1024 号和 3057 号之间的一切关系都是假的），而是照 A1–A3 跑一遍：<b>盖住一个词，让机器根据前后文猜它是什么</b>，猜错就调。跑完海量文本，<b>用法相近的词，那串数自然就靠在一起</b>——猫和狗挨着，北京和东京挨着。<br><br>这串数叫 <b class="purple">词向量</b>（Embedding），2013 年那个著名做法叫 <b class="purple">word2vec</b>。</div></div>
+        <div class="note b-red mt"><div class="t red">但它只是一张固定的词典</div>
+          <div class="cap">一个词，<b>永远只有一份表示</b>（术语：<b>静态词向量</b>）。而这正好解不了下面这道题。</div></div>
+      </div>
+      <div>
+        <div class="card t-orange"><div class="t orange">要解的题，全章就这一道</div>
+          <div class="cap" style="margin-top:6px"><span class="code" style="display:block">那只猫没跳上桌子，因为<b class="blue">它</b>太<b class="orange">胖</b>了。
+那只猫没跳上桌子，因为<b class="blue">它</b>太<b class="orange">高</b>了。</span>
+          <span style="display:block;margin-top:10px">两句<b>只差一个字</b>。第一句「它」＝猫，第二句「它」＝桌子。<b>猫不会「太高」，桌子也不会「太胖」</b>。</span>
+          <span style="display:block;margin-top:10px">「它」在词典里那份表示，两句里一模一样，<b>是个空壳</b>。要指对，只能靠句子里别的词。</span></div></div>
+        <div class="note b-purple mt"><div class="t purple">于是题目可以写成一行</div>
+          <div class="cap" style="font-size:14px"><b>求一个做法：把每个词那份「词典里的表示」，换成「这句话里的表示」。</b><br><br>下一页列出这个做法必须满足的四条要求。之后的一切，都是从那四条里推出来的。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="约束">
+  <div class="hd"><h2>四条约束：这个做法必须同时满足</h2></div>
+  <div class="bd">
+    <div class="p mb">前两条来自题目本身，第三条来自「要用得起」，第四条是 A3 的直接推论。<b>每条后面都跟一个真实的反例——那是历史上真走过、并且撞墙的路。</b></div>
+    <div class="g4">
+      <div class="card t-red"><div class="t red">C1 · 随上下文变</div>
+        <div class="cap">同一个词，在不同句子里必须得到<b>不同</b>的表示。<br><br><b class="dim">反例：词向量本身。</b>它是查表，「它」在两句里完全相同，题目直接失败。</div></div>
+      <div class="card t-red"><div class="t red">C2 · 长度任意</div>
+        <div class="cap">句子可能 5 个词，也可能 5000 个。<b>参数量不能随长度变。</b><br><br><b class="dim">反例：给每个位置配一套自己的参数。</b>那 5 个词和 5000 个词就是两个不同的模型，训过的白训。</div></div>
+      <div class="card t-red"><div class="t red">C3 · 不许排队</div>
+        <div class="cap">不能出现「第 n 个必须等第 n−1 个算完」。<br><br><b class="dim">反例：RNN。</b>下一页详说——这是当时唯一的做法，也是最贵的一条约束。</div></div>
+      <div class="card t-red"><div class="t red">C4 · 处处可调</div>
+        <div class="cap">整条路上不能有非黑即白的硬判断，否则 A3 算不出该往哪挪。<br><br><b class="dim">反例：第 3 页那条写规则的路。</b>「如果是代词，就找前面的名词」——这种判断没法调。</div></div>
+    </div>
+    <div class="note b-orange mt2"><div class="t orange">C3 为什么是最贵的一条：看看放弃它会怎样</div>
+      <div class="cap">当时唯一的做法是<b>排队读</b>：从左往右，每读一个词，把「读到目前为止的印象」压成一份往下传。这种结构叫 <b class="purple">循环神经网络（RNN）</b>，那份印象叫 <b class="purple">隐状态</b>，改进版叫 <b class="purple">LSTM</b>。<br>它满足 C1、C2、C4，<b>唯独违反 C3，代价是两条，而且互相锁住</b>：<b>慢</b>——第 500 个词要等前 499 个算完，第 5 页刚拿到手的显卡（几十万像素一次铺开）在这里<b>完全用不上</b>；<b>忘</b>——那份印象<b>容量是固定的</b>，5 个词压进去这么大，500 个词压进去还这么大。<br><b>想记得住就把印象做大，更慢；想快就把句子切短，更容易忘。只要还在排队，就出不了这个圈。</b></div></div>
+  </div>
+</section>
+
+<section class="slide" data-act="推导">
+  <div class="hd"><h2>第一步：新表示只能是「按比例把全句兑成一份」</h2></div>
+  <div class="bd">
+    <div class="p mb"><span class="tag">由 C1 + A1 + C4</span>　C1 说新表示必须由全句决定；A1 说机器只会加权求和。<b>两条一夹，形状就定死了一半</b>——剩下的一半，由反证补完。</div>
+    <div class="g23">
+      <div>
+        <svg viewBox="0 0 460 300" width="100%" height="300" style="display:block">
+          <g font-family="PingFang SC,Hiragino Sans GB,-apple-system,sans-serif">
+            <text x="230" y="18" font-size="13" fill="#5b6675" text-anchor="middle">读第一句时，「它」算出的比例</text>
+            <text x="80" y="60" font-size="14" fill="#1f2937" text-anchor="end">猫</text>
+            <rect x="100" y="46" width="252" height="18" rx="3" fill="#f4f7fb"/>
+            <rect x="100" y="46" width="216" height="18" rx="3" fill="#2563eb"/>
+            <text x="364" y="60" font-size="12" fill="#5b6675">高</text>
+            <text x="80" y="100" font-size="14" fill="#1f2937" text-anchor="end">桌子</text>
+            <rect x="100" y="86" width="252" height="18" rx="3" fill="#f4f7fb"/>
+            <rect x="100" y="86" width="50" height="18" rx="3" fill="#2563eb" opacity=".45"/>
+            <text x="364" y="100" font-size="12" fill="#5b6675">低</text>
+            <text x="80" y="140" font-size="14" fill="#1f2937" text-anchor="end">胖</text>
+            <rect x="100" y="126" width="252" height="18" rx="3" fill="#f4f7fb"/>
+            <rect x="100" y="126" width="140" height="18" rx="3" fill="#2563eb" opacity=".7"/>
+            <text x="364" y="140" font-size="12" fill="#5b6675">中</text>
+            <text x="80" y="180" font-size="14" fill="#1f2937" text-anchor="end">因为</text>
+            <rect x="100" y="166" width="252" height="18" rx="3" fill="#f4f7fb"/>
+            <rect x="100" y="166" width="28" height="18" rx="3" fill="#2563eb" opacity=".35"/>
+            <text x="364" y="180" font-size="12" fill="#5b6675">低</text>
+            <line x1="20" y1="215" x2="440" y2="215" stroke="#e2e8f0" stroke-width="1.5"/>
+            <text x="20" y="245" font-size="13" fill="#5b6675">按这个比例，把各个词的东西</text>
+            <text x="20" y="268" font-size="13" fill="#5b6675">兑在一起，得到的那一份，</text>
+            <text x="20" y="291" font-size="13" fill="#0e9f6e">就是「它」在这句话里的表示。</text>
+          </g>
+        </svg>
+      </div>
+      <div>
+        <div class="card t-red"><div class="t red">反证 · 只挑最相关的那一个词行不行</div>
+          <div class="cap">「找出得分最高的词，只取它，其余全不要」——这是<b>非黑即白的硬选择</b>。得分稍微变一点，结果要么完全不变、要么整个跳掉，<b>A3 算不出该往哪挪</b>。<b class="red">C4 挡住。</b></div></div>
+        <div class="card t-red mt"><div class="t red">反证 · 全部等比例平均行不行</div>
+          <div class="cap">那么句子里每个位置得到的东西<b>完全一样</b>，「它」和「桌子」拿到同一份平均值。<b class="red">C1 失败</b>——等于没看。</div></div>
+        <div class="note b-green mt"><div class="t green">于是只剩一条路</div>
+          <div class="cap"><b>每个词分到一个各不相同、连续可调的比例，按比例兑成一份。</b>不是 0 和 1，也不是全相等。<br><br>这个比例，正式名字叫 <b class="purple">注意力权重</b>；一句话内部自己对自己做这件事，叫 <b class="purple">自注意力</b>（Self-Attention）。<br><b>「注意力」不是谁想出来的点子，它是这两条反证之后剩下的唯一形状。</b></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="推导">
+  <div class="hd"><h2>第二步：这个比例，只能由两个词的内容现场算</h2></div>
+  <div class="bd">
+    <div class="p mb"><span class="tag">由 C1 + C2 + A1</span>　上一步只说「有个比例」，没说它从哪来。<b>候选一共三个，前两个被反证掉。</b></div>
+    <div class="g3">
+      <div class="card t-red"><div class="t red">候选一 · 查一张固定的大表</div>
+        <div class="cap">事先存好「词 × 词」的比例表，用的时候查。<br><br>词表 5 万，表就是 5 万 × 5 万 = <b>25 亿个数</b>；更要命的是<b>它和具体句子无关</b>——「它 → 猫」在两句话里查出同一个值。<b class="red">C1 失败。</b></div></div>
+      <div class="card t-red"><div class="t red">候选二 · 只看隔多远</div>
+        <div class="cap">按相对位置定死：前一个词多少、前两个多少……<br><br>那么「它」<b>永远只看它前面那几个词</b>，跟句子说了什么毫无关系。<b class="red">C1 失败。</b><br>（顺带：这也正是滑窗式做法的老毛病。）</div></div>
+      <div class="card t-green"><div class="t green">候选三 · 由两个词的内容现算</div>
+        <div class="cap">比例 = 某个函数（词 i 的表示，词 j 的表示）。<b>只剩这一条。</b><br><br>再由 <b>C2</b>：这个函数对句子里所有词对<b>必须是同一套参数</b>，否则句子一长就要加参数。<br>再由 <b>A1</b>：它最简单的可调形式，就是<b>两边各放出一份数，对一下，得一个分</b>。</div></div>
+    </div>
+    <div class="note b-purple mt2"><div class="t purple">「各放出一份数，对一下」——这两份就有名字了</div>
+      <div class="cap">词 i 放出的那份，表示<b>「我在找什么」</b>，叫 <b>Query</b>（查询）。词 j 放出的那份，表示<b>「我是什么」</b>，叫 <b>Key</b>（钥匙）。两份一对，得一个分；分越高，比例越大。</div></div>
+    <div class="tbl s mt">
+      <table><thead><tr><th style="width:38%">「它」的 Query ≈ 我是代词，在找前面出现过、能当主语的名词</th><th>那个词的 Key ≈</th><th>对上了吗</th><th>得分</th></tr></thead>
+      <tbody>
+        <tr><td>拿去对「猫」</td><td>名词 · 动物 · 在前面出现过</td><td class="green">要找的全中</td><td class="green"><b>高</b></td></tr>
+        <tr><td>拿去对「桌子」</td><td>名词 · 在前面出现过 · 不是动物</td><td class="orange">对上一半</td><td class="orange">低</td></tr>
+        <tr><td>拿去对「胖」</td><td>形容词 · 描述体型</td><td class="dim">类别就不对</td><td class="dim">中（另有用处）</td></tr>
+        <tr><td>拿去对「因为」</td><td>连词</td><td class="dim">完全不沾边</td><td class="dim">低</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="推导">
+  <div class="hd"><h2>第三步：为什么非得是三份不同的东西，一份都不能省</h2></div>
+  <div class="bd">
+    <div class="p mb"><span class="tag">两次反证</span>　上一步推出了 Query 和 Key。可还有两个偷懒的写法要先排除掉——排除完，第三份东西自己就冒出来了。</div>
+    <div class="g2">
+      <div class="card t-red"><div class="t red">反证 · 让 Query 就等于 Key 行不行</div>
+        <div class="cap">也就是：不另外变，直接拿词本身的表示去互相对。<br><br><b>后果一：每个词和自己最像。</b>「它」拿自己去对自己，分必然最高，<b>每个词永远只看得见自己</b>——<b class="red">C1 白费</b>。<br><br><b>后果二：关系本来就不对称。</b>「它」<b>在找</b>名词，可它自己<b>不是</b>名词。「我在找什么」和「我是什么」是两件事，一份东西装不下。<br><br><b class="green">→ Q 和 K 必须各调一套参数，从同一份词向量变出两份不同的东西。</b></div></div>
+      <div class="card t-red"><div class="t red">反证 · 那兑进去的就用 Key 行不行</div>
+        <div class="cap">也就是：既然靠 Key 找到的，那就把 Key 兑进去。<br><br>问题在于这两者要的东西正好相反。<b>「猫」为了容易被代词找到</b>，它的 Key 里应该突出「我是名词、我是动物、我在前面出现过」——<b>这是给别人看的标签</b>。<br><b>可「猫」真要传给「它」的内容</b>，是「一只白的、胖的、刚才没跳上桌子的猫」——<b>这是货</b>。<br><br>标签和货捆在一起，两边互相拖累：标签调得好找，货就传不准；货传得准，就不好找。<br><br><b class="green">→ 必须再单独变一份，专门用来被兑。这份叫 Value。</b></div></div>
+    </div>
+    <div class="tbl s mt2">
+      <table><thead><tr><th style="width:12%">这一份</th><th style="width:24%">回答的问题</th><th>「猫」这个词的大意</th><th>拿掉它会怎样</th></tr></thead>
+      <tbody>
+        <tr><td><b class="blue">Query</b></td><td>我在找什么</td><td>（「它」放出的）我是代词，在找前面能当主语的名词</td><td class="red">没人发起寻找</td></tr>
+        <tr><td><b class="green">Key</b></td><td>我是什么</td><td>我是名词，是动物，在前面出现过</td><td class="red">找不着，比例算不出来</td></tr>
+        <tr><td><b class="orange">Value</b></td><td>我能给出什么</td><td>一只白的、胖的、刚才没跳上桌子的猫</td><td class="red">找得到，但传过去的是标签不是内容</td></tr>
+      </tbody></table>
+    </div>
+    <div class="note b-purple mt"><div class="t purple">这三份是怎么来的</div>
+      <div class="cap">都是同一份词向量，<b>各乘一套参数</b>变出来的——除此之外没有别的机关。而这三套参数，是按 A1–A3 那个循环、在海量句子上调出来的。<br><b>没有任何人写过「代词该找名词」。第 3 页那两堵墙，正是在这里被绕过去的：讲不出来的规律，不用讲，喂就行了。</b></div></div>
+  </div>
+</section>
+
+<section class="slide" data-act="推导">
+  <div class="hd"><h2>第四步：分数变比例，只能软着来；而且一套不够用</h2></div>
+  <div class="bd">
+    <div class="p mb"><span class="tag">由 C4</span>　<span class="tag">由 C1 加强</span>　上一步得到的是一堆<b>分数</b>，不是比例。这一页把它变成比例，顺手补掉一个漏洞。</div>
+    <div class="g2">
+      <div>
+        <div class="card t-blue"><div class="t blue">分数 → 比例：必须是「软的排名」</div>
+          <div class="cap">比例要能当比例用，得满足两点：<b>都不为负</b>，<b>加起来正好是 1</b>。<br><br>最省事的做法是<b>只留分数最高的那个，其余归零</b>——但这正是第一步已经被反证掉的硬选择：<b class="red">分数稍微一变，结果整个跳掉，A3 算不出该往哪挪。C4 第三次挡住。</b><br><br><b class="green">→ 只能用一个「软」的换算：分高的拿走大头，分低的也留一点点，而且整条曲线处处可调。</b><br><br>这个换算函数就叫 <b class="purple">softmax</b>。名字里的 soft，说的正是「不做非黑即白的选择」。</div></div>
+      </div>
+      <div>
+        <div class="card t-red"><div class="t red">漏洞 · 一套比例只能表达一种关系</div>
+          <div class="cap">同一句话里同时有好几种关系要看：<b>「它」指谁</b>、<b>「胖」在修饰谁</b>、<b>「跳」的主语是谁</b>……<br><br>可到目前为止，每个词对全句<b>只有一套比例</b>。三种关系挤进同一套，只会互相平均掉——<b>就像用一个数同时表示身高和体重</b>。<b class="red">C1 只满足了一半：上下文变了，可上下文不止一种。</b></div></div>
+        <div class="card t-green mt"><div class="t green">→ 并排跑好几套，各调各的</div>
+          <div class="cap">一套盯指代，一套盯修饰，一套盯句法……<b>各算各的比例，各兑各的，最后把结果拼成一份</b>。<br><br>这就是 <b class="purple">多头注意力</b>（Multi-Head Attention），每一套叫一个「头」。原论文 8 个头，今天的大模型几十个。<br><br><b>「多头」听着吓人，就是同一件事并排做很多份，各看各的角度。</b></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="推导">
+  <div class="hd"><h2>第五步：还账——加权求和把语序抹掉了</h2></div>
+  <div class="bd">
+    <div class="lead"><span class="tag">第一步的必然代价</span>　这一步不是新需求。<b>它是第一步选了「加权求和」之后，一定会欠下的一笔账。</b></div>
+    <div class="g2 mt">
+      <div class="card t-red"><div class="t red">「加起来」这个动作，本身不认顺序</div>
+        <div class="cap">把一堆数加起来，<b>换个先后次序加，结果一模一样</b>——这是小学就知道的事，但放在这里是致命的。<br><br>于是：<span class="code" style="display:block;margin-top:8px">猫 追 狗
+狗 追 猫</span>
+        <span style="display:block;margin-top:8px">这两句话，每个位置算出来的东西<b>逐字相同</b>。模型读到的是<b>一袋词</b>，不是一句话。</span><br>
+        <b>注意这不是 bug。</b>只要新表示是「按比例把全句兑成一份」，语序就一定会丢——<b>这是第一步买下的东西，必须付钱。</b></div></div>
+      <div>
+        <div class="card t-green"><div class="t green">还法只有一条路</div>
+          <div class="cap">既然<b>结构本身</b>装不下顺序，那就把顺序<b>混进内容里</b>：在每个词的表示上，另外加一个标记「我排第几」的数——第 1 个词加 1 号戳，第 2 个加 2 号戳。<br><br>这个戳叫 <b class="purple">位置编码</b>（Positional Encoding）。<br><br>它和词的含义<b>一起</b>送进第一步，所以算比例的时候，「隔多远」「谁在前」自然就参与进去了。</div></div>
+        <div class="note b-blue mt"><div class="t">于是 Transformer 眼里的一个词</div>
+          <div class="cap" style="font-size:14.5px"><b>＝ 它是什么</b>（词向量）<b> ＋ 它排第几</b>（位置编码）<br><br>缺了后半截，它读不出任何语序。<span class="dim">这也解释了一件常被问的事：为什么模型对「第几段第几句」这类指令不太可靠——顺序对它来说是外挂上去的，不是天生的。</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="推导">
+  <div class="hd"><h2>第六步：还差两件，堆起来才算数</h2></div>
+  <div class="bd">
+    <div class="p mb"><span class="tag">由 A1 后半句</span>　<span class="tag">由 A3 在深层失效</span>　到上一页，「一次交换信息」已经完备了。可只做一次远远不够——要堆。而<b>一堆，两个新问题立刻冒出来。</b></div>
+    <div class="g2">
+      <div class="card t-red"><div class="t red">问题一 · 堆一百层，等于一层</div>
+        <div class="cap">加权求和是<b>线性</b>的：一堆数乘系数再相加。<b>线性套线性，结果还是线性</b>——把它堆一百遍，能表达的东西和堆一遍完全一样。<b>白堆。</b><br><br><b class="green">→ 两次交换之间，必须插一道非线性的加工。</b>这正是 A1 后半句说的那个弯折函数。这一道加工的正式名字是 <b class="purple">前馈网络</b>（FFN），结构就是最普通的那种层。<br><br><b>而且它必须「位置之间不来往」</b>——每个词各自加工自己那一份。否则就是又做了一遍第一步，还是没有新东西。</div></div>
+      <div class="card t-red"><div class="t red">问题二 · 堆深了，A3 又传不动了</div>
+        <div class="cap">第 5 页那个老问题原样回来：层一多，「该往哪挪」的信号从后往前越传越弱，前面的层学不到东西。<br><br><b class="green">→ 残差连接</b>：把这一层的<b>输入原样加回它的输出</b>。这样 A3 的信号有一条<b>直通到底的路</b>，不必逐层挤过去；顺带保证深层不会把浅层已经学好的东西弄丢。<br><br><b class="green">→ 层归一化</b>：每层把数值拉回正常范围，防止越堆越飘。<br><br><b>这两个零件不改变任何含义</b>，它们只做一件事：<b>保证 A2、A3 在几十层上仍然成立。</b></div></div>
+    </div>
+    <div class="note b-green mt2"><div class="t green">推导到此结束</div>
+      <div class="cap">一层里的两个动作出齐了：<b>① 词之间交换信息</b>（多头自注意力）<b>② 每个词各自加工</b>（FFN），各自外挂残差和层归一化。<b>下一页把它们拼起来——然后你会看到，每个零件都能指回前面某一步。</b></div></div>
+  </div>
+</section>
+
+<section class="slide" data-act="收口">
+  <div class="hd"><h2>拼起来：这就是 Transformer，每个零件都能指回去</h2></div>
+  <div class="bd">
+    <div class="g23">
+      <div>
+        <svg viewBox="0 0 460 340" width="100%" height="340" style="display:block">
+          <g font-family="PingFang SC,Hiragino Sans GB,-apple-system,sans-serif">
+            <rect x="70" y="10" width="220" height="38" rx="6" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+            <text x="180" y="34" font-size="13" fill="#1f2937" text-anchor="middle">输出 → 交给下一层</text>
+            <line x1="180" y1="80" x2="180" y2="62" stroke="#94a3b8" stroke-width="1.5"/>
+            <polygon points="180,52 175,64 185,64" fill="#94a3b8"/>
+            <rect x="40" y="64" width="280" height="190" rx="8" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="5 4"/>
+            <rect x="70" y="80" width="220" height="54" rx="6" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+            <text x="180" y="103" font-size="13.5" fill="#1f2937" text-anchor="middle">② 每个词各自加工　FFN</text>
+            <text x="180" y="123" font-size="12" fill="#5b6675" text-anchor="middle">位置之间不来往　←第六步</text>
+            <line x1="180" y1="182" x2="180" y2="150" stroke="#94a3b8" stroke-width="1.5"/>
+            <polygon points="180,140 175,152 185,152" fill="#94a3b8"/>
+            <rect x="70" y="182" width="220" height="54" rx="6" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+            <text x="180" y="205" font-size="13.5" fill="#1f2937" text-anchor="middle">① 词之间交换信息</text>
+            <text x="180" y="225" font-size="12" fill="#5b6675" text-anchor="middle">多头自注意力　←第一～四步</text>
+            <line x1="180" y1="286" x2="180" y2="252" stroke="#94a3b8" stroke-width="1.5"/>
+            <polygon points="180,242 175,254 185,254" fill="#94a3b8"/>
+            <rect x="70" y="286" width="220" height="38" rx="6" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
+            <text x="180" y="304" font-size="12.5" fill="#1f2937" text-anchor="middle">词向量 ＋ 位置编码</text>
+            <text x="180" y="319" font-size="11" fill="#5b6675" text-anchor="middle">←题目　　←第五步</text>
+            <text x="336" y="92" font-size="13" fill="#7c3aed">一层</text>
+            <text x="336" y="124" font-size="20" font-weight="600" fill="#7c3aed">× N</text>
+            <text x="336" y="148" font-size="11.5" fill="#94a3b8">原论文 6 层</text>
+            <text x="336" y="166" font-size="11.5" fill="#94a3b8">今天几十上百层</text>
+            <text x="336" y="196" font-size="11" fill="#0e9f6e">两处各挂</text>
+            <text x="336" y="212" font-size="11" fill="#0e9f6e">残差 + 层归一化</text>
+            <text x="336" y="228" font-size="11" fill="#94a3b8">←第六步</text>
+          </g>
+        </svg>
+      </div>
+      <div>
+        <div class="tbl s">
+          <table><thead><tr><th style="width:42%">零件</th><th style="width:14%">哪一步</th><th>被什么逼出来的</th></tr></thead>
+          <tbody>
+            <tr><td>按比例把全句兑成一份（<b>自注意力</b>）</td><td>一</td><td>C1 要随上下文变 · A1 只会加权和 · C4 不许硬选</td></tr>
+            <tr><td><b>Query</b> / <b>Key</b></td><td>二</td><td>C1 不许查固定表 · C2 不许按长度加参数</td></tr>
+            <tr><td><b>Value</b> 单独一份</td><td>三</td><td>「给别人找的标签」≠「要传的内容」</td></tr>
+            <tr><td><b>softmax</b> 软比例</td><td>四</td><td>C4 · 取最大值不可调</td></tr>
+            <tr><td><b>多头</b></td><td>四</td><td>C1 加强 · 上下文关系不止一种</td></tr>
+            <tr><td><b>位置编码</b></td><td>五</td><td>第一步的必然代价 · 加权和不认顺序</td></tr>
+            <tr><td><b>FFN</b>，且位置间不来往</td><td>六</td><td>A1 后半句 · 不然堆一百层等于一层</td></tr>
+            <tr><td><b>残差</b> + <b>层归一化</b></td><td>六</td><td>A3 在深层失效 · 信号要有直通的路</td></tr>
+          </tbody></table>
+        </div>
+        <div class="note b-green mt"><div class="t green">推完了</div>
+          <div class="cap">整张表<b>八行，没有第九行</b>。Transformer 里再没有别的东西——剩下的全是这一层原封不动堆 N 遍。<br><b>每一行都不是「有人想到了」，而是「走到那一步，只剩这一条路」。</b></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="收口">
+  <div class="hd"><h2>验收：拿掉任何一个，会崩成什么样</h2></div>
+  <div class="bd">
+    <div class="p mb">推导对不对，不看你记住了几个名词，看<b>你能不能说出拿掉它的后果</b>。先盖住中间那一列，自己答一遍。</div>
+    <div class="tbl mt">
+      <table><thead><tr><th style="width:26%">改动</th><th style="width:52%">会崩成什么样</th><th>违反了哪一条</th></tr></thead>
+      <tbody>
+        <tr><td>比例改成「只取分最高的那一个」</td><td>分数动一点，结果整个跳掉；倒推不出该往哪挪，<b>根本训不起来</b></td><td class="red">C4</td></tr>
+        <tr><td>让 Query ＝ Key</td><td>每个词和自己最像，<b>永远只看得见自己</b>，等于没做</td><td class="red">C1</td></tr>
+        <tr><td>去掉 Value，直接兑 Key</td><td>找得到人，但<b>传过去的是标签不是内容</b>；调好了找就传不准</td><td class="red">标签 ≠ 内容</td></tr>
+        <tr><td>只留一个头</td><td>指代、修饰、句法挤一套比例里，<b>互相平均掉</b></td><td class="red">C1 加强</td></tr>
+        <tr><td>比例改成按相对位置写死</td><td>「它」永远只看前面那几个词，<b>跟句子说了什么无关</b></td><td class="red">C1</td></tr>
+        <tr><td>去掉位置编码</td><td>「猫追狗」和「狗追猫」输出<b>逐字相同</b>，读到的是一袋词</td><td class="red">第五步的账没还</td></tr>
+        <tr><td>去掉 FFN</td><td>线性套线性还是线性，<b>堆一百层等于一层</b></td><td class="red">A1 后半句</td></tr>
+        <tr><td>去掉残差</td><td>层一多，「该往哪挪」传不回前面，<b>前面的层学不到东西</b></td><td class="red">A3</td></tr>
+      </tbody></table>
+    </div>
+    <div class="note b-blue mt"><div class="t">中间那一列，才是这一章真正要交给你的东西</div>
+      <div class="cap">记住「Transformer 有多头注意力」不难，随便一篇文章都写。<b>但你如果能说出「去掉多头会怎样」，那说明你手里握的是结构，不是名词。</b>答不上来的行，回去找对应那一步。</div></div>
+  </div>
+</section>
+
+<section class="slide" data-act="收口">
+  <div class="hd"><h2>这套推导的唯一代价：n²</h2></div>
+  <div class="bd">
+    <div class="lead">第一步说「每个词对全句每个词算一个比例」。这句话有个直接后果：<b>句子长一倍，要算的比例是四倍。</b>业内写作 n²。</div>
+    <div class="g2 mt">
+      <div class="card t-orange"><div class="t orange">它不是缺陷，是 C3 的标价</div>
+        <div class="cap">C3 要的是「谁也不用等谁」。换来的正是这个：<b>所有词同时开算，显卡全速运转。</b><br><br>代价明码标价——<b>人人都要看人人</b>。这就是你在实际用的时候撞到的那堵墙：长上下文贵、要做上下文管理、要切片要摘要。<b>根子全在这一行。</b></div></div>
+      <div class="card t-blue"><div class="t blue">对照：放弃 C3 能省掉它</div>
+        <div class="cap">RNN 那条路上，每个词只跟前一个打交道，账是<b>线性</b>的，长一倍就是一倍。<b>n² 根本不存在。</b><br><br>但它换来的是第 7 页那两条：<b>慢</b>（显卡用不上）和<b>忘</b>（印象容量固定）。</div></div>
+    </div>
+    <div class="note b-green mt2"><div class="t green">2017 年的判断，可以用一句话说完</div>
+      <div class="cap" style="font-size:15.5px"><b>n² 的账能用钱买，串行的账买不到。</b><br>算力可以堆、可以并行、可以等它变便宜；而「第 500 个必须等第 499 个算完」这件事，<b>花多少钱都买不来</b>。<br><br>那篇论文的标题就是这个意思——<b>Attention Is All You Need</b>。「All」是冲着当时两大主流一起说的：<b class="dim">循环网络不要了，卷积网络也不要了。</b></div></div>
+    <div class="note b-purple mt"><div class="t purple">这一条的真正后果不是「快」</div>
+      <div class="cap">是<b>同样的钱和时间，能训练大一个量级的模型</b>。今天所有大模型的存在，直接建立在这一行上。<span class="dim">（n² 怎么变成你账单上的数字，第五章算。）</span></div></div>
+  </div>
+</section>
+
+<section class="slide" data-act="收口">
+  <div class="hd"><h2>最后一处分岔：准不准回头看后面</h2></div>
+  <div class="bd">
+    <div class="p mb">推导完了，还剩一个开关没拨。前面一直默认「它」<b>能看见整句话</b>，包括它后面的「胖」。这件事对不对，要看你让它干什么。</div>
+    <div class="g2">
+      <div class="card t-blue"><div class="t blue">要它「读懂」：整句都能看</div>
+        <div class="cap">做分类、判断情绪、抽取信息——句子是<b>现成的、完整的</b>，当然该让每个词把前后文都看全。<br><br>这一半叫 <b class="purple">Encoder</b>（编码器）。BERT 那一系走的是这条。</div></div>
+      <div class="card t-orange"><div class="t orange">要它「往下写」：只准看前面</div>
+        <div class="cap">生成的时候，后面的词<b>还不存在</b>——它正是要被猜出来的那一个。训练时如果让它偷看答案，用起来就露馅。<br><br>所以要<b>把每个位置后面的词强行挡住</b>，这个动作叫 <b class="purple">掩码</b>（Mask）。这一半叫 <b class="purple">Decoder</b>（解码器）。</div></div>
+    </div>
+    <div class="note b-green mt2"><div class="t green">今天的大模型，走的是右边这条</div>
+      <div class="cap">它做的事从头到尾只有一件：<b>看着前面所有的字，猜下一个字最可能是什么；猜出来接上，再猜下一个。</b>这个方式叫 <b>自回归</b>。<br>你和它对话时看到的逐字往外蹦，<b>就是这个过程本身，不是打字机特效</b>。</div></div>
+    <div class="note b-purple mt"><div class="t purple">推导的活到这里干完了</div>
+      <div class="cap">从「猜下一个字」到「能查资料、能调工具、能自己安排步骤」，中间还差好几步大的——那是<b>第三章</b>的事，和本章的推导无关，不看也行。</div></div>
+  </div>
+</section>
+
+<section class="slide" data-act="收尾">
+  <div class="hd"><h2>这一章交付了什么，又欠下了什么</h2></div>
+  <div class="bd">
+    <div class="g2">
+      <div>
+        <div class="card t-green"><div class="t green">交付 · 三件</div>
+          <div class="cap">① <b>你能把 Transformer 从头推一遍</b>，而不是背下来。三条公理、四条约束、六步推导、八个零件，每个零件都指得回去；拿掉任何一个，你说得出会崩成什么样。<br>② <b>你能解释它为什么会自信地说错。</b>它的全部本事装在被调出来的参数里，而三条公理里<b>压根没有「我不知道」这个东西</b>——例子覆盖不到的地方，它照样按最像的模式往下接。<br>③ <b>你能解释长上下文为什么贵。</b>n² 不是实现没优化好，是 C3 的标价。</div></div>
+        <div class="note b-orange mt"><div class="t orange">这一章有意跳过的</div>
+          <div class="cap">图灵测试、两次寒冬、深蓝、AlphaGo、生成对抗网络、扩散模型、强化学习……<b>它们没有出现在这条推导链上</b>，要么属于别的链。名字放这儿，你想查有得查。</div></div>
+      </div>
+      <div>
+        <div class="card t-red"><div class="t red">欠下 · 两笔，本章都不还</div>
+          <div class="cap"><b>一 · 幻觉。</b>它擅长的是「接下去最像什么」，不是「事实是什么」。第 3 页那堵墙换了个身体又站回来了：<b>专家系统在规则外自信地错，大模型在例子外自信地错。</b><br><br><b>二 · 说不清自己为什么这么答。</b>第 3 页那笔账——本事散在几千亿个数里，没有一条能读出来。整章推导只解释了<b>结构</b>为什么长这样，<b>没有、也不能解释某一次回答为什么是那样。</b></div></div>
+        <div class="note b-blue mt"><div class="t">想接着往下看的话</div>
+          <div class="cap"><b>第三章</b>：一个只会猜下一个字的东西，怎么变成能自己干活的 Agent。<br><b>第五章</b>：n² 怎么变成账单上的数字，幻觉在生产里怎么加护栏。<br><span class="cap dim">六章各自独立，这两处只是指路——本章的推导自己闭合，不看也成立。</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!--SLIDES-END-->
+
+</main></div></div>
+
+<div id="ov"><div id="ovg"></div></div>
+
+<script>
+(function(){
+  var deck=document.getElementById('deck'), bar=document.getElementById('bar'),
+      ov=document.getElementById('ov'), ovg=document.getElementById('ovg'),
+      slides=[].slice.call(document.querySelectorAll('.slide')),
+      N=slides.length, cur=0, ovOpen=false, built=false;
+
+  // 页眉幕名 + 页脚页码（封面不加）
+  slides.forEach(function(s,i){
+    var hd=s.querySelector('.hd'), act=s.getAttribute('data-act');
+    if(hd&&act){ var b=document.createElement('b'); b.textContent=act; hd.appendChild(b); }
+    if(!s.classList.contains('cover')){
+      var ft=document.createElement('div'); ft.className='ft';
+      var p=document.createElement('span'); p.className='pg';
+      p.textContent=(i+1)+' / '+N; ft.appendChild(p); s.appendChild(ft);
+    }
+  });
+
+  function fit(){
+    var k=Math.min(window.innerWidth/1280, window.innerHeight/720)*0.96;
+    deck.style.transform='scale('+k+')';
+  }
+  window.addEventListener('resize',fit); fit();
+
+  function check(i){
+    var s=slides[i], b=s.querySelector('.bd'); if(!b) return;
+    var vo=b.scrollHeight-b.clientHeight, ho=0;
+    var els=b.querySelectorAll('*');
+    for(var k=0;k<els.length;k++){
+      if(els[k].closest('svg')) continue;
+      var d=els[k].scrollWidth-els[k].clientWidth; if(d>ho) ho=d;
+    }
+    if(vo>1||ho>1){ s.style.outline='3px solid #dc2626'; s.style.outlineOffset='-3px';
+      console.warn('[溢出] 第'+(i+1)+'页　纵向 +'+vo+'　横向 +'+ho); }
+    else { s.style.outline=''; }
+  }
+
+  function go(i){
+    i=Math.max(0,Math.min(N-1,i));
+    slides[cur].classList.remove('on'); cur=i; slides[cur].classList.add('on');
+    bar.style.width=((cur+1)/N*100)+'%';
+    history.replaceState(null,'','#'+(cur+1));
+    check(cur);
+  }
+  function next(){ if(cur<N-1) go(cur+1); }
+  function prev(){ if(cur>0) go(cur-1); }
+
+  function build(){
+    if(built) return; built=true;
+    slides.forEach(function(s,i){
+      var c=document.createElement('div'); c.className='ovc';
+      var w=document.createElement('div'); w.className='ovi';
+      var cl=s.cloneNode(true); cl.classList.add('on'); cl.style.animation='none';
+      w.appendChild(cl); c.appendChild(w);
+      var n=document.createElement('div'); n.className='ovn'; n.textContent=i+1; c.appendChild(n);
+      c.addEventListener('click',function(){ go(i); toggleOv(false); });
+      ovg.appendChild(c);
+    });
+  }
+  function toggleOv(on){ ovOpen=(on===undefined)?!ovOpen:on; if(ovOpen) build();
+    ov.classList.toggle('on',ovOpen); }
+
+  document.addEventListener('keydown',function(e){
+    var k=e.key;
+    if(k==='Escape'){ if(ovOpen) toggleOv(false);
+      else if(document.fullscreenElement) document.exitFullscreen(); return; }
+    if(k==='o'||k==='O'){ toggleOv(); e.preventDefault(); return; }
+    if(ovOpen) return;
+    if(k==='ArrowRight'||k==='PageDown'||k===' '||k==='j'||k==='J'){ next(); e.preventDefault(); }
+    else if(k==='ArrowLeft'||k==='PageUp'||k==='k'||k==='K'){ prev(); e.preventDefault(); }
+    else if(k==='Home'){ go(0); e.preventDefault(); }
+    else if(k==='End'){ go(N-1); e.preventDefault(); }
+    else if(k==='f'||k==='F'){ document.fullscreenElement?document.exitFullscreen()
+      :document.documentElement.requestFullscreen(); e.preventDefault(); }
+  });
+
+  document.getElementById('stage').addEventListener('click',function(e){
+    if(ovOpen) return;
+    if(e.target.closest('a,.code,.kbd')) return;
+    if(String(window.getSelection()).length>0) return;
+    (e.clientX/window.innerWidth < 0.28) ? prev() : next();
+  });
+
+  var tx=0;
+  document.addEventListener('touchstart',function(e){ tx=e.changedTouches[0].clientX; },{passive:true});
+  document.addEventListener('touchend',function(e){
+    if(ovOpen) return; var d=e.changedTouches[0].clientX-tx;
+    if(Math.abs(d)>50){ d<0?next():prev(); }
+  },{passive:true});
+
+  window.addEventListener('hashchange',function(){
+    var n=parseInt(location.hash.slice(1),10); if(!isNaN(n)&&n-1!==cur) go(n-1);
+  });
+
+  var h=parseInt(location.hash.slice(1),10);
+  go(isNaN(h)?0:h-1);
+})();
+</script>
+</body>
+</html>

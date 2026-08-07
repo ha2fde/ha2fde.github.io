@@ -1,4 +1,8 @@
 {
+  "agent-principles-ch2-versions": {
+    "desc": "第二章重写三次的四个版本（含废弃的公理推导版）+ 每版为什么塌的复盘",
+    "src": "/tmp/ch2-versions"
+  },
   "agent-principles-flash": {
     "desc": "同一套提示词交给 DeepSeek Flash 生成的六章版本，可与 posts/agent-principles/ 对照看模型差异。_parts/ 是分片源和拼装脚本",
     "src": "/Users/fde/Documents/agent ppt flash"
