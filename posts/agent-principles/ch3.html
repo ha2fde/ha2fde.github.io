@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>第三章 · 从 chat 到 agent</title>
+<title>第三章 · 从 Chat 到 Agent</title>
 <style>
 :root{
   --bg:#e9edf3; --slide:#fff; --panel:#f4f7fb; --line:#e2e8f0;
@@ -121,9 +121,9 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
 
 <section class="slide cover">
   <div class="ser">AGENT 原理与实践 · 第三章</div>
-  <h1>从 chat 到 agent</h1>
+  <h1>从 Chat 到 Agent</h1>
   <div class="rule"></div>
-  <div class="sl">起点是一个只会预测下一个词的架构。<br>终点是一个会拆任务、会查资料、会调工具的系统。<br><b>中间每一步补了什么，代价是什么——这是一门工程课。</b></div>
+  <div class="sl">一个只会预测下一个词的模型，<br><b>是怎么变成会拆任务、会调工具的系统的。</b></div>
   <div class="meta" style="margin-top:34px">工程课 · 每一步补了什么、代价是什么</div>
   <div class="meta" style="margin-top:10px">← → 翻页　·　O 概览　·　F 全屏</div>
 </section>
@@ -549,7 +549,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
       <tr><th style="width:14%">这一步</th><th style="width:29%">上一步差什么</th><th style="width:29%">这一步补什么</th><th style="width:28%">代价</th></tr>
       <tr><td>预训练</td><td>没有任何语言能力</td><td>用下一词预测这一个目标，把世界知识、语言、逻辑一起学进去</td><td class="orange">算力和数据的门槛极高；知识冻结在训练截止点</td></tr>
       <tr><td>对齐到对话</td><td>只会续写，问它问题它接着编问题</td><td>用对话模板 + 监督微调装上把手；用偏好比较调行为</td><td class="orange">能力上有损耗；会过度拒绝；倾向于迎合用户</td></tr>
-      <tr><td>思维链</td><td>答案一步吐出，难题的可用计算量被卡死</td><td>把推理摊到多个词元上，同时把中间结论外置成可读的文本</td><td class="orange">输出词元大增，成本和延迟按倍数上去</td></tr>
+      <tr><td>思维链</td><td>答案一步吐出，难题的可用计算量被卡住</td><td>把推理摊到多个词元上，同时把中间结论外置成可读的文本</td><td class="orange">输出词元大增，成本和延迟按倍数上去</td></tr>
       <tr><td>ReAct</td><td>推理全在脑内，拿不到外部信息也改变不了任何东西</td><td>在提示词里约定思考与行动交替，由外部程序执行并回填结果</td><td class="orange">格式随时会破、参数没类型、工具说明只能塞提示里</td></tr>
       <tr><td>工具调用</td><td>调用意图用自然语言表达，没有任何结构保证</td><td>工具进接口、意图变结构化输出，并且模型被专门训练过</td><td class="orange">依赖模型具备这项能力；接口本身要有一套约定</td></tr>
       <tr><td class="purple">上下文工程</td><td class="dim">（横向，不在链上）</td><td>管理每一轮到底把什么放进那段有限的输入里</td><td class="orange">压缩会丢信息、隔离会失去全局视野，没有免费的解法</td></tr>
@@ -571,10 +571,10 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
         </ul>
       </div>
       <div class="card"><div class="t">这一章刻意停在这里</div>
-        <div class="cap mt" style="margin-top:8px">工具调用这一节讲到<b>「模型能输出调用意图、执行的是宿主」</b>就停了。下面这些明确不在本章范围内：<br><br>· <b>那份调用意图具体长什么样</b>——字段怎么定义、参数的类型约定怎么写、真实报文的结构<br>· <b>工具是怎么被接上来的</b>——它可以是宿主里写死的一个函数，也可以来自一个外部服务，这中间有一整套约定<br>· <b>多个 Agent 之间怎么互相委派</b><br><br>这些属于<b>接口怎么定义与传递</b>的范畴，是独立的一层，需要单独讲。<br><br><b>本章交付的是：能力是怎么一步步长出来的。</b>接口层怎么组织，是另一个问题。</div></div>
+        <div class="cap mt" style="margin-top:8px">工具调用这一节讲到<b>「模型能输出调用意图、执行的是宿主」</b>就停了。下面这些明确不在本章范围内：<br><br>· <b>那份调用意图具体长什么样</b>——字段怎么定义、参数的类型约定怎么写、真实报文的结构<br>· <b>工具是怎么被接上来的</b>——它可以是宿主里内置的一个函数，也可以来自一个外部服务，这中间有一整套约定<br>· <b>多个 Agent 之间怎么互相委派</b><br><br>这些属于<b>接口怎么定义与传递</b>的范畴，是独立的一层，需要单独讲。<br><br><b>本章交付的是：能力是怎么一步步长出来的。</b>接口层怎么组织，是另一个问题。</div></div>
     </div>
     <div class="note b-purple mt2"><div class="t purple">如果只带走一句话</div>
-      <div class="cap">从 chat 到 agent，<b>模型本身并没有发生质变——变的是它周围那一圈东西</b>：怎么把历史拼给它、怎么让它先想再答、怎么把它的输出接到真实动作上、怎么在窗口装不下时挑该留什么。<br>
+      <div class="cap">从 Chat 到 Agent，<b>模型本身并没有发生质变——变的是它周围那一圈东西</b>：怎么把历史拼给它、怎么让它先想再答、怎么把它的输出接到真实动作上、怎么在窗口装不下时挑该留什么。<br>
       所以当一个 Agent 表现不好时，<b>先怀疑的应该是这一圈，而不是模型不够强</b>——这一圈里能改的东西，比换模型多得多，也便宜得多。</div></div>
   </div>
 </section>

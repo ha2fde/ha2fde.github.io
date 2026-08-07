@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>第五章 · 从 demo 到生产</title>
+<title>第五章 · 从 Demo 到生产</title>
 <style>
 :root{
   --bg:#e9edf3; --slide:#fff; --panel:#f4f7fb; --line:#e2e8f0;
@@ -121,9 +121,9 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
 
 <section class="slide cover">
   <div class="ser">AGENT 原理与实践 · 第五章</div>
-  <h1>从 demo 到生产</h1>
+  <h1>从 Demo 到生产</h1>
   <div class="rule"></div>
-  <div class="sl">先决定控制权交出去多少，再决定用什么工具。<br>顺序反了，选出来的东西一定是错的。</div>
+  <div class="sl"><b>先决定控制权交出去多少，再决定用什么工具。</b><br>顺序反了，选出来的东西一定是错的。</div>
   <div class="meta" style="margin-top:34px">决策型 · 给要把 Agent 送上线的人 · 建议回查</div>
   <div class="meta" style="margin-top:10px">← → 翻页　·　O 概览　·　F 全屏</div>
 </section>
@@ -150,7 +150,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
 </section>
 
 <section class="slide" data-act="开场">
-  <div class="hd"><h2>六种典型死法，先认一遍</h2></div>
+  <div class="hd"><h2>六种典型的翻车方式，先认一遍</h2></div>
   <div class="bd">
     <div class="g3 mb">
       <div class="card t-red"><div class="t red">① 九成对，剩下一成没人管</div>
@@ -158,7 +158,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
       <div class="card t-red"><div class="t red">② 没有评估，改动全靠感觉</div>
         <div class="cap">改了提示词，感觉好像好了点——<b>但没有任何东西能证明它没在别的地方变差。</b>于是不敢改，也不敢上。</div></div>
       <div class="card t-red"><div class="t red">③ 算不过账</div>
-        <div class="cap">一次任务的模型开销，比它省下来的人力还贵。<b>技术是通的，单位经济不成立</b>，这类项目死得最安静。</div></div>
+        <div class="cap">一次任务的模型开销，比它省下来的人力还贵。<b>技术是通的，单位经济不成立</b>，这类项目收场得最安静。</div></div>
       <div class="card t-red"><div class="t red">④ 出事了查不清</div>
         <div class="cap">用户说结果不对，你打开日志，只有一句「调用失败」。<b>它当时看到了什么、为什么这么决定，全都没留下来。</b></div></div>
       <div class="card t-red"><div class="t red">⑤ 权限一刀切</div>
@@ -193,7 +193,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
     <svg viewBox="0 0 1160 250" width="100%" height="250" style="display:block">
       <g font-family="PingFang SC,Hiragino Sans GB,-apple-system,sans-serif">
         <rect x="40" y="16" width="200" height="52" rx="6" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
-        <text x="140" y="48" font-size="15" fill="#1f2937" text-anchor="middle">流程全写死</text>
+        <text x="140" y="48" font-size="15" fill="#1f2937" text-anchor="middle">流程全固定</text>
         <rect x="300" y="16" width="200" height="52" rx="6" fill="#ecfdf5" stroke="#047857" stroke-width="1.5"/>
         <text x="400" y="48" font-size="15" fill="#1f2937" text-anchor="middle">代码决定每一步</text>
         <rect x="600" y="16" width="200" height="52" rx="6" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/>
@@ -217,7 +217,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
         <text x="140" y="174" font-size="12" fill="#5b6675" text-anchor="middle">分类、抽取、改写</text>
         <text x="140" y="196" font-size="12" fill="#2563eb" text-anchor="middle">这不叫 Agent</text>
 
-        <text x="400" y="138" font-size="12" fill="#5b6675" text-anchor="middle">流程图是代码写死的，</text>
+        <text x="400" y="138" font-size="12" fill="#5b6675" text-anchor="middle">流程图是代码定好的，</text>
         <text x="400" y="156" font-size="12" fill="#5b6675" text-anchor="middle">模型在固定的节点上</text>
         <text x="400" y="174" font-size="12" fill="#5b6675" text-anchor="middle">被调用，输出即入参</text>
         <text x="400" y="196" font-size="12" fill="#047857" text-anchor="middle">工作流</text>
@@ -249,7 +249,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
       <tr><td><b>结果稳定性</b></td><td class="green"><b>同样输入同样输出</b>，可以写单元测试，回归可比对。</td><td>同样输入可能走不同路径。<b>只能统计地评估，不能逐条断言。</b></td></tr>
       <tr><td><b>成本与延迟</b></td><td class="green">模型调用次数固定且可数，成本可以提前算准。</td><td>调用次数由模型当场决定，<b>同一个任务可能便宜十倍，也可能贵十倍</b>。</td></tr>
       <tr><td><b>出错时</b></td><td class="green">错在哪一步一目了然，改哪儿也明确。</td><td>要从一长串决策里找出哪一步开始跑偏，<b>而且不一定能复现</b>。</td></tr>
-      <tr><td><b>权限面</b></td><td class="green">每一步能碰什么，代码里就锁死了。</td><td>工具的组合方式由模型决定，<b>你只能约束边界，无法约束路径</b>。</td></tr>
+      <tr><td><b>权限面</b></td><td class="green">每一步能碰什么，代码里就锁定了。</td><td>工具的组合方式由模型决定，<b>你只能约束边界，无法约束路径</b>。</td></tr>
       <tr><td><b>开发成本</b></td><td>每一种情况都要你写一遍。<b>场景越多，代码越长。</b></td><td class="purple"><b>不需要穷举</b>。给对工具和目标，剩下的它自己组合。</td></tr>
       <tr><td><b>维护成本</b></td><td>需求变了要改流程图，但改起来确定。</td><td>改一句提示词可能影响所有场景，<b>没有评估就等于盲改</b>。</td></tr>
     </table>
@@ -358,13 +358,13 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
       <tr><td class="blue"><b>①</b></td><td><b>这件事的步骤能提前写出来吗</b><br><span class="dim">不是「大概是这几步」，是「能画成图、分支能列全」</span></td><td class="green">能 → <b>写成流程，别用 Agent</b></td><td>不能，因为下一步做什么取决于这一步看到了什么 → 需要自主</td></tr>
       <tr><td class="blue"><b>②</b></td><td><b>做错了的代价有多大</b></td><td class="green">发出去就收不回、或者影响钱和合规 → <b>往左，并加人工确认</b></td><td>错了能重来、能人工修，且用户看得出来 → 可以往右</td></tr>
       <tr><td class="blue"><b>③</b></td><td><b>你能不能判断它做得对不对</b><br><span class="dim">这一条最容易被跳过</span></td><td class="green">判断不了 → <b>必须往左</b>，把它拆成你能验的小步</td><td>能自动判断（有测试、有校验、有比对基准）→ 可以往右</td></tr>
-      <tr><td class="blue"><b>④</b></td><td><b>单次成本的上限能接受吗</b></td><td class="green">不能接受波动 → 往左，调用次数写死</td><td>能接受，并且能设硬上限 → 可以往右</td></tr>
+      <tr><td class="blue"><b>④</b></td><td><b>单次成本的上限能接受吗</b></td><td class="green">不能接受波动 → 往左，调用次数固定</td><td>能接受，并且能设硬上限 → 可以往右</td></tr>
     </table>
     <div class="g2">
       <div class="note b-orange"><div class="t orange">默认答案是「往左」</div>
         <div class="cap">四个问题里<b>只要有一个把你推向左边，就往左</b>。往右的收益只有一样（不用穷举路径），而往左的收益有四样。<br><b>把举证责任放在「为什么必须自主」这一侧</b>，而不是放在「为什么不用 Agent」那一侧。</div></div>
       <div class="note b-purple"><div class="t purple">位置不是永久的</div>
-        <div class="cap">正确的演进方向通常是<b>从右往左</b>：先用自主循环把这件事跑通、看清它实际走了哪些路径，再把稳定下来的路径固化成代码。<br>反过来（先写死再放开）也行，但更少见——因为写死的过程本身就会暴露出路径其实是有限的。</div></div>
+        <div class="cap">正确的演进方向通常是<b>从右往左</b>：先用自主循环把这件事跑通、看清它实际走了哪些路径，再把稳定下来的路径固化成代码。<br>反过来（先固定再放开）也行，但更少见——因为固定的过程本身就会暴露出路径其实是有限的。</div></div>
     </div>
   </div>
 </section>
@@ -380,7 +380,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
         <div class="cap">你直接调接口，还是用官方 SDK，还是上一个编排框架。<b>这是实现决定</b>，由团队和复杂度推出来——错了，做起来更累，但需求还是能满足。<br><br>它决定的是：<b>你写多少代码、以及多少东西不在你手里。</b></div></div>
     </div>
     <div class="note b-orange mb"><div class="t orange">为什么顺序不能反</div>
-      <div class="cap">因为<b>第一条轴决定了第二条轴的选项</b>：一个纯工作流用不上编排框架的大半功能；一个真正的自主循环，用最原始的方式写也就多几十行。<br>先选框架再想控制权，等于<b>让工具的能力边界替你做设计决定</b>——最后往往是把一个本该写死的流程，硬做成了一个「Agent」，因为框架的示例就是那么写的。</div></div>
+      <div class="cap">因为<b>第一条轴决定了第二条轴的选项</b>：一个纯工作流用不上编排框架的大半功能；一个真正的自主循环，用最原始的方式写也就多几十行。<br>先选框架再想控制权，等于<b>让工具的能力边界替你做设计决定</b>——最后往往是把一个本该固定下来的流程，硬做成了一个「Agent」，因为框架的示例就是那么写的。</div></div>
     <div class="note b-purple"><div class="t purple">先回答这个，再谈选型</div>
       <div class="cap"><b>「我这个功能在控制权轴上的位置是哪儿，为什么？」</b>——这个问题答不上来之前，任何框架对比都没有意义。</div></div>
   </div>
@@ -418,7 +418,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
       <tr><td class="orange"><b>法务与合规</b><br><span class="dim">治理</span></td><td>它做的决定，谁负责？出事怎么追？</td><td>「还没想过」</td><td class="orange"><b>责任人明确，动作可追溯，数据去向可说明。</b></td></tr>
       <tr><td class="green"><b>财务</b><br><span class="dim">成本与延迟</span></td><td>一次多少钱？多久出结果？规模上去了呢？</td><td>「跑一次好像几分钱」</td><td class="green"><b>单位成本算得清，且比它替代的方式便宜。</b></td></tr>
       <tr><td class="blue"><b>值班的人</b><br><span class="dim">可观测性</span></td><td>用户说结果不对，这一次到底发生了什么？</td><td>「我翻翻终端记录」</td><td class="blue"><b>任意一次执行都能完整回放。</b></td></tr>
-      <tr><td class="orange"><b>业务负责人</b><br><span class="dim">人在环</span></td><td>哪些事它能自己做主，哪些要先问人？</td><td>「我一直看着呢」</td><td class="orange"><b>审批点写死在流程里，不靠人盯着。</b></td></tr>
+      <tr><td class="orange"><b>业务负责人</b><br><span class="dim">人在环</span></td><td>哪些事它能自己做主，哪些要先问人？</td><td>「我一直看着呢」</td><td class="orange"><b>审批点固定在流程里，不靠人盯着。</b></td></tr>
     </table>
     <div class="note b-purple mt2"><div class="t purple">这张表就是这一章后半段的目录</div>
       <div class="cap">顺序是有讲究的：<b>评估必须在最前</b>——没有它，后面六项的任何改动都无法验证是不是真的改好了。</div></div>
@@ -562,7 +562,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
 <section class="slide" data-act="成本">
   <div class="hd"><h2>成本：很多项目不是技术不行，是账算不过来</h2></div>
   <div class="bd">
-    <div class="p mb">这是最安静的一种死法：<b>什么都跑得通，就是不划算</b>。而且它常常到规模化那一刻才暴露——demo 阶段一次几分钱，谁也不会去算。</div>
+    <div class="p mb">这是最安静的一种翻车：<b>什么都跑得通，就是不划算</b>。而且它常常到规模化那一刻才暴露——demo 阶段一次几分钱，谁也不会去算。</div>
     <div class="g2 mb">
       <div class="card t-red"><div class="t red">为什么 Agent 的成本比直觉贵得多</div>
         <div class="cap"><b>① 每一轮都要重付整段对话。</b>第 N 轮的输入包含前 N-1 轮的全部内容，所以成本大致随轮数<b>平方增长</b>，不是线性。<br><br><b>② 轮数由模型决定。</b>同一个任务，顺利时三轮，卡住时二十轮。<b>成本的方差极大。</b><br><br><b>③ 工具回执占比常常最高。</b>一次目录列表、一段日志、一份查询结果，往往比对话本身长得多，而且每一轮都要重付一次。<br><br><b>④ 失败也要付钱。</b>跑了十五轮最后放弃，这十五轮照样计费。</div></div>

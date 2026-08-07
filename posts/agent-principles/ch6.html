@@ -123,7 +123,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
   <div class="ser">AGENT 原理与实践 · 第六章</div>
   <h1>从 Agent 到 AGI</h1>
   <div class="rule"></div>
-  <div class="sl">不预测，只梳理路径。<br>每条路只问四件事，最后一件是：如果它对了，我们会先看到什么。</div>
+  <div class="sl">不预测，只梳理路径。<br><b>每条路都问一句：如果它对了，我们会先看到什么。</b></div>
   <div class="meta" style="margin-top:34px">观点型 · 不给时间表 · 结论会被后来的事实检验</div>
   <div class="meta" style="margin-top:10px">← → 翻页　·　O 概览　·　F 全屏</div>
 </section>
@@ -315,9 +315,9 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
       <div class="card t-green"><div class="t green">② 证据</div>
         <div class="cap"><b>· 「生成 + 审查」这个最小结构确实有效。</b>让一个角色产出、另一个角色专门挑毛病，质量提升是可观测的——这是多 Agent 里最扎实的一块证据。<br><br><b>· 独立多次尝试再取一致，能提高可靠性。</b>同一个任务跑几遍、比较结果，这在实践中被广泛使用且确实有用。<br><br><b>· 上下文隔离带来的收益是真的。</b>把子任务交给独立的上下文去做，避免主线被细节淹没——这在长任务上效果明显。<br><br><b>· 协议层已经在往这个方向铺</b>：Agent 之间互相委派所需要的能力发现、任务状态、跨域鉴权，已经有了规范化的尝试。</div></div>
       <div class="card t-orange"><div class="t orange">③ 瓶颈</div>
-        <div class="cap"><b>· 错误会相乘，不会相消。</b>每个环节九成对，五个环节串起来就只剩六成。<b>协作结构不会自动纠错，除非专门设计了纠错机制</b>——而这正是难的部分。<br><br><b>· 成本乘以角色数。</b>五个 Agent 讨论一轮，成本是一个的五倍以上，而收益远不是五倍。<b>很多多 Agent 方案在经济上直接不成立。</b><br><br><b>· 沟通本身会失真。</b>Agent 之间用自然语言交接，每一次交接都可能丢信息或引入歧义——组织学里叫沟通成本，这里同样存在。<br><br><b>· 大量「多 Agent」其实是伪装的流程图。</b>如果角色和顺序都是人写死的，那它就是一个工作流，收益来自流程设计，不来自「多 Agent」。</div></div>
+        <div class="cap"><b>· 错误会相乘，不会相消。</b>每个环节九成对，五个环节串起来就只剩六成。<b>协作结构不会自动纠错，除非专门设计了纠错机制</b>——而这正是难的部分。<br><br><b>· 成本乘以角色数。</b>五个 Agent 讨论一轮，成本是一个的五倍以上，而收益远不是五倍。<b>很多多 Agent 方案在经济上直接不成立。</b><br><br><b>· 沟通本身会失真。</b>Agent 之间用自然语言交接，每一次交接都可能丢信息或引入歧义——组织学里叫沟通成本，这里同样存在。<br><br><b>· 大量「多 Agent」其实是伪装的流程图。</b>如果角色和顺序都是人定好的，那它就是一个工作流，收益来自流程设计，不来自「多 Agent」。</div></div>
       <div class="card t-purple"><div class="t purple">④ 会先看到什么</div>
-        <div class="cap"><b>走通的信号：</b><br>· 出现<b>角色和分工由系统自己决定</b>的方案，且效果稳定优于人写死的流程——这是区分「真多 Agent」和「伪装的工作流」的关键。<br>· <b>多 Agent 方案在成本上打平或胜过单 Agent</b>，而不只是效果好一点点、成本翻几倍。<br>· 出现跨组织的真实 Agent 协作，并且解决了责任和计费问题——<b>注意是责任和计费，不是协议格式</b>。<br><br><b>卡住的信号：</b><br>· 多 Agent 长期停留在「生成 + 审查」这一种结构上，再复杂的编排都跑不稳。<br>· 更强的单模型反复地把多 Agent 方案打回原形：一个模型多想几轮就赢了。<br>· 跨组织协作卡在信任和归责上，协议做得再完备也没人真的接。</div></div>
+        <div class="cap"><b>走通的信号：</b><br>· 出现<b>角色和分工由系统自己决定</b>的方案，且效果稳定优于人定好的流程——这是区分「真多 Agent」和「伪装的工作流」的关键。<br>· <b>多 Agent 方案在成本上打平或胜过单 Agent</b>，而不只是效果好一点点、成本翻几倍。<br>· 出现跨组织的真实 Agent 协作，并且解决了责任和计费问题——<b>注意是责任和计费，不是协议格式</b>。<br><br><b>卡住的信号：</b><br>· 多 Agent 长期停留在「生成 + 审查」这一种结构上，再复杂的编排都跑不稳。<br>· 更强的单模型反复地把多 Agent 方案打回原形：一个模型多想几轮就赢了。<br>· 跨组织协作卡在信任和归责上，协议做得再完备也没人真的接。</div></div>
     </div>
   </div>
 </section>
@@ -385,7 +385,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
       <tr><td class="blue"><b>继续 scaling</b></td><td class="green">新一代在<b>训练截止之后才出现</b>的任务上明显更好　·　长任务成功率随代际稳定上升　·　单位能力成本继续下降</td><td class="orange">提升只体现在基准分上，实际用起来感受不到　·　资源明显转向别的方向　·「更大的模型」不再是卖点</td></tr>
       <tr><td class="green"><b>RL + 可验证环境</b></td><td class="green"><b>能力从可验证领域溢出到不可验证领域</b>　·　出现公认的通用环境集合　·「造环境」成为独立分工</td><td class="orange">提升长期只发生在有自动判定的领域　·　大量成绩被发现来自钻空子　·　环境成本高过训练本身</td></tr>
       <tr><td class="purple"><b>连续学习</b></td><td class="green">出现<b>能测出「用得越久越好用」</b>的产品　·「学到的东西」变成可查看、可编辑、可转移的对象　·　出现针对自更新系统的评估方法</td><td class="orange">长期停留在外挂检索库，行为本身从不改变　·　在线更新因退化或污染被回退　·「个性化」始终等于提示词拼接</td></tr>
-      <tr><td class="orange"><b>多 Agent</b></td><td class="green"><b>角色和分工由系统自己决定</b>且稳定优于人写死的流程　·　多 Agent 在成本上打平单 Agent　·　跨组织协作解决了责任与计费</td><td class="orange">长期只有「生成 + 审查」这一种结构跑得稳　·　更强的单模型反复把多 Agent 打回原形　·　跨组织协作卡在信任和归责上</td></tr>
+      <tr><td class="orange"><b>多 Agent</b></td><td class="green"><b>角色和分工由系统自己决定</b>且稳定优于人定好的流程　·　多 Agent 在成本上打平单 Agent　·　跨组织协作解决了责任与计费</td><td class="orange">长期只有「生成 + 审查」这一种结构跑得稳　·　更强的单模型反复把多 Agent 打回原形　·　跨组织协作卡在信任和归责上</td></tr>
       <tr><td class="red"><b>世界模型与具身</b></td><td class="green">机器人在<b>没见过的杂乱真实环境</b>里完成没专门训练过的任务　·　纯视觉训练让语言上的因果推理也变好　·　真实互动数据成本数量级下降</td><td class="orange">演示很好看但始终限于布置过的场景　·　视频越来越逼真，反事实推理却没提升　·　硬件成本与可靠性长期不变</td></tr>
     </table>
     <div class="note b-purple"><div class="t purple">使用说明</div>

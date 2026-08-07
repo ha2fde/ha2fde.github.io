@@ -123,7 +123,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
   <div class="ser">AGENT 原理与实践 · 第四章</div>
   <h1>Agent 的协议层</h1>
   <div class="rule"></div>
-  <div class="sl">模型只会输出文本。<br>让文本变成动作，靠的是一份<b>约定</b>——<br><b>这份约定由谁写、写在哪里、由谁执行。</b><br>下面几样，各给了一套不同的答案。</div>
+  <div class="sl">模型只会输出文本。<br><b>让文本变成动作，靠的是一份约定。</b></div>
   <div class="meta" style="margin-top:34px">对接层 · 以真实报文和实体关系图为主</div>
   <div class="meta" style="margin-top:10px">← → 翻页　·　O 概览　·　F 全屏</div>
 </section>
@@ -596,7 +596,7 @@ some-tool --version</div>
     <div class="p mb">既然三样东西在结构上是同一件事，那就值得给这件事一个名字：<b>Agent 与外部世界之间的那层接口</b>。它既不是 API，也不是 UI——因为读它的既不是编译器，也不是人。</div>
     <table class="tbl">
       <tr><th style="width:16%"></th><th style="width:20%">读者是谁</th><th style="width:32%">读错了会怎样</th><th>因此设计时优化的是</th></tr>
-      <tr><td class="blue"><b>API</b></td><td>另一段程序</td><td><b>不会读错。</b>类型不匹配在编译期或运行期直接报错，行为是确定的。</td><td>严谨、正交、性能。字段名短一点无所谓，反正调用方是照文档写死的。</td></tr>
+      <tr><td class="blue"><b>API</b></td><td>另一段程序</td><td><b>不会读错。</b>类型不匹配在编译期或运行期直接报错，行为是确定的。</td><td>严谨、正交、性能。字段名短一点无所谓，反正调用方是照文档固定写好的。</td></tr>
       <tr><td class="green"><b>UI</b></td><td>人</td><td>人会犹豫、会点错，但<b>人能看懂上下文</b>，能从界面布局、图标、颜色里补全没写出来的信息。</td><td>直观、可发现、可撤销。信息可以放在视觉层面，不必全写成文字。</td></tr>
       <tr class="t-purple"><td class="purple"><b>ACI</b></td><td class="purple"><b>一个概率模型</b></td><td class="purple"><b>会读错，而且是概率性地读错。</b>同一份接口，十次里可能有九次用对、一次用错，且错法不固定。<br>它看不到颜色和布局，<b>只能看到你写下的那些字</b>。</td><td class="purple"><b>让「用对」的概率尽可能高。</b>所以：名字要能望文生义，说明要写清什么时候用，错误信息要能指导下一步。</td></tr>
     </table>
@@ -621,7 +621,7 @@ some-tool --version</div>
       <div class="card t-purple"><div class="t purple">⑤ 给回执定预算</div>
         <div class="cap">返回前就截断、分页、只留要紧字段，并在结尾写清「共 N 条，此处显示前 20 条」。<br><br><span class="dim">（上下文是有限资源，而且塞得越满，模型的判断质量越差——这一点在长任务里尤其明显。）</span></div></div>
       <div class="card t-purple"><div class="t purple">⑥ 让它能自己查</div>
-        <div class="cap">提供一个能列出可选值、看示例、试运行的入口，而不是把所有可能性写死在说明里。<br><br><span class="dim">（说明是常驻上下文的，写得越全越占位置；能查的东西按需取用，只在需要时才花 token。）</span></div></div>
+        <div class="cap">提供一个能列出可选值、看示例、试运行的入口，而不是把所有可能性罗列在说明里。<br><br><span class="dim">（说明是常驻上下文的，写得越全越占位置；能查的东西按需取用，只在需要时才花 token。）</span></div></div>
     </div>
     <div class="note b-green mt2"><div class="t green">怎么验证一份接口写得好不好</div>
       <div class="cap"><b>把工具定义原样贴给模型，问它「这个工具是干什么的、什么时候该用、给我三个调用例子」。</b>它答偏了，就是接口写得不够——这个检查一分钟就能做完，比事后从失败日志里倒推快得多。</div></div>
