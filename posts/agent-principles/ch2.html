@@ -337,7 +337,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
         <table class="tbl s">
           <tr><td style="width:22%">DENDRAL</td><td>从质谱数据推断有机化合物结构。第一个把领域专家知识系统化的成功案例</td></tr>
           <tr><td>MYCIN</td><td>诊断血液感染并给出抗生素方案。评测中表现不逊于人类专科医生，但<b>因责任与伦理问题从未投入临床</b></td></tr>
-          <tr><td>XCON</td><td>为 DEC 的小型机订单自动配置硬件组合。这是转折点——<b>它省下的是实打实的钱</b>，AI 第一次有了商业闭环</td></tr>
+          <tr><td>XCON</td><td>为 DEC 的小型机订单自动配置硬件组合。这是转折点——<b>它省下的是实打实的钱</b>，AI 第一次在商业上真正跑通了</td></tr>
         </table>
         <div class="note b-green mt2"><div class="t green">这一轮的成功是真的</div>
           <div class="cap">1980 年代，专家系统撑起了一个规模可观的产业：企业成建制地部署，专用硬件（LISP 机）有了自己的市场，日本在 1982 年启动了国家级的第五代计算机计划，各国跟投。<b>符号主义拿回了主导权。</b></div></div>
@@ -461,7 +461,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
       <div>
         <div class="p mb">1989 年起，杨立昆（Yann LeCun）等人把反向传播用在手写数字识别上，做出了卷积神经网络。1998 年定型的 LeNet-5 被真实部署，<b>用于读取支票上的手写金额</b>——在深度学习被普遍冷落的年代，这是极少数的工业级战果。</div>
         <div class="card t-blue"><div class="t blue">它凭什么在数据和算力都不足时能跑通</div>
-          <div class="cap">因为它把图像的两条先验直接<b>写进了网络结构</b>：<br><br>① <b>局部性</b>——一个像素只跟邻近像素相关，不必和整幅图全连接<br>② <b>平移不变性</b>——同一个特征检测器在图像各处复用，同一组权重反复使用<br><br>结果是参数量大幅下降。<b>结构里带的先验越多，需要从数据里学的东西就越少。</b></div></div>
+          <div class="cap">因为它把图像的两条<b>先验</b>——事先就认定成立的规律——直接<b>写进了网络结构</b>：<br><br>① <b>局部性</b>——一个像素只跟邻近像素相关，不必和整幅图全连接<br>② <b>平移不变性</b>——同一个特征检测器在图像各处复用，同一组权重反复使用<br><br>结果是参数量大幅下降。<b>结构里带的先验越多，需要从数据里学的东西就越少。</b></div></div>
       </div>
       <div>
         <div class="note b-orange mb"><div class="t orange">记住这个权衡，后面要用</div>

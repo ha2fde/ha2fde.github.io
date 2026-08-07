@@ -158,7 +158,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
       <div class="card t-red"><div class="t red">② 没有评估，改动全靠感觉</div>
         <div class="cap">改了提示词，感觉好像好了点——<b>但没有任何东西能证明它没在别的地方变差。</b>于是不敢改，也不敢上。</div></div>
       <div class="card t-red"><div class="t red">③ 算不过账</div>
-        <div class="cap">一次任务的模型开销，比它省下来的人力还贵。<b>技术是通的，单位经济不成立</b>，这类项目收场得最安静。</div></div>
+        <div class="cap">一次任务的模型开销，比它省下来的人力还贵。<b>技术是通的，一笔一笔算下来不划算</b>，这类项目收场得最安静。</div></div>
       <div class="card t-red"><div class="t red">④ 出事了查不清</div>
         <div class="cap">用户说结果不对，你打开日志，只有一句「调用失败」。<b>它当时看到了什么、为什么这么决定，全都没留下来。</b></div></div>
       <div class="card t-red"><div class="t red">⑤ 权限一刀切</div>
@@ -344,7 +344,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
       <div class="note b-purple"><div class="t purple">这样做换来什么</div>
         <div class="cap"><b>不确定性被限制在一段里</b>。评估只需要盯这一段，成本上限只需要在这一段设，出问题也知道去哪儿找。</div></div>
       <div class="note b-orange"><div class="t orange">演进方向也清楚了</div>
-        <div class="cap">用一段时间后，你会发现自主段里的某些路径其实很固定——<b>把它们固化成代码，自主段就缩小一点</b>。这是正向的收敛。</div></div>
+        <div class="cap">用一段时间后，你会发现自主段里的某些路径其实很固定——<b>把它们固化成代码，自主段就缩小一点</b>。这是好的方向：自主的那段在变小。</div></div>
     </div>
   </div>
 </section>
@@ -376,7 +376,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
     <div class="g2 mb">
       <div class="card t-blue"><div class="t blue">第一条轴：控制权（前面讲完了）</div>
         <div class="cap">下一步做什么由谁决定。<b>这是设计决定</b>，由业务约束推出来——错了，做出来的东西不满足需求。<br><br>它决定的是：<b>你的系统长什么样。</b></div></div>
-      <div class="card t-purple"><div class="t purple">第二条轴：抽象层级（这一节）</div>
+      <div class="card t-purple"><div class="t purple">第二条轴：用什么来写（这一节）</div>
         <div class="cap">你直接调接口，还是用官方 SDK，还是上一个编排框架。<b>这是实现决定</b>，由团队和复杂度推出来——错了，做起来更累，但需求还是能满足。<br><br>它决定的是：<b>你写多少代码、以及多少东西不在你手里。</b></div></div>
     </div>
     <div class="note b-orange mb"><div class="t orange">为什么顺序不能反</div>
@@ -392,7 +392,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
     <table class="tbl mb">
       <tr><th style="width:13%"></th><th style="width:24%">你自己写什么</th><th style="width:26%">适配控制权轴的哪一段</th><th>代价</th></tr>
       <tr><td class="blue"><b>直接调接口</b><br><span class="dim">HTTP 请求</span></td><td>全部。包括拼请求、解析返回、重试、循环。</td><td>任何一段都能写，<b>但只在你想完全掌控、或者环境受限时才值得</b>。</td><td>大量本可以不写的胶水代码；每次接口有新特性都要自己跟。</td></tr>
-      <tr><td class="green"><b>官方 SDK</b><br><span class="dim">各语言的客户端库</span></td><td>循环和编排逻辑。SDK 管掉请求构造、重试、流式、工具调用的往返。</td><td class="green"><b>轴上任何一段都成立</b>，是绝大多数项目的合理起点——包括自主循环，那个循环本身也就几十行。</td><td>编排、状态、并发要自己组织。项目变复杂后需要自己收敛结构。</td></tr>
+      <tr><td class="green"><b>官方 SDK</b><br><span class="dim">各语言的客户端库</span></td><td>循环和编排逻辑。SDK 管掉请求构造、重试、流式、工具调用的往返。</td><td class="green"><b>轴上任何一段都成立</b>，是绝大多数项目的合理起点——包括自主循环，那个循环本身也就几十行。</td><td>编排、状态、并发要自己组织。项目变复杂后需要自己整理结构。</td></tr>
       <tr><td class="purple"><b>编排框架</b><br><span class="dim">第三方</span></td><td>节点里的业务逻辑。框架管掉流程编排、状态流转、持久化、并发、断点续跑。</td><td class="purple">主要是<b>中间那段</b>——流程复杂、有分支和并发、需要中断后恢复。<br><span class="dim">极左端用不上；极右端框架能帮的其实不多。</span></td><td class="red"><b>多一层抽象</b>：调试要穿透它、行为受它约束、升级会破坏你的代码、出问题要先判断是你的还是它的。</td></tr>
     </table>
     <div class="g3">
@@ -515,7 +515,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
           <li><b>能碰生产环境。</b>demo 阶段图方便直接连了生产库，然后就一直没改。<b>默认连非生产环境</b>，接生产是需要单独评审的动作。</li>
         </div></div>
       <div class="card t-orange"><div class="t orange">怎么定这个「最小面」</div>
-        <div class="cap">列出它要完成的任务，<b>逐个任务问：为了做成这件事，最少需要哪些权限？</b>然后把并集给它，别多给。<br><br>几个具体的收敛手段：<br>· <b>限定范围</b>——只能访问指定目录、指定表、指定项目。<br>· <b>限定动作</b>——枚举允许的操作，不在名单里的直接拒。<br>· <b>限定用量</b>——每小时最多调多少次、单次最多处理多少条。<br>· <b>加时效</b>——凭证短期有效，过期重新签发。<br><br><b>这些约束都在宿主侧执行，不写在提示词里。</b>写在提示词里的约束，是建议，不是限制。</div></div>
+        <div class="cap">列出它要完成的任务，<b>逐个任务问：为了做成这件事，最少需要哪些权限？</b>然后把并集给它，别多给。<br><br>几个具体的收窄手段：<br>· <b>限定范围</b>——只能访问指定目录、指定表、指定项目。<br>· <b>限定动作</b>——枚举允许的操作，不在名单里的直接拒。<br>· <b>限定用量</b>——每小时最多调多少次、单次最多处理多少条。<br>· <b>加时效</b>——凭证短期有效，过期重新签发。<br><br><b>这些约束都在宿主侧执行，不写在提示词里。</b>写在提示词里的约束，是建议，不是限制。</div></div>
     </div>
     <div class="note b-red"><div class="t red">一个容易忽略的方向：输出也要管</div>
       <div class="cap">大家通常只盯着「它能做什么」，但<b>「它能把什么送出去」同样重要</b>。一个能读内部文档、又能发外部请求的 Agent，两个权限单独看都合理，组合起来就是一条数据外泄的通路。<br><b>检查权限时，永远要看组合，不能只看单项。</b></div></div>
@@ -566,7 +566,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
     <div class="g2 mb">
       <div class="card t-red"><div class="t red">为什么 Agent 的成本比直觉贵得多</div>
         <div class="cap"><b>① 每一轮都要重付整段对话。</b>第 N 轮的输入包含前 N-1 轮的全部内容，所以成本大致随轮数<b>平方增长</b>，不是线性。<br><br><b>② 轮数由模型决定。</b>同一个任务，顺利时三轮，卡住时二十轮。<b>成本的方差极大。</b><br><br><b>③ 工具回执占比常常最高。</b>一次目录列表、一段日志、一份查询结果，往往比对话本身长得多，而且每一轮都要重付一次。<br><br><b>④ 失败也要付钱。</b>跑了十五轮最后放弃，这十五轮照样计费。</div></div>
-      <div class="card t-green"><div class="t green">该算的那个数：单位经济</div>
+      <div class="card t-green"><div class="t green">该算的那个数：完成一次任务要花多少</div>
         <div class="cap">不要算「一个月的模型账单」，要算<b>「完成一次任务的成本」</b>，然后和它替代的方式比。<br><br><b>算式很朴素：</b><br>· 一次任务的平均模型开销<br>· ÷ 一次任务的成功率 <span class="dim">（失败的那些也要摊进来）</span><br>· ＋ 人工复核和兜底的成本<br>· ＝ <b>一次成功交付的真实成本</b><br><br>拿这个数和「人来做一次要多少钱」比。<b>比不过，就不该上线</b>——哪怕技术上完全跑得通。</div></div>
     </div>
     <div class="note b-orange"><div class="t orange">最见效的四个降本手段，按性价比排</div>
@@ -613,7 +613,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
 </section>
 
 <section class="slide" data-act="人在环">
-  <div class="hd"><h2>人在环：审批点放哪儿、粒度多大</h2></div>
+  <div class="hd"><h2>人在环：审批点放哪儿、管多细</h2></div>
   <div class="bd">
     <div class="p mb">加人工确认是最有效的兜底，也最容易做成摆设——<b>问得太频繁，人就会开始无脑点确认</b>，那还不如不问。所以关键不是加不加，而是加在哪、怎么问。</div>
     <div class="g2 mb">
@@ -627,7 +627,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
       <div class="card t-green"><div class="t green">怎么问：三条决定它有没有用</div>
         <div class="cap"><b>① 展示实际参数，不要只问「是否继续」。</b><br><span class="red">×</span> 「Agent 想执行一个删除操作，是否允许？」<br><span class="green">√</span> 「将删除 <b>147</b> 条记录，条件是 <span style="font-family:var(--mono);font-size:13px">status='draft' AND created&lt;2026-01-01</span>，前 5 条是…」<br><br><b>② 给出「为什么」。</b>把模型这一步的理由一起显示出来，人才能判断它是不是想岔了。<br><br><b>③ 允许改，不只是允许拒。</b>批准 / 拒绝 / <b>改完再批准</b>——第三个选项能救回大量本来要重跑的任务。</div></div>
     </div>
-    <div class="note b-purple"><div class="t purple">粒度：按风险分级，不要一刀切</div>
+    <div class="note b-purple"><div class="t purple">管多细：按风险分级，不要一刀切</div>
       <div class="cap">合理的形态通常是<b>三档</b>：<b>自动做</b>（只读、可撤销）· <b>做完通知</b>（有影响但可回滚，人事后可核可撤）· <b>做前审批</b>（不可逆或影响面大）。<br>而档位<b>可以随信心变化</b>——上线初期把线划得保守些，等评估数据积累起来、错误率稳定了，再逐档放开。<b>这是评估的另一个用处：它让「什么时候可以少问一点」变成一个有依据的决定。</b></div></div>
   </div>
 </section>
@@ -650,7 +650,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
       <tr><td class="red"><b>失败</b></td><td>它做不了的时候会怎样？<b>用户看得出来它失败了吗？</b></td><td>明确的失败交付：说清没做完、做到哪儿、产生了哪些副作用。</td></tr>
     </table>
     <div class="note b-orange mt2"><div class="t orange">先做哪几条</div>
-      <div class="cap">如果时间只够做三件事：<b>评估、可观测性、权限收敛。</b><br>前两件让你有能力持续改进，第三件让改进过程中的错误不至于变成事故。<b>其余的都可以在上线后逐步补，唯独这三件补起来最贵。</b></div></div>
+      <div class="cap">如果时间只够做三件事：<b>评估、可观测性、权限收窄。</b><br>前两件让你有能力持续改进，第三件让改进过程中的错误不至于变成事故。<b>其余的都可以在上线后逐步补，唯独这三件补起来最贵。</b></div></div>
   </div>
 </section>
 
@@ -682,8 +682,8 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
     <div class="g2 mb">
       <div class="card t-green"><div class="t green">讲完了这些</div>
         <div class="ul s">
-          <li><b>控制权连续谱</b>：两端各自换来什么、付出什么；三种编排做法在谱上的位置；为什么真实产品几乎都是混合的；以及怎么用四个问题给自己的功能定位。</li>
-          <li><b>抽象层级是另一条轴</b>：直接调接口 / 官方 SDK / 编排框架各适配哪一段，什么时候该上框架、什么时候不该。</li>
+          <li><b>控制权那条轴</b>：两端各自换来什么、付出什么；三种编排做法在轴上的位置；为什么真实产品几乎都是混合的；以及怎么用四个问题给自己的功能定位。</li>
+          <li><b>用什么来写是另一条轴</b>：直接调接口 / 官方 SDK / 编排框架各适配哪一段，什么时候该上框架、什么时候不该。</li>
           <li><b>上线前的七项</b>：评估（放最前的理由，以及一套下周就能建起来的最小版本）· 记忆与检索 · 安全（权限最小面、内容里藏的指令）· 治理 · 成本与延迟 · 可观测性 · 人在环。</li>
           <li><b>一份能直接拿去用的上线前清单</b>，以及时间不够时该先做哪三件。</li>
         </div></div>
@@ -697,7 +697,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
         </div></div>
     </div>
     <div class="note b-purple"><div class="t purple">这一章适合被回查</div>
-      <div class="cap">前半段的连续谱和四个问题，在<b>做设计决定时</b>用；后半段的七项和那份清单，在<b>上线评审前</b>用。<br>建议的用法：把清单那一页对着自己的项目走一遍，把答不上来的那几条列成待办——<b>那就是你和生产之间真实的距离。</b></div></div>
+      <div class="cap">前半段那条轴和四个问题，在<b>做设计决定时</b>用；后半段的七项和那份清单，在<b>上线评审前</b>用。<br>建议的用法：把清单那一页对着自己的项目走一遍，把答不上来的那几条列成待办——<b>那就是你和生产之间真实的距离。</b></div></div>
     <div class="src mt">本章不引用比例类统计数字作为论据；涉及数字之处均标注口径与核对日期　·　核对日期 2026-08</div>
   </div>
 </section>

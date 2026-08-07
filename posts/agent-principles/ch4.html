@@ -124,7 +124,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
   <h1>Agent 的协议层</h1>
   <div class="rule"></div>
   <div class="sl">模型只会输出文本。<br><b>让文本变成动作，靠的是一份约定。</b></div>
-  <div class="meta" style="margin-top:34px">对接层 · 以真实报文和实体关系图为主</div>
+  <div class="meta" style="margin-top:34px">对接层 · 以真实报文和角色关系图为主</div>
   <div class="meta" style="margin-top:10px">← → 翻页　·　O 概览　·　F 全屏</div>
 </section>
 
@@ -141,7 +141,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
         <div class="cap"><b>Skills</b>：管的是<b>该怎么做</b>，不是<b>能做什么</b>。它不给你新能力，它给做法。<br><br><b>A2A</b>：对端不是一台机器，<b>是另一个 agent</b>。<br><br>这两样不要硬塞进 ACI 的框子里，塞进去就理解错了。</div></div>
     </div>
     <div class="note b-orange mt2"><div class="t orange">这一章的深度标准，先说在前面</div>
-      <div class="cap">五样具体机制（tools / MCP / CLI / Skills / A2A）都要讲到<b>同一个刻度</b>——你要能徒手画出它的实体关系和一次完整往返、能看懂它的真实配置或报文、能说出它<b>什么时候不该用</b>。<b>不允许有哪一样是含糊过去的。</b>ACI 是抽象层，不适用这个刻度。</div></div>
+      <div class="cap">五样具体机制（tools / MCP / CLI / Skills / A2A）都要讲到<b>同样的深度</b>——你要能徒手画出它的角色关系和一次完整往返、能看懂它的真实配置或报文、能说出它<b>什么时候不该用</b>。<b>不允许有哪一样是含糊过去的。</b>ACI 是抽象层，不适用这个要求。</div></div>
   </div>
 </section>
 
@@ -270,7 +270,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
         <ul class="ul s mt" style="margin-top:8px">
           <li><b>你自己就知道该调什么的时候。</b>固定流程里的固定步骤，直接写代码调，别绕一圈让模型来决定——那是白花一轮往返的钱，还多一份不确定。</li>
           <li><b>动作不可逆且没有确认环节的时候。</b>模型给出的是概率性的意图，参数写错的可能永远不为零。删除、转账、发布这类动作，中间必须有宿主的确认或人工审批。</li>
-          <li><b>工具数量已经失控的时候。</b>几十上百个工具全塞进去，模型的选择准确率会掉得很难看。这时候要重新设计工具的粒度，而不是继续加。</li>
+          <li><b>工具数量已经失控的时候。</b>几十上百个工具全塞进去，模型的选择准确率会掉得很难看。这时候要重新想工具该怎么切分，而不是继续加。</li>
           <li><b>返回内容极大的时候。</b>一个返回几万行日志的工具，会一次性把上下文冲垮。要么在宿主侧先过滤、分页、摘要，要么把结果落盘只回一个引用。</li>
         </ul>
       </div>
@@ -332,7 +332,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
 </section>
 
 <section class="slide" data-act="MCP">
-  <div class="hd"><h2>四个实体，一张图分清</h2></div>
+  <div class="hd"><h2>四个角色，一张图分清</h2></div>
   <div class="bd">
     <svg viewBox="0 0 1160 300" width="100%" height="300" style="display:block">
       <g font-family="PingFang SC,Hiragino Sans GB,-apple-system,sans-serif">
@@ -435,9 +435,9 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
 </section>
 
 <section class="slide" data-act="MCP">
-  <div class="hd"><h2>MCP 的三个原语，按「谁决定」分层</h2></div>
+  <div class="hd"><h2>MCP 的三种基本件，按「谁决定」分层</h2></div>
   <div class="bd">
-    <div class="p mb">MCP 提供的不止工具。三个原语的真正区别不在于内容，而在于<b>谁来决定它什么时候被用</b>——这是理解 MCP 设计的关键。</div>
+    <div class="p mb">MCP 提供的不止工具。这三种基本件（官方文档里叫 primitives / 原语）的真正区别不在于内容，而在于<b>谁来决定它什么时候被用</b>——这是理解 MCP 设计的关键。</div>
     <div class="g3">
       <div class="card t-purple"><div class="t purple">Tools　→ 模型决定</div>
         <div class="cap">可执行的动作。<b>放进上下文后，由模型自己判断什么时候调、调哪个。</b><br><br>这是唯一会主动改变外部状态的一类，因此也是权限设计的重点对象。<br><br><span style="font-family:var(--mono);font-size:12px">tools/list　tools/call</span></div></div>
@@ -464,7 +464,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
         <div class="ul s">
           <li><b>同一份能力要给多个宿主用。</b>公司内部的知识库、工单系统、部署平台，接一次，所有 Agent 产品都能用——这是 N × M 里那个 M 真实存在的情况。</li>
           <li><b>要用别人已经写好的 Server。</b>数据库、浏览器、云平台，社区已有现成实现，接一个配置就能用，自己重写没有意义。</li>
-          <li><b>能力的提供方和使用方不是同一批人。</b>平台团队维护 Server，业务团队接就行，两边靠协议解耦，各自发版互不影响。</li>
+          <li><b>能力的提供方和使用方不是同一批人。</b>平台团队维护 Server，业务团队接就行，两边靠协议对接，各自发版互不影响。</li>
           <li><b>希望用户自己能装。</b>Server 是可分发的单元，用户改一个配置文件就能给自己的 Agent 加能力，不需要你改代码重新发版。</li>
         </div></div>
       <div class="card t-red"><div class="t red">这些场景，别为了用而用</div>
@@ -596,7 +596,7 @@ some-tool --version</div>
     <div class="p mb">既然三样东西在结构上是同一件事，那就值得给这件事一个名字：<b>Agent 与外部世界之间的那层接口</b>。它既不是 API，也不是 UI——因为读它的既不是编译器，也不是人。</div>
     <table class="tbl">
       <tr><th style="width:16%"></th><th style="width:20%">读者是谁</th><th style="width:32%">读错了会怎样</th><th>因此设计时优化的是</th></tr>
-      <tr><td class="blue"><b>API</b></td><td>另一段程序</td><td><b>不会读错。</b>类型不匹配在编译期或运行期直接报错，行为是确定的。</td><td>严谨、正交、性能。字段名短一点无所谓，反正调用方是照文档固定写好的。</td></tr>
+      <tr><td class="blue"><b>API</b></td><td>另一段程序</td><td><b>不会读错。</b>类型不匹配在编译期或运行期直接报错，行为是确定的。</td><td>严谨、不重不漏、性能。字段名短一点无所谓，反正调用方是照文档固定写好的。</td></tr>
       <tr><td class="green"><b>UI</b></td><td>人</td><td>人会犹豫、会点错，但<b>人能看懂上下文</b>，能从界面布局、图标、颜色里补全没写出来的信息。</td><td>直观、可发现、可撤销。信息可以放在视觉层面，不必全写成文字。</td></tr>
       <tr class="t-purple"><td class="purple"><b>ACI</b></td><td class="purple"><b>一个概率模型</b></td><td class="purple"><b>会读错，而且是概率性地读错。</b>同一份接口，十次里可能有九次用对、一次用错，且错法不固定。<br>它看不到颜色和布局，<b>只能看到你写下的那些字</b>。</td><td class="purple"><b>让「用对」的概率尽可能高。</b>所以：名字要能望文生义，说明要写清什么时候用，错误信息要能指导下一步。</td></tr>
     </table>
@@ -612,7 +612,7 @@ some-tool --version</div>
     <div class="g3">
       <div class="card t-blue"><div class="t blue">① 名字要能望文生义</div>
         <div class="cap"><span class="red">×</span> <code style="font-family:var(--mono)">exec_op</code>　<span class="green">√</span> <code style="font-family:var(--mono)">search_orders_by_email</code><br><br><span class="dim">（模型是靠字面语义选工具的，名字本身就是最强的一条提示。）</span></div></div>
-      <div class="card t-blue"><div class="t blue">② 粒度对着任务切</div>
+      <div class="card t-blue"><div class="t blue">② 按任务切，不按接口切</div>
         <div class="cap">按<b>用户想完成的一件事</b>切，不要按后端接口切。三个必须按顺序调的工具，不如一个工具。<br><br><span class="dim">（每多一次调用，就多一次选错的机会；顺序约束只存在于说明里，模型不一定遵守。）</span></div></div>
       <div class="card t-blue"><div class="t blue">③ 错误信息就是提示词</div>
         <div class="cap"><span class="red">×</span> <code style="font-family:var(--mono)">Error: invalid input</code><br><span class="green">√</span> <code style="font-family:var(--mono)">date 必须是 YYYY-MM-DD，你传的是「上周五」。今天是 2026-08-06。</code><br><br><span class="dim">（回执会原样进上下文，成为模型下一步的依据——它是你影响下一步的最直接手段。）</span></div></div>
@@ -897,7 +897,7 @@ some-tool --version</div>
       <div class="card t-green"><div class="t green">讲完了这些</div>
         <div class="ul s">
           <li><b>tools</b>：工具定义的真实形状、一次完整往返的报文、description 怎么写、什么时候不该做成工具。</li>
-          <li><b>MCP</b>：它解决的 N × M 问题、四个实体分别是谁、从配置文件到报文的完整链路、三个原语按「谁决定」的分层、以及什么场景纯属浪费。</li>
+          <li><b>MCP</b>：它解决的 N × M 问题、四个角色分别是谁、从配置文件到报文的完整流程、三种基本件按「谁决定」的分层、以及什么场景纯属浪费。</li>
           <li><b>CLI</b>：为什么它几乎不需要接口定义、强在哪三条、代价是哪四条、什么时候该把一条命令升级成专用工具。</li>
           <li><b>抽象层</b>：这三样在结构上是同一件事，差别只在「约定写在哪儿」；以及由「读者是概率模型」推出的六个设计习惯。</li>
           <li><b>Skills</b>：它管的是「该怎么做」、分层加载机制、编写的四条要点、以及把它当第三方依赖看待的理由。</li>
@@ -908,7 +908,7 @@ some-tool --version</div>
           <li><b>具体产品怎么配。</b>各家客户端的配置路径、界面、开关都不一样，且改得频繁，写下来很快就过期。</li>
           <li><b>某个 Server 或某个 Skill 的实现细节。</b>本章讲的是接口形态，不是某一份具体实现的使用说明。</li>
           <li><b>协议的完整字段表与版本差异。</b>用到的都是稳定部分，边角字段和版本变更请查当前规范。</li>
-          <li><b>把这些东西送上生产。</b>权限收敛、失败重试、成本控制、可观测、灰度——这些不是接口层的问题，是工程层的问题。</li>
+          <li><b>把这些东西送上生产。</b>权限收窄、失败重试、成本控制、可观测、灰度——这些不是接口层的问题，是工程层的问题。</li>
           <li><b>多 Agent 的编排模式。</b>本章只讲了 Agent 之间对话的协议形态，没有讲怎么设计一个多 Agent 系统。</li>
         </div></div>
     </div>

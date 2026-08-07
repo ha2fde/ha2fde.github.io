@@ -312,7 +312,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
         <div class="card t-orange"><div class="t orange">为什么会这样：一个结构性的限制</div>
           <div class="cap">模型每生成<b>一个</b>词元，就是把输入过一遍那 N 层网络——<b>层数是固定的，题目再难也不会多给它几层。</b><br><br>所以：<b>如果答案必须一步吐出来，那么这道题能用的全部计算，就压在生成那一个词元的这一次前向里。</b><br><br>而写出中间步骤，等于把推理摊在几十上百个词元上——<b>每多写一个词元，就多过一遍完整的网络。可用的计算量是按词元数量线性增加的。</b></div></div>
         <div class="note b-blue mt2"><div class="t">还有第二重作用</div>
-          <div class="cap">写出来的中间步骤会进入后续词元的上下文，<b>成为模型自己能看到的输入</b>。「还剩 3 个」这句话一旦写出来，后面就可以直接用它，不必在一次前向里凭空存住。<br><br><b>相当于把工作记忆外置到了输出序列上。</b></div></div>
+          <div class="cap">写出来的中间步骤会进入后续词元的上下文，<b>成为模型自己能看到的输入</b>。「还剩 3 个」这句话一旦写出来，后面就可以直接用它，不必在一次前向里凭空存住。<br><br><b>相当于把要记的东西挪到了纸面上。</b></div></div>
       </div>
     </div>
   </div>
@@ -549,7 +549,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
       <tr><th style="width:14%">这一步</th><th style="width:29%">上一步差什么</th><th style="width:29%">这一步补什么</th><th style="width:28%">代价</th></tr>
       <tr><td>预训练</td><td>没有任何语言能力</td><td>用下一词预测这一个目标，把世界知识、语言、逻辑一起学进去</td><td class="orange">算力和数据的门槛极高；知识冻结在训练截止点</td></tr>
       <tr><td>对齐到对话</td><td>只会续写，问它问题它接着编问题</td><td>用对话模板 + 监督微调装上把手；用偏好比较调行为</td><td class="orange">能力上有损耗；会过度拒绝；倾向于迎合用户</td></tr>
-      <tr><td>思维链</td><td>答案一步吐出，难题的可用计算量被卡住</td><td>把推理摊到多个词元上，同时把中间结论外置成可读的文本</td><td class="orange">输出词元大增，成本和延迟按倍数上去</td></tr>
+      <tr><td>思维链</td><td>答案一步吐出，难题的可用计算量被卡住</td><td>把推理摊到多个词元上，同时把中间结论写成一段可读的文本</td><td class="orange">输出词元大增，成本和延迟按倍数上去</td></tr>
       <tr><td>ReAct</td><td>推理全在脑内，拿不到外部信息也改变不了任何东西</td><td>在提示词里约定思考与行动交替，由外部程序执行并回填结果</td><td class="orange">格式随时会破、参数没类型、工具说明只能塞提示里</td></tr>
       <tr><td>工具调用</td><td>调用意图用自然语言表达，没有任何结构保证</td><td>工具进接口、意图变结构化输出，并且模型被专门训练过</td><td class="orange">依赖模型具备这项能力；接口本身要有一套约定</td></tr>
       <tr><td class="purple">上下文工程</td><td class="dim">（横向，不在链上）</td><td>管理每一轮到底把什么放进那段有限的输入里</td><td class="orange">压缩会丢信息、隔离会失去全局视野，没有免费的解法</td></tr>
