@@ -281,52 +281,90 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
 <section class="slide" data-act="MCP">
   <div class="hd"><h2>MCP 要解决的问题：N × M</h2></div>
   <div class="bd">
-    <div class="g2">
-      <div>
-        <div class="p mb">tools 解决了「模型怎么表达调用意图」，<b>但没解决「这些工具是怎么来的」</b>。每个客户端要接每个外部系统，都得各自写一遍适配。</div>
-        <svg viewBox="0 0 560 250" width="100%" height="250" style="display:block">
-          <g font-family="PingFang SC,Hiragino Sans GB,-apple-system,sans-serif">
-            <text x="100" y="18" font-size="13" fill="#dc2626" font-weight="600" text-anchor="middle">N 个客户端 × M 个系统</text>
-            <rect x="20" y="40" width="90" height="36" rx="4" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
-            <rect x="20" y="100" width="90" height="36" rx="4" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
-            <rect x="20" y="160" width="90" height="36" rx="4" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
-            <rect x="190" y="40" width="90" height="36" rx="4" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
-            <rect x="190" y="100" width="90" height="36" rx="4" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
-            <rect x="190" y="160" width="90" height="36" rx="4" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
-            <g stroke="#dc2626" stroke-width="1.2" opacity=".55">
-              <line x1="110" y1="58"  x2="190" y2="58"/><line x1="110" y1="58"  x2="190" y2="118"/><line x1="110" y1="58"  x2="190" y2="178"/>
-              <line x1="110" y1="118" x2="190" y2="58"/><line x1="110" y1="118" x2="190" y2="118"/><line x1="110" y1="118" x2="190" y2="178"/>
-              <line x1="110" y1="178" x2="190" y2="58"/><line x1="110" y1="178" x2="190" y2="118"/><line x1="110" y1="178" x2="190" y2="178"/>
-            </g>
-            <text x="150" y="228" font-size="13" fill="#dc2626" text-anchor="middle">要写 N × M 份适配</text>
+    <div class="p mb">tools 解决了「模型怎么表达调用意图」，<b>但没解决「这些工具是怎么来的」</b>。每个客户端要接每个外部系统，都得各自写一遍适配。</div>
+    <svg viewBox="0 0 1088 250" width="100%" height="250" style="display:block">
+  <defs><marker id="mcpar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+    <path d="M0,0 L10,5 L0,10 z" fill="#7c3aed"/></marker></defs>
+  <g font-family="PingFang SC,Hiragino Sans GB,-apple-system,sans-serif">
+      <text x="229" y="16" font-size="13" font-weight="600" fill="#dc2626" text-anchor="middle">没有 MCP：4 个客户端 × 4 个系统 ＝ 16 套适配</text>
+      <rect x="24" y="40" width="104" height="28" rx="4" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="76" y="59" font-size="12" fill="#1f2937" text-anchor="middle">IDE 插件</text>
+      <rect x="24" y="82" width="104" height="28" rx="4" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="76" y="101" font-size="12" fill="#1f2937" text-anchor="middle">聊天客户端</text>
+      <rect x="24" y="124" width="104" height="28" rx="4" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="76" y="143" font-size="12" fill="#1f2937" text-anchor="middle">命令行 agent</text>
+      <rect x="24" y="166" width="104" height="28" rx="4" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="76" y="185" font-size="12" fill="#1f2937" text-anchor="middle">自建后端</text>
+      <rect x="330" y="40" width="104" height="28" rx="4" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
+      <text x="382" y="59" font-size="12" fill="#1f2937" text-anchor="middle">GitHub</text>
+      <rect x="330" y="82" width="104" height="28" rx="4" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
+      <text x="382" y="101" font-size="12" fill="#1f2937" text-anchor="middle">数据库</text>
+      <rect x="330" y="124" width="104" height="28" rx="4" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
+      <text x="382" y="143" font-size="12" fill="#1f2937" text-anchor="middle">企业 IM</text>
+      <rect x="330" y="166" width="104" height="28" rx="4" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
+      <text x="382" y="185" font-size="12" fill="#1f2937" text-anchor="middle">内部工单</text>
+      <g stroke="#dc2626" stroke-width="1.1" opacity=".3">
+        <line x1="128" y1="54" x2="330" y2="54"/>
+        <line x1="128" y1="54" x2="330" y2="96"/>
+        <line x1="128" y1="54" x2="330" y2="138"/>
+        <line x1="128" y1="54" x2="330" y2="180"/>
+        <line x1="128" y1="96" x2="330" y2="54"/>
+        <line x1="128" y1="96" x2="330" y2="96"/>
+        <line x1="128" y1="96" x2="330" y2="138"/>
+        <line x1="128" y1="96" x2="330" y2="180"/>
+        <line x1="128" y1="138" x2="330" y2="54"/>
+        <line x1="128" y1="138" x2="330" y2="96"/>
+        <line x1="128" y1="138" x2="330" y2="138"/>
+        <line x1="128" y1="138" x2="330" y2="180"/>
+        <line x1="128" y1="180" x2="330" y2="54"/>
+        <line x1="128" y1="180" x2="330" y2="96"/>
+        <line x1="128" y1="180" x2="330" y2="138"/>
+        <line x1="128" y1="180" x2="330" y2="180"/>
+      </g>
+      <text x="229" y="214" font-size="12.5" fill="#5b6675" text-anchor="middle">每加一个客户端，所有系统都要再接一次</text>
+      <text x="229" y="234" font-size="12.5" fill="#5b6675" text-anchor="middle">每加一个系统，所有客户端都要再改一次</text>
 
-            <text x="420" y="18" font-size="13" fill="#0e9f6e" font-weight="600" text-anchor="middle">加一层统一协议</text>
-            <rect x="320" y="40" width="90" height="36" rx="4" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
-            <rect x="320" y="100" width="90" height="36" rx="4" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
-            <rect x="320" y="160" width="90" height="36" rx="4" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
-            <rect x="428" y="40" width="34" height="156" rx="5" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
-            <text x="445" y="118" font-size="12" fill="#0e9f6e" text-anchor="middle" transform="rotate(-90 445 118)">MCP</text>
-            <rect x="480" y="40" width="70" height="36" rx="4" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
-            <rect x="480" y="100" width="70" height="36" rx="4" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
-            <rect x="480" y="160" width="70" height="36" rx="4" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
-            <g stroke="#0e9f6e" stroke-width="1.5">
-              <line x1="410" y1="58"  x2="428" y2="58"/>
-              <line x1="410" y1="118" x2="428" y2="118"/>
-              <line x1="410" y1="178" x2="428" y2="178"/>
-              <line x1="462" y1="58"  x2="480" y2="58"/>
-              <line x1="462" y1="118" x2="480" y2="118"/>
-              <line x1="462" y1="178" x2="480" y2="178"/>
-            </g>
-            <text x="435" y="228" font-size="13" fill="#0e9f6e" text-anchor="middle">各写一次即可，N + M</text>
-          </g>
-        </svg>
-      </div>
-      <div>
-        <div class="card"><div class="t">MCP 是什么</div>
-          <div class="cap"><b>模型上下文协议</b>（Model Context Protocol）。它规定了一套标准化的接口，让「提供工具和数据的一方」和「使用它们的一方」之间只需要遵守同一份约定。<br><br>底层用的是 <b>JSON-RPC 2.0</b>——一个已经存在很久的通用远程调用格式，不是新发明的报文体系。</div></div>
-        <div class="note b-orange mt2"><div class="t orange">它和 tools 的关系，必须先说清</div>
-          <div class="cap"><b>MCP 不是 tools 的替代品。</b><br><br>MCP 服务器提供的工具，最终仍然要被客户端<b>拍平成一个普通的 tools 数组</b>，随请求发给模型。<b>模型根本不知道 MCP 的存在</b>——它看到的和上一节那个 <span style="font-family:var(--mono);font-size:12px">get_weather</span> 没有任何区别。<br><br>MCP 解决的是<b>工具怎么被接进来</b>，不是<b>工具怎么被调用</b>。这两层不要混。</div></div>
-      </div>
+      <line x1="508" y1="112" x2="578" y2="112" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#mcpar)"/>
+      <text x="543" y="98" font-size="12.5" font-weight="600" fill="#7c3aed" text-anchor="middle">MCP</text>
+
+      <text x="844" y="16" font-size="13" font-weight="600" fill="#0e9f6e" text-anchor="middle">有 MCP：4 ＋ 4 ＝ 8 套，中间隔一层统一协议</text>
+      <rect x="640" y="40" width="104" height="28" rx="4" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="692" y="59" font-size="12" fill="#1f2937" text-anchor="middle">IDE 插件</text>
+      <rect x="640" y="82" width="104" height="28" rx="4" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="692" y="101" font-size="12" fill="#1f2937" text-anchor="middle">聊天客户端</text>
+      <rect x="640" y="124" width="104" height="28" rx="4" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="692" y="143" font-size="12" fill="#1f2937" text-anchor="middle">命令行 agent</text>
+      <rect x="640" y="166" width="104" height="28" rx="4" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="692" y="185" font-size="12" fill="#1f2937" text-anchor="middle">自建后端</text>
+      <rect x="830" y="36" width="54" height="160" rx="6" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="857" y="116" font-size="13" font-weight="600" fill="#0e9f6e" text-anchor="middle" transform="rotate(-90 857 116)">MCP 协议</text>
+      <rect x="944" y="40" width="104" height="28" rx="4" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
+      <text x="996" y="59" font-size="12" fill="#1f2937" text-anchor="middle">GitHub</text>
+      <rect x="944" y="82" width="104" height="28" rx="4" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
+      <text x="996" y="101" font-size="12" fill="#1f2937" text-anchor="middle">数据库</text>
+      <rect x="944" y="124" width="104" height="28" rx="4" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
+      <text x="996" y="143" font-size="12" fill="#1f2937" text-anchor="middle">企业 IM</text>
+      <rect x="944" y="166" width="104" height="28" rx="4" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
+      <text x="996" y="185" font-size="12" fill="#1f2937" text-anchor="middle">内部工单</text>
+      <g stroke="#0e9f6e" stroke-width="1.4" opacity=".75">
+        <line x1="744" y1="54" x2="830" y2="90"/>
+        <line x1="744" y1="96" x2="830" y2="106"/>
+        <line x1="744" y1="138" x2="830" y2="126"/>
+        <line x1="744" y1="180" x2="830" y2="142"/>
+        <line x1="884" y1="90" x2="944" y2="54"/>
+        <line x1="884" y1="106" x2="944" y2="96"/>
+        <line x1="884" y1="126" x2="944" y2="138"/>
+        <line x1="884" y1="142" x2="944" y2="180"/>
+      </g>
+      <text x="844" y="214" font-size="12.5" fill="#5b6675" text-anchor="middle">每个客户端只实现一次 MCP 客户端</text>
+      <text x="844" y="234" font-size="12.5" fill="#5b6675" text-anchor="middle">每个系统只实现一次 MCP 服务端</text>
+  </g>
+</svg>
+    <div class="g2 mt2">
+      <div class="card"><div class="t">MCP 是什么</div>
+        <div class="cap"><b>模型上下文协议</b>（Model Context Protocol）。它规定了一套标准化的接口，让「提供工具和数据的一方」和「使用它们的一方」之间只需要遵守同一份约定。底层用的是 <b>JSON-RPC 2.0</b>——一个已经存在很久的通用远程调用格式，不是新发明的报文体系。</div></div>
+      <div class="note b-orange"><div class="t orange">它和 tools 的关系，必须先说清</div>
+        <div class="cap"><b>MCP 不是 tools 的替代品。</b>MCP 服务器提供的工具，最终仍然要被客户端<b>拍平成一个普通的 tools 数组</b>，随请求发给模型。<b>模型根本不知道 MCP 的存在</b>——它看到的和上一节那个 <span style="font-family:var(--mono);font-size:12px">get_weather</span> 没有任何区别。MCP 解决的是<b>工具怎么被接进来</b>，不是<b>工具怎么被调用</b>。这两层不要混。</div></div>
     </div>
   </div>
 </section>
