@@ -17,6 +17,14 @@ import shutil
 import subprocess
 import sys
 
+# Windows 控制台默认 GBK，打印 ✅ / ⚠️ / ❌ 会 UnicodeEncodeError。
+# 崩的位置最坑：文件已复制、_meta.json 已写，但 git 一步没跑，看着像失败其实做了一半。
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, OSError, ValueError):
+        pass  # 被重定向到不支持 reconfigure 的对象，忽略
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LAB = os.path.join(ROOT, "lab")
 META = os.path.join(LAB, "_meta.json")
