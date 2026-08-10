@@ -35,6 +35,10 @@
     "desc": "从语言模型到通用智能体：十篇论文拆解 AGI 工程路线图，11 篇成套",
     "src": "原站点 posts/llm-evolution/"
   },
+  "llm-pretraining-explained": {
+    "desc": "《一个大模型是怎么练出来的》29 页单文件 PPT,写给零基础读者:参数/分词/embedding → 数据清洗与 Scaling Law → 预训练六步循环、loss 曲线、并行与训练事故 → SFT/偏好优化/RLVR → 发布。图表配色经色觉障碍验证",
+    "src": "C:/Users/think/build-pretrain-deck/llm-pretraining-explained"
+  },
   "llm-to-agent-ppt": {
     "desc": "从预训练到 Agent 的工程链路双版 PPT：预训练 → 对齐 → CoT → ReAct → tool call",
     "src": "~/llm-to-agent-ppt/"

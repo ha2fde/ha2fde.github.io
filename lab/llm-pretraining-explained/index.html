@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>一个大模型是怎么练出来的 · 从零到发布</title>
+<style>
+:root{
+  --bg:#0a0e14; --stage:#0d1117; --panel:#161b22; --panel2:#1c2431;
+  --line:#283040; --line2:#3a4557;
+  --tx:#e6edf3; --tx2:#adbac7; --mut:#7d8896;
+  --b:#58a6ff; --g:#7ee787; --o:#ffa657; --p:#d2a8ff; --r:#ff7b72; --y:#e3b341;
+  /* 图表专用类别色：经 CVD / 对比度验证 */
+  --c1:#388bfd; --c2:#db6d28; --c3:#db61a2;
+  --mono:"SF Mono",'JetBrains Mono',Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--sans);overflow:hidden}
+body{display:flex;align-items:center;justify-content:center}
+#deck{position:relative;width:1280px;height:720px;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;background:var(--stage);padding:46px 60px 56px;
+  display:none;flex-direction:column;overflow:hidden;border:1px solid var(--line);border-radius:6px}
+.slide.on{display:flex;animation:fade .28s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.kick{font-size:12px;letter-spacing:.18em;color:var(--mut);text-transform:uppercase;
+  font-family:var(--mono);margin-bottom:9px;display:flex;gap:10px;align-items:center}
+.kick b{color:var(--b);font-weight:600}
+h1{font-size:44px;line-height:1.16;font-weight:700;letter-spacing:-.01em}
+h2{font-size:29px;line-height:1.25;font-weight:700;letter-spacing:-.01em}
+h3{font-size:15px;font-weight:700;color:var(--tx);margin-bottom:7px}
+.sub{font-size:16px;color:var(--mut);margin-top:10px;line-height:1.6}
+.rule{height:2px;background:linear-gradient(90deg,var(--b),transparent);margin:12px 0 18px;border-radius:2px}
+.body{flex:1;min-height:0;display:flex;flex-direction:column;gap:14px;font-size:15px;line-height:1.62;color:var(--tx2)}
+p{margin:0}
+strong{color:var(--tx);font-weight:600}
+em{font-style:normal;color:var(--b);font-weight:600}
+.hl{color:var(--o);font-weight:600}
+.hlg{color:var(--g);font-weight:600}
+.hlr{color:var(--r);font-weight:600}
+.hlp{color:var(--p);font-weight:600}
+ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+li{padding-left:17px;position:relative}
+li::before{content:"";position:absolute;left:2px;top:.62em;width:6px;height:6px;border-radius:50%;background:var(--line2)}
+li.k::before{background:var(--o)}
+ol{padding-left:19px;display:flex;flex-direction:column;gap:6px}
+ol li{padding-left:2px}
+ol li::before{display:none}
+code{font-family:var(--mono);font-size:.92em;background:#1e2530;color:var(--g);padding:1px 5px;border-radius:4px;border:1px solid var(--line)}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}
+.g23{display:grid;grid-template-columns:1.15fr .85fr;gap:17px}
+.g32{display:grid;grid-template-columns:.85fr 1.15fr;gap:17px}
+.col{display:flex;flex-direction:column;gap:11px;min-height:0}
+.fill{flex:1;min-height:0}
+.center{justify-content:center}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:13px 15px}
+.card.b{border-left:3px solid var(--b)}
+.card.g{border-left:3px solid var(--g)}
+.card.o{border-left:3px solid var(--o)}
+.card.p{border-left:3px solid var(--p)}
+.card.r{border-left:3px solid var(--r)}
+.card h3{font-size:14.5px;margin-bottom:5px}
+.card .t{font-size:11px;font-family:var(--mono);color:var(--mut);letter-spacing:.08em;margin-bottom:5px}
+.card p,.card ul{font-size:13.5px;line-height:1.58}
+.card.tight{padding:10px 12px}
+.card.tight p,.card.tight ul,.card.tight li{font-size:13px;line-height:1.52}
+
+.note{background:#12181f;border:1px solid var(--line);border-radius:8px;padding:10px 13px;font-size:14px;line-height:1.58}
+.note.key{border-color:#2d4a6b;background:#0e1a26}
+.note.warn{border-color:#5a3a2a;background:#1c130c}
+.note.bad{border-color:#5a2b2b;background:#1e1213}
+.note .lb{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--mut);display:block;margin-bottom:3px;text-transform:uppercase}
+.note.key .lb{color:var(--b)} .note.warn .lb{color:var(--o)} .note.bad .lb{color:var(--r)}
+
+.pill{display:inline-block;font-family:var(--mono);font-size:10.5px;padding:2px 8px;border-radius:20px;border:1px solid var(--line2);color:var(--mut);letter-spacing:.05em}
+.pill.b{color:var(--b);border-color:#2b4a6b;background:#0e1a26}
+.pill.g{color:var(--g);border-color:#2b5a3a;background:#0e1e14}
+.pill.o{color:var(--o);border-color:#5a4326;background:#1c1409}
+.pill.r{color:var(--r);border-color:#5a2f2c;background:#1e1211}
+.pill.p{color:var(--p);border-color:#4a3a6b;background:#160f22}
+
+pre{font-family:var(--mono);font-size:12.5px;line-height:1.6;background:#0b0f16;border:1px solid var(--line);
+  border-radius:8px;padding:11px 13px;overflow:hidden;color:#c9d1d9;white-space:pre;tab-size:2}
+pre.sm{font-size:11.5px;line-height:1.54}
+pre.xs{font-size:10.6px;line-height:1.48}
+.c{color:#6b7684;font-style:italic}
+.k{color:#ff7b72}
+.s{color:#a5d6ff}
+.n{color:#79c0ff}
+.f{color:#d2a8ff}
+.a{color:#7ee787}
+.d{color:#e3b341}
+.mutx{color:#57606a}
+
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{text-align:left;padding:7px 11px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--mut);text-transform:uppercase;
+  border-bottom:1px solid var(--line2);font-weight:500}
+td:first-child{color:var(--tx);font-weight:600;white-space:nowrap}
+table.sm{font-size:12.5px}
+table.sm th,table.sm td{padding:6px 9px}
+
+/* 章节分隔页 */
+.sec{align-items:flex-start;justify-content:center}
+.sec .num{font-family:var(--mono);font-size:96px;font-weight:700;color:#1c2431;line-height:1}
+.sec h1{margin-top:-14px}
+
+/* 图表 */
+.fig{background:#0b0f16;border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.fig .cap{font-size:11.5px;color:var(--mut);font-family:var(--mono);letter-spacing:.06em}
+.fig svg{display:block;width:100%;height:auto}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--tx2)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.axis{stroke:#283040;stroke-width:1}
+.grid{stroke:#1a2029;stroke-width:1}
+.tick{fill:#6b7684;font-size:10px;font-family:var(--mono)}
+.dlab{fill:#adbac7;font-size:11px;font-family:var(--mono)}
+.dlab.em{fill:#e6edf3;font-weight:600}
+
+/* 导航 */
+#bar{position:fixed;left:0;bottom:0;height:3px;background:var(--b);width:0;transition:width .25s;z-index:20}
+#hud{position:fixed;right:14px;bottom:12px;font-family:var(--mono);font-size:11.5px;color:var(--mut);z-index:20;
+  background:#0d1117cc;border:1px solid var(--line);border-radius:20px;padding:4px 12px}
+#hud b{color:var(--tx)}
+#nav{position:fixed;left:14px;bottom:12px;display:flex;gap:6px;z-index:20}
+#nav button{font-family:var(--mono);font-size:11.5px;background:#0d1117cc;color:var(--mut);border:1px solid var(--line);
+  border-radius:20px;padding:4px 11px;cursor:pointer}
+#nav button:hover{color:var(--tx);border-color:var(--line2)}
+#toc{position:fixed;inset:0;background:#0a0e14f2;z-index:30;display:none;padding:44px 56px;overflow:auto}
+#toc.on{display:block}
+#toc h2{margin-bottom:16px}
+#toc .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+#toc a{display:block;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:9px 11px;
+  color:var(--tx2);text-decoration:none;font-size:12.5px;line-height:1.4}
+#toc a:hover{border-color:var(--b);color:var(--tx)}
+#toc a i{font-family:var(--mono);font-size:10.5px;color:var(--mut);font-style:normal;display:block;margin-bottom:2px}
+#toc a.s{background:#0e1a26;border-color:#2d4a6b}
+</style>
+</head>
+<body>
+<div id="deck">
+
+<!-- ════════ 1 封面 ════════ -->
+<section class="slide on" data-t="封面">
+  <div class="body center" style="gap:0">
+    <div class="kick"><b>PRETRAINING EXPLAINED</b><span>写给没接触过训练的人</span></div>
+    <h1>一个大模型<br>是怎么练出来的</h1>
+    <div class="sub" style="max-width:760px">
+      从一堆<strong>随机数字</strong>,到一个能对话、会写代码、能解数学题的模型。<br>
+      中间到底发生了什么 —— 完整流程,不跳步,不用公式。
+    </div>
+    <div style="margin-top:28px;display:flex;gap:9px;flex-wrap:wrap">
+      <span class="pill b">数据准备</span>
+      <span class="pill b">分词器</span>
+      <span class="pill p">预训练</span>
+      <span class="pill o">后训练</span>
+      <span class="pill g">发布</span>
+    </div>
+    <div style="margin-top:34px;font-size:13px;color:var(--mut);font-family:var(--mono)">
+      ← → 翻页 &nbsp;·&nbsp; O 打开目录 &nbsp;·&nbsp; 共 29 页
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 2 全景 ════════ -->
+<section class="slide" data-t="全景路线图">
+  <div class="kick"><b>OVERVIEW</b><span>先看全景</span></div>
+  <h2>整条流水线,一眼看完</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="fig fill" style="justify-content:center">
+      <svg viewBox="0 0 1140 392" role="img" aria-label="大模型训练全流程:准备、预训练、后训练、发布四个阶段">
+        <!-- 阶段底色条 -->
+        <rect x="8" y="56" width="270" height="208" rx="10" fill="#0e1a26" stroke="#2d4a6b"/>
+        <rect x="290" y="56" width="330" height="208" rx="10" fill="#160f22" stroke="#4a3a6b"/>
+        <rect x="632" y="56" width="330" height="208" rx="10" fill="#1c1409" stroke="#5a4326"/>
+        <rect x="974" y="56" width="158" height="208" rx="10" fill="#0e1e14" stroke="#2b5a3a"/>
+
+        <g font-family="monospace" text-anchor="middle" font-size="13">
+          <text x="143" y="40" fill="#58a6ff">阶段 1 · 准备</text>
+          <text x="455" y="40" fill="#d2a8ff">阶段 2 · 预训练 · 占算力 99%</text>
+          <text x="797" y="40" fill="#ffa657">阶段 3 · 后训练 · 占算力 1%</text>
+          <text x="1053" y="40" fill="#7ee787">阶段 4 · 发布</text>
+        </g>
+
+        <g font-family="monospace" text-anchor="middle">
+          <!-- 阶段 1 -->
+          <rect x="24" y="88" width="110" height="64" rx="7" fill="#161b22" stroke="#283040"/>
+          <text x="79" y="118" fill="#e6edf3" font-size="12.5">清洗数据</text>
+          <text x="79" y="137" fill="#7d8896" font-size="10.5">数百TB→15T</text>
+
+          <rect x="152" y="88" width="110" height="64" rx="7" fill="#161b22" stroke="#283040"/>
+          <text x="207" y="118" fill="#e6edf3" font-size="12.5">训练分词器</text>
+          <text x="207" y="137" fill="#7d8896" font-size="10.5">定下固定词表</text>
+
+          <rect x="24" y="168" width="238" height="64" rx="7" fill="#161b22" stroke="#283040"/>
+          <text x="143" y="198" fill="#e6edf3" font-size="12.5">定架构 + 随机初始化权重</text>
+          <text x="143" y="217" fill="#7d8896" font-size="10.5">此时模型什么都不会</text>
+
+          <!-- 阶段 2 -->
+          <rect x="306" y="88" width="136" height="64" rx="7" fill="#161b22" stroke="#283040"/>
+          <text x="374" y="118" fill="#e6edf3" font-size="12.5">猜下一个词</text>
+          <text x="374" y="137" fill="#7d8896" font-size="10.5">重复几十万次</text>
+
+          <rect x="458" y="88" width="146" height="64" rx="7" fill="#161b22" stroke="#283040"/>
+          <text x="531" y="118" fill="#e6edf3" font-size="12.5">退火 + 长上下文</text>
+          <text x="531" y="137" fill="#7d8896" font-size="10.5">收尾阶段</text>
+
+          <rect x="306" y="168" width="298" height="64" rx="7" fill="#0b0f16" stroke="#4a3a6b"/>
+          <text x="455" y="198" fill="#d2a8ff" font-size="12.5">产物:base model</text>
+          <text x="455" y="217" fill="#7d8896" font-size="10.5">知识都有了,但只会续写,不会对话</text>
+
+          <!-- 阶段 3 -->
+          <rect x="648" y="88" width="94" height="64" rx="7" fill="#161b22" stroke="#283040"/>
+          <text x="695" y="118" fill="#e6edf3" font-size="12.5">SFT</text>
+          <text x="695" y="137" fill="#7d8896" font-size="10.5">教它对话</text>
+
+          <rect x="754" y="88" width="94" height="64" rx="7" fill="#161b22" stroke="#283040"/>
+          <text x="801" y="118" fill="#e6edf3" font-size="12.5">偏好优化</text>
+          <text x="801" y="137" fill="#7d8896" font-size="10.5">教它好好说</text>
+
+          <rect x="860" y="88" width="88" height="64" rx="7" fill="#161b22" stroke="#283040"/>
+          <text x="904" y="118" fill="#e6edf3" font-size="12.5">RLVR</text>
+          <text x="904" y="137" fill="#7d8896" font-size="10.5">教它推理</text>
+
+          <rect x="648" y="168" width="300" height="64" rx="7" fill="#0b0f16" stroke="#5a4326"/>
+          <text x="798" y="198" fill="#ffa657" font-size="12.5">产物:chat model</text>
+          <text x="798" y="217" fill="#7d8896" font-size="10.5">不教新知识,只改变如何使用已有能力</text>
+
+          <!-- 阶段 4 -->
+          <rect x="990" y="88" width="126" height="144" rx="7" fill="#161b22" stroke="#283040"/>
+          <text x="1053" y="140" fill="#e6edf3" font-size="12.5">评测 · 红队</text>
+          <text x="1053" y="166" fill="#e6edf3" font-size="12.5">量化 · 发布</text>
+        </g>
+
+        <!-- 箭头 -->
+        <g stroke="#3a4557" stroke-width="1.5" fill="none">
+          <path d="M278,181 L288,181" marker-end="url(#ar)"/>
+          <path d="M620,181 L630,181" marker-end="url(#ar)"/>
+          <path d="M962,181 L972,181" marker-end="url(#ar)"/>
+        </g>
+        <defs><marker id="ar" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L8,4 L0,8 z" fill="#3a4557"/></marker></defs>
+
+        <!-- 时间轴 -->
+        <line x1="8" y1="302" x2="1132" y2="302" class="axis"/>
+        <g class="tick" text-anchor="middle" style="font-size:11.5px">
+          <text x="143" y="326">几个月(最花人力)</text>
+          <text x="455" y="326">几周 ~ 几个月 · 上万张 GPU</text>
+          <text x="797" y="326">几天 ~ 几周</text>
+          <text x="1053" y="326">几周</text>
+        </g>
+        <text x="8" y="370" class="dlab" style="font-size:12.5px">整个过程只有<tspan fill="#d2a8ff" font-weight="600">阶段 2</tspan> 在"学知识"。它之前是准备,它之后是调教。</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 3 章节一 ════════ -->
+<section class="slide sec" data-t="§1 模型是什么">
+  <div class="body center">
+    <div class="num">01</div>
+    <h1>先搞清楚:<br>"模型"到底是什么东西</h1>
+    <div class="sub" style="max-width:640px">不理解这一点,后面所有的"训练"都会像魔法。<br>其实它非常朴素 —— 就是<strong>一大堆数字</strong>。</div>
+  </div>
+</section>
+
+<!-- ════════ 4 模型=一堆数字 ════════ -->
+<section class="slide" data-t="模型 = 一堆数字">
+  <div class="kick"><b>01 / 模型是什么</b></div>
+  <h2>一个模型,本质是一大堆数字</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <p>你下载一个开源模型,得到的是几个几 GB 的文件。打开看,里面没有代码、没有规则、没有词典 —— <strong>只有一张张数字表格</strong>。</p>
+    <div class="g23 fill">
+      <div class="col">
+        <pre class="sm"><span class="c"># 一个模型文件里真实存着的东西</span>
+model.embed_tokens.weight      <span class="n">[128256, 4096]</span>
+model.layers.0.self_attn.q_proj.weight  <span class="n">[4096, 4096]</span>
+model.layers.0.mlp.gate_proj.weight     <span class="n">[14336, 4096]</span>
+model.layers.0.input_layernorm.weight   <span class="n">[4096]</span>
+<span class="mutx">        ... 重复 32 层 ...</span>
+model.norm.weight              <span class="n">[4096]</span>
+lm_head.weight                 <span class="n">[128256, 4096]</span></pre>
+        <div class="note key"><span class="lb">这些数字有个名字</span>
+          它们叫 <strong>参数</strong>(parameter),也叫<strong>权重</strong>(weight)。<br>
+          "80 亿参数的模型" = 这些表格里一共有 80 亿个数字。</div>
+      </div>
+      <div class="col">
+        <div class="card b tight"><h3>训练 = 找这堆数字</h3>
+          <p>模型的结构(有几层、每层怎么连)是人写死的代码,几百行而已。<br><br>
+          <strong>训练要解决的唯一问题是:这 80 亿个数字应该各是多少。</strong></p></div>
+        <div class="card o tight"><h3>一个类比</h3>
+          <p>结构像一台调音台的<strong>接线方式</strong> —— 固定的。<br>
+          参数像上面几十亿个<strong>旋钮的位置</strong>。<br><br>
+          训练就是拧旋钮,拧到这台机器能把话说顺为止。</p></div>
+      </div>
+    </div>
+    <div class="note"><span class="lb">记住这句</span>
+      后面讲的一切 —— 数据、算力、几个月的训练 —— 都只是在回答一个问题:<span class="hl">这几十亿个数字,该填什么。</span></div>
+  </div>
+</section>
+
+<!-- ════════ 5 tokenizer ════════ -->
+<section class="slide" data-t="文字怎么变数字">
+  <div class="kick"><b>01 / 模型是什么</b></div>
+  <h2>第一步:文字得先变成数字</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <p>计算机只能算数字。所以任何文本进模型前,要先被切成小块,每块给一个编号。这个切分器叫 <strong>tokenizer(分词器)</strong>,切出的小块叫 <strong>token</strong>。</p>
+    <div class="fig">
+      <div class="cap">TOKENIZATION · 切分与编号</div>
+      <svg viewBox="0 0 1120 128" role="img" aria-label="文本被切成 token 并映射为整数编号">
+        <text x="0" y="20" class="dlab em" style="font-size:13px">"今天天气真好"</text>
+        <g stroke="#3a4557" stroke-width="1.5" fill="none"><path d="M96,15 L128,15" marker-end="url(#ar2)"/></g>
+        <defs><marker id="ar2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L8,4 L0,8 z" fill="#3a4557"/></marker></defs>
+        <g>
+          <rect x="140" y="2" width="62" height="26" rx="5" fill="#0e1a26" stroke="#2d4a6b"/><text x="171" y="20" text-anchor="middle" fill="#e6edf3" font-size="13">今天</text>
+          <rect x="208" y="2" width="62" height="26" rx="5" fill="#0e1a26" stroke="#2d4a6b"/><text x="239" y="20" text-anchor="middle" fill="#e6edf3" font-size="13">天气</text>
+          <rect x="276" y="2" width="46" height="26" rx="5" fill="#0e1a26" stroke="#2d4a6b"/><text x="299" y="20" text-anchor="middle" fill="#e6edf3" font-size="13">真</text>
+          <rect x="328" y="2" width="46" height="26" rx="5" fill="#0e1a26" stroke="#2d4a6b"/><text x="351" y="20" text-anchor="middle" fill="#e6edf3" font-size="13">好</text>
+        </g>
+        <g class="dlab" text-anchor="middle" font-size="12">
+          <text x="171" y="50">↓</text><text x="239" y="50">↓</text><text x="299" y="50">↓</text><text x="351" y="50">↓</text>
+          <text x="171" y="70" style="fill:#db6d28">37046</text>
+          <text x="239" y="70" style="fill:#db6d28">104307</text>
+          <text x="299" y="70" style="fill:#db6d28">89151</text>
+          <text x="351" y="70" style="fill:#db6d28">52801</text>
+        </g>
+        <line x1="0" y1="88" x2="1120" y2="88" class="grid"/>
+        <text x="0" y="110" class="dlab">这些编号是 <tspan fill="#ff7b72" font-weight="600">完全任意</tspan> 的 —— 37046 不代表频率、不代表含义,相邻编号之间也毫无关系。</text>
+      </svg>
+    </div>
+    <div class="g3 fill">
+      <div class="card tight"><div class="t">词表</div><p>所有可能的 token 列成一张表,叫<strong>词表</strong>。现代模型通常 <span class="hl">10 万 ~ 20 万</span> 个 token。</p></div>
+      <div class="card tight"><div class="t">不是按"字"切</div><p>英文常按<strong>子词</strong>切:<code>transformer</code> → <code>transform</code>+<code>er</code>。中文常用字多是一字一 token。</p></div>
+      <div class="card tight"><div class="t">切法是提前定死的</div><p>词表在<strong>模型训练之前</strong>就用语料统计好,训练全程不再变。<span class="hl">这是整个流程里唯一的人为预设。</span></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 6 tokenizer 副作用 ════════ -->
+<section class="slide" data-t="分词的副作用">
+  <div class="kick"><b>01 / 模型是什么</b></div>
+  <h2>顺带解释一个著名的"智障时刻"</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <p>"编号是任意的、模型看不到字母"这件事,会实实在在地漏出来。</p>
+    <div class="g2 fill">
+      <div class="col">
+        <div class="card r"><h3>为什么模型数不清 strawberry 里有几个 r</h3>
+          <pre class="sm" style="margin-top:8px"><span class="c"># 你以为它看到的:</span>
+s t r a w b e r r y   <span class="c">→ 数一下,3 个 r</span>
+
+<span class="c"># 它实际看到的:</span>
+[<span class="n">495</span>] [<span class="n">675</span>] [<span class="n">15717</span>]
+ str    aw    berry</pre>
+          <p style="margin-top:9px">三个不透明的编号而已。<strong>字母层面它根本接触不到</strong>,数不对是结构决定的,不是"笨"。</p></div>
+      </div>
+      <div class="col">
+        <div class="card o tight"><h3>算术也受切分影响</h3>
+          <p>早期模型里 <code>1234</code> 可能切成 <code>12|34</code>,<code>1235</code> 切成 <code>123|5</code> —— 同样位数切法都不一致,竖式对不齐。<br>
+          <span class="hlg">后来的模型专门规定数字按固定位数切,算术立刻改善。</span></p></div>
+        <div class="card p tight"><h3>幽灵 token</h3>
+          <p>GPT-2/3 词表里有个 <code>SolidGoldMagikarp</code>(一个 Reddit 用户名)。它在造词表的语料里频繁出现,分到了编号;但在真正的训练语料里几乎不出现。<br>
+          结果:<strong>这个编号对应的数字从没被训练过</strong>,一输入就让模型胡言乱语。</p></div>
+        <div class="note warn"><span class="lb">这个例子后面还会用到</span>
+          它证明了一件重要的事:<span class="hl">没被训练碰过的参数,就是不会变。</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 7 embedding ════════ -->
+<section class="slide" data-t="embedding 查找表">
+  <div class="kick"><b>01 / 模型是什么</b></div>
+  <h2>编号怎么变成"含义":查一张表</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <p>光有编号没用 —— 37046 这个数字本身不含信息。模型拿它去<strong>查一张大表</strong>,取出一行数字,这一行才是模型真正用的东西。</p>
+    <div class="fig">
+      <div class="cap">EMBEDDING LOOKUP · 查表</div>
+      <svg viewBox="0 0 1120 176" role="img" aria-label="token 编号作为行号,从 embedding 表中取出一行向量">
+        <text x="0" y="18" class="dlab em">token 编号</text>
+        <rect x="0" y="30" width="86" height="30" rx="6" fill="#1c1409" stroke="#5a4326"/>
+        <text x="43" y="50" text-anchor="middle" fill="#db6d28" font-size="13" font-family="monospace">37046</text>
+        <text x="0" y="82" class="dlab" style="font-size:11px">= 第 37046 行</text>
+
+        <g stroke="#3a4557" stroke-width="1.5" fill="none"><path d="M94,45 L140,45" marker-end="url(#ar3)"/></g>
+        <defs><marker id="ar3" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L8,4 L0,8 z" fill="#3a4557"/></marker></defs>
+
+        <text x="152" y="18" class="dlab em">embedding 表 · 12.8 万行 × 4096 列</text>
+        <rect x="152" y="26" width="470" height="120" rx="6" fill="#0b0f16" stroke="#283040"/>
+        <g font-family="monospace" font-size="10.5" fill="#57606a">
+          <text x="164" y="44">行 0      0.13  -0.02   0.41   0.08  …</text>
+          <text x="164" y="60">行 1     -0.31   0.22  -0.17   0.55  …</text>
+          <text x="164" y="76">  ⋮</text>
+        </g>
+        <rect x="158" y="84" width="458" height="22" rx="4" fill="#1c1409" stroke="#5a4326"/>
+        <text x="164" y="99" font-family="monospace" font-size="10.5" fill="#ffa657">行 37046   0.21  -0.43   0.88  -0.05  …  ← 取这一行</text>
+        <g font-family="monospace" font-size="10.5" fill="#57606a">
+          <text x="164" y="124">  ⋮</text>
+          <text x="164" y="140">行 128255  0.07   0.19  -0.36   0.12  …</text>
+        </g>
+
+        <g stroke="#3a4557" stroke-width="1.5" fill="none"><path d="M630,90 L676,90" marker-end="url(#ar3)"/></g>
+        <text x="688" y="18" class="dlab em">送进模型的东西</text>
+        <rect x="688" y="72" width="300" height="36" rx="6" fill="#0e1a26" stroke="#2d4a6b"/>
+        <text x="838" y="95" text-anchor="middle" fill="#58a6ff" font-size="12" font-family="monospace">4096 个数字组成的一行</text>
+        <text x="688" y="128" class="dlab" style="font-size:11px">这行数字就叫这个 token 的 <tspan fill="#e6edf3" font-weight="600">向量</tspan></text>
+      </svg>
+    </div>
+    <div class="g2">
+      <div class="note key"><span class="lb">关键</span>这张表本身<strong>也是参数</strong> —— 就是上一页清单里的 <code>embed_tokens.weight</code>。它和其他权重一样,一开始是<span class="hlr">随机数</span>,靠训练变得有意义。</div>
+      <div class="note"><span class="lb">尺寸感</span>12.8 万 × 4096 ≈ <strong>5.2 亿个数字</strong>。光这一张表,就占了一个 80 亿参数模型的 6%。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 8 完整参数地图 ════════ -->
+<section class="slide" data-t="完整参数地图">
+  <div class="kick"><b>01 / 模型是什么</b></div>
+  <h2>完整地图:这几十亿数字都在哪</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g32 fill">
+      <div class="fig" style="justify-content:center">
+        <div class="cap">ARCHITECTURE · 参数分布</div>
+        <svg viewBox="0 0 380 380" role="img" aria-label="模型架构中各类参数的位置">
+          <rect x="40" y="8" width="300" height="34" rx="7" fill="#0e1a26" stroke="#2d4a6b"/>
+          <text x="190" y="30" text-anchor="middle" fill="#58a6ff" font-size="12.5">embedding 查找表</text>
+
+          <g stroke="#3a4557" stroke-width="1.5"><line x1="190" y1="42" x2="190" y2="56"/></g>
+
+          <rect x="24" y="56" width="332" height="196" rx="9" fill="#160f22" stroke="#4a3a6b" stroke-dasharray="4 3"/>
+          <text x="40" y="74" fill="#d2a8ff" font-size="11" font-family="monospace">× 32 层,每层结构完全相同</text>
+
+          <rect x="44" y="84" width="292" height="26" rx="6" fill="#161b22" stroke="#283040"/>
+          <text x="190" y="102" text-anchor="middle" fill="#adbac7" font-size="11.5">归一化 <tspan fill="#57606a">(小)</tspan></text>
+
+          <rect x="44" y="116" width="292" height="46" rx="6" fill="#161b22" stroke="#3a4557"/>
+          <text x="190" y="135" text-anchor="middle" fill="#e6edf3" font-size="12.5">注意力 · 4 个矩阵</text>
+          <text x="190" y="152" text-anchor="middle" fill="#7d8896" font-size="10.5">决定"看哪些词" · 占 19%</text>
+
+          <rect x="44" y="168" width="292" height="26" rx="6" fill="#161b22" stroke="#283040"/>
+          <text x="190" y="186" text-anchor="middle" fill="#adbac7" font-size="11.5">归一化 <tspan fill="#57606a">(小)</tspan></text>
+
+          <rect x="44" y="200" width="292" height="46" rx="6" fill="#1c1409" stroke="#5a4326"/>
+          <text x="190" y="219" text-anchor="middle" fill="#ffa657" font-size="12.5">前馈网络 · 3 个矩阵</text>
+          <text x="190" y="236" text-anchor="middle" fill="#7d8896" font-size="10.5">存放"知识" · 占 81%</text>
+
+          <g stroke="#3a4557" stroke-width="1.5"><line x1="190" y1="252" x2="190" y2="266"/></g>
+          <rect x="40" y="266" width="300" height="26" rx="6" fill="#161b22" stroke="#283040"/>
+          <text x="190" y="284" text-anchor="middle" fill="#adbac7" font-size="11.5">最终归一化</text>
+
+          <g stroke="#3a4557" stroke-width="1.5"><line x1="190" y1="292" x2="190" y2="306"/></g>
+          <rect x="40" y="306" width="300" height="34" rx="7" fill="#0e1a26" stroke="#2d4a6b"/>
+          <text x="190" y="328" text-anchor="middle" fill="#58a6ff" font-size="12.5">输出表 → 预测下一个 token</text>
+
+          <text x="190" y="364" text-anchor="middle" fill="#7d8896" font-size="10.5" font-family="monospace">全部都是"要被训练出来的数字"</text>
+        </svg>
+      </div>
+      <div class="col">
+        <div class="card o"><h3>前馈网络:参数的大头</h3>
+          <p>每层三个大矩阵,吃掉 <span class="hl">八成</span> 参数。研究普遍认为<strong>事实性知识主要存在这里</strong> —— "巴黎是法国首都"这类信息就分布在这些数字中。</p></div>
+        <div class="card b"><h3>注意力:决定看哪里</h3>
+          <p>四个矩阵,占两成。它负责让每个词<strong>去看句子里的其他词</strong>。<br>
+          "苹果"到底指水果还是公司,就是靠它把上下文混进来判断的。</p></div>
+        <div class="card tight"><h3>归一化:参数量约等于零,但缺了就崩</h3>
+          <p>每层两个,每个只有 4096 个数字。占比 <code>0.004%</code>,但它控制每层数值的大小 —— 拿掉训练直接发散。</p></div>
+        <div class="note key"><span class="lb">重要</span>32 层的结构<strong>完全一模一样</strong>,只是里面的数字不同。所谓"更大的模型",基本就是把层数和每层宽度加大。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 9 参数占比图 ════════ -->
+<section class="slide" data-t="参数花在哪">
+  <div class="kick"><b>01 / 模型是什么</b></div>
+  <h2>算一笔账:80 亿参数怎么凑出来的</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="fig fill" style="justify-content:center">
+      <div class="cap">以 Llama 3 8B 为例 · 单层参数构成</div>
+      <svg viewBox="0 0 1080 366" role="img" aria-label="单层参数构成条形图:前馈网络1.76亿、注意力0.42亿、归一化可忽略">
+        <!-- 网格 -->
+        <g class="grid">
+          <line x1="420" y1="34" x2="420" y2="286"/>
+          <line x1="640" y1="34" x2="640" y2="286"/><line x1="860" y1="34" x2="860" y2="286"/>
+        </g>
+        <line x1="200" y1="286" x2="1060" y2="286" class="axis"/>
+        <line x1="200" y1="34" x2="200" y2="286" class="axis"/>
+
+        <!-- 条 1 前馈 -->
+        <rect x="200" y="62" width="770" height="52" rx="4" fill="#db6d28"/>
+        <text x="192" y="94" text-anchor="end" class="dlab em" style="font-size:13px">前馈网络</text>
+        <text x="984" y="94" class="dlab em" style="font-size:13px">1.76 亿 · 81%</text>
+
+        <!-- 条 2 注意力 -->
+        <rect x="200" y="134" width="184" height="52" rx="4" fill="#388bfd"/>
+        <text x="192" y="166" text-anchor="end" class="dlab em" style="font-size:13px">注意力</text>
+        <text x="398" y="166" class="dlab em" style="font-size:13px">0.42 亿 · 19%</text>
+
+        <!-- 条 3 归一化 -->
+        <rect x="200" y="206" width="3" height="52" rx="1.5" fill="#db61a2"/>
+        <text x="192" y="238" text-anchor="end" class="dlab em" style="font-size:13px">归一化</text>
+        <text x="215" y="238" class="dlab" style="font-size:13px">8 千 · 0.004%(条形细到几乎看不见)</text>
+
+        <g class="tick" text-anchor="middle" style="font-size:11.5px">
+          <text x="200" y="306">0</text><text x="420" y="306">5000万</text>
+          <text x="640" y="306">1亿</text><text x="860" y="306">1.5亿</text>
+        </g>
+
+        <line x1="0" y1="326" x2="1080" y2="326" class="grid"/>
+        <text x="0" y="350" class="dlab" style="font-size:12.5px">
+          单层合计 <tspan fill="#e6edf3" font-weight="600">2.18 亿</tspan> × 32 层 = <tspan fill="#e6edf3" font-weight="600">70 亿</tspan>
+          &#160;&#160;+&#160;&#160;两张词表(输入/输出) <tspan fill="#e6edf3" font-weight="600">10.5 亿</tspan>
+          &#160;&#160;=&#160;&#160;<tspan fill="#7ee787" font-weight="600">约 80 亿</tspan>
+        </text>
+      </svg>
+    </div>
+    <div class="g3">
+      <div class="card tight b"><div class="t">规律一</div><p>模型越大,<strong>词表占比越小</strong>。8B 模型词表占 13%,万亿模型只占 0.1% —— 所以大模型可以放心用大词表。</p></div>
+      <div class="card tight o"><div class="t">规律二</div><p>参数主要花在<strong>前馈网络</strong>上。想让模型"记住更多",加宽这部分最直接。</p></div>
+      <div class="card tight"><div class="t">规律三</div><p>参数量 ≈ 层数 × 宽度²。所以宽度翻倍,参数量翻四倍。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 10 章节二 ════════ -->
+<section class="slide sec" data-t="§2 训练前的准备">
+  <div class="body center">
+    <div class="num">02</div>
+    <h1>开火之前:<br>要准备什么</h1>
+    <div class="sub" style="max-width:640px">这一阶段不写模型、不用 GPU 集群,<br>但它决定了模型的<strong>上限</strong>。</div>
+  </div>
+</section>
+
+<!-- ════════ 11 数据漏斗 ════════ -->
+<section class="slide" data-t="数据清洗">
+  <div class="kick"><b>02 / 准备</b></div>
+  <h2>数据:最脏、最累、最决定成败的一步</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g23 fill">
+      <div class="fig" style="justify-content:center">
+        <div class="cap">DATA PIPELINE · 从原始网页到训练语料(单一色相,深浅表示数量级)</div>
+        <svg viewBox="0 0 620 400" role="img" aria-label="数据清洗漏斗:原始网页数百TB逐级过滤到约15T token">
+          <g font-size="11.5" font-family="monospace">
+            <rect x="10" y="16" width="600" height="44" rx="5" fill="#0d2d4d" stroke="#1f4b73"/>
+            <text x="24" y="43" fill="#cfe3f7">1 · 原始网页存档(Common Crawl 等)</text>
+            <text x="596" y="43" text-anchor="end" fill="#cfe3f7">数百 TB</text>
+
+            <rect x="52" y="72" width="516" height="44" rx="5" fill="#10375c" stroke="#22537f"/>
+            <text x="66" y="99" fill="#cfe3f7">2 · 抽正文、去广告导航、识别语言</text>
+            <text x="554" y="99" text-anchor="end" fill="#cfe3f7">~30%</text>
+
+            <rect x="100" y="128" width="420" height="44" rx="5" fill="#144270" stroke="#265f92"/>
+            <text x="114" y="155" fill="#cfe3f7">3 · 去重(同一段话被抄了几千遍)</text>
+            <text x="506" y="155" text-anchor="end" fill="#cfe3f7">砍掉大半</text>
+
+            <rect x="148" y="184" width="324" height="44" rx="5" fill="#1a4f83" stroke="#2b6ba3"/>
+            <text x="162" y="211" fill="#e3f0fb">4 · 质量过滤(打分,留下"像人写的")</text>
+
+            <rect x="196" y="240" width="228" height="44" rx="5" fill="#215f9a" stroke="#3179b4"/>
+            <text x="210" y="267" fill="#e3f0fb">5 · 去隐私、去有害、去测试题</text>
+
+            <rect x="244" y="296" width="132" height="52" rx="5" fill="#2b7cc4" stroke="#3f92d8"/>
+            <text x="310" y="320" text-anchor="middle" fill="#ffffff" font-size="12.5">训练语料</text>
+            <text x="310" y="338" text-anchor="middle" fill="#d8ecff" font-size="11">约 15 万亿 token</text>
+          </g>
+          <text x="10" y="382" fill="#7d8896" font-size="11" font-family="monospace">每一层的宽度表示剩余数据量(示意,非等比)</text>
+        </svg>
+      </div>
+      <div class="col">
+        <div class="card b tight"><h3>还要"配菜"</h3>
+          <p>光有网页不够,得混进:<br>
+          <span class="pill b">代码</span> <span class="pill b">书籍</span> <span class="pill b">论文</span> <span class="pill b">百科</span> <span class="pill b">多语言</span><br><br>
+          <strong>各占多少比例是核心机密。</strong>代码比例影响推理能力,多语言比例影响中文表现。</p></div>
+        <div class="card r tight"><h3>去重为什么这么重要</h3>
+          <p>同一段文字重复出现,模型会<strong>死记硬背</strong>而不是学规律,还浪费算力。去重是性价比最高的一步。</p></div>
+        <div class="card o tight"><h3>去测试题:防作弊</h3>
+          <p>如果考题混进了训练数据,跑分会虚高。这叫<strong>数据污染</strong>,必须专门检测清除。</p></div>
+        <div class="note warn"><span class="lb">现实</span>这一步通常是整个项目<strong>耗时最长</strong>的部分,而且没有捷径。业界共识:<span class="hl">数据质量比模型大小更决定效果。</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 12 定架构 ════════ -->
+<section class="slide" data-t="定架构 · Scaling Law">
+  <div class="kick"><b>02 / 准备</b></div>
+  <h2>模型做多大?这个是算出来的,不是拍脑袋</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <p>给定一笔固定的预算(比如 1000 万美元的算力),该训一个<strong>小模型看很多数据</strong>,还是<strong>大模型看少量数据</strong>?这有最优解。</p>
+    <div class="g2 fill">
+      <div class="fig" style="justify-content:center">
+        <div class="cap">SCALING LAW · 用小模型外推大模型</div>
+        <svg viewBox="0 0 520 240" role="img" aria-label="用一系列小模型拟合出算力与损失的关系曲线,外推到目标规模">
+          <line x1="52" y1="20" x2="52" y2="188" class="axis"/>
+          <line x1="52" y1="188" x2="500" y2="188" class="axis"/>
+          <g class="grid">
+            <line x1="52" y1="146" x2="500" y2="146"/><line x1="52" y1="104" x2="500" y2="104"/><line x1="52" y1="62" x2="500" y2="62"/>
+          </g>
+          <!-- 实测点 -->
+          <g fill="#388bfd">
+            <circle cx="92" cy="60" r="5"/><circle cx="140" cy="82" r="5"/><circle cx="190" cy="100" r="5"/>
+            <circle cx="242" cy="115" r="5"/><circle cx="296" cy="127" r="5"/>
+          </g>
+          <path d="M92,60 C150,86 220,110 296,127" fill="none" stroke="#388bfd" stroke-width="2"/>
+          <!-- 外推 -->
+          <path d="M296,127 C350,138 410,148 470,157" fill="none" stroke="#db6d28" stroke-width="2" stroke-dasharray="6 4"/>
+          <circle cx="470" cy="157" r="6" fill="#db6d28"/>
+          <circle cx="470" cy="157" r="9" fill="none" stroke="#db6d28" stroke-width="1.5" opacity=".5"/>
+
+          <text x="92" y="46" class="dlab" text-anchor="middle" style="font-size:10.5px">小模型实测</text>
+          <text x="470" y="140" class="dlab em" text-anchor="end" style="fill:#db6d28">外推:目标规模</text>
+
+          <text x="276" y="212" text-anchor="middle" class="tick" style="font-size:11px">投入的算力 →</text>
+          <text x="18" y="104" text-anchor="middle" class="tick" style="font-size:11px" transform="rotate(-90,18,104)">损失(越低越好)</text>
+          <text x="52" y="232" class="dlab" style="font-size:10.5px;fill:#7d8896">先花小钱训一批百万~十亿级小模型,拟合出曲线,再外推</text>
+        </svg>
+      </div>
+      <div class="col">
+        <div class="card b"><h3>要定的东西</h3>
+          <ul style="margin-top:4px">
+            <li>层数(深度)</li><li>每层宽度</li>
+            <li>注意力头数</li><li>是不是 MoE(混合专家)</li>
+            <li>用多少数据训</li>
+          </ul></div>
+        <div class="card g"><h3>为什么能外推</h3>
+          <p>业界发现:<strong>损失和算力之间存在稳定的幂律关系</strong>。用一批便宜的小模型量出这条曲线,就能相当准地预测"花 X 算力能得到多好的模型"。</p></div>
+        <div class="note key"><span class="lb">为什么必须这么干</span>
+          大模型只有<strong>一次机会</strong> —— 训一次几个月、几百万美元,不可能试错。所以关键决策必须在开火前用小实验定下来。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 13 章节三 ════════ -->
+<section class="slide sec" data-t="§3 预训练">
+  <div class="body center">
+    <div class="num">03</div>
+    <h1>预训练:<br>整个过程的主体</h1>
+    <div class="sub" style="max-width:660px">占掉 <strong>99% 以上</strong> 的算力和时间。<br>模型的全部知识,都在这一步形成。</div>
+  </div>
+</section>
+
+<!-- ════════ 14 起点 ════════ -->
+<section class="slide" data-t="起点:随机">
+  <div class="kick"><b>03 / 预训练</b></div>
+  <h2>起点:所有数字都是随机的</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <p>训练开始的一刻,那 80 亿个数字全部是随机生成的小数。模型此时<strong>什么都不会</strong> —— 给它任何输入,它对下一个 token 的预测都是"均匀瞎猜"。</p>
+    <div class="g23 fill">
+      <div class="col">
+        <div class="card b"><h3>有意思的是:起点的分数可以精确算出来</h3>
+          <p style="margin-top:6px">衡量"猜得有多差"的指标叫 <strong>loss(损失)</strong>,越低越好。<br>
+          均匀瞎猜时,loss 恰好等于词表大小的自然对数:</p>
+          <pre class="sm" style="margin-top:9px">loss₀ = ln(词表大小)
+      = ln(128000)
+      = <span class="d">11.76</span></pre>
+          <p style="margin-top:9px"><strong>任何一次训练,第一个记录下来的 loss 都在 11.7 附近。</strong>如果不是,说明代码写错了 —— 这是工程师的第一个检查点。</p></div>
+      </div>
+      <div class="col">
+        <div class="card o tight"><h3>终点大概在哪</h3>
+          <p>训练结束时 loss 通常降到 <span class="hl">1.5 ~ 2.0</span>。<br>
+          从 11.76 到 1.8,就是这几个月、几百万美元买到的全部东西。</p></div>
+        <div class="card tight"><h3>loss 到底在量什么</h3>
+          <p>翻开一本书,遮住下一个词让模型猜。<br>
+          猜得越准,loss 越低。<strong>就这么简单。</strong></p></div>
+        <div class="note bad"><span class="lb">别被"随机"骗过去</span>
+          随机初始化不是"随便"。数值范围经过精心设计 —— 太大训练会爆炸,太小信号传不下去。但<span class="hlr">确实不含任何语义</span>。</div>
+        <div class="note key"><span class="lb">没有人教它</span>
+          从头到尾,<strong>没有人告诉过模型"猫"和"狗"是相似的</strong>。没有词典、没有语法书、没有标注。全部结构都是自己长出来的。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 15 一个 step ════════ -->
+<section class="slide" data-t="一次训练循环">
+  <div class="kick"><b>03 / 预训练</b></div>
+  <h2>训练的核心:一个只有 6 步的循环</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <p>整个预训练在算法上<strong>没有比这更复杂的东西</strong>。这 6 步重复几十万次,就是全部。</p>
+    <div class="g23 fill">
+      <div class="fig" style="justify-content:center">
+        <div class="cap">TRAINING STEP · 一次迭代</div>
+        <svg viewBox="0 0 560 268" role="img" aria-label="训练循环六个步骤">
+          <g font-size="12">
+            <rect x="16" y="10" width="250" height="36" rx="7" fill="#0e1a26" stroke="#2d4a6b"/>
+            <text x="30" y="27" fill="#58a6ff" font-family="monospace" font-size="11">1</text>
+            <text x="52" y="27" fill="#e6edf3">取一批文本</text>
+            <text x="52" y="41" fill="#7d8896" font-size="10.5">比如 400 万 token</text>
+
+            <rect x="16" y="52" width="250" height="36" rx="7" fill="#161b22" stroke="#283040"/>
+            <text x="30" y="69" fill="#58a6ff" font-family="monospace" font-size="11">2</text>
+            <text x="52" y="69" fill="#e6edf3">前向:让模型预测</text>
+            <text x="52" y="83" fill="#7d8896" font-size="10.5">每个位置猜下一个 token</text>
+
+            <rect x="16" y="94" width="250" height="36" rx="7" fill="#161b22" stroke="#283040"/>
+            <text x="30" y="111" fill="#58a6ff" font-family="monospace" font-size="11">3</text>
+            <text x="52" y="111" fill="#e6edf3">对答案,算 loss</text>
+            <text x="52" y="125" fill="#7d8896" font-size="10.5">真实的下一个词就是标准答案</text>
+
+            <rect x="16" y="136" width="250" height="36" rx="7" fill="#1c1409" stroke="#5a4326"/>
+            <text x="30" y="153" fill="#ffa657" font-family="monospace" font-size="11">4</text>
+            <text x="52" y="153" fill="#e6edf3">反向:算每个数字的"责任"</text>
+            <text x="52" y="167" fill="#7d8896" font-size="10.5">这一步叫反向传播</text>
+
+            <rect x="16" y="178" width="250" height="36" rx="7" fill="#1c1409" stroke="#5a4326"/>
+            <text x="30" y="195" fill="#ffa657" font-family="monospace" font-size="11">5</text>
+            <text x="52" y="195" fill="#e6edf3">按责任微调每个数字</text>
+            <text x="52" y="209" fill="#7d8896" font-size="10.5">改动极小,但有方向</text>
+
+            <rect x="16" y="220" width="250" height="30" rx="7" fill="#0b0f16" stroke="#3a4557"/>
+            <text x="30" y="240" fill="#7d8896" font-family="monospace" font-size="11">6</text>
+            <text x="52" y="240" fill="#adbac7">回到第 1 步</text>
+          </g>
+          <!-- 回环箭头 -->
+          <path d="M276,235 C330,235 330,28 276,28" fill="none" stroke="#3a4557" stroke-width="1.5" marker-end="url(#ar4)"/>
+          <defs><marker id="ar4" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0,0 L8,4 L0,8 z" fill="#3a4557"/></marker></defs>
+          <text x="344" y="122" fill="#7d8896" font-size="11" font-family="monospace">重复</text>
+          <text x="344" y="140" fill="#e6edf3" font-size="15" font-weight="600" font-family="monospace">30 万+ 次</text>
+          <text x="344" y="160" fill="#7d8896" font-size="10.5" font-family="monospace">几周 ~ 几个月</text>
+        </svg>
+      </div>
+      <div class="col">
+        <div class="card b tight"><h3>第 4 步在干什么(通俗版)</h3>
+          <p>模型猜错了,要追责:"这 80 亿个数字里,<strong>每一个</strong>对这次猜错负多大责任?往哪个方向调一点能更准?"<br><br>
+          反向传播就是把这个责任<strong>从输出一路倒推回输入</strong>,一次算清所有数字的调整方向。</p></div>
+        <div class="card o tight"><h3>一个细节:embedding 是"稀疏更新"</h3>
+          <p>这批文本里出现过的 token,对应的行才会被调整;<strong>没出现的行原封不动</strong>。<br>
+          所以"的""是"这种高频词被更新上亿次,生僻字可能几万步才轮到一次。</p></div>
+        <div class="note warn"><span class="lb">回头看</span>
+          还记得那个 <code>SolidGoldMagikarp</code> 吗?它就是<span class="hl">从来没被抽中过</span>,所以那一行永远停在随机初始化的状态。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 16 loss 曲线 ════════ -->
+<section class="slide" data-t="loss 怎么下降">
+  <div class="kick"><b>03 / 预训练</b></div>
+  <h2>几十万次之后:loss 怎么走的</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="fig fill" style="justify-content:center">
+      <div class="cap">LOSS CURVE · 横轴为对数刻度(否则前期下降会挤成一条竖线)</div>
+      <svg viewBox="0 0 1060 302" role="img" aria-label="预训练损失曲线,从11.76降至约1.8">
+        <g class="grid">
+          <line x1="86" y1="59" x2="1010" y2="59"/><line x1="86" y1="94" x2="1010" y2="94"/>
+          <line x1="86" y1="129" x2="1010" y2="129"/><line x1="86" y1="164" x2="1010" y2="164"/>
+          <line x1="86" y1="199" x2="1010" y2="199"/>
+        </g>
+        <line x1="86" y1="24" x2="86" y2="234" class="axis"/>
+        <line x1="86" y1="234" x2="1010" y2="234" class="axis"/>
+
+        <!-- y 轴刻度(线性等距) -->
+        <g class="tick" text-anchor="end">
+          <text x="78" y="63">10</text><text x="78" y="98">8</text>
+          <text x="78" y="133">6</text><text x="78" y="168">4</text><text x="78" y="203">2</text>
+        </g>
+        <!-- x 轴刻度 -->
+        <g class="tick" text-anchor="middle">
+          <text x="86" y="252">0</text><text x="317" y="252">1千步</text>
+          <text x="548" y="252">1万步</text><text x="779" y="252">10万步</text><text x="1010" y="252">30万步</text>
+        </g>
+
+        <!-- 曲线(纵轴线性:y = 234 − loss × 17.5) -->
+        <path d="M86,28 C150,70 230,100 317,120 C400,141 480,164 548,178 C630,190 710,195 779,197 C860,200 940,202 1010,203"
+              fill="none" stroke="#388bfd" stroke-width="2" stroke-linecap="round"/>
+
+        <!-- 关键点 -->
+        <circle cx="86" cy="28" r="5" fill="#388bfd" stroke="#0b0f16" stroke-width="2"/>
+        <circle cx="1010" cy="203" r="5" fill="#388bfd" stroke="#0b0f16" stroke-width="2"/>
+
+        <!-- 直接标注 -->
+        <text x="100" y="26" class="dlab em">起点 11.76 = ln(词表)· 纯瞎猜</text>
+        <text x="1002" y="190" class="dlab em" text-anchor="end">终点 ≈ 1.8</text>
+
+        <!-- 阶段注记 -->
+        <line x1="317" y1="24" x2="317" y2="234" stroke="#3a4557" stroke-width="1" stroke-dasharray="3 3"/>
+        <text x="196" y="278" text-anchor="middle" class="dlab" style="font-size:11px">最初几千步</text>
+        <text x="196" y="292" text-anchor="middle" class="dlab" style="font-size:11px;fill:#7d8896">学会基本语法、常用搭配</text>
+        <text x="660" y="278" text-anchor="middle" class="dlab" style="font-size:11px">剩下 99%+ 的步数</text>
+        <text x="660" y="292" text-anchor="middle" class="dlab" style="font-size:11px;fill:#7d8896">缓慢积累事实、逻辑、代码、多语言 —— 昂贵的部分在这里</text>
+      </svg>
+    </div>
+    <div class="g3">
+      <div class="card tight r"><div class="t">反直觉</div><p>后面 99% 的算力,只把 loss 从 3 降到 1.8。<strong>但模型能力的差距全在这一段。</strong></p></div>
+      <div class="card tight b"><div class="t">为什么值</div><p>loss 每降一点,对应的是"更长的逻辑链能接对"。分数变化小,体感差别巨大。</p></div>
+      <div class="card tight o"><div class="t">工程师盯什么</div><p>盯的不是绝对值,是<strong>曲线有没有按预测的幂律走</strong>。偏离了就说明出问题了。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 17 学习率 ════════ -->
+<section class="slide" data-t="学习率安排">
+  <div class="kick"><b>03 / 预训练</b></div>
+  <h2>每次调多大?这个也要精心安排</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <p>第 5 步"微调每个数字"时,幅度由 <strong>学习率</strong> 控制。它不是常数,全程按计划变化。</p>
+    <div class="g23 fill">
+      <div class="fig" style="justify-content:center">
+        <div class="cap">LEARNING RATE SCHEDULE</div>
+        <svg viewBox="0 0 620 230" role="img" aria-label="学习率调度曲线:预热、衰减、退火三段">
+          <line x1="56" y1="18" x2="56" y2="176" class="axis"/>
+          <line x1="56" y1="176" x2="600" y2="176" class="axis"/>
+          <g class="grid"><line x1="56" y1="60" x2="600" y2="60"/><line x1="56" y1="118" x2="600" y2="118"/></g>
+
+          <path d="M56,176 L104,36 C200,42 300,74 420,116 C470,132 500,142 528,150 L560,170 L600,174"
+                fill="none" stroke="#db6d28" stroke-width="2" stroke-linecap="round"/>
+
+          <!-- 分段背景 -->
+          <rect x="56" y="18" width="48" height="158" fill="#388bfd" opacity=".07"/>
+          <rect x="528" y="18" width="72" height="158" fill="#db61a2" opacity=".09"/>
+
+          <text x="80" y="200" text-anchor="middle" class="tick" style="font-size:10.5px">预热</text>
+          <text x="316" y="200" text-anchor="middle" class="tick" style="font-size:10.5px">主体:缓慢衰减</text>
+          <text x="564" y="200" text-anchor="middle" class="tick" style="font-size:10.5px">退火</text>
+
+          <text x="112" y="32" class="dlab em" style="font-size:11px">峰值</text>
+          <text x="56" y="224" class="dlab" style="font-size:10.5px;fill:#7d8896">纵轴 = 每步调整的幅度</text>
+        </svg>
+      </div>
+      <div class="col">
+        <div class="card b tight"><h3>预热(开头几千步)</h3>
+          <p>从 0 慢慢升上去。<strong>一上来就大幅调整,会把随机初始化的权重直接打乱</strong>,训练当场崩掉。</p></div>
+        <div class="card o tight"><h3>主体:缓慢衰减</h3>
+          <p>前期大步走,快速接近大致正确的区域;后期小步走,精细调整。<br>
+          <span style="color:var(--mut)">像下山:远处大步跑,接近谷底改成挪。</span></p></div>
+        <div class="card p tight"><h3>退火(最后一段)</h3>
+          <p>学习率降到接近零,<strong>同时把高质量数据的比例大幅提高</strong>(教科书、精选代码、合成数据)。<br>
+          <span class="hlg">这一步性价比极高</span> —— 用不到 5% 的算力,能显著提升最终表现。</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 18 并行 ════════ -->
+<section class="slide" data-t="上万张卡怎么协作">
+  <div class="kick"><b>03 / 预训练</b></div>
+  <h2>一台机器装不下,怎么办</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <p>一个大模型的参数 + 训练所需的中间数据,远超单张 GPU 的显存。必须<strong>同时用四种方式切开</strong>,分散到上万张卡上。</p>
+    <div class="g4 fill">
+      <div class="card b"><div class="t">切法 1</div><h3>数据并行</h3>
+        <p>每张卡拿<strong>不同的文本</strong>,各自算,然后把结果汇总平均。<br><br>
+        <span style="color:var(--mut)">像全班分头做不同的题,再对一次答案。</span></p></div>
+      <div class="card o"><div class="t">切法 2</div><h3>张量并行</h3>
+        <p>一个矩阵太大,<strong>横着切成几块</strong>,几张卡各算一块。<br><br>
+        <span style="color:var(--mut)">像几个人合抬一张大桌子。</span></p></div>
+      <div class="card p"><div class="t">切法 3</div><h3>流水线并行</h3>
+        <p><strong>不同的层放不同的卡</strong>。第 1–8 层在 A 卡,9–16 层在 B 卡,依次传递。<br><br>
+        <span style="color:var(--mut)">像工厂流水线。</span></p></div>
+      <div class="card g"><div class="t">切法 4</div><h3>专家并行</h3>
+        <p>MoE 模型专用:<strong>不同的"专家"放不同的卡</strong>,每个 token 只送去它需要的那几个。</p></div>
+    </div>
+    <div class="g2">
+      <div class="note warn"><span class="lb">实话</span>
+        这套并行方案的<strong>工程复杂度,比模型本身高得多</strong>。模型代码几百行,训练框架是几万行。真正的门槛在这里。</div>
+      <div class="note key"><span class="lb">代价</span>
+        卡之间要频繁通信同步。<strong>网络带宽往往才是瓶颈</strong>,不是算力 —— 这也是为什么训练集群要用专门的高速互联。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 19 训练事故 ════════ -->
+<section class="slide" data-t="训练途中的意外">
+  <div class="kick"><b>03 / 预训练</b></div>
+  <h2>真实的训练曲线不是平滑的</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g23 fill">
+      <div class="fig" style="justify-content:center">
+        <div class="cap">LOSS SPIKE · 训练尖峰与回滚</div>
+        <svg viewBox="0 0 620 220" role="img" aria-label="损失曲线中出现尖峰,回滚到检查点后恢复">
+          <line x1="52" y1="16" x2="52" y2="164" class="axis"/>
+          <line x1="52" y1="164" x2="600" y2="164" class="axis"/>
+          <g class="grid"><line x1="52" y1="60" x2="600" y2="60"/><line x1="52" y1="112" x2="600" y2="112"/></g>
+
+          <!-- 正常段 -->
+          <path d="M52,60 C110,78 160,92 220,102" fill="none" stroke="#388bfd" stroke-width="2"/>
+          <!-- 尖峰 -->
+          <path d="M220,102 L246,28 L268,96" fill="none" stroke="#db61a2" stroke-width="2"/>
+          <!-- 回滚虚线 -->
+          <path d="M268,96 L220,102" fill="none" stroke="#db61a2" stroke-width="1.5" stroke-dasharray="4 3" opacity=".7"/>
+          <!-- 恢复段 -->
+          <path d="M220,102 C300,112 400,124 600,136" fill="none" stroke="#388bfd" stroke-width="2"/>
+
+          <circle cx="220" cy="102" r="5" fill="#7ee787" stroke="#0b0f16" stroke-width="2"/>
+          <text x="212" y="126" class="dlab em" text-anchor="middle" style="fill:#7ee787;font-size:11px">检查点</text>
+          <text x="252" y="20" class="dlab em" text-anchor="middle" style="fill:#db61a2;font-size:11px">loss 突然飙升</text>
+          <text x="330" y="90" class="dlab" style="font-size:11px;fill:#7d8896">回滚 → 跳过那批数据 → 继续</text>
+          <text x="52" y="196" class="dlab" style="font-size:11px">所以要<tspan fill="#e6edf3" font-weight="600">频繁存档</tspan> —— 每隔一段时间保存一次完整状态</text>
+          <text x="52" y="212" class="dlab" style="font-size:10.5px;fill:#7d8896">存档要连优化器状态一起存,体积是模型本身的三倍</text>
+        </svg>
+      </div>
+      <div class="col">
+        <div class="card r tight"><h3>Loss 尖峰</h3>
+          <p>某一批数据触发了数值异常,loss 突然飙升甚至变成 NaN。<strong>常规处理:回滚到上一个存档,跳过那批数据重来。</strong></p></div>
+        <div class="card o tight"><h3>硬件故障是常态</h3>
+          <p>上万张卡连续跑几周,<strong>坏卡几乎每天都有</strong>。训练框架必须能自动检测、隔离、恢复,否则永远训不完。</p></div>
+        <div class="card tight"><h3>数值溢出</h3>
+          <p>为了省显存,训练用的是低精度数字格式。某些层的数值一旦超出范围就会溢出 —— 需要专门的稳定化技巧。</p></div>
+        <div class="note bad"><span class="lb">值得知道</span>
+          真实的大模型训练<strong>更像运维一个大型工厂</strong>,而不是跑一段程序。有团队专门 24 小时轮班盯曲线。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 20 收尾 & base model ════════ -->
+<section class="slide" data-t="产物:base model">
+  <div class="kick"><b>03 / 预训练</b></div>
+  <h2>预训练结束,得到的是个"怪东西"</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <p>此时的模型叫 <strong>base model(基座模型)</strong>。它读遍了互联网,知识极其丰富 —— 但<strong>它不会聊天</strong>。</p>
+    <div class="g2 fill">
+      <div class="col">
+        <div class="card r"><h3>你问它:"你好"</h3>
+          <pre class="sm" style="margin-top:8px"><span class="c">输入:</span>
+你好
+
+<span class="c">base model 的输出:</span>
+,我是小明,今年读高三。
+今天想跟大家分享一下我的学习方法……</pre>
+          <p style="margin-top:9px">它没在回答你,它在<strong>续写</strong>。因为它整个训练过程只学了一件事:<span class="hlr">猜下一个 token</span>。</p></div>
+        <div class="card b tight"><h3>收尾还做了两件事</h3>
+          <ul style="margin-top:4px">
+            <li><strong>数据退火</strong> —— 最后一段用高质量数据 + 极小学习率</li>
+            <li><strong>长上下文扩展</strong> —— 前期为省钱只在短文本上训,最后专门把窗口从 4千 撑到 12万+ token</li>
+          </ul></div>
+      </div>
+      <div class="col">
+        <div class="card g"><h3>但它已经拥有了几乎全部能力</h3>
+          <p style="margin-top:6px">语法、常识、事实、代码、多语言、逻辑推理的雏形 —— <strong>全都在里面了</strong>,只是没有被组织成"对话"这种形式。</p>
+          <p style="margin-top:9px">接下来的后训练<span class="hl">不会再教它新知识</span>,只是教它<strong>怎么把已有的能力拿出来用</strong>。</p></div>
+        <div class="note key"><span class="lb">一个好比喻</span>
+          base model 像一个<strong>读完了整个图书馆、但从没跟人说过话</strong>的人。<br><br>
+          知识不缺,缺的是"被提问时该怎么回应"这个习惯。</div>
+        <div class="note"><span class="lb">顺带一提</span>
+          很多开源模型会同时发布 <code>-base</code> 和 <code>-instruct</code> 两个版本。前者就是这个"怪东西",留给研究者和想自己做后训练的人。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 21 章节四 ════════ -->
+<section class="slide sec" data-t="§4 后训练">
+  <div class="body center">
+    <div class="num">04</div>
+    <h1>后训练:<br>把它调教成助手</h1>
+    <div class="sub" style="max-width:640px">只占 <strong>1% 不到</strong> 的算力,<br>却决定了你实际用起来的全部体验。</div>
+  </div>
+</section>
+
+<!-- ════════ 22 SFT ════════ -->
+<section class="slide" data-t="SFT 监督微调">
+  <div class="kick"><b>04 / 后训练</b><span>第一步</span></div>
+  <h2>SFT:给它看几万个"标准范例"</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <p><strong>SFT = 监督微调</strong>。做法朴素得出奇:准备一批"问题 → 理想回答"的范例,让模型继续训练。<span class="hl">训练目标完全没变,还是猜下一个 token</span> —— 只是数据从网页换成了对话。</p>
+    <div class="g23 fill">
+      <div class="col">
+        <pre class="sm"><span class="c"># 训练数据长这样</span>
+<span class="d">&lt;|user|&gt;</span>
+帮我写一封请假邮件,明天家里有事。
+<span class="d">&lt;|assistant|&gt;</span>
+主题:请假申请(3月12日)
+
+您好,
+
+因家中临时有事,我需要于 3 月 12 日
+请假一天……</pre>
+        <div class="note key"><span class="lb">那些尖括号标记是什么</span>
+          <code>&lt;|user|&gt;</code> 这类<strong>特殊 token</strong> 用来标记谁在说话。<br>
+          它们<span class="hl">没有被硬编码任何行为</span> —— 在 embedding 表里就是普通的一行,和"猫"一样。<br>
+          模型之所以懂它们,纯粹是因为<strong>训练数据里它们总出现在固定位置</strong>。</div>
+      </div>
+      <div class="col">
+        <div class="card b tight"><h3>数据量</h3>
+          <p>几万到几百万条。<strong>相比预训练的 15 万亿 token,这是个零头。</strong></p></div>
+        <div class="card o tight"><h3>数据从哪来</h3>
+          <ul style="margin-top:4px">
+            <li>人工撰写(贵,但质量最高)</li>
+            <li>更强的模型生成后人工筛选</li>
+            <li>已有的高质量问答改写</li>
+          </ul>
+          <p style="margin-top:6px"><strong>质量远比数量重要</strong> —— 几千条精品胜过几十万条水货。</p></div>
+        <div class="card g tight"><h3>做完之后</h3>
+          <p>模型知道"被问了就要回答",格式也像样了。<br>
+          <strong>但它还不知道:两个都还行的回答,哪个更好。</strong></p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 23 偏好优化 ════════ -->
+<section class="slide" data-t="偏好优化 RLHF">
+  <div class="kick"><b>04 / 后训练</b><span>第二步</span></div>
+  <h2>偏好优化:教它"什么叫更好的回答"</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <p>很多问题没有唯一正确答案,只有"更好"和"更差"。这没法用范例教,只能<strong>让人来比较</strong>。</p>
+    <div class="fig">
+      <div class="cap">PREFERENCE OPTIMIZATION · 从人类比较中学习</div>
+      <svg viewBox="0 0 1120 130" role="img" aria-label="偏好优化流程:同一问题生成多个回答,人类排序,模型学习偏好">
+        <g font-size="12" font-family="monospace">
+          <rect x="0" y="14" width="150" height="60" rx="7" fill="#161b22" stroke="#283040"/>
+          <text x="75" y="40" text-anchor="middle" fill="#e6edf3" font-size="12">同一个问题</text>
+          <text x="75" y="58" text-anchor="middle" fill="#7d8896" font-size="10.5">让模型生成多个回答</text>
+
+          <path d="M158,44 L192,30" stroke="#3a4557" stroke-width="1.5" fill="none" marker-end="url(#ar5)"/>
+          <path d="M158,44 L192,58" stroke="#3a4557" stroke-width="1.5" fill="none" marker-end="url(#ar5)"/>
+          <defs><marker id="ar5" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0,0 L8,4 L0,8 z" fill="#3a4557"/></marker></defs>
+
+          <rect x="200" y="10" width="180" height="30" rx="6" fill="#0e1e14" stroke="#2b5a3a"/>
+          <text x="214" y="30" fill="#7ee787" font-size="11.5">回答 A</text>
+          <rect x="200" y="48" width="180" height="30" rx="6" fill="#1e1211" stroke="#5a2f2c"/>
+          <text x="214" y="68" fill="#ff7b72" font-size="11.5">回答 B</text>
+
+          <path d="M388,44 L422,44" stroke="#3a4557" stroke-width="1.5" fill="none" marker-end="url(#ar5)"/>
+
+          <rect x="430" y="14" width="180" height="60" rx="7" fill="#1c1409" stroke="#5a4326"/>
+          <text x="520" y="40" text-anchor="middle" fill="#ffa657" font-size="12">人来选:A 更好</text>
+          <text x="520" y="58" text-anchor="middle" fill="#7d8896" font-size="10.5">只需比较,不用自己写</text>
+
+          <path d="M618,44 L652,44" stroke="#3a4557" stroke-width="1.5" fill="none" marker-end="url(#ar5)"/>
+
+          <rect x="660" y="14" width="200" height="60" rx="7" fill="#0e1a26" stroke="#2d4a6b"/>
+          <text x="760" y="40" text-anchor="middle" fill="#58a6ff" font-size="12">调整参数</text>
+          <text x="760" y="58" text-anchor="middle" fill="#7d8896" font-size="10.5">让 A 这类回答更可能出现</text>
+
+          <path d="M868,44 L902,44" stroke="#3a4557" stroke-width="1.5" fill="none" marker-end="url(#ar5)"/>
+          <rect x="910" y="14" width="210" height="60" rx="7" fill="#0e1e14" stroke="#2b5a3a"/>
+          <text x="1015" y="40" text-anchor="middle" fill="#7ee787" font-size="12">重复几十万次比较</text>
+          <text x="1015" y="58" text-anchor="middle" fill="#7d8896" font-size="10.5">模型逐渐"品味"对齐</text>
+        </g>
+        <text x="0" y="112" class="dlab" style="font-size:11.5px">
+          关键洞察:<tspan fill="#e6edf3" font-weight="600">让人写出完美回答很难,但让人在两个回答里挑一个容易得多</tspan> —— 这一步把昂贵的"创作"换成了廉价的"比较"。
+        </text>
+      </svg>
+    </div>
+    <div class="g3 fill">
+      <div class="card tight p"><div class="t">经典做法</div><h3>RLHF</h3>
+        <p>先用比较数据训一个"打分模型",再用强化学习让主模型去追高分。<br><strong>效果好,但流程复杂、容易训崩。</strong></p></div>
+      <div class="card tight g"><div class="t">现在更常用</div><h3>DPO 等直接方法</h3>
+        <p>跳过打分模型,<strong>直接用"A 好过 B"的数据对调参数</strong>。<br>简单、稳定、便宜,效果接近。</p></div>
+      <div class="card tight o"><div class="t">这一步的产物</div><h3>"有礼貌、有条理"</h3>
+        <p>回答变得结构清晰、语气得体、该拒绝的会拒绝。<br><strong>你对一个模型"好不好用"的主观感受,大部分来自这里。</strong></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 24 RLVR ════════ -->
+<section class="slide" data-t="RLVR 推理能力">
+  <div class="kick"><b>04 / 后训练</b><span>第三步 · 近两年的突破</span></div>
+  <h2>RLVR:有标准答案的题,可以自己练</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <p>上一步依赖人类打分,<strong>贵且慢</strong>。但数学题和代码有个特点 —— <span class="hlg">对错是客观的,不需要人判断</span>。</p>
+    <div class="g23 fill">
+      <div class="col">
+        <div class="fig" style="justify-content:center">
+          <div class="cap">RLVR · 可验证奖励的自我训练</div>
+          <svg viewBox="0 0 600 208" role="img" aria-label="模型生成多个解法,自动验证对错,保留正确的用于强化">
+            <g font-size="12" font-family="monospace">
+              <rect x="0" y="10" width="130" height="44" rx="7" fill="#161b22" stroke="#283040"/>
+              <text x="65" y="30" text-anchor="middle" fill="#e6edf3" font-size="11.5">一道数学题</text>
+              <text x="65" y="46" text-anchor="middle" fill="#7d8896" font-size="10">已知标准答案</text>
+
+              <path d="M138,32 L168,32" stroke="#3a4557" stroke-width="1.5" fill="none" marker-end="url(#ar6)"/>
+              <defs><marker id="ar6" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+                <path d="M0,0 L8,4 L0,8 z" fill="#3a4557"/></marker></defs>
+
+              <rect x="176" y="0" width="150" height="64" rx="7" fill="#160f22" stroke="#4a3a6b"/>
+              <text x="251" y="24" text-anchor="middle" fill="#d2a8ff" font-size="11.5">模型自己解 64 遍</text>
+              <text x="251" y="42" text-anchor="middle" fill="#7d8896" font-size="10">每次思路可能不同</text>
+              <text x="251" y="56" text-anchor="middle" fill="#7d8896" font-size="10">不需要任何人参与</text>
+
+              <path d="M334,32 L364,32" stroke="#3a4557" stroke-width="1.5" fill="none" marker-end="url(#ar6)"/>
+
+              <rect x="372" y="0" width="110" height="28" rx="6" fill="#0e1e14" stroke="#2b5a3a"/>
+              <text x="427" y="19" text-anchor="middle" fill="#7ee787" font-size="11">答对的 12 条</text>
+              <rect x="372" y="36" width="110" height="28" rx="6" fill="#1e1211" stroke="#5a2f2c"/>
+              <text x="427" y="55" text-anchor="middle" fill="#ff7b72" font-size="11">答错的 52 条</text>
+
+              <path d="M490,14 L520,14" stroke="#3a4557" stroke-width="1.5" fill="none" marker-end="url(#ar6)"/>
+              <text x="528" y="18" fill="#7ee787" font-size="11">强化</text>
+              <path d="M490,50 L520,50" stroke="#3a4557" stroke-width="1.5" fill="none" marker-end="url(#ar6)"/>
+              <text x="528" y="54" fill="#ff7b72" font-size="11">抑制</text>
+
+              <path d="M560,32 C588,32 588,120 300,120 C40,120 20,90 20,66" fill="none" stroke="#3a4557"
+                    stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#ar6)"/>
+              <text x="300" y="140" text-anchor="middle" fill="#7d8896" font-size="10.5">循环 —— 模型越强,答对的越多,可用的训练信号越好</text>
+            </g>
+            <line x1="0" y1="158" x2="600" y2="158" class="grid"/>
+            <text x="0" y="180" class="dlab" style="font-size:11px">奖励来自 <tspan fill="#7ee787" font-weight="600">代码跑通了没有 / 答案对不对</tspan>,不是来自人的主观判断</text>
+            <text x="0" y="195" class="dlab" style="font-size:11px;fill:#7d8896">所以能无限规模化,这是它和 RLHF 最本质的区别</text>
+          </svg>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card g"><h3>为什么这是个突破</h3>
+          <p style="margin-top:6px">前面每一步都<strong>受限于人类能提供多少标注</strong>。RLVR 第一次让模型可以<span class="hlg">自己生产训练信号</span>,只要题目有客观答案。</p></div>
+        <div class="card p tight"><h3>它教会了模型什么</h3>
+          <p>不是新知识,而是<strong>"先想清楚再回答"这个习惯</strong>。模型发现:写出一长串推导过程,答对的概率显著更高 —— 于是这个行为被强化。</p></div>
+        <div class="note key"><span class="lb">你见过的效果</span>
+          现在那些会"思考一会儿再回答"、能解奥数题、能写复杂程序的模型,能力主要就来自这一步。</div>
+        <div class="note warn"><span class="lb">局限</span>
+          只适用于<strong>能自动判对错</strong>的领域。写文章、给建议这类没有标准答案的任务,还是得靠人类偏好。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 25 对比 99/1 ════════ -->
+<section class="slide" data-t="预训练 vs 后训练">
+  <div class="kick"><b>04 / 后训练</b></div>
+  <h2>最该记住的一张对比</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="fig">
+      <div class="cap">COMPUTE SHARE · 算力分配</div>
+      <svg viewBox="0 0 1080 96" role="img" aria-label="算力分配:预训练占99%以上,后训练不到1%">
+        <rect x="0" y="14" width="1064" height="30" rx="5" fill="#388bfd"/>
+        <!-- 2px 间隙 -->
+        <rect x="1066" y="14" width="14" height="30" rx="5" fill="#db6d28"/>
+        <text x="16" y="34" fill="#ffffff" font-size="13" font-weight="600" font-family="monospace">预训练 · 99%+</text>
+        <text x="1064" y="70" text-anchor="end" fill="#db6d28" font-size="12" font-family="monospace">后训练 · &lt;1% ↑</text>
+        <text x="0" y="88" class="dlab" style="font-size:11.5px;fill:#7d8896">右端那一小条(已放大到最小可见宽度,实际更窄)就是所有 SFT + 偏好优化 + RLVR 的总和</text>
+      </svg>
+    </div>
+    <div class="g23 fill">
+      <table>
+        <thead><tr><th></th><th>预训练</th><th>后训练</th></tr></thead>
+        <tbody>
+          <tr><td>数据量</td><td>约 15 万亿 token</td><td>百万 ~ 十亿 token</td></tr>
+          <tr><td>调整幅度</td><td>大(学习率 ~1e-4)</td><td>极小(小两个数量级)</td></tr>
+          <tr><td>耗时</td><td>几周 ~ 几个月</td><td>几天 ~ 几周</td></tr>
+          <tr><td>参数变化</td><td>从随机到完全成型</td><td>轻微微调</td></tr>
+          <tr><td>作用</td><td><span class="hlp">获得全部知识与能力</span></td><td><span class="hl">改变如何使用这些能力</span></td></tr>
+        </tbody>
+      </table>
+      <div class="col">
+        <div class="note key"><span class="lb">由此推出的重要结论</span>
+          <strong>后训练不注入新知识,只是解锁和引导。</strong><br><br>
+          你没法靠微调让模型学会它预训练时压根没见过的领域 —— 那得回去重新预训练。</div>
+        <div class="card o tight"><h3>这解释了一个常见现象</h3>
+          <p>企业想让模型"学会自家业务知识",微调往往效果不佳。<br>
+          <strong>正确做法通常是 RAG(检索增强)</strong> —— 把资料查出来放进提示词,而不是试图塞进参数里。</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 26 章节五 ════════ -->
+<section class="slide sec" data-t="§5 发布">
+  <div class="body center">
+    <div class="num">05</div>
+    <h1>最后一步:<br>评测与发布</h1>
+  </div>
+</section>
+
+<!-- ════════ 27 发布 ════════ -->
+<section class="slide" data-t="评测与发布">
+  <div class="kick"><b>05 / 发布</b></div>
+  <h2>训完了,还不能直接给人用</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g4 fill">
+      <div class="card b"><div class="t">STEP 1</div><h3>跑分评测</h3>
+        <p>在几十个标准测试集上测:数学、代码、常识、多语言、长文本……<br><br>
+        <span style="color:var(--mut)">注意:跑分容易被针对性优化,所以还要有人工盲测。</span></p></div>
+      <div class="card r"><div class="t">STEP 2</div><h3>红队测试</h3>
+        <p>专门找人<strong>想尽办法诱导模型出问题</strong>:越狱、有害内容、隐私泄露。<br><br>
+        发现的问题回流到后训练,再修一轮。</p></div>
+      <div class="card o"><div class="t">STEP 3</div><h3>压缩与量化</h3>
+        <p>把参数从高精度压到低精度(比如 16 位 → 4 位),<strong>体积缩小数倍</strong>,普通显卡也能跑,代价是轻微掉点。</p></div>
+      <div class="card g"><div class="t">STEP 4</div><h3>打包发布</h3>
+        <p>丢掉训练用的优化器状态,只留权重。<br>
+        写说明文档、许可证,上传。</p></div>
+    </div>
+    <div class="note key"><span class="lb">终点回到起点</span>
+      发布出来的那个几 GB 的文件,里面就是我们第一页看到的那些张量 —— <strong>只不过里面的数字,已经从 <code>ln(128000)=11.76</code> 的随机状态,变成了几十万步梯度更新之后的样子。</strong></div>
+  </div>
+</section>
+
+<!-- ════════ 28 三个反直觉 ════════ -->
+<section class="slide" data-t="三个反直觉的结论">
+  <div class="kick"><b>SUMMARY</b></div>
+  <h2>如果只记住三件事</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g3 fill">
+      <div class="card b" style="display:flex;flex-direction:column;justify-content:center">
+        <div class="t">其一</div>
+        <h3 style="font-size:17px;margin-bottom:10px">没有人教过它任何知识</h3>
+        <p>整个训练过程中,<strong>没有词典、没有语法书、没有知识库</strong>。</p>
+        <p style="margin-top:9px">唯一的训练目标从头到尾只有一个:<span class="hl">猜下一个 token</span>。</p>
+        <p style="margin-top:9px">语法、常识、推理、代码能力 —— 全部是为了把这一件事做好而<strong>自己长出来的副产品</strong>。</p>
+      </div>
+      <div class="card p" style="display:flex;flex-direction:column;justify-content:center">
+        <div class="t">其二</div>
+        <h3 style="font-size:17px;margin-bottom:10px">能力在预训练,体验在后训练</h3>
+        <p>99% 的算力花在预训练上,模型的<strong>知识天花板在那时就定死了</strong>。</p>
+        <p style="margin-top:9px">后训练那不到 1%,不增加知识,只改变<strong>它如何组织和表达</strong>已有的东西。</p>
+        <p style="margin-top:9px"><span class="hlp">但你日常感受到的"好不好用",大部分恰恰来自这 1%。</span></p>
+      </div>
+      <div class="card o" style="display:flex;flex-direction:column;justify-content:center">
+        <div class="t">其三</div>
+        <h3 style="font-size:17px;margin-bottom:10px">难的不是算法,是工程</h3>
+        <p>核心算法就是那个 <strong>6 步循环</strong>,几百行代码写得完,大学课程就能讲清楚。</p>
+        <p style="margin-top:9px">真正的门槛在:<strong>数据怎么洗、上万张卡怎么协同、坏了怎么自动恢复、几个月不能出错。</strong></p>
+        <p style="margin-top:9px"><span class="hl">这是一个工业问题,不是一个数学问题。</span></p>
+      </div>
+    </div>
+    <div class="note"><span class="lb">最后一句</span>
+      从 <code>11.76</code> 到 <code>1.8</code>,几十亿个随机数字被推到了一个特定的位置。<strong>所谓"大模型",就是这个位置。</strong></div>
+  </div>
+</section>
+
+<!-- ════════ 29 延伸 ════════ -->
+<section class="slide" data-t="想自己验证">
+  <div class="kick"><b>APPENDIX</b></div>
+  <h2>这些东西,你都可以自己去看</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <p>前面讲的一切都不是黑箱 —— 开源模型把权重、结构、甚至训练过程都放出来了。</p>
+    <div class="g2 fill">
+      <div class="col">
+        <div class="card b"><h3>看权重长什么样</h3>
+          <p style="margin-top:6px">在 Hugging Face 上打开任意开源模型的 Files 页,点任何一个 <code>.safetensors</code> 文件 —— 网页会直接列出<strong>每个张量的名字和形状</strong>,不用下载。</p>
+          <pre class="xs" style="margin-top:9px">model.embed_tokens.weight       [151936, 4096]
+model.layers.0.self_attn.q_proj.weight  [4096, 4096]
+model.layers.0.self_attn.k_proj.weight   [512, 4096]  <span class="c">← 明显更小</span></pre>
+          <p style="margin-top:8px;color:var(--mut);font-size:13px">连"这个模型用了哪种省显存技巧"都藏不住。</p></div>
+        <div class="card g tight"><h3>看架构参数</h3>
+          <p>同目录下的 <code>config.json</code> 只有几十行,层数、宽度、词表大小全在里面 —— 本 PPT 里所有算账用的数字,都来自这个文件。</p></div>
+      </div>
+      <div class="col">
+        <div class="card p"><h3>想看训练过程本身</h3>
+          <p style="margin-top:6px">有两个项目专门为此而生,把<strong>训练途中的存档</strong>也全部公开了:</p>
+          <ul style="margin-top:8px">
+            <li class="k"><strong>Pythia</strong> —— 每个模型发布 154 个中间存档</li>
+            <li class="k"><strong>OLMo</strong> —— 权重 + 训练数据 + 训练代码 + 存档,全套开放</li>
+          </ul>
+          <p style="margin-top:9px">拿第 1000 步和第 143000 步的存档对比同一个 token 的向量,<span class="hlg">可以亲眼看到它是怎么移动的</span>。</p></div>
+        <div class="note warn"><span class="lb">一个容易混淆的区分</span>
+          <strong>开放权重 ≠ 开源。</strong><br>
+          Llama / Qwen / DeepSeek 只给最终权重;Pythia / OLMo 才连数据和过程一起给。<br>
+          前者你能看到结果,看不到它<strong>怎么变成这样的</strong>。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><!-- /deck -->
+
+<div id="bar"></div>
+<div id="nav">
+  <button id="prev">←</button><button id="next">→</button><button id="tocBtn">目录</button>
+</div>
+<div id="hud"><b id="cur">1</b> / <span id="tot">29</span></div>
+
+<div id="toc">
+  <h2>目录 <span style="font-size:13px;color:var(--mut);font-weight:400">— 点击跳转 · 按 O 或 Esc 关闭</span></h2>
+  <div class="grid" id="tocGrid"></div>
+</div>
+
+<script>
+(function(){
+  var slides = [].slice.call(document.querySelectorAll('.slide'));
+  var i = 0, n = slides.length;
+  var bar = document.getElementById('bar'), cur = document.getElementById('cur');
+  document.getElementById('tot').textContent = n;
+  var toc = document.getElementById('toc'), grid = document.getElementById('tocGrid');
+
+  slides.forEach(function(s, k){
+    var a = document.createElement('a');
+    a.href = '#';
+    a.innerHTML = '<i>' + String(k+1).padStart(2,'0') + '</i>' + (s.dataset.t || ('第 '+(k+1)+' 页'));
+    if (s.classList.contains('sec')) a.className = 's';
+    a.onclick = function(e){ e.preventDefault(); go(k); toc.classList.remove('on'); };
+    grid.appendChild(a);
+  });
+
+  function go(k){
+    i = Math.max(0, Math.min(n-1, k));
+    slides.forEach(function(s,x){ s.classList.toggle('on', x===i); });
+    bar.style.width = ((i+1)/n*100) + '%';
+    cur.textContent = i+1;
+    try { location.hash = String(i+1); } catch(e){}
+  }
+
+  document.getElementById('prev').onclick = function(){ go(i-1); };
+  document.getElementById('next').onclick = function(){ go(i+1); };
+  document.getElementById('tocBtn').onclick = function(){ toc.classList.toggle('on'); };
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') { toc.classList.remove('on'); return; }
+    if (e.key === 'o' || e.key === 'O') { toc.classList.toggle('on'); return; }
+    if (toc.classList.contains('on')) return;
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); go(i+1); }
+    if (e.key === 'ArrowLeft'  || e.key === 'PageUp')                    { e.preventDefault(); go(i-1); }
+    if (e.key === 'Home') go(0);
+    if (e.key === 'End')  go(n-1);
+  });
+
+  // 点击左右半屏翻页（避开导航条）
+  document.addEventListener('click', function(e){
+    if (e.target.closest('#nav') || e.target.closest('#toc') || e.target.closest('a')) return;
+    if (e.clientY > window.innerHeight - 48) return;
+    go(e.clientX < window.innerWidth/2 ? i-1 : i+1);
+  });
+
+  // 触屏滑动
+  var x0 = null;
+  document.addEventListener('touchstart', function(e){ x0 = e.touches[0].clientX; }, {passive:true});
+  document.addEventListener('touchend', function(e){
+    if (x0 === null) return;
+    var dx = e.changedTouches[0].clientX - x0;
+    if (Math.abs(dx) > 46) go(dx < 0 ? i+1 : i-1);
+    x0 = null;
+  }, {passive:true});
+
+  // 自适应缩放
+  function fit(){
+    var d = document.getElementById('deck');
+    var s = Math.min(window.innerWidth / 1280, window.innerHeight / 720) * 0.965;
+    d.style.transform = 'scale(' + s + ')';
+  }
+  window.addEventListener('resize', fit);
+  fit();
+
+  var h = parseInt((location.hash || '').replace('#',''), 10);
+  go(isFinite(h) && h > 0 ? h-1 : 0);
+})();
+</script>
+</body>
+</html>
