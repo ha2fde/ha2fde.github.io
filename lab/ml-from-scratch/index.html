@@ -164,7 +164,7 @@ table.xs{font-size:11.8px} table.xs th,table.xs td{padding:4.5px 8px}
       <span class="pill g">第 3 章 · Transformer 讲透</span>
     </div>
     <div style="margin-top:30px;font-size:13px;color:var(--mut);font-family:var(--mono)">
-      ← → 翻页 &nbsp;·&nbsp; O 打开目录 &nbsp;·&nbsp; 共 31 页
+      ← → 翻页 &nbsp;·&nbsp; O 打开目录 &nbsp;·&nbsp; 共 33 页
     </div>
   </div>
 </section>
@@ -394,7 +394,127 @@ table.xs{font-size:11.8px} table.xs th,table.xs td{padding:4.5px 8px}
   </div>
 </section>
 
-<!-- ═══════════ 9 三个动作 ═══════════ -->
+<!-- ═══════════ 9 注意力的假设有多弱 ═══════════ -->
+<section class="slide" data-t="注意力的假设弱到什么程度">
+  <div class="kick"><b>00 / 学科在干什么</b><span>归纳偏置 · 深一层</span></div>
+  <h2>把这个概念用到底:注意力假设了什么</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g2">
+      <div class="core"><span class="lb">它假设的 · 只有一条</span>
+        <p style="font-size:15px;margin-top:2px"><strong>数据是一堆元素的集合,元素之间存在成对的、由内容决定的相互作用。</strong></p>
+        <p style="margin-top:8px;color:#8fb8dd">这几乎是"结构化数据"能有的<strong>最小假设</strong>。</p></div>
+      <div class="card r"><h3>它没有假设的</h3>
+        <table class="sm" style="margin-top:4px">
+          <tr><td>顺序</td><td>注意力本身完全无视顺序 —— 顺序靠位置编码外挂补进去</td></tr>
+          <tr><td>距离衰减</td><td>隔 1 个和隔 1000 个,地位完全平等</td></tr>
+          <tr><td>模态</td><td>不假设是文字、图像、分子还是别的什么</td></tr>
+        </table></div>
+    </div>
+    <div class="fig">
+      <div class="cap">偏置强弱谱系 · 越往右假设越少</div>
+      <svg viewBox="0 0 1080 76" role="img" aria-label="归纳偏置强弱谱系:CNN偏置强省数据适用窄,Transformer偏置弱费数据适用广">
+        <defs><linearGradient id="sp" x1="0" x2="1"><stop offset="0" stop-color="#388bfd"/><stop offset="1" stop-color="#db6d28"/></linearGradient></defs>
+        <rect x="60" y="12" width="960" height="8" rx="4" fill="url(#sp)"/>
+        <g font-family="monospace" font-size="12" text-anchor="middle" fill="#e6edf3">
+          <circle cx="150" cy="16" r="6" fill="#0b0f16" stroke="#388bfd" stroke-width="2"/><text x="150" y="44">CNN</text>
+          <circle cx="400" cy="16" r="6" fill="#0b0f16" stroke="#6a8fd0" stroke-width="2"/><text x="400" y="44">RNN</text>
+          <circle cx="720" cy="16" r="6" fill="#0b0f16" stroke="#db6d28" stroke-width="2"/><text x="720" y="44">Transformer</text>
+          <circle cx="960" cy="16" r="6" fill="#0b0f16" stroke="#8a6a4a" stroke-width="2"/><text x="960" y="44">纯 MLP</text>
+        </g>
+        <g class="tick" font-size="11">
+          <text x="60" y="68">假设强 · 省数据 · 适用窄</text>
+          <text x="1020" y="68" text-anchor="end">假设弱 · 费数据 · 适用广</text>
+        </g>
+      </svg>
+    </div>
+    <div class="g23 fill">
+      <div class="card o tight"><h3>代价是真的:ViT 就是活证据</h3>
+        <p style="margin-top:5px">把 Transformer 直接用在图像上(ViT),<strong>同一个架构</strong>:</p>
+        <ul style="margin-top:6px">
+          <li>在百万张规模上训 → <span class="hlr">打不过 CNN</span></li>
+          <li>在三亿张规模上预训练 → <span class="hlg">反超 CNN</span></li>
+        </ul>
+        <p style="margin-top:7px">CNN 免费拿到了"平移不变"这条真先验,小数据就够;ViT 什么都不假设,<strong>这条规律得自己从数据里学出来</strong> —— 学得会,但要花数据。</p></div>
+      <div class="col">
+        <div class="core sm"><span class="lb">核心</span>
+          <p><strong>归纳偏置的本质,是"用先验知识替代数据"。</strong>少假设一点,就得多喂一点 —— 这就是 No Free Lunch 在实践中的样子。</p></div>
+        <div class="note key"><span class="lb">所以 Transformer 赢在哪</span>
+          一半因为<strong>假设少所以通用</strong>,另一半因为<strong>这个时代恰好有足够数据补上那些没假设的东西</strong>。<br>
+          <span class="hl">换到 2010 年,它会输得很难看。</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 10 蛋白质 ═══════════ -->
+<section class="slide" data-t="跨领域验证:蛋白质">
+  <div class="kick"><b>00 / 学科在干什么</b><span>归纳偏置 · 一个非语言的验证</span></div>
+  <h2>同一个注意力,为什么也能算蛋白质</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g23 fill">
+      <div class="col">
+        <div class="fig">
+          <div class="cap">蛋白质的核心难题:序列上远,空间上近</div>
+          <svg viewBox="0 0 620 194" role="img" aria-label="氨基酸序列折叠后,序列上相距很远的两个残基在空间上接触">
+            <text x="10" y="13" class="dlab" style="font-size:10.5px">一维序列</text>
+            <line x1="10" y1="32" x2="610" y2="32" stroke="#283040" stroke-width="2"/>
+            <g fill="#3a4557">
+              <circle cx="60" cy="32" r="4"/><circle cx="110" cy="32" r="4"/><circle cx="210" cy="32" r="4"/>
+              <circle cx="260" cy="32" r="4"/><circle cx="310" cy="32" r="4"/><circle cx="360" cy="32" r="4"/>
+              <circle cx="460" cy="32" r="4"/><circle cx="560" cy="32" r="4"/>
+            </g>
+            <circle cx="160" cy="32" r="7" fill="#388bfd" stroke="#0b0f16" stroke-width="2"/>
+            <circle cx="510" cy="32" r="7" fill="#db6d28" stroke="#0b0f16" stroke-width="2"/>
+            <text x="160" y="18" text-anchor="middle" class="dlab em" style="fill:#388bfd;font-size:11px">A</text>
+            <text x="510" y="18" text-anchor="middle" class="dlab em" style="fill:#db6d28;font-size:11px">B</text>
+            <path d="M160,44 L160,52 L510,52 L510,44" fill="none" stroke="#3a4557" stroke-width="1" stroke-dasharray="3 3"/>
+            <text x="335" y="68" text-anchor="middle" class="dlab" style="font-size:10.5px">序列上相隔 200 多个残基</text>
+
+            <text x="335" y="88" text-anchor="middle" class="dlab em" style="font-size:11.5px">↓ 折叠</text>
+
+            <text x="10" y="106" class="dlab" style="font-size:10.5px">三维结构</text>
+            <path d="M40,150 C90,108 150,175 215,142 C258,120 262,166 300,150 C348,130 300,104 250,128
+                     C214,146 236,168 286,160 C360,148 430,175 580,132"
+                  fill="none" stroke="#283040" stroke-width="2.5"/>
+            <circle cx="215" cy="142" r="7" fill="#388bfd" stroke="#0b0f16" stroke-width="2"/>
+            <circle cx="232" cy="156" r="7" fill="#db6d28" stroke="#0b0f16" stroke-width="2"/>
+            <path d="M215,142 L232,156" stroke="#7ee787" stroke-width="2.5"/>
+            <text x="203" y="132" text-anchor="end" class="dlab em" style="fill:#388bfd;font-size:11px">A</text>
+            <text x="246" y="170" class="dlab em" style="fill:#db6d28;font-size:11px">B</text>
+            <text x="300" y="178" class="dlab em" style="fill:#7ee787;font-size:10.5px">← 空间上紧贴,决定了整个结构</text>
+            <text x="10" y="192" class="dlab" style="font-size:10.5px;fill:#7d8896">CNN 只看邻居、RNN 记忆随距离衰减 —— 都对"远"有偏见。只有注意力不在乎距离。</text>
+          </svg>
+        </div>
+        <div class="card b tight"><h3>而且不是硬套 —— 那个领域早就知道核心是成对关系</h3>
+          <p>深度学习进场前,结构预测的主流叫<strong>共进化分析</strong>:翻遍上万个物种的同源序列,找出<strong>哪两个位置总是一起突变</strong> —— 那说明它俩在空间上接触。</p>
+          <p style="margin-top:6px"><span class="hl">这本质就是在算一个成对关系矩阵</span>,和注意力矩阵是同一个东西,只是当年用统计方法算。</p></div>
+      </div>
+      <div class="col">
+        <div class="card g"><h3>最漂亮的证据</h3>
+          <p style="margin-top:5px">蛋白质语言模型(ESM)的训练目标极其朴素 —— <strong>遮住一个氨基酸,猜它是什么</strong>,和语言模型一模一样。<span class="hlr">从没人告诉过它任何三维结构。</span></p>
+          <p style="margin-top:8px">训完之后有人去看它的注意力图:<br>
+          <strong>注意力权重高的残基对,基本就是三维结构里真正接触的残基对。</strong></p>
+          <p style="margin-top:8px"><span class="hlg">没有人教过它折叠。它只是在猜被遮住的氨基酸,却自己学出了接触图。</span></p></div>
+        <div class="core sm"><span class="lb">核心</span>
+          <p>和语言模型自发长出专门化的注意力头是同一件事:<strong>你只规定"元素之间可以成对互相看",数据里真实存在的关系就会自己浮到那个矩阵上。</strong></p></div>
+        <div class="eng"><span class="lb">工程 · 但纯注意力其实不够</span>
+          <p><strong>AlphaFold 不是"把 Transformer 套上去"就成了。</strong>它里面有大量专为几何设计的结构:</p>
+          <ul style="margin-top:5px">
+            <li><strong>三角更新</strong> —— 距离必须满足三角不等式,这是纯注意力不知道的硬约束</li>
+            <li><strong>不变点注意力</strong> —— 保证蛋白质在空间里旋转平移后预测不变</li>
+          </ul>
+          <p style="margin-top:7px;color:#c9a173">注意力只提供通用骨架 —— <strong>科学领域最大的成果来自"注意力 + 领域先验"</strong>。</p></div>
+      </div>
+    </div>
+    <div class="note key"><span class="lb">收束 · 最优不是"假设最少"</span>
+      纯 MLP 比 Transformer 假设更弱,连"数据由离散元素组成"都不假设 —— <strong>结果在几乎所有结构化任务上都更差</strong>。
+      <span class="hl">最优点是"假设恰好只包含真实成立的那部分"</span> —— Transformer 保留的那两条,在语言、蛋白质、分子、图像上<strong>碰巧全都成立</strong>。</div>
+  </div>
+</section>
+
+<!-- ═══════════ 11 三个动作 ═══════════ -->
 <section class="slide" data-t="于是只剩三个动作">
   <div class="kick"><b>00 / 学科在干什么</b><span>本章收束</span></div>
   <h2>于是,整门学科只剩三个动作</h2>
@@ -1203,7 +1323,7 @@ table.xs{font-size:11.8px} table.xs th,table.xs td{padding:4.5px 8px}
 <div id="nav">
   <button id="prev">←</button><button id="next">→</button><button id="tocBtn">目录</button>
 </div>
-<div id="hud"><b id="cur">1</b> / <span id="tot">31</span></div>
+<div id="hud"><b id="cur">1</b> / <span id="tot">33</span></div>
 
 <div id="toc">
   <h2>目录 <span style="font-size:13px;color:var(--mut);font-weight:400">— 点击跳转 · 按 O 或 Esc 关闭</span></h2>
