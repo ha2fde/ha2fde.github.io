@@ -43,6 +43,10 @@
     "desc": "从预训练到 Agent 的工程链路双版 PPT：预训练 → 对齐 → CoT → ReAct → tool call",
     "src": "~/llm-to-agent-ppt/"
   },
+  "ml-from-scratch": {
+    "desc": "《机器学习·深度学习·Transformer》31 页单文件 PPT,零基础向。全篇核心/工程双色分离:蓝色是逻辑上绕不开的(不到10条),橙色是可替换的工程选择。§0 从请你写出认椅子的规则切入讲学科定位,§1 地基7条,§2 能用6条,§3 Transformer 讲透并给出哪些能换哪些换不掉总表。梯度下降和 ReLU 例子是真跑出来的数字",
+    "src": "C:/Users/think/build-ml-deck/ml-from-scratch"
+  },
   "workbuddy": {
     "desc": "WorkBuddy 每日自动产出（按时间戳分目录）：预训练到 Agent 初稿、协议栈初稿",
     "src": "~/WorkBuddy/（不含 .workbuddy/ 工作记忆）"

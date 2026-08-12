@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>机器学习 · 深度学习 · Transformer —— 从"这门学科在干什么"讲起</title>
+<style>
+:root{
+  --bg:#0a0e14; --stage:#0d1117; --panel:#161b22; --panel2:#1c2431;
+  --line:#283040; --line2:#3a4557;
+  --tx:#e6edf3; --tx2:#adbac7; --mut:#7d8896;
+  --b:#58a6ff; --g:#7ee787; --o:#ffa657; --p:#d2a8ff; --r:#ff7b72; --y:#e3b341;
+  --c1:#388bfd; --c2:#db6d28; --c3:#db61a2;   /* 图表类别色:经 CVD 验证 */
+  --mono:"SF Mono",'JetBrains Mono',Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--sans);overflow:hidden}
+body{display:flex;align-items:center;justify-content:center}
+#deck{position:relative;width:1280px;height:720px;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;background:var(--stage);padding:44px 58px 54px;
+  display:none;flex-direction:column;overflow:hidden;border:1px solid var(--line);border-radius:6px}
+.slide.on{display:flex;animation:fade .28s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.kick{font-size:12px;letter-spacing:.18em;color:var(--mut);text-transform:uppercase;
+  font-family:var(--mono);margin-bottom:8px;display:flex;gap:10px;align-items:center}
+.kick b{color:var(--b);font-weight:600}
+h1{font-size:43px;line-height:1.16;font-weight:700;letter-spacing:-.01em}
+h2{font-size:28px;line-height:1.25;font-weight:700;letter-spacing:-.01em}
+h3{font-size:15px;font-weight:700;color:var(--tx);margin-bottom:6px}
+.sub{font-size:16px;color:var(--mut);margin-top:10px;line-height:1.6}
+.rule{height:2px;background:linear-gradient(90deg,var(--b),transparent);margin:11px 0 16px;border-radius:2px}
+.body{flex:1;min-height:0;display:flex;flex-direction:column;gap:13px;font-size:15px;line-height:1.6;color:var(--tx2)}
+p{margin:0}
+strong{color:var(--tx);font-weight:600}
+em{font-style:normal;color:var(--b);font-weight:600}
+.hl{color:var(--o);font-weight:600}
+.hlg{color:var(--g);font-weight:600}
+.hlr{color:var(--r);font-weight:600}
+.hlp{color:var(--p);font-weight:600}
+ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+li{padding-left:17px;position:relative}
+li::before{content:"";position:absolute;left:2px;top:.62em;width:6px;height:6px;border-radius:50%;background:var(--line2)}
+li.k::before{background:var(--o)}
+ol{padding-left:19px;display:flex;flex-direction:column;gap:6px}
+ol li{padding-left:2px}
+ol li::before{display:none}
+code{font-family:var(--mono);font-size:.92em;background:#1e2530;color:var(--g);padding:1px 5px;border-radius:4px;border:1px solid var(--line)}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}
+.g23{display:grid;grid-template-columns:1.12fr .88fr;gap:16px}
+.g32{display:grid;grid-template-columns:.88fr 1.12fr;gap:16px}
+.col{display:flex;flex-direction:column;gap:11px;min-height:0}
+.fill{flex:1;min-height:0}
+.center{justify-content:center}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.card.b{border-left:3px solid var(--b)}
+.card.g{border-left:3px solid var(--g)}
+.card.o{border-left:3px solid var(--o)}
+.card.p{border-left:3px solid var(--p)}
+.card.r{border-left:3px solid var(--r)}
+.card h3{font-size:14px;margin-bottom:5px}
+.card .t{font-size:11px;font-family:var(--mono);color:var(--mut);letter-spacing:.08em;margin-bottom:5px}
+.card p,.card ul{font-size:13.5px;line-height:1.56}
+.card.tight{padding:10px 12px}
+.card.tight p,.card.tight ul,.card.tight li{font-size:13px;line-height:1.5}
+
+/* ══ 核心 / 工程 —— 全篇固定的视觉约定 ══ */
+.core,.eng{border-radius:10px;padding:12px 15px;position:relative;border:1px solid}
+.core{background:#0c1a26;border-color:#2d5a86}
+.eng {background:#1c1409;border-color:#6b5230}
+.core .lb,.eng .lb{font-family:var(--mono);font-size:10px;letter-spacing:.14em;font-weight:700;
+  display:inline-block;align-self:flex-start;margin-bottom:6px;padding:2px 8px;border-radius:20px}
+.core .lb{color:#0a0e14;background:#58a6ff}
+.eng  .lb{color:#0a0e14;background:#ffa657}
+.core p,.core ul,.eng p,.eng ul{font-size:13.5px;line-height:1.58}
+.core strong{color:#cfe6ff}
+.eng  strong{color:#ffdcb3}
+.core.sm,.eng.sm{padding:9px 12px}
+.core.sm p,.eng.sm p,.core.sm ul,.eng.sm ul,.core.sm li,.eng.sm li{font-size:12.5px;line-height:1.5}
+
+.note{background:#12181f;border:1px solid var(--line);border-radius:8px;padding:10px 13px;font-size:14px;line-height:1.56}
+.note.key{border-color:#2d4a6b;background:#0e1a26}
+.note.warn{border-color:#5a3a2a;background:#1c130c}
+.note.bad{border-color:#5a2b2b;background:#1e1213}
+.note .lb{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--mut);display:block;margin-bottom:3px;text-transform:uppercase}
+.note.key .lb{color:var(--b)} .note.warn .lb{color:var(--o)} .note.bad .lb{color:var(--r)}
+
+.pill{display:inline-block;font-family:var(--mono);font-size:10.5px;padding:2px 8px;border-radius:20px;border:1px solid var(--line2);color:var(--mut);letter-spacing:.05em}
+.pill.b{color:var(--b);border-color:#2b4a6b;background:#0e1a26}
+.pill.g{color:var(--g);border-color:#2b5a3a;background:#0e1e14}
+.pill.o{color:var(--o);border-color:#5a4326;background:#1c1409}
+.pill.r{color:var(--r);border-color:#5a2f2c;background:#1e1211}
+
+pre{font-family:var(--mono);font-size:12.5px;line-height:1.58;background:#0b0f16;border:1px solid var(--line);
+  border-radius:8px;padding:11px 13px;overflow:hidden;color:#c9d1d9;white-space:pre;tab-size:2}
+pre.sm{font-size:11.5px;line-height:1.52}
+pre.xs{font-size:10.6px;line-height:1.46}
+.c{color:#6b7684;font-style:italic}
+.k{color:#ff7b72} .s{color:#a5d6ff} .n{color:#79c0ff} .f{color:#d2a8ff} .a{color:#7ee787} .d{color:#e3b341}
+.mutx{color:#57606a}
+
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--mut);text-transform:uppercase;
+  border-bottom:1px solid var(--line2);font-weight:500}
+td:first-child{color:var(--tx);font-weight:600;white-space:nowrap}
+table.sm{font-size:12.5px} table.sm th,table.sm td{padding:5.5px 9px}
+table.xs{font-size:11.8px} table.xs th,table.xs td{padding:4.5px 8px}
+
+.sec{align-items:flex-start;justify-content:center}
+.sec .num{font-family:var(--mono);font-size:92px;font-weight:700;color:#1c2431;line-height:1}
+.sec h1{margin-top:-12px}
+
+.fig{background:#0b0f16;border:1px solid var(--line);border-radius:10px;padding:11px 13px;display:flex;flex-direction:column;gap:7px}
+.fig .cap{font-size:11.5px;color:var(--mut);font-family:var(--mono);letter-spacing:.06em}
+.fig svg{display:block;width:100%;height:auto}
+.axis{stroke:#283040;stroke-width:1}
+.grid{stroke:#1a2029;stroke-width:1}
+.tick{fill:#6b7684;font-size:10px;font-family:var(--mono)}
+.dlab{fill:#adbac7;font-size:11px;font-family:var(--mono)}
+.dlab.em{fill:#e6edf3;font-weight:600}
+
+#bar{position:fixed;left:0;bottom:0;height:3px;background:var(--b);width:0;transition:width .25s;z-index:20}
+#hud{position:fixed;right:14px;bottom:12px;font-family:var(--mono);font-size:11.5px;color:var(--mut);z-index:20;
+  background:#0d1117cc;border:1px solid var(--line);border-radius:20px;padding:4px 12px}
+#hud b{color:var(--tx)}
+#nav{position:fixed;left:14px;bottom:12px;display:flex;gap:6px;z-index:20}
+#nav button{font-family:var(--mono);font-size:11.5px;background:#0d1117cc;color:var(--mut);border:1px solid var(--line);
+  border-radius:20px;padding:4px 11px;cursor:pointer}
+#nav button:hover{color:var(--tx);border-color:var(--line2)}
+#toc{position:fixed;inset:0;background:#0a0e14f2;z-index:30;display:none;padding:38px 48px;overflow:auto}
+#toc.on{display:block}
+#toc h2{margin-bottom:14px}
+#toc .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+#toc a{display:block;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 10px;
+  color:var(--tx2);text-decoration:none;font-size:12px;line-height:1.35}
+#toc a:hover{border-color:var(--b);color:var(--tx)}
+#toc a i{font-family:var(--mono);font-size:10px;color:var(--mut);font-style:normal;display:block;margin-bottom:2px}
+#toc a.s{background:#0e1a26;border-color:#2d4a6b}
+</style>
+</head>
+<body>
+<div id="deck">
+
+<!-- ═══════════ 1 封面 ═══════════ -->
+<section class="slide on" data-t="封面">
+  <div class="body center" style="gap:0">
+    <div class="kick"><b>FROM FIRST PRINCIPLES</b><span>不用公式 · 不背术语</span></div>
+    <h1>机器学习 · 深度学习<br>Transformer</h1>
+    <div class="sub" style="max-width:780px">
+      从<strong>"这门学科到底在干什么"</strong>讲起,一次只加一样新东西。<br>
+      每一页都分开标注:哪些是<span style="color:#58a6ff;font-weight:600">不会变的核心</span>,哪些是<span style="color:#ffa657;font-weight:600">可以换的工程</span>。
+    </div>
+    <div style="margin-top:26px;display:flex;gap:9px;flex-wrap:wrap">
+      <span class="pill b">第 0 章 · 学科在干什么</span>
+      <span class="pill b">第 1 章 · 地基 7 条</span>
+      <span class="pill o">第 2 章 · 能用 6 条</span>
+      <span class="pill g">第 3 章 · Transformer 讲透</span>
+    </div>
+    <div style="margin-top:30px;font-size:13px;color:var(--mut);font-family:var(--mono)">
+      ← → 翻页 &nbsp;·&nbsp; O 打开目录 &nbsp;·&nbsp; 共 31 页
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 2 阅读约定 ═══════════ -->
+<section class="slide" data-t="阅读约定:核心 vs 工程">
+  <div class="kick"><b>HOW TO READ</b></div>
+  <h2>先说清这份材料的读法</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <p>这个领域最让人晕的地方,是<strong>把"必然如此的道理"和"当前碰巧这么做"混在一起讲</strong>。所以全篇每个概念都拆成两块:</p>
+    <div class="g2 fill">
+      <div class="core" style="display:flex;flex-direction:column;justify-content:center">
+        <span class="lb">核心</span>
+        <h3 style="color:#cfe6ff;font-size:17px;margin-bottom:8px">逻辑上绕不开的东西</h3>
+        <p>不是谁发明的,是<strong>被问题逼出来的唯一出路</strong>。</p>
+        <p style="margin-top:8px">换任何一种技术路线,这些还在。十年后大概率也还在。</p>
+        <p style="margin-top:8px;color:#8fb8dd">数量极少 —— <strong>全部加起来不到 10 条</strong>。</p>
+      </div>
+      <div class="eng" style="display:flex;flex-direction:column;justify-content:center">
+        <span class="lb">工程</span>
+        <h3 style="color:#ffdcb3;font-size:17px;margin-bottom:8px">当前这么做,但可以换</h3>
+        <p>为了跑得快、省显存、好训练<strong>而做的具体选择</strong>。</p>
+        <p style="margin-top:8px">很多已经换过好几轮了,还会继续换。</p>
+        <p style="margin-top:8px;color:#c9a173">数量极多 —— <strong>论文的绝大部分在讲这个</strong>。</p>
+      </div>
+    </div>
+    <div class="note key"><span class="lb">为什么这个区分值钱</span>
+      <strong>核心让你看懂,工程让你知道哪里能动。</strong>
+      看新技术时,第一个问题就变成"它换掉了哪个工程零件、有没有动核心"——
+      <span class="hl">99% 的新论文只动工程。</span></div>
+  </div>
+</section>
+
+<!-- ═══════════ 3 章节 0 ═══════════ -->
+<section class="slide sec" data-t="§0 这门学科在干什么">
+  <div class="body center">
+    <div class="num">00</div>
+    <h1>这门学科<br>到底在干什么</h1>
+    <div class="sub" style="max-width:620px">这一章不讲任何技术。<br>但它是全篇最重要的一章 —— 没有它,后面所有东西都像魔法。</div>
+  </div>
+</section>
+
+<!-- ═══════════ 4 椅子 ═══════════ -->
+<section class="slide" data-t="请你写出认椅子的规则">
+  <div class="kick"><b>00 / 学科在干什么</b></div>
+  <h2>先做一道题:请写出"怎么认出一把椅子"</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <p>不用写代码,用中文写清楚规则就行。要求是:<strong>照着你的规则去判断,不能出错。</strong></p>
+    <div class="g2 fill">
+      <div class="col">
+        <div class="card r"><h3>你大概会这样写,然后逐条被推翻</h3>
+          <table class="sm" style="margin-top:6px">
+            <tr><td style="color:#adbac7">有四条腿</td><td>三脚凳、独脚椅、吊椅、办公椅<br>只有一根柱子</td></tr>
+            <tr><td style="color:#adbac7">有靠背</td><td>凳子没有</td></tr>
+            <tr><td style="color:#adbac7">能坐人</td><td>石头、台阶、床都能坐</td></tr>
+            <tr><td style="color:#adbac7">木头做的</td><td>塑料、铁、藤、充气的都有</td></tr>
+            <tr><td style="color:#adbac7">高约 45cm</td><td>儿童椅、吧台椅</td></tr>
+          </table>
+          <p style="margin-top:9px"><strong>一条都写不出来。</strong></p></div>
+      </div>
+      <div class="col center">
+        <div class="note key" style="font-size:15px">
+          <span class="lb">但是</span>
+          你<strong>三岁</strong>就会认椅子。<br>
+          从来没认错过。<br>
+          见到没见过的款式,照样一眼认出。<br><br>
+          <span class="hl">你会,但你说不出你是怎么会的。</span></div>
+        <div class="card tight"><h3>这个现象有个名字</h3>
+          <p><strong>波兰尼悖论</strong>:<em>我们知道的,远多于我们能说出来的。</em></p></div>
+        <div class="core sm"><span class="lb">核心</span>
+          <p><strong>这一页就是整门学科存在的理由。</strong>先卡在这里,后面才有落点。</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 5 两种能力 ═══════════ -->
+<section class="slide" data-t="人类能力的两种">
+  <div class="kick"><b>00 / 学科在干什么</b></div>
+  <h2>人类能力有两种,编程只够得着一半</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g2 fill">
+      <div class="card b" style="display:flex;flex-direction:column"><div class="t">第一种</div>
+        <h3 style="font-size:17px;margin-bottom:8px">说得清的</h3>
+        <p>算工资、查库存、排序、算房贷、记账。</p>
+        <p style="margin-top:8px">你能<strong>把步骤一条条写下来</strong>,照着做,结果一模一样。</p>
+        <div style="margin-top:12px" class="note"><span class="lb">状态</span>
+          计算机在 <strong>1950 年代</strong> 就彻底征服了。<br>这就是普通编程。</div>
+        <p style="margin-top:10px;color:var(--mut)">前提是:<strong style="color:var(--tx)">你得先把规则说清楚。</strong></p>
+      </div>
+      <div class="card r" style="display:flex;flex-direction:column"><div class="t">第二种</div>
+        <h3 style="font-size:17px;margin-bottom:8px">说不清的</h3>
+        <p>认脸、认椅子、听懂一句话、骑车、判断文字通不通顺、看出对方在生气、写文章。</p>
+        <p style="margin-top:8px"><strong>你会,但你说不出规则。</strong></p>
+        <div style="margin-top:12px" class="note bad"><span class="lb">状态</span>
+          整整六十年,计算机在这一类上是 <strong>零</strong>。<br>
+          <span class="hlr">不是慢,是根本够不着。</span></div>
+        <p style="margin-top:10px;color:var(--mut)">而人类<strong style="color:var(--tx)">绝大部分</strong>能力都在这一边。</p>
+      </div>
+    </div>
+    <div class="core"><span class="lb">核心</span>
+      <p style="font-size:15px"><strong>这门学科专门对付第二种。它的办法是绕开"说清楚"这一步 ——</strong></p>
+      <p style="margin-top:6px;font-size:15px">你说不出椅子的规则,没关系:<strong>你能指出哪些是椅子。</strong>
+      给一万张图,你只需要说"是 / 不是",<span class="hl">剩下的让机器自己把规则找出来。</span></p>
+      <p style="margin-top:8px;color:#8fb8dd">从「描述规则」改成「给出例子」—— 这就是全部的转换。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 6 一切任务=找函数 ═══════════ -->
+<section class="slide" data-t="一切任务 = 找一个函数">
+  <div class="kick"><b>00 / 学科在干什么</b></div>
+  <h2>第二步转换:所有任务,其实是同一个任务</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <p>要让"给例子"这件事能落地,还需要把五花八门的任务<strong>压成同一种形状</strong>:</p>
+    <div class="core"><span class="lb">核心</span>
+      <p style="font-size:17px;text-align:center;padding:4px 0"><strong>找一个函数,把输入变成输出。</strong></p></div>
+    <table class="sm fill">
+      <thead><tr><th>任务</th><th>输入</th><th>输出</th></tr></thead>
+      <tbody>
+        <tr><td>认椅子</td><td>一张图</td><td>是 / 否</td></tr>
+        <tr><td>人脸识别</td><td>一张图</td><td>这是谁</td></tr>
+        <tr><td>语音输入</td><td>一段声音</td><td>一串文字</td></tr>
+        <tr><td>翻译</td><td>一句中文</td><td>一句英文</td></tr>
+        <tr><td>房价评估</td><td>面积、地段、房龄</td><td>一个价格</td></tr>
+        <tr><td>下围棋</td><td>当前棋盘</td><td>下一手下哪</td></tr>
+        <tr><td style="color:#7ee787">ChatGPT 对话</td><td style="color:#7ee787">前面所有的话</td><td style="color:#7ee787">下一个词</td></tr>
+      </tbody>
+    </table>
+    <div class="note key"><span class="lb">看最后一行</span>
+      在这个框架里,<strong>ChatGPT 和房价评估是同一类东西</strong> —— 只是那个函数复杂得多。<br>
+      正因为所有任务被压成了同一种形状,<span class="hl">同一套方法才能通吃图像、语音、文字、棋类</span>。否则这就不是一门学科,是一堆各不相通的手艺。</div>
+  </div>
+</section>
+
+<!-- ═══════════ 7 无穷条曲线 ═══════════ -->
+<section class="slide" data-t="为什么这事本来不该成立">
+  <div class="kick"><b>00 / 学科在干什么</b></div>
+  <h2>但这件事,逻辑上本来不成立</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g23 fill">
+      <div class="fig" style="justify-content:center">
+        <div class="cap">同样穿过全部数据点的曲线,有无穷多条</div>
+        <svg viewBox="0 0 620 430" role="img" aria-label="三条完全不同的曲线都穿过同样的数据点,但对新数据的预测天差地别">
+          <line x1="40" y1="20" x2="40" y2="320" class="axis"/>
+          <line x1="40" y1="320" x2="590" y2="320" class="axis"/>
+          <g class="grid">
+            <line x1="40" y1="245" x2="590" y2="245"/><line x1="40" y1="170" x2="590" y2="170"/><line x1="40" y1="95" x2="590" y2="95"/>
+          </g>
+
+          <!-- 蓝:最简单的一条 -->
+          <path d="M70,270 L150,235 L235,195 L320,155 L400,120" fill="none" stroke="#388bfd" stroke-width="2"/>
+          <path d="M400,120 L500,88 L580,62" fill="none" stroke="#388bfd" stroke-width="2" stroke-dasharray="6 4"/>
+
+          <!-- 橙:剧烈震荡 -->
+          <path d="M70,270 Q100,140 150,235 Q190,70 235,195 Q280,45 320,155 Q356,40 400,120"
+                fill="none" stroke="#db6d28" stroke-width="2"/>
+          <path d="M400,120 C430,20 452,300 480,55 C512,310 545,28 580,262"
+                fill="none" stroke="#db6d28" stroke-width="2" stroke-dasharray="6 4"/>
+
+          <!-- 粉:温和起伏 -->
+          <path d="M70,270 Q112,228 150,235 Q196,178 235,195 Q282,132 320,155 Q362,108 400,120"
+                fill="none" stroke="#db61a2" stroke-width="2"/>
+          <path d="M400,120 C462,104 508,118 580,186" fill="none" stroke="#db61a2" stroke-width="2" stroke-dasharray="6 4"/>
+
+          <!-- 数据点 -->
+          <g fill="#e6edf3" stroke="#0b0f16" stroke-width="2">
+            <circle cx="70" cy="270" r="6"/><circle cx="150" cy="235" r="6"/><circle cx="235" cy="195" r="6"/>
+            <circle cx="320" cy="155" r="6"/><circle cx="400" cy="120" r="6"/>
+          </g>
+
+          <line x1="400" y1="20" x2="400" y2="320" stroke="#3a4557" stroke-width="1" stroke-dasharray="4 4"/>
+          <text x="408" y="34" class="dlab" style="font-size:11px">← 已知数据到此为止</text>
+          <text x="496" y="316" text-anchor="middle" class="dlab em" style="font-size:11px">这里开始全是猜的</text>
+
+          <text x="40" y="358" class="dlab" style="font-size:12px">三条曲线<tspan fill="#e6edf3" font-weight="600">都穿过每一个点</tspan> —— 在已知数据上一模一样好。</text>
+          <text x="40" y="380" class="dlab" style="font-size:12px">但虚线部分(对新数据的预测)<tspan fill="#ff7b72" font-weight="600">天差地别</tspan>。</text>
+          <text x="40" y="402" class="dlab" style="font-size:12px;fill:#7d8896">数据本身没有告诉你该选哪条。逻辑上,你没有任何理由偏好任何一条。</text>
+        </svg>
+      </div>
+      <div class="col">
+        <div class="card r tight"><h3>这是个古老的哲学问题</h3>
+          <p>看过一万只白天鹅,<strong>推不出</strong>"天鹅都是白的"。<br>
+          从有限例子推出普遍规律,<span class="hlr">在逻辑上是不成立的</span>。</p></div>
+        <div class="core"><span class="lb">核心</span>
+          <p>机器学习能work,是因为它<strong>偷偷加了一条数据里没有的假设</strong>:</p>
+          <p style="margin-top:7px;text-align:center;font-size:15px"><strong>优先选简单的、平滑的那条。</strong></p>
+          <p style="margin-top:7px">这个偏好<strong>不是从数据来的,是人塞进去的</strong>。</p></div>
+        <div class="eng sm"><span class="lb">代价</span>
+          <p>有定理证明:<strong>不存在在所有问题上都最好的偏好</strong>。<br>
+          你偏好某类规律,就必然在另一类问题上变差。</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 8 归纳偏置 ═══════════ -->
+<section class="slide" data-t="这门学科真正的手艺">
+  <div class="kick"><b>00 / 学科在干什么</b></div>
+  <h2>所以真正的手艺是:挑对那个假设</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <p>既然必须往里塞假设,那<strong>塞什么假设</strong>就成了关键决策。这个假设有个学名叫<strong>归纳偏置</strong>。</p>
+    <table class="fill">
+      <thead><tr><th>结构</th><th>它塞进去的假设是</th><th>适合</th></tr></thead>
+      <tbody>
+        <tr><td>CNN</td><td>"东西挪个位置,还是同一个东西"</td><td>图像</td></tr>
+        <tr><td>RNN</td><td>"顺序很重要,近的比远的更相关"</td><td>早期的语音、文本</td></tr>
+        <tr><td style="color:#7ee787">Transformer</td><td style="color:#7ee787">"任意两个位置都可能相关,不预设距离"</td><td style="color:#7ee787">语言(以及后来的一切)</td></tr>
+        <tr><td>深度网络</td><td>"复杂的东西,由简单的东西层层组合而成"</td><td>几乎所有真实数据</td></tr>
+      </tbody>
+    </table>
+    <div class="g2">
+      <div class="core"><span class="lb">核心</span>
+        <p><strong>结构不产生智能。</strong><br>
+        它只规定了"机器倾向于相信世界是什么样的"。<br>
+        猜对了,少量数据就够;<span class="hl">猜错了,再多数据也是硬填</span>。</p></div>
+      <div class="note key"><span class="lb">一个重要推论</span>
+        Transformer 的假设<strong>最弱、最不做预设</strong> —— 这既是它能通吃各个领域的原因,<span class="hl">也是它极度数据饥渴的原因</span>。<br>
+        <strong>假设少,就得靠数据补。</strong></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 9 三个动作 ═══════════ -->
+<section class="slide" data-t="于是只剩三个动作">
+  <div class="kick"><b>00 / 学科在干什么</b><span>本章收束</span></div>
+  <h2>于是,整门学科只剩三个动作</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <p>任务 = 找函数。函数有无穷多个。要在无穷里找到一个,<strong>只能这么分解</strong>:</p>
+    <div class="g3 fill">
+      <div class="core" style="display:flex;flex-direction:column;justify-content:center">
+        <span class="lb">核心 · 动作一</span>
+        <h3 style="color:#cfe6ff;font-size:16px">划定范围</h3>
+        <p style="margin-top:6px">不在无穷里捞。只在<strong>一族带旋钮的函数</strong>里找。</p>
+        <p style="margin-top:8px;color:#8fb8dd">旋钮 = <strong>参数</strong><br>这一族 = <strong>模型</strong></p></div>
+      <div class="core" style="display:flex;flex-direction:column;justify-content:center">
+        <span class="lb">核心 · 动作二</span>
+        <h3 style="color:#cfe6ff;font-size:16px">定个标准</h3>
+        <p style="margin-top:6px">怎么判断这组旋钮<strong>比那组好</strong>。必须能压成<strong>一个数</strong>。</p>
+        <p style="margin-top:8px;color:#8fb8dd">这个数 = <strong>损失</strong></p></div>
+      <div class="core" style="display:flex;flex-direction:column;justify-content:center">
+        <span class="lb">核心 · 动作三</span>
+        <h3 style="color:#cfe6ff;font-size:16px">系统地搜</h3>
+        <p style="margin-top:6px">旋钮几十亿个,不能瞎试。<strong>得有方向地拧</strong>。</p>
+        <p style="margin-top:8px;color:#8fb8dd">这个方向 = <strong>梯度</strong></p></div>
+    </div>
+    <div class="note key"><span class="lb">这不是一个记忆框架</span>
+      这三条<strong>不是谁设计出来的</strong>,是"在函数空间里搜索"这件事<span class="hl">唯一可行的分解</span>。<br>
+      从 2 个参数的直线,到万亿参数的大模型,<strong>用的是同一套三件套</strong> —— 只是每一格填的东西复杂度差十个数量级。</div>
+  </div>
+</section>
+
+<!-- ═══════════ 10 章节 1 ═══════════ -->
+<section class="slide sec" data-t="§1 地基 7 条">
+  <div class="body center">
+    <div class="num">01</div>
+    <h1>地基:七条</h1>
+    <div class="sub" style="max-width:640px">缺任何一条,这门学科都不成立。<br><strong>七条全部都是核心,没有一条需要公式。</strong></div>
+  </div>
+</section>
+
+<!-- ═══════════ 11 ①例子代替规则 ═══════════ -->
+<section class="slide" data-t="① 用例子代替规则">
+  <div class="kick"><b>01 / 地基</b><span>第 1 条</span></div>
+  <h2>① 什么叫"学":从例子里总结规律</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g23 fill">
+      <div class="col">
+        <div class="card b"><h3>一道小学题</h3>
+          <table class="sm" style="margin-top:6px">
+            <thead><tr><th>面积</th><th>价格</th></tr></thead>
+            <tbody><tr><td>50</td><td>100</td></tr><tr><td>80</td><td>160</td></tr><tr><td>100</td><td>200</td></tr></tbody>
+          </table>
+          <p style="margin-top:10px;font-size:15px"><strong>问:120 平米值多少?</strong></p>
+          <p style="margin-top:8px">你心里已经算出来了 —— <span class="hlg">240</span>。</p>
+          <p style="margin-top:8px">你怎么做到的?你从三个例子里<strong>总结出了一条规律</strong>(价格 = 2 × 面积),然后把它用在了一个<strong>没见过</strong>的数上。</p></div>
+        <div class="core"><span class="lb">核心</span>
+          <p><strong>这就是机器学习的全部。</strong>后面所有内容,只是把这件事做得更难一点。</p></div>
+      </div>
+      <div class="col">
+        <div class="card tight"><h3>对应的术语,一次性认完</h3>
+          <table class="sm" style="margin-top:4px">
+            <tr><td>那三行数据</td><td>训练数据</td></tr>
+            <tr><td>"价格 = w × 面积"</td><td>模型</td></tr>
+            <tr><td>那个 w</td><td>参数</td></tr>
+            <tr><td>算 120 平米</td><td>推理 / 预测</td></tr>
+            <tr><td>找出 w=2 的过程</td><td>训练</td></tr>
+          </table></div>
+        <div class="note key"><span class="lb">关键区别</span>
+          普通编程:<strong>你</strong>告诉计算机 w = 2。<br>
+          机器学习:<strong>计算机自己</strong>把 2 找出来。<br><br>
+          <span class="hl">区别只在这一点,但它就是全部。</span></div>
+        <div class="eng sm"><span class="lb">工程</span>
+          <p>真实场景里"面积"会变成几千个特征、模型会变成几十亿参数 —— <strong>但这一页的逻辑一个字都不用改</strong>。</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 12 ②损失 ═══════════ -->
+<section class="slide" data-t="② 损失:给错误一个分数">
+  <div class="kick"><b>01 / 地基</b><span>第 2 条</span></div>
+  <h2>② 机器不会"看出来",它只会试</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <p>你一眼看出 w = 2。机器不行 —— 它只能<strong>先瞎猜一个,然后看自己错得多离谱</strong>。</p>
+    <div class="g23 fill">
+      <div class="col">
+        <div class="card o"><h3>假设它猜 w = 1</h3>
+          <table class="sm" style="margin-top:6px">
+            <thead><tr><th>面积</th><th>它的预测</th><th>真实</th><th>差</th></tr></thead>
+            <tbody>
+              <tr><td>50</td><td>50</td><td>100</td><td style="color:#ff7b72">−50</td></tr>
+              <tr><td>80</td><td>80</td><td>160</td><td style="color:#ff7b72">−80</td></tr>
+              <tr><td>100</td><td>100</td><td>200</td><td style="color:#ff7b72">−100</td></tr>
+            </tbody>
+          </table>
+          <pre class="sm" style="margin-top:9px">误差平方后取平均
+= (50² + 80² + 100²) / 3
+= <span class="d">6300</span></pre></div>
+      </div>
+      <div class="col">
+        <div class="core"><span class="lb">核心</span>
+          <p>这个数叫<strong>损失(loss)</strong>。</p>
+          <p style="margin-top:7px">它是机器<strong>唯一能看见的东西</strong> —— 一个"我现在有多烂"的分数。</p>
+          <p style="margin-top:7px">于是整件事被改写成:<br>
+          <span class="hl">找一组参数,让这个数尽可能小。</span></p>
+          <p style="margin-top:7px;color:#8fb8dd"><strong>必须能压成一个数</strong> —— 否则没法比较好坏,也就没法搜索。这一点绕不开。</p></div>
+        <div class="eng"><span class="lb">工程</span>
+          <p><strong>用什么公式算这个数,是可以换的。</strong></p>
+          <ul style="margin-top:5px">
+            <li>预测数值 → 误差平方(本例)</li>
+            <li>预测类别 → 交叉熵</li>
+            <li>大模型猜下一个词 → 也是交叉熵</li>
+          </ul>
+          <p style="margin-top:6px">为什么本例要平方?让正负不抵消,并且<strong>放大严重的错误</strong>。这是选择,不是必然。</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 13 ③梯度下降 ═══════════ -->
+<section class="slide" data-t="③ 梯度下降:摸黑下山">
+  <div class="kick"><b>01 / 地基</b><span>第 3 条 · 全领域唯一的发动机</span></div>
+  <h2>③ 怎么找:摸黑下山</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g23 fill">
+      <div class="col">
+        <div class="core sm"><span class="lb">核心</span>
+          <p style="font-size:14px"><strong>站在原地,感受哪边是下坡,朝那儿迈一小步。重复。</strong><br>
+          "哪边是下坡"这个信息就叫<strong>梯度</strong> —— 它回答:<em style="color:#8fb8dd">w 增大一点点,损失会变大还是变小,变多少?</em></p></div>
+        <div class="fig">
+          <div class="cap">真跑一遍 · 从瞎猜的 1 滚到 2</div>
+          <table class="xs">
+            <thead><tr><th>轮次</th><th>w</th><th>损失</th><th>梯度</th></tr></thead>
+            <tbody>
+              <tr><td>0</td><td>1.000</td><td>6300.0</td><td style="color:#ff7b72">−12600</td></tr>
+              <tr><td>1</td><td>1.630</td><td>862.5</td><td style="color:#ff7b72">−4662</td></tr>
+              <tr><td>2</td><td>1.863</td><td>118.1</td><td style="color:#ff7b72">−1725</td></tr>
+              <tr><td>3</td><td>1.949</td><td>16.2</td><td style="color:#ff7b72">−638</td></tr>
+              <tr><td>4</td><td>1.981</td><td>2.2</td><td style="color:#ff7b72">−236</td></tr>
+              <tr><td>5</td><td>1.993</td><td>0.3</td><td style="color:#ff7b72">−87</td></tr>
+              <tr><td style="color:#7ee787">收敛</td><td style="color:#7ee787">2.000</td><td style="color:#7ee787">0.0000</td><td></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card g"><h3>看两个细节</h3>
+          <ul style="margin-top:5px">
+            <li class="k"><strong>梯度是负的</strong> → 意思是"往大了调会变好" → 所以 w 增加</li>
+            <li class="k"><strong>越接近答案,梯度越小,步子越小</strong> → 自动减速,不会冲过头</li>
+          </ul>
+          <p style="margin-top:9px"><span class="hlg">没有任何人告诉过它答案是 2。</span></p></div>
+        <div class="core"><span class="lb">核心</span>
+          <p><strong>这是整个领域唯一的发动机。</strong><br>
+          从这个 2 参数的例子,到万亿参数的大模型 —— <span class="hl">用的是同一台</span>,没有第二台。</p></div>
+        <div class="eng sm"><span class="lb">工程</span>
+          <p>每步迈多大叫<strong>学习率</strong>(本例 0.00005)。太大在山谷里来回弹甚至飞出去,太小走到天荒地老。<br>
+          <strong>怎么自动调整步子、怎么带惯性冲过小坑</strong> —— 这就是各种优化器(SGD / Adam / AdamW)在竞争的东西。全是工程。</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 14 ④反向传播 ═══════════ -->
+<section class="slide" data-t="④ 反向传播:从后往前追责">
+  <div class="kick"><b>01 / 地基</b><span>第 4 条</span></div>
+  <h2>④ 几十亿个参数,坡度怎么算得过来</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <p>上一页只有 1 个参数,试探一下就知道方向。<strong>80 亿个参数,一个个试要试到宇宙热寂。</strong></p>
+    <div class="g23 fill">
+      <div class="fig" style="justify-content:center">
+        <div class="cap">工厂追责 · 从最后一道工序往回推</div>
+        <svg viewBox="0 0 620 250" role="img" aria-label="反向传播类比:从最终缺陷倒推每道工序的责任">
+          <g font-family="monospace" font-size="12">
+            <rect x="16" y="40" width="104" height="42" rx="7" fill="#161b22" stroke="#283040"/>
+            <text x="68" y="66" text-anchor="middle" fill="#adbac7">原料</text>
+            <rect x="144" y="40" width="104" height="42" rx="7" fill="#161b22" stroke="#283040"/>
+            <text x="196" y="66" text-anchor="middle" fill="#adbac7">冲压</text>
+            <rect x="272" y="40" width="104" height="42" rx="7" fill="#161b22" stroke="#283040"/>
+            <text x="324" y="66" text-anchor="middle" fill="#adbac7">焊接</text>
+            <rect x="400" y="40" width="104" height="42" rx="7" fill="#161b22" stroke="#283040"/>
+            <text x="452" y="66" text-anchor="middle" fill="#adbac7">组装</text>
+            <rect x="528" y="40" width="76" height="42" rx="7" fill="#1e1213" stroke="#5a2b2b"/>
+            <text x="566" y="60" text-anchor="middle" fill="#ff7b72" font-size="11.5">次品!</text>
+            <text x="566" y="75" text-anchor="middle" fill="#7d8896" font-size="10">损失</text>
+          </g>
+          <g stroke="#283040" stroke-width="1.5" fill="none">
+            <path d="M120,61 L140,61"/><path d="M248,61 L268,61"/><path d="M376,61 L504,61" stroke-dasharray="0"/>
+          </g>
+          <text x="310" y="34" text-anchor="middle" class="dlab" style="font-size:11px;fill:#7d8896">前向:算出结果</text>
+
+          <!-- 反向 -->
+          <path d="M528,116 L410,116" stroke="#ffa657" stroke-width="2" fill="none" marker-end="url(#arb)"/>
+          <path d="M392,116 L282,116" stroke="#ffa657" stroke-width="2" fill="none" marker-end="url(#arb)"/>
+          <path d="M264,116 L154,116" stroke="#ffa657" stroke-width="2" fill="none" marker-end="url(#arb)"/>
+          <path d="M136,116 L26,116" stroke="#ffa657" stroke-width="2" fill="none" marker-end="url(#arb)"/>
+          <defs><marker id="arb" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0,0 L8,4 L0,8 z" fill="#ffa657"/></marker></defs>
+          <text x="310" y="140" text-anchor="middle" class="dlab em" style="fill:#ffa657;font-size:11.5px">反向:逐层分摊责任</text>
+
+          <line x1="16" y1="164" x2="604" y2="164" class="grid"/>
+          <text x="16" y="188" class="dlab" style="font-size:11.5px">每道工序只需要知道两件事:</text>
+          <text x="30" y="208" class="dlab" style="font-size:11.5px">① 下一道工序传回来的责任有多大</text>
+          <text x="30" y="226" class="dlab" style="font-size:11.5px">② 我自己对下一道工序的影响有多大</text>
+          <text x="16" y="246" class="dlab em" style="font-size:11.5px">两者相乘 = 我的责任,然后继续往前传。</text>
+        </svg>
+      </div>
+      <div class="col">
+        <div class="core"><span class="lb">核心</span>
+          <p><strong>从最后的错误往回倒推,一层一层分摊责任。</strong></p>
+          <p style="margin-top:8px">走一遍网络算出错误(前向),再倒着走一遍分摊责任(反向)—— <strong>所有参数的梯度就全有了</strong>。</p>
+          <p style="margin-top:8px">代价只有前向计算的<span class="hl">两倍左右</span>,而不是几十亿倍。</p></div>
+        <div class="note key"><span class="lb">这一条的分量</span>
+          <strong>没有反向传播,深度学习根本不存在。</strong><br>
+          它就是让"训练几十亿参数"从数学幻想变成工程现实的那一步。</div>
+        <div class="eng sm"><span class="lb">工程</span>
+          <p>今天没人手写这个 —— PyTorch 之类的框架<strong>自动完成</strong>(自动微分)。你只写前向,反向白送。</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 15 ⑤非线性 ═══════════ -->
+<section class="slide" data-t="⑤ 非线性:加一个折角">
+  <div class="kick"><b>01 / 地基</b><span>第 5 条</span></div>
+  <h2>⑤ 直线不够用:给它"折弯"的能力</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <p>换个问题:<strong>温度和舒适度</strong>。太冷不舒服,太热也不舒服,20 度最舒服 —— 画出来是个<strong>倒 V</strong>。<span class="hlr">直线无论怎么调都做不出来。</span></p>
+    <div class="g23 fill">
+      <div class="col">
+        <div class="core sm"><span class="lb">核心</span>
+          <p style="font-size:14px">引入一个简单到可笑的函数,叫 <strong>ReLU</strong>:</p>
+          <pre class="sm" style="margin-top:6px">ReLU(x) = x 大于 0 就是 x
+          否则就是 0</pre>
+          <p style="margin-top:6px;font-size:14px">负数压成 0,正数原样通过 —— <strong>就是一个折角</strong>。</p></div>
+        <pre class="sm">舒适度 = −ReLU(温度−20)
+       − ReLU(20−温度) + 10
+<span class="c">          ↑ 两个折角拼一下</span></pre>
+        <div class="fig">
+          <div class="cap">跑出来的结果</div>
+          <pre class="xs">  5°C   -5.0
+ 10°C    0.0
+ 15°C    5.0   <span class="a">▇▇▇▇▇</span>
+ 20°C   10.0   <span class="a">▇▇▇▇▇▇▇▇▇▇</span>
+ 25°C    5.0   <span class="a">▇▇▇▇▇</span>
+ 30°C    0.0
+ 35°C   -5.0</pre>
+        </div>
+      </div>
+      <div class="col">
+        <div class="core"><span class="lb">核心 · 这是关键的一跃</span>
+          <p><strong>直的东西怎么加还是直的。</strong></p>
+          <p style="margin-top:7px">但只要允许"折",<strong>拼够多的折角,你能逼近任何形状</strong>。</p>
+          <p style="margin-top:9px;color:#8fb8dd">这就是"非线性"的全部含义 —— 它是神经网络唯一的表达力来源。</p></div>
+        <div class="note bad"><span class="lb">拿掉会怎样</span>
+          <strong>去掉折角,一百层网络在数学上等价于一层。</strong><br>
+          深度<span class="hlr">完全白费</span>。这是它绕不开的原因。</div>
+        <div class="eng sm"><span class="lb">工程</span>
+          <p><strong>用哪种折角是可以换的</strong>,而且换过很多轮:<br>
+          <span class="pill">Sigmoid</span> <span class="pill">Tanh</span> <span class="pill o">ReLU</span> <span class="pill o">GELU</span> <span class="pill o">SiLU</span> <span class="pill o">SwiGLU</span><br>
+          差别只在"折得多平滑""好不好训",<strong>核心思想一模一样</strong>。</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 16 ⑥深度 ═══════════ -->
+<section class="slide" data-t="⑥ 深度:分层复用">
+  <div class="kick"><b>01 / 地基</b><span>第 6 条</span></div>
+  <h2>⑥ 为什么要"深"</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <p>先说清一个神经元是什么:<strong>把输入按权重加起来,然后折一下</strong>。没了。把很多个并排 = 一层;很多层摞起来 = 深度网络。</p>
+    <div class="g23 fill">
+      <div class="fig" style="justify-content:center">
+        <div class="cap">认数字 · 每层用下一层的成果</div>
+        <svg viewBox="0 0 600 280" role="img" aria-label="分层抽象:像素到线段到圆圈到数字">
+          <g font-size="12" font-family="monospace">
+            <rect x="20" y="16" width="560" height="46" rx="8" fill="#161b22" stroke="#283040"/>
+            <text x="36" y="38" fill="#7d8896" font-size="11">输入</text>
+            <text x="120" y="45" fill="#adbac7">一堆像素点(亮/暗)</text>
+
+            <rect x="20" y="76" width="560" height="46" rx="8" fill="#0e1a26" stroke="#2d4a6b"/>
+            <text x="36" y="98" fill="#58a6ff" font-size="11">第1层</text>
+            <text x="120" y="105" fill="#cfe3f7">找出短横、短竖、小弧线</text>
+
+            <rect x="20" y="136" width="560" height="46" rx="8" fill="#123049" stroke="#2d6288"/>
+            <text x="36" y="158" fill="#58a6ff" font-size="11">第2层</text>
+            <text x="120" y="165" fill="#cfe3f7">把它们组合成 —— 圆圈、长竖线、拐角</text>
+
+            <rect x="20" y="196" width="560" height="46" rx="8" fill="#17456b" stroke="#2f7bad"/>
+            <text x="36" y="218" fill="#9fd0f7" font-size="11">第3层</text>
+            <text x="120" y="225" fill="#e3f0fb">两个圈叠着 = 8 &#160;&#160; 一个圈加一竖 = 9</text>
+          </g>
+          <g stroke="#3a4557" stroke-width="1.5" fill="none">
+            <path d="M300,62 L300,74" marker-end="url(#ard)"/>
+            <path d="M300,122 L300,134" marker-end="url(#ard)"/>
+            <path d="M300,182 L300,194" marker-end="url(#ard)"/>
+          </g>
+          <defs><marker id="ard" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0,0 L8,4 L0,8 z" fill="#3a4557"/></marker></defs>
+          <text x="20" y="266" class="dlab" style="font-size:11.5px">第 2 层<tspan fill="#e6edf3" font-weight="600">不用重新看像素</tspan>,它直接用第 1 层的成果。"圆圈"只需要学一次,8/9/0/6 全都能共用。</text>
+        </svg>
+      </div>
+      <div class="col">
+        <div class="core"><span class="lb">核心</span>
+          <p><strong>"深"的意义不是更强,是更省。</strong></p>
+          <p style="margin-top:7px">一层理论上也能逼近任意函数,但<strong>可能需要天文数字个神经元</strong>。</p>
+          <p style="margin-top:7px">分层能<span class="hl">复用</span>:上层直接站在下层的成果上,不用从零开始。</p>
+          <p style="margin-top:9px;color:#8fb8dd">用<strong>分层复用</strong>换掉<strong>指数级的宽度</strong> —— 这就是深度学习的"深"。</p></div>
+        <div class="note key"><span class="lb">对应到大模型</span>
+          前面说过"第 0 层所有'苹果'都一样,第 40 层已经分清水果和公司"——<br>
+          <strong>就是这个过程在语言上的版本。</strong></div>
+        <div class="eng sm"><span class="lb">工程</span>
+          <p>多少层、每层多宽?<strong>没有理论答案,靠 Scaling Law 用小模型外推出来。</strong></p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 17 ⑦泛化 ═══════════ -->
+<section class="slide" data-t="⑦ 泛化:会做题 vs 背答案">
+  <div class="kick"><b>01 / 地基</b><span>第 7 条 · 这门学科真正的研究对象</span></div>
+  <h2>⑦ 最容易搞反的一条:目标不是"损失最小"</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g2 fill">
+      <div class="card r" style="display:flex;flex-direction:column;justify-content:center">
+        <div class="t">学生 A</div>
+        <h3 style="font-size:16px">把 100 道题的答案背下来</h3>
+        <p style="margin-top:8px">原题考试 → <strong style="color:#7ee787">满分</strong></p>
+        <p style="margin-top:4px">换新题 → <strong style="color:#ff7b72">0 分</strong></p>
+        <p style="margin-top:10px;color:var(--mut)">损失函数会认为他<strong style="color:var(--tx)">很优秀</strong>。</p>
+      </div>
+      <div class="card g" style="display:flex;flex-direction:column;justify-content:center">
+        <div class="t">学生 B</div>
+        <h3 style="font-size:16px">总结出了解题方法</h3>
+        <p style="margin-top:8px">原题考试 → <strong>95 分</strong></p>
+        <p style="margin-top:4px">换新题 → <strong style="color:#7ee787">90 分</strong></p>
+        <p style="margin-top:10px;color:var(--mut)">损失函数会认为他<strong style="color:var(--tx)">不如 A</strong>。</p>
+      </div>
+    </div>
+    <div class="core"><span class="lb">核心</span>
+      <p><strong>我们要的是 B。但机器只能看见损失,而损失偏爱 A。</strong></p>
+      <p style="margin-top:7px">所以必须<span class="hl">把数据分开</span>:一部分拿去训练,另一部分<strong>藏起来当考卷</strong>,训练时绝不给模型看,只用它来检验有没有真学会。</p>
+      <p style="margin-top:7px;color:#8fb8dd">在训练数据上做对从来不难 —— <strong>参数够多,死记硬背就行。难的是没见过的数据上也对。这才是这门学科真正的研究对象。</strong></p>
+    </div>
+    <div class="g3">
+      <div class="card tight"><div class="t">欠拟合</div><p>太笨,连训练集都学不好</p></div>
+      <div class="card tight r"><div class="t">过拟合</div><p>训练集完美,新数据崩溃 —— <strong>背答案</strong></p></div>
+      <div class="card tight g"><div class="t">泛化</div><p>两边都好 —— <strong>目标</strong></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 18 第1章小结 ═══════════ -->
+<section class="slide" data-t="地基全图">
+  <div class="kick"><b>01 / 地基</b><span>小结</span></div>
+  <h2>七条地基,一张图</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <table class="fill">
+      <thead><tr><th>#</th><th>遇到的失败</th><th>补丁</th><th>学名</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>"什么是椅子"的规则根本写不出来</td><td>改成给例子,让程序自己找规律</td><td>机器学习</td></tr>
+        <tr><td>2</td><td>程序不知道自己找得好不好</td><td>定义一个"错得多离谱"的分数</td><td>损失函数</td></tr>
+        <tr><td>3</td><td>参数太多,不可能一个个试</td><td>摸黑下山,顺着坡迈小步</td><td>梯度下降</td></tr>
+        <tr><td>4</td><td>几十亿参数的坡度算不过来</td><td>从后往前逐层分摊责任</td><td>反向传播</td></tr>
+        <tr><td>5</td><td>直线拼多少还是直线</td><td>加一个折角</td><td>激活函数</td></tr>
+        <tr><td>6</td><td>一层要天文数字个神经元</td><td>分层复用下层成果</td><td>深度</td></tr>
+        <tr><td>7</td><td>它可能只是把答案背下来了</td><td>藏一份考卷,绝不给它看</td><td>泛化</td></tr>
+      </tbody>
+    </table>
+    <div class="core"><span class="lb">核心</span>
+      <p><strong>七条全是核心,没有一条是可选的,也没有一条需要公式。</strong>
+      到这里,"机器学习"和"深度学习"这两个词你已经完全懂了 ——
+      <span class="hl">深度学习 = 第 5、6 条(折角 + 分层)加进机器学习之后的样子。</span></p></div>
+  </div>
+</section>
+
+<!-- ═══════════ 19 章节 2 ═══════════ -->
+<section class="slide sec" data-t="§2 从地基到能用">
+  <div class="body center">
+    <div class="num">02</div>
+    <h1>从地基<br>到真的能用</h1>
+    <div class="sub" style="max-width:640px">地基决定了它<strong>能不能work</strong>。<br>这一章的六条,决定了它<strong>能不能用在真实世界上</strong>。</div>
+  </div>
+</section>
+
+<!-- ═══════════ 20 ⑧表示学习 ═══════════ -->
+<section class="slide" data-t="⑧ 表示学习:连特征也交出去">
+  <div class="kick"><b>02 / 能用</b><span>第 8 条</span></div>
+  <h2>⑧ "深度学习"真正特殊的地方</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <p>这是最容易被名字误导的一点 —— 它的关键<strong>不是"更深"</strong>。</p>
+    <div class="g2 fill">
+      <div class="card r" style="display:flex;flex-direction:column;justify-content:center">
+        <div class="t">传统机器学习</div>
+        <pre class="sm" style="margin-top:6px">原始数据
+   ↓
+<span class="k">[ 人工设计特征 ]</span>   ← 占 90% 工作量
+   ↓                 靠领域专家
+简单模型
+   ↓
+答案</pre>
+        <p style="margin-top:9px">做图像要手工设计"边缘检测算子";做文本要设计词性、句法树、本体库。<br>
+        <strong>特征工程才是主战场,模型只是最后一小步。</strong></p>
+      </div>
+      <div class="card g" style="display:flex;flex-direction:column;justify-content:center">
+        <div class="t">深度学习</div>
+        <pre class="sm" style="margin-top:6px">原始数据
+   ↓
+<span class="a">[ 层层自动学出特征 ]</span>  ← 也交给梯度
+   ↓
+答案</pre>
+        <p style="margin-top:9px">把"设计特征"这一步<strong>也吃掉了</strong>。<br>
+        所以它的正式名字叫 <strong>表示学习</strong> —— <span class="hlg">学的不是答案,是"怎么表示输入"</span>。</p>
+      </div>
+    </div>
+    <div class="core"><span class="lb">核心</span>
+      <p><strong>人只规定结构,不规定含义。含义全部由梯度在给定结构下自己找出来。</strong></p>
+      <p style="margin-top:6px;color:#8fb8dd">这条贯穿全篇 —— 后面你会看到,连"注意力该关注什么""每个注意力头负责什么"都没有人指定过。</p></div>
+  </div>
+</section>
+
+<!-- ═══════════ 21 ⑨自监督 ═══════════ -->
+<section class="slide" data-t="⑨ 自监督:例子从哪来">
+  <div class="kick"><b>02 / 能用</b><span>第 9 条 · 大模型的经济学基础</span></div>
+  <h2>⑨ 例子从哪来?这决定了规模的上限</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <p>前面一直假设"有标准答案"。<strong>现实中答案的来源不同,方法就分成几大类</strong> —— 这条线比"有哪些算法"重要得多。</p>
+    <table class="fill">
+      <thead><tr><th>处境</th><th>叫法</th><th>例子</th><th>瓶颈</th></tr></thead>
+      <tbody>
+        <tr><td>人给了标准答案</td><td>监督学习</td><td>一万张图,每张标了猫/狗</td><td style="color:#ff7b72">贵、慢、规模上不去</td></tr>
+        <tr><td>没答案,只想找规律</td><td>无监督学习</td><td>把十万客户自动分成几群</td><td>没有明确目标</td></tr>
+        <tr><td style="color:#7ee787"><strong>答案藏在数据自己里</strong></td><td style="color:#7ee787"><strong>自监督学习</strong></td><td style="color:#7ee787">遮住下一个词让它猜</td><td style="color:#7ee787">需要海量数据</td></tr>
+        <tr><td>只有事后好坏</td><td>强化学习</td><td>下棋:只有最后输赢</td><td>信号稀疏、不稳</td></tr>
+      </tbody>
+    </table>
+    <div class="core"><span class="lb">核心 · 第三行是大模型的命根子</span>
+      <p><strong>互联网上每一句话都自带无数道题和答案</strong> —— 下一个词就是标准答案,不需要任何人标注。</p>
+      <p style="margin-top:6px">于是监督信号<span class="hl">无限、免费</span>。这就是为什么能训 15 万亿个词。<strong>如果必须靠人标注,这个规模在经济上根本不可能存在。</strong></p></div>
+    <div class="note key"><span class="lb">用这条线可以预测未来</span>
+      凡是能找到<strong>"自动产生监督信号"</strong>的新领域,那里就是下一个突破口。<br>
+      <span class="hl">数学和代码能自动判对错 → 于是有了会推理的模型。</span></div>
+  </div>
+</section>
+
+<!-- ═══════════ 22 ⑩⑪ CNN RNN ═══════════ -->
+<section class="slide" data-t="⑩⑪ 给不同数据挑不同假设">
+  <div class="kick"><b>02 / 能用</b><span>第 10–11 条</span></div>
+  <h2>⑩⑪ 把"人类已知的常识"编进结构里</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <p>同样是神经网络,为什么图像用一种结构、语言用另一种?回到第 0 章那个结论:<strong>必须往里塞假设。塞什么,按数据的性质来挑。</strong></p>
+    <div class="g2 fill">
+      <div class="col">
+        <div class="card b"><h3>图像:位置无关</h3>
+          <p style="margin-top:5px">一只猫在照片<strong>左上角还是右下角,它都是猫</strong>。</p>
+          <p style="margin-top:7px">既然如此,就<span class="hl">没必要为每个位置各学一套猫检测器</span> —— 用同一小组权重像放大镜一样滑过整张图就行。</p>
+          <p style="margin-top:7px;color:var(--mut)">这就是<strong style="color:var(--tx)">卷积(CNN)</strong>。</p></div>
+        <div class="eng sm"><span class="lb">工程</span>
+          <p>卷积核多大、几层、怎么池化 —— 全是可调的工程选择。</p></div>
+      </div>
+      <div class="col">
+        <div class="card o"><h3>语言:任意两处可能相关</h3>
+          <p style="margin-top:5px">"<strong>那个</strong>穿红衣服在门口站了很久的<strong>人</strong>" —— 主语和中心词中间隔了十几个字。</p>
+          <p style="margin-top:7px">所以<strong>不能只看邻居</strong>,得允许任意两个位置直接连上。</p>
+          <p style="margin-top:7px;color:var(--mut)">早期方案是 <strong style="color:var(--tx)">RNN</strong>(逐词递推,带着记忆走)—— <span class="hlr">但它有个致命缺陷,下一页就是它</span>。</p></div>
+        <div class="core sm"><span class="lb">核心</span>
+          <p><strong>结构 = 你对世界的假设。</strong>猜对了少量数据就够,猜错了再多数据也是硬填。</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 23 ⑫注意力 ═══════════ -->
+<section class="slide" data-t="⑫ 注意力:被逼出来的">
+  <div class="kick"><b>02 / 能用</b><span>第 12 条 · 关键转折</span></div>
+  <h2>⑫ 注意力不是被想出来的,是被逼出来的</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g2 fill">
+      <div class="col">
+        <div class="card r"><h3>2014 年,机器翻译撞墙</h3>
+          <pre class="sm" style="margin-top:6px">编码器逐词读完整句
+      ↓
+<span class="k">压成一个固定大小的向量</span>
+      ↓
+解码器从这个向量生成译文</pre>
+          <p style="margin-top:9px"><strong>问题:不管 5 个词还是 50 个词,都要压进同样大小的向量。</strong></p>
+          <p style="margin-top:7px">实测:超过 20 个词,翻译质量<span class="hlr">断崖式下跌</span>。</p>
+          <p style="margin-top:7px;color:var(--mut)">相当于让人读完一整段,<strong style="color:var(--tx)">不许回看原文</strong>,凭记忆复述。</p></div>
+      </div>
+      <div class="col">
+        <div class="core"><span class="lb">核心 · 解法朴素到理所当然</span>
+          <p style="font-size:15px"><strong>既然压缩会丢信息,那就别压。</strong></p>
+          <p style="margin-top:7px">把每个词的向量<strong>全都留着</strong>。输出每个词的时候,<span class="hl">回头看一眼整句,自己决定这一步该重点看哪几个位置</span>。</p>
+          <p style="margin-top:9px;color:#8fb8dd">名字来自和人类译者的类比:译到某个词,眼睛会自动回到原文对应位置。</p></div>
+        <div class="note key"><span class="lb">最有说服力的证据</span>
+          把学出来的权重画成热力图,英法对照的<strong>对角线清清楚楚浮现出来了</strong> —— 而<span class="hl">从来没有人标注过词对齐</span>。</div>
+      </div>
+    </div>
+    <div class="note"><span class="lb">记住这个句式</span>
+      <strong>"因为 <em>整句压进固定向量装不下长句</em>,所以 <em>全部留着按需取用</em>。"</strong>
+      —— 不用任何术语就能讲清楚,这就是懂了。</div>
+  </div>
+</section>
+
+<!-- ═══════════ 24 ⑬⑭ Transformer ═══════════ -->
+<section class="slide" data-t="⑬⑭ 扔掉循环">
+  <div class="kick"><b>02 / 能用</b><span>第 13–14 条</span></div>
+  <h2>⑬⑭ 真正激进的一步:把 RNN 整个扔掉</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <p>注意力刚出现时,只是 RNN 上的一个<strong>补丁</strong>。2017 年有人问:既然注意力已经承担了大部分工作,<strong>那个循环还留着干什么?</strong></p>
+    <div class="g23 fill">
+      <div class="col">
+        <div class="card r"><h3>RNN 的致命缺陷:强制串行</h3>
+          <p style="margin-top:5px">第 100 个词<strong>必须等第 99 个算完</strong>。GPU 有上万个核心,全在那儿闲着。</p></div>
+        <div class="core"><span class="lb">核心 · 去掉循环之后</span>
+          <p>✅ <strong>整个序列可以一次性并行计算</strong> —— 训练速度提升一个数量级</p>
+          <p style="margin-top:5px">❌ 失去顺序信息(循环天然自带顺序)→ <strong>必须把位置单独编码补回去</strong></p></div>
+      </div>
+      <div class="col">
+        <div class="note warn" style="font-size:14.5px"><span class="lb">说句实话</span>
+          <strong>Transformer 赢,主要不是因为它更"聪明",是因为它更适合 GPU。</strong><br><br>
+          能并行 → 能喂给上万张卡 → 能 scale。<br>
+          <span class="hl">后面十年所有的大模型、Scaling Law、万亿参数,前提都是这一步。</span><br><br>
+          架构选择在这里其实是一个<strong>硬件经济学问题</strong>。</div>
+        <div class="eng sm"><span class="lb">工程</span>
+          <p>位置怎么补回去,换过好几轮:<span class="pill">学习式位置表</span> <span class="pill o">RoPE</span> <span class="pill o">ALiBi</span><br>
+          现在主流是 RoPE —— <strong>纯计算,零参数</strong>,而且能外推到训练时没见过的长度。</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 25 章节 3 ═══════════ -->
+<section class="slide sec" data-t="§3 Transformer 讲透">
+  <div class="body center">
+    <div class="num">03</div>
+    <h1>Transformer<br>讲透</h1>
+    <div class="sub" style="max-width:660px">前面所有铺垫都是为了这一章。<br><strong>它的核心只有一句话,剩下全是工程。</strong></div>
+  </div>
+</section>
+
+<!-- ═══════════ 26 核心一句话 ═══════════ -->
+<section class="slide" data-t="Transformer 的核心一句话">
+  <div class="kick"><b>03 / TRANSFORMER</b></div>
+  <h2>先把核心和工程彻底分开</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="core" style="padding:20px 24px">
+      <span class="lb">核心 · 整个 Transformer 就这一句</span>
+      <p style="font-size:19px;line-height:1.5;margin-top:4px"><strong>每个词都去看一遍所有词,按"跟我多相关"的比例,把它们的内容加权混合进自己。<br>然后重复几十次。</strong></p>
+    </div>
+    <p>就这样。<strong>下面全部是为了让这件事跑得快、训得稳而做的工程选择</strong> —— 每一项都被换过或正在被换:</p>
+    <div class="g3 fill">
+      <div class="eng"><span class="lb">工程</span>
+        <ul style="margin-top:4px">
+          <li>用 <strong>Q/K/V 三个投影</strong>分离角色</li>
+          <li>用<strong>点积</strong>算相关度</li>
+          <li>用 <strong>softmax</strong> 归一化</li>
+        </ul>
+        <p style="margin-top:7px;color:#c9a173">都可以换成别的算法</p></div>
+      <div class="eng"><span class="lb">工程</span>
+        <ul style="margin-top:4px">
+          <li>拆成 <strong>32 个头</strong>并行做</li>
+          <li><strong>GQA</strong>:多个头共享 K/V</li>
+          <li>前馈网络用 <strong>SwiGLU</strong></li>
+        </ul>
+        <p style="margin-top:7px;color:#c9a173">纯粹是省显存 / 提效果</p></div>
+      <div class="eng"><span class="lb">工程</span>
+        <ul style="margin-top:4px">
+          <li><strong>残差连接</strong>(让梯度好传)</li>
+          <li><strong>归一化</strong>放前面还是后面</li>
+          <li><strong>RoPE</strong> 编码位置</li>
+        </ul>
+        <p style="margin-top:7px;color:#c9a173">训练稳定性的技巧</p></div>
+    </div>
+    <div class="note key"><span class="lb">这一页的用法</span>
+      以后看任何 Transformer 变体 —— Mamba、线性注意力、MoE、FlashAttention ——
+      先问:<strong>它动的是那句核心,还是这些工程零件?</strong><span class="hl">99% 只动工程。</span></div>
+  </div>
+</section>
+
+<!-- ═══════════ 27 软检索 ═══════════ -->
+<section class="slide" data-t="核心:为什么必须是软的">
+  <div class="kick"><b>03 / TRANSFORMER</b><span>核心机制</span></div>
+  <h2>唯一真正需要理解的机制:软检索</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <p>你可能会觉得注意力"长得很奇怪"。奇怪的点通常是这个:<strong>为什么不直接选中最相关的那个词,非要把所有词都混一点进来?</strong></p>
+    <div class="g2 fill">
+      <div class="col">
+        <div class="card r"><h3>硬查表:选中一个</h3>
+          <pre class="sm" style="margin-top:6px">苹果  100%
+吃      0%
+了      0%
+它      0%</pre>
+          <p style="margin-top:9px"><span class="hlr">不可导 —— 训不了。</span></p>
+          <p style="margin-top:6px">稍微改一点参数,要么输出完全不变,要么<strong>突然跳到另一个词</strong>。梯度在这里彻底失灵。</p></div>
+      </div>
+      <div class="col">
+        <div class="card g"><h3>软加权:按比例混合</h3>
+          <pre class="sm" style="margin-top:6px">苹果   88%
+吃      3%
+了      2%
+它      7%</pre>
+          <p style="margin-top:9px"><span class="hlg">处处可导 —— 梯度能流。</span></p>
+          <p style="margin-top:6px">参数动一点,比例就<strong>连续地</strong>动一点。梯度下降这台发动机才能带得动它。</p></div>
+      </div>
+    </div>
+    <div class="core"><span class="lb">核心</span>
+      <p style="font-size:15px"><strong>注意力的本质,是"可微分的检索"。</strong></p>
+      <p style="margin-top:7px">这不是花哨的设计选择,<span class="hl">是唯一的出路</span> —— 你想让网络学会"按内容去别处取信息",又必须靠梯度训练它,<strong>那这个取信息的动作就必须是软的</strong>。</p>
+      <p style="margin-top:7px;color:#8fb8dd">它看起来奇怪,是被"可微分"这个约束逼出来的形状,不是因为谁觉得优雅。</p></div>
+  </div>
+</section>
+
+<!-- ═══════════ 28 QKV ═══════════ -->
+<section class="slide" data-t="Q/K/V:核心是角色,三个矩阵是工程">
+  <div class="kick"><b>03 / TRANSFORMER</b><span>常被误解的一点</span></div>
+  <h2>Q / K / V:哪部分是核心,哪部分是工程</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g23 fill">
+      <div class="col">
+        <div class="core"><span class="lb">核心 · 三个角色的分离</span>
+          <p>要做"按内容检索",逻辑上<strong>必须区分两件事</strong>:</p>
+          <table class="sm" style="margin-top:7px">
+            <tr><td style="color:#cfe6ff">用什么<br>被找到</td><td>标签 —— 只参与"算比例",不流向下一层</td></tr>
+            <tr><td style="color:#cfe6ff">被找到后<br>给出什么</td><td>内容 —— <strong>真正被搬走的东西</strong></td></tr>
+          </table>
+          <p style="margin-top:9px">图书馆的例子:<strong>索引卡</strong>(为了检索方便)和<strong>书本身</strong>(你真正要的)不是一回事。<br>
+          <span class="hl">你不会想让整本书当索引卡用。</span></p></div>
+        <div class="note key"><span class="lb">所以 V 是什么</span>
+          <strong>V 就是真正被搬走的那份"货"。</strong>Q 和 K 只负责决定"搬多少",<span class="hl">流到下一层去的东西,全部来自 V</span>。</div>
+      </div>
+      <div class="col">
+        <div class="eng"><span class="lb">工程 · 用三个矩阵实现,是选择</span>
+          <p>"角色要分离"是核心,但<strong>"用三个独立矩阵来分"是工程做法</strong>,已经在被改:</p>
+          <ul style="margin-top:6px">
+            <li><strong>GQA</strong> —— 多个 Q 头共享同一组 K/V,矩阵直接缩小到 1/8</li>
+            <li><strong>MLA</strong> —— K/V 换成低秩压缩,省 KV cache</li>
+            <li>有些变体<strong>把 K 和 V 合并</strong></li>
+          </ul>
+          <p style="margin-top:8px;color:#c9a173">名字也是事后起的 —— 借自键值数据库,不是设计说明书。</p></div>
+        <div class="core sm"><span class="lb">核心 · 最反直觉的一点</span>
+          <p>初始化时三个矩阵<strong>完全对称</strong> —— 一样的形状、一样的随机数。<br>
+          <strong>把 W<sub>q</sub> 和 W<sub>v</sub> 对调,什么都不会发生</strong>,它们会各自学成对方的角色。</p>
+          <p style="margin-top:6px"><span class="hl">分工不是人定的,是"它在公式里的位置"逼出来的。</span></p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 29 一层结构图 ═══════════ -->
+<section class="slide" data-t="一层 Transformer 全图">
+  <div class="kick"><b>03 / TRANSFORMER</b><span>把所有东西装配起来</span></div>
+  <h2>一层 Transformer 的全貌 · 蓝=核心 橙=工程</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g23 fill">
+      <div class="fig" style="justify-content:center">
+        <div class="cap">这一层重复 32 ~ 100+ 次,就是整个模型</div>
+        <svg viewBox="0 0 560 400" role="img" aria-label="一层Transformer的结构,区分核心机制与工程选择">
+          <text x="280" y="16" text-anchor="middle" class="dlab" style="font-size:11px">输入:每个词当前的向量</text>
+          <line x1="280" y1="22" x2="280" y2="36" stroke="#5a6a7d" stroke-width="2"/>
+
+          <rect x="150" y="36" width="260" height="24" rx="6" fill="#1c1409" stroke="#6b5230"/>
+          <text x="280" y="53" text-anchor="middle" fill="#ffa657" font-size="11.5" font-family="monospace">归一化 · 工程</text>
+          <line x1="280" y1="60" x2="280" y2="74" stroke="#5a6a7d" stroke-width="2"/>
+
+          <rect x="34" y="74" width="492" height="96" rx="9" fill="#0c1a26" stroke="#2d5a86"/>
+          <text x="50" y="94" fill="#58a6ff" font-size="12" font-family="monospace">注意力</text>
+          <rect x="50" y="102" width="460" height="26" rx="5" fill="#123049" stroke="#2d6288"/>
+          <text x="62" y="120" fill="#cfe6ff" font-size="11.5">核心:按内容加权取信息,而且必须是"软"的</text>
+          <rect x="50" y="134" width="460" height="26" rx="5" fill="#1c1409" stroke="#6b5230"/>
+          <text x="62" y="152" fill="#ffdcb3" font-size="11.5">工程:Q/K/V 三分 · 点积 · softmax · 多头 · GQA</text>
+
+          <line x1="280" y1="170" x2="280" y2="186" stroke="#5a6a7d" stroke-width="2"/>
+          <rect x="150" y="186" width="260" height="24" rx="6" fill="#1c1409" stroke="#6b5230"/>
+          <text x="280" y="203" text-anchor="middle" fill="#ffa657" font-size="11.5" font-family="monospace">加上残差 · 工程</text>
+          <line x1="280" y1="210" x2="280" y2="224" stroke="#5a6a7d" stroke-width="2"/>
+
+          <rect x="150" y="224" width="260" height="24" rx="6" fill="#1c1409" stroke="#6b5230"/>
+          <text x="280" y="241" text-anchor="middle" fill="#ffa657" font-size="11.5" font-family="monospace">归一化 · 工程</text>
+          <line x1="280" y1="248" x2="280" y2="262" stroke="#5a6a7d" stroke-width="2"/>
+
+          <rect x="34" y="262" width="492" height="96" rx="9" fill="#0c1a26" stroke="#2d5a86"/>
+          <text x="50" y="282" fill="#58a6ff" font-size="12" font-family="monospace">前馈网络</text>
+          <rect x="50" y="290" width="460" height="26" rx="5" fill="#123049" stroke="#2d6288"/>
+          <text x="62" y="308" fill="#cfe6ff" font-size="11.5">核心:非线性变换(折角)· 知识主要存在这里</text>
+          <rect x="50" y="322" width="460" height="26" rx="5" fill="#1c1409" stroke="#6b5230"/>
+          <text x="62" y="340" fill="#ffdcb3" font-size="11.5">工程:SwiGLU · 3 个矩阵 · 可换成 MoE</text>
+
+          <line x1="280" y1="358" x2="280" y2="372" stroke="#5a6a7d" stroke-width="2"/>
+          <text x="280" y="388" text-anchor="middle" class="dlab" style="font-size:11px">输出:混合了上下文之后的新向量 → 送进下一层</text>
+        </svg>
+      </div>
+      <div class="col">
+        <div class="core"><span class="lb">核心 · 只有两件事</span>
+          <p><strong>① 注意力</strong> —— 从别的词那里<strong>取信息</strong>(横向:词与词之间)</p>
+          <p style="margin-top:7px"><strong>② 前馈网络</strong> —— 对取来的信息<strong>做加工</strong>(纵向:每个词自己内部)</p>
+          <p style="margin-top:9px;color:#8fb8dd">一横一纵,交替几十次。<strong>这就是全部。</strong></p></div>
+        <div class="eng sm"><span class="lb">工程 · 那些"归一化""残差"</span>
+          <p>它们<strong>不参与理解,只负责让训练别崩</strong>:</p>
+          <ul style="margin-top:4px">
+            <li><strong>残差</strong>:给梯度留一条高速路,不然几十层传不下去</li>
+            <li><strong>归一化</strong>:控制每层数值大小,不然会爆炸</li>
+          </ul>
+          <p style="margin-top:6px;color:#c9a173">参数量几乎为零,<strong>但拿掉训练当场发散</strong>。</p></div>
+        <div class="note key"><span class="lb">参数都在哪</span>
+          前馈网络吃掉 <strong>约 80%</strong>,注意力约 20%,归一化 ≈ 0。<br>
+          <span class="hl">"知识存在前馈网络里"的说法就来自这个比例。</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 30 能换/不能换 ═══════════ -->
+<section class="slide" data-t="哪些能换,哪些不能">
+  <div class="kick"><b>03 / TRANSFORMER</b><span>这一页是全篇的实用落点</span></div>
+  <h2>总表:哪些能换,哪些换不掉</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g2 fill">
+      <div class="core" style="display:flex;flex-direction:column">
+        <span class="lb">核心 · 换不掉</span>
+        <p style="margin-bottom:8px;color:#8fb8dd">任何取代 Transformer 的东西,<strong>这些还得有</strong>:</p>
+        <table class="sm">
+          <tr><td style="color:#cfe6ff">用例子代替规则</td><td>否则回到编程</td></tr>
+          <tr><td style="color:#cfe6ff">要有打分标准</td><td>否则无法比较</td></tr>
+          <tr><td style="color:#cfe6ff">必须可微分</td><td>否则梯度用不了</td></tr>
+          <tr><td style="color:#cfe6ff">必须能并行</td><td>否则吃不满 GPU,scale 不了</td></tr>
+          <tr><td style="color:#cfe6ff">任意距离直连</td><td>否则长依赖断掉</td></tr>
+          <tr><td style="color:#cfe6ff">要有归纳偏置</td><td>否则无法泛化</td></tr>
+          <tr><td style="color:#cfe6ff">分层抽象</td><td>否则宽度指数爆炸</td></tr>
+        </table>
+      </div>
+      <div class="eng" style="display:flex;flex-direction:column">
+        <span class="lb">工程 · 已经在换或换过了</span>
+        <table class="sm">
+          <tr><td style="color:#ffdcb3">激活函数</td><td>Sigmoid → ReLU → SwiGLU</td></tr>
+          <tr><td style="color:#ffdcb3">优化器</td><td>SGD → Adam → AdamW</td></tr>
+          <tr><td style="color:#ffdcb3">位置编码</td><td>学习式 → RoPE / ALiBi</td></tr>
+          <tr><td style="color:#ffdcb3">归一化位置</td><td>Post-LN → Pre-LN</td></tr>
+          <tr><td style="color:#ffdcb3">K/V 结构</td><td>独立 → GQA → MLA</td></tr>
+          <tr><td style="color:#ffdcb3">前馈网络</td><td>稠密 → MoE</td></tr>
+          <tr><td style="color:#ffdcb3"><strong>注意力本身</strong></td><td><strong>线性注意力 / Mamba / 混合架构</strong></td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="note warn"><span class="lb">注意最后一行</span>
+      <strong>连注意力本身都在被替换。</strong>Mamba 这类方案用 O(n) 取代了 O(n²),代价是"精确回忆"变弱 ——
+      <span class="hl">兜一圈又撞上了 2014 年那个"固定大小装不下"的老问题。</span><br>
+      现在实际在赢的是<strong>混合架构</strong>:大部分层用便宜的,少数关键层插注意力。</div>
+  </div>
+</section>
+
+<!-- ═══════════ 31 收尾 ═══════════ -->
+<section class="slide" data-t="三句话 + 出师标准">
+  <div class="kick"><b>SUMMARY</b></div>
+  <h2>全篇收束</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="core" style="padding:16px 20px">
+      <span class="lb">这门学科的三句话定义</span>
+      <p style="margin-top:4px"><strong>1.</strong> 它对付的是<strong>"人会做,但说不清怎么做"</strong>的事。</p>
+      <p style="margin-top:5px"><strong>2.</strong> 办法是:把任务改写成<strong>"找一个函数"</strong>,用例子代替规则去搜索这个函数。</p>
+      <p style="margin-top:5px"><strong>3.</strong> 而搜索能成功,靠的不是数据本身 —— 靠的是<strong>人预先塞进去的那个"世界大概长什么样"的假设</strong>。</p>
+    </div>
+    <div class="g3 fill">
+      <div class="card b"><div class="t">出师标准 · 一</div>
+        <h3>不用术语能讲出来</h3>
+        <p style="margin-top:6px;color:#ff7b72">✗ "注意力通过 Q、K、V 投影计算加权和"</p>
+        <p style="margin-top:6px;color:#7ee787">✓ "以前要把整句话压成一个固定大小的东西,一长就装不下。后来干脆全留着,用的时候回头看一眼,自己决定该重点看哪几个位置。"</p></div>
+      <div class="card o"><div class="t">出师标准 · 二</div>
+        <h3>能说出它什么时候会失效</h3>
+        <p style="margin-top:6px"><strong>懂边界才是真懂。</strong></p>
+        <p style="margin-top:6px">比如:"注意力要每个词和所有词比一遍,所以文章长一倍、成本变四倍。"</p></div>
+      <div class="card g"><div class="t">出师标准 · 三</div>
+        <h3>新东西能自己归位</h3>
+        <p style="margin-top:6px">看到没见过的技术,第一反应变成:</p>
+        <p style="margin-top:6px"><strong>"它在补哪个失败?动的是核心还是工程?"</strong></p>
+        <p style="margin-top:6px;color:#7ee787">做到这条就出师了。这门学科不需要更多。</p></div>
+    </div>
+    <div class="note key"><span class="lb">最后一句</span>
+      <strong>给一个带旋钮的函数,给一个打分标准,让梯度去拧旋钮。</strong>
+      从 1950 年代的感知机到今天的万亿参数模型,<span class="hl">这副骨架没变过</span> ——
+      变的只是函数变复杂了、打分变巧妙了、算力变大了。</div>
+  </div>
+</section>
+
+</div><!-- /deck -->
+
+<div id="bar"></div>
+<div id="nav">
+  <button id="prev">←</button><button id="next">→</button><button id="tocBtn">目录</button>
+</div>
+<div id="hud"><b id="cur">1</b> / <span id="tot">31</span></div>
+
+<div id="toc">
+  <h2>目录 <span style="font-size:13px;color:var(--mut);font-weight:400">— 点击跳转 · 按 O 或 Esc 关闭</span></h2>
+  <div class="grid" id="tocGrid"></div>
+</div>
+
+<script>
+(function(){
+  var slides = [].slice.call(document.querySelectorAll('.slide'));
+  var i = 0, n = slides.length;
+  var bar = document.getElementById('bar'), cur = document.getElementById('cur');
+  document.getElementById('tot').textContent = n;
+  var toc = document.getElementById('toc'), grid = document.getElementById('tocGrid');
+
+  slides.forEach(function(s, k){
+    var a = document.createElement('a');
+    a.href = '#';
+    a.innerHTML = '<i>' + String(k+1).padStart(2,'0') + '</i>' + (s.dataset.t || ('第 '+(k+1)+' 页'));
+    if (s.classList.contains('sec')) a.className = 's';
+    a.onclick = function(e){ e.preventDefault(); go(k); toc.classList.remove('on'); };
+    grid.appendChild(a);
+  });
+
+  function go(k){
+    i = Math.max(0, Math.min(n-1, k));
+    slides.forEach(function(s,x){ s.classList.toggle('on', x===i); });
+    bar.style.width = ((i+1)/n*100) + '%';
+    cur.textContent = i+1;
+    try { location.hash = String(i+1); } catch(e){}
+  }
+
+  document.getElementById('prev').onclick = function(){ go(i-1); };
+  document.getElementById('next').onclick = function(){ go(i+1); };
+  document.getElementById('tocBtn').onclick = function(){ toc.classList.toggle('on'); };
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') { toc.classList.remove('on'); return; }
+    if (e.key === 'o' || e.key === 'O') { toc.classList.toggle('on'); return; }
+    if (toc.classList.contains('on')) return;
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); go(i+1); }
+    if (e.key === 'ArrowLeft'  || e.key === 'PageUp')                    { e.preventDefault(); go(i-1); }
+    if (e.key === 'Home') go(0);
+    if (e.key === 'End')  go(n-1);
+  });
+
+  document.addEventListener('click', function(e){
+    if (e.target.closest('#nav') || e.target.closest('#toc') || e.target.closest('a')) return;
+    if (e.clientY > window.innerHeight - 48) return;
+    go(e.clientX < window.innerWidth/2 ? i-1 : i+1);
+  });
+
+  var x0 = null;
+  document.addEventListener('touchstart', function(e){ x0 = e.touches[0].clientX; }, {passive:true});
+  document.addEventListener('touchend', function(e){
+    if (x0 === null) return;
+    var dx = e.changedTouches[0].clientX - x0;
+    if (Math.abs(dx) > 46) go(dx < 0 ? i+1 : i-1);
+    x0 = null;
+  }, {passive:true});
+
+  function fit(){
+    var d = document.getElementById('deck');
+    var s = Math.min(window.innerWidth / 1280, window.innerHeight / 720) * 0.965;
+    d.style.transform = 'scale(' + s + ')';
+  }
+  window.addEventListener('resize', fit);
+  fit();
+
+  var h = parseInt((location.hash || '').replace('#',''), 10);
+  go(isFinite(h) && h > 0 ? h-1 : 0);
+})();
+</script>
+</body>
+</html>
