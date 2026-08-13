@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>西瓜书速读 —— 在大模型时代读周志华《机器学习》</title>
+<style>
+:root{
+  /* 底色取自瓜皮与籽:偏绿的近黑 */
+  --bg:#080c0a; --stage:#0c1210; --panel:#131b17; --panel2:#18221d;
+  --line:#22302a; --line2:#33453c;
+  --tx:#e9f1ec; --tx2:#aebcb4; --mut:#7b8b83;
+  --rind:#2ea043;      /* 瓜皮绿 —— 只做装饰,不承担语义 */
+  --flesh:#f2555f;     /* 瓤红 */
+  /* 四档语义色:三种色觉模拟下两两 ΔE 最差 28.6,全部通过 */
+  --must:#58a6ff; --opt:#e3b341; --skip:#8b9a92; --cal:#f2555f;
+  --mono:"SF Mono",'JetBrains Mono',Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  --serif:"Songti SC","Source Han Serif SC","Noto Serif SC",STSong,SimSun,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--tx);font-family:var(--sans);overflow:hidden}
+body{display:flex;align-items:center;justify-content:center}
+#deck{position:relative;width:1280px;height:720px;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;background:var(--stage);padding:40px 56px 50px;
+  display:none;flex-direction:column;overflow:hidden;border:1px solid var(--line);border-radius:6px}
+.slide.on{display:flex;animation:fade .26s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.slide.on{animation:none}}
+
+.kick{font-size:11.5px;letter-spacing:.18em;color:var(--mut);font-family:var(--mono);
+  margin-bottom:7px;display:flex;gap:10px;align-items:center}
+.kick b{color:var(--rind);font-weight:700}
+h1{font-size:42px;line-height:1.16;font-weight:700;letter-spacing:-.01em}
+h2{font-size:27px;line-height:1.24;font-weight:700;letter-spacing:-.01em}
+h3{font-size:16px;font-weight:700;color:var(--tx);margin-bottom:5px}
+.sub{font-size:17px;color:var(--mut);margin-top:9px;line-height:1.6}
+.rule{height:2px;background:linear-gradient(90deg,var(--rind),transparent);margin:10px 0 15px;border-radius:2px}
+.body{flex:1;min-height:0;display:flex;flex-direction:column;gap:13px;font-size:16.4px;line-height:1.6;color:var(--tx2)}
+p{margin:0}
+strong{color:var(--tx);font-weight:600}
+em{font-style:normal;color:var(--rind);font-weight:600}
+.hl{color:var(--opt);font-weight:600}
+.hr{color:var(--flesh);font-weight:600}
+.hb{color:var(--must);font-weight:600}
+ul{list-style:none;display:flex;flex-direction:column;gap:5px}
+li{padding-left:16px;position:relative}
+li::before{content:"";position:absolute;left:2px;top:.62em;width:5px;height:5px;border-radius:50%;background:var(--line2)}
+li.k::before{background:var(--rind)}
+ol{padding-left:19px;display:flex;flex-direction:column;gap:5px}
+ol li{padding-left:2px} ol li::before{display:none}
+code{font-family:var(--mono);font-size:.92em;background:#0f1714;color:var(--rind);padding:1px 5px;border-radius:4px;border:1px solid var(--line)}
+
+/* ══ 排版即语义:衬线 = 书里的原话/原术语,无衬线 = 我的解读 ══ */
+.q{font-family:var(--serif);font-size:17px;line-height:1.74;color:#dbe7df;
+  border-left:3px solid var(--rind);padding:9px 0 9px 15px;background:linear-gradient(90deg,#101a14,transparent 70%)}
+.q .src{display:block;font-family:var(--mono);font-size:10.5px;color:var(--mut);letter-spacing:.08em;margin-top:6px}
+.bk{font-family:var(--serif);color:#dbe7df}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.g23{display:grid;grid-template-columns:1.15fr .85fr;gap:15px}
+.g32{display:grid;grid-template-columns:.85fr 1.15fr;gap:15px}
+.col{display:flex;flex-direction:column;gap:10px;min-height:0}
+.fill{flex:1;min-height:0}
+.center{justify-content:center}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:11px 13px}
+.card h3{font-size:15px;margin-bottom:5px}
+.card .t{font-size:10.5px;font-family:var(--mono);color:var(--mut);letter-spacing:.08em;margin-bottom:4px}
+.card p,.card ul{font-size:14.8px;line-height:1.58}
+.card.must{border-left:3px solid var(--must)}
+.card.opt{border-left:3px solid var(--opt)}
+.card.skip{border-left:3px solid var(--skip)}
+.card.tight{padding:9px 11px}
+.card.tight p,.card.tight ul,.card.tight li{font-size:14.2px;line-height:1.53}
+
+/* ══ 今日校准:全篇第二个固定约定 ══ */
+.cal{background:#1c0e10;border:1px solid #63292f;border-radius:9px;padding:11px 14px;
+  display:flex;flex-direction:column;gap:5px}
+.cal .lb{font-family:var(--mono);font-size:10px;letter-spacing:.14em;font-weight:700;
+  align-self:flex-start;padding:2px 8px;border-radius:20px;color:#12080a;background:var(--cal)}
+.cal p,.cal ul{font-size:14.8px;line-height:1.58}
+.cal strong{color:#ffd0d3}
+.cal .then,.cal .now{display:flex;gap:9px;align-items:baseline;font-size:14.8px}
+.cal .then i,.cal .now i{font-style:normal;font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+  color:var(--mut);flex:none;width:52px;padding-top:2px}
+.cal.sm{padding:9px 11px} .cal.sm p,.cal.sm .then,.cal.sm .now{font-size:14px;line-height:1.52}
+
+.note{background:#0f1714;border:1px solid var(--line);border-radius:8px;padding:11px 14px;font-size:15.6px;line-height:1.58}
+.note.key{border-color:#2b4a6b;background:#0c1520}
+.note.warn{border-color:#5c4a22;background:#191408}
+.note.sm{font-size:14.1px;line-height:1.5;padding:9px 12px}
+.note .lb{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--mut);display:block;margin-bottom:3px}
+.note.key .lb{color:var(--must)} .note.warn .lb{color:var(--opt)}
+
+.pill{display:inline-block;font-family:var(--mono);font-size:10.5px;padding:2px 8px;border-radius:20px;
+  border:1px solid var(--line2);color:var(--mut);letter-spacing:.05em}
+.pill.must{color:var(--must);border-color:#2b4a6b;background:#0c1520}
+.pill.opt {color:var(--opt); border-color:#5c4a22;background:#191408}
+.pill.skip{color:var(--skip);border-color:#39463f;background:#121917}
+.pill.cal {color:var(--cal); border-color:#63292f;background:#1c0e10}
+.pill.g   {color:var(--rind);border-color:#1f5c30;background:#0c1a10}
+
+pre{font-family:var(--mono);font-size:13.8px;line-height:1.58;background:#080e0b;border:1px solid var(--line);
+  border-radius:8px;padding:11px 13px;overflow:hidden;color:#c6d3cb;white-space:pre;tab-size:2}
+pre.sm{font-size:12.8px;line-height:1.52}
+pre.xs{font-size:11.8px;line-height:1.46}
+.c{color:#5f7069;font-style:italic}
+.k{color:#f2555f} .s{color:#9fd8b4} .n{color:#8fc7ff} .f{color:#d8b45a} .a{color:#4ec26b}
+
+table{width:100%;border-collapse:collapse;font-size:14.9px}
+th,td{text-align:left;padding:6.5px 9px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--mut);
+  border-bottom:1px solid var(--line2);font-weight:500}
+td:first-child{color:var(--tx);font-weight:600;white-space:nowrap}
+table.sm{font-size:14.1px} table.sm th,table.sm td{padding:6px 9px}
+table.xs{font-size:13.1px} table.xs th,table.xs td{padding:5px 8px}
+td.num{font-family:var(--mono);color:var(--tx2);font-weight:400}
+
+.sec{align-items:flex-start;justify-content:center}
+.sec .num{font-family:var(--mono);font-size:88px;font-weight:700;color:#17231c;line-height:1}
+.sec h1{margin-top:-10px}
+
+.fig{background:#080e0b;border:1px solid var(--line);border-radius:9px;padding:10px 12px;
+  display:flex;flex-direction:column;gap:6px}
+/* 内容偏少的页整体放大一档,而不是把面板拉成空盒子 */
+.slide.z1 .body{zoom:1.09} .slide.z2 .body{zoom:1.17}
+.fig .cap{font-size:12.4px;color:var(--mut);font-family:var(--mono);letter-spacing:.05em}
+.fig svg{display:block;width:100%;height:auto}
+.axis{stroke:#3a4a42;stroke-width:1}
+.grid{stroke:#18231d;stroke-width:1}
+.tick{fill:#6b7c74;font-size:10px;font-family:var(--mono)}
+.dlab{fill:#aebcb4;font-size:11px;font-family:var(--mono)}
+.dlab.em{fill:#e9f1ec;font-weight:600}
+
+/* ══ 签名元素:十六章书脊 —— 它本身就是阅读路线 ══ */
+.spine{display:flex;gap:3px;align-items:stretch}
+.spine .sp{flex:1;border-radius:4px;padding:5px 3px 6px;text-align:center;
+  border:1px solid var(--line);background:var(--panel);position:relative}
+.spine .sp b{display:block;font-family:var(--mono);font-size:11px;font-weight:700;color:var(--mut);line-height:1.2}
+.spine .sp span{display:block;font-size:10.2px;color:var(--mut);line-height:1.25;margin-top:2px}
+.spine .sp.must{background:#0c1520;border-color:#2b4a6b}
+.spine .sp.must b{color:var(--must)} .spine .sp.must span{color:#93bfe8}
+.spine .sp.opt{background:#191408;border-color:#5c4a22}
+.spine .sp.opt b{color:var(--opt)} .spine .sp.opt span{color:#cbb079}
+.spine .sp.skip{opacity:.5}
+.spine .sp.now{outline:2px solid var(--rind);outline-offset:1px}
+.spine.mini .sp{padding:4px 2px}
+.spine.mini .sp b{font-size:10px} .spine.mini .sp span{display:none}
+
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13.2px;color:var(--mut);align-items:center}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+
+#bar{position:fixed;left:0;bottom:0;height:3px;background:var(--rind);width:0;transition:width .25s;z-index:20}
+#hud{position:fixed;right:14px;bottom:12px;font-family:var(--mono);font-size:11.5px;color:var(--mut);z-index:20;
+  background:#0c1210cc;border:1px solid var(--line);border-radius:20px;padding:4px 12px}
+#hud b{color:var(--tx)}
+#nav{position:fixed;left:14px;bottom:12px;display:flex;gap:6px;z-index:20}
+#nav button{font-family:var(--mono);font-size:11.5px;background:#0c1210cc;color:var(--mut);border:1px solid var(--line);
+  border-radius:20px;padding:4px 11px;cursor:pointer}
+#nav button:hover{color:var(--tx);border-color:var(--line2)}
+#nav button:focus-visible,#toc a:focus-visible{outline:2px solid var(--rind);outline-offset:2px}
+#toc{position:fixed;inset:0;background:#080c0af5;z-index:30;display:none;padding:34px 44px;overflow:auto}
+#toc.on{display:block}
+#toc h2{margin-bottom:13px}
+#toc .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+#toc a{display:block;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:7px 10px;
+  color:var(--tx2);text-decoration:none;font-size:11.8px;line-height:1.35}
+#toc a:hover{border-color:var(--rind);color:var(--tx)}
+#toc a i{font-family:var(--mono);font-size:10px;color:var(--mut);font-style:normal;display:block;margin-bottom:2px}
+#toc a.s{background:#0c1a10;border-color:#1f5c30}
+</style>
+</head>
+<body>
+<div id="deck">
+
+<!-- ═══════════ 1 封面 ═══════════ -->
+<section class="slide on" data-t="封面">
+  <div class="body center" style="gap:0">
+    <div class="kick"><b>SPEEDRUN</b><span>周志华《机器学习》· 清华大学出版社 · 2016</span></div>
+    <h1>西瓜书速读</h1>
+    <div class="sub" style="max-width:800px;margin-top:14px">
+      在<strong>大模型已经落地十年之后</strong>,重新打开这本 2016 年的教材:<br>
+      哪四章今天照样是地基,哪七章可以直接跳过,哪几处结论<span class="hr">已经被推翻了</span>。
+    </div>
+    <div class="spine" style="margin-top:30px;max-width:1000px">
+      <div class="sp must"><b>1</b><span>绪论</span></div>
+      <div class="sp must"><b>2</b><span>评估</span></div>
+      <div class="sp opt"><b>3</b><span>线性</span></div>
+      <div class="sp opt"><b>4</b><span>决策树</span></div>
+      <div class="sp must"><b>5</b><span>神经网络</span></div>
+      <div class="sp skip"><b>6</b><span>SVM</span></div>
+      <div class="sp opt"><b>7</b><span>贝叶斯</span></div>
+      <div class="sp opt"><b>8</b><span>集成</span></div>
+      <div class="sp skip"><b>9</b><span>聚类</span></div>
+      <div class="sp skip"><b>10</b><span>降维</span></div>
+      <div class="sp skip"><b>11</b><span>稀疏</span></div>
+      <div class="sp must"><b>12</b><span>学习理论</span></div>
+      <div class="sp skip"><b>13</b><span>半监督</span></div>
+      <div class="sp skip"><b>14</b><span>概率图</span></div>
+      <div class="sp skip"><b>15</b><span>规则</span></div>
+      <div class="sp opt"><b>16</b><span>强化</span></div>
+    </div>
+    <div style="margin-top:12px" class="legend">
+      <span><i style="background:#58a6ff"></i>必读 4</span>
+      <span><i style="background:#e3b341"></i>选读 5</span>
+      <span><i style="background:#8b9a92;opacity:.5"></i>可跳过 7</span>
+      <span style="margin-left:auto;font-family:var(--mono);font-size:11px">← → 翻页 · O 目录 · 共 33 页</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 2 读法约定 ═══════════ -->
+<section class="slide" data-t="读法:两个固定约定">
+  <div class="kick"><b>HOW TO READ</b></div>
+  <h2>这份材料的两个固定约定</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <p>速读一本旧教材,最大的风险不是读不完,是<strong>把过时的东西当成定论背下来</strong>。所以全篇有两套固定标记,看到就知道该怎么对待。</p>
+    <div class="g2 fill">
+      <div class="col">
+        <h3 style="font-size:17px">约定一 · 每章一个评级</h3>
+        <div class="card must tight"><div class="t">必读 · 4 章</div>
+          <p>今天照样成立,而且是<strong>公共语言</strong> —— 不看会一直听不懂别人在说什么。</p></div>
+        <div class="card opt tight"><div class="t">选读 · 5 章</div>
+          <p>方法本身多半退场了,但里面的<strong>思路还活着</strong>,值一小时。</p></div>
+        <div class="card skip tight"><div class="t">可跳过 · 7 章</div>
+          <p>不是内容差,是<strong>投入产出比低</strong>。每章我给一句话遗产,拿走就行。</p></div>
+      </div>
+      <div class="col">
+        <h3 style="font-size:17px">约定二 · 今日校准</h3>
+        <div class="cal" style="flex:1;justify-content:center">
+          <span class="lb">今日校准</span>
+          <div class="then"><i>书上说</i><span>某个 2016 年成立的结论</span></div>
+          <div class="now"><i>今天</i><span>它在什么范围内还对、在哪里已经不对了</span></div>
+          <p style="margin-top:6px;color:#ffd0d3">这是全篇最值钱的部分。全书共标出 <strong>5 处</strong> —— 都不是小毛病,是<strong>教科书上的图直接画错了</strong>那一级。</p>
+        </div>
+        <div class="note"><span class="lb">排版也在说话</span>
+          <span class="bk">衬线体</span>是书里的原话和原术语,无衬线体是我的解读。看到衬线体,那是周志华说的,不是我说的。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 3 这是本什么书 ═══════════ -->
+<section class="slide" data-t="这是本什么书">
+  <div class="kick"><b>WHAT IT IS</b></div>
+  <h2>先把它是什么书说清楚</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g23 fill">
+      <div class="col">
+        <table class="sm">
+          <tr><td>书名</td><td>《机器学习》,周志华(南京大学),清华大学出版社,2016 年</td></tr>
+          <tr><td>俗称</td><td>西瓜书 —— 封面是西瓜,书里从头到尾用<strong>"怎么挑一个好瓜"</strong>当例子</td></tr>
+          <tr><td>体量</td><td>16 章 + 3 个数学附录,四百多页</td></tr>
+          <tr><td>定位</td><td>大三本科生 / 研一的<strong>教材</strong>,不是科普</td></tr>
+          <tr><td>预设</td><td>线性代数、概率论、最优化。<strong>公式驱动</strong>,不是绕开公式讲</td></tr>
+          <tr><td>配套</td><td>《南瓜书》—— 民间补它省略的推导步骤,方向是<strong>更深不是更浅</strong></td></tr>
+        </table>
+        <div class="note key"><span class="lb">它在中文世界的真实地位</span>
+          它是<strong>中文机器学习的术语标准</strong>。"泛化""过拟合""假设空间""归纳偏好"这些词今天在中文语境里怎么说,基本由这本书定下来。<br>
+          所以哪怕你不打算做算法,读它也有一个硬收益:<strong>以后别人说什么你听得懂。</strong></div>
+      </div>
+      <div class="col">
+        <div class="card"><h3>它不是什么</h3>
+          <ul>
+            <li>不是入门读物 —— 第 6 章开始有大量推导</li>
+            <li>不是深度学习教材 —— 神经网络只占一章</li>
+            <li>不是编程书 —— 全书几乎没有代码</li>
+            <li>不是一条逻辑线 —— 第 3–11 章是<strong>方法目录</strong></li>
+          </ul></div>
+        <div class="cal">
+          <span class="lb">今日校准 1 / 5</span>
+          <div class="then"><i>时间</i><span>成书于 2016 年</span></div>
+          <div class="now"><i>意味着</i><span>书里<strong>没有 Transformer</strong> —— 那篇论文 2017 年才出</span></div>
+          <p>这一条决定了整本书今天该怎么用。下一页展开。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 4 最大的误解 ═══════════ -->
+<section class="slide" data-t="最大的误解:它通不到大模型">
+  <div class="kick"><b>THE BIG MISREAD</b><span>先破除这一条,后面才不会白读</span></div>
+  <h2>它通不到大模型 —— 这不是缺点,是分工</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="fig" style="flex:none">
+      <svg viewBox="0 0 1130 168">
+        <line x1="40" y1="96" x2="1090" y2="96" class="axis"/>
+        <g class="tick" text-anchor="middle">
+          <text x="120" y="122">2016</text><text x="270" y="122">2017</text><text x="420" y="122">2018</text>
+          <text x="600" y="122">2020</text><text x="780" y="122">2022</text><text x="1000" y="122">2026</text>
+        </g>
+        <g stroke="#3a4a42" stroke-width="1">
+          <line x1="120" y1="90" x2="120" y2="102"/><line x1="270" y1="90" x2="270" y2="102"/>
+          <line x1="420" y1="90" x2="420" y2="102"/><line x1="600" y1="90" x2="600" y2="102"/>
+          <line x1="780" y1="90" x2="780" y2="102"/><line x1="1000" y1="90" x2="1000" y2="102"/>
+        </g>
+        <!-- 书 -->
+        <rect x="78" y="42" width="84" height="30" rx="5" fill="#0c1a10" stroke="#2ea043"/>
+        <text x="120" y="62" text-anchor="middle" font-size="12.5" fill="#7ee0a0" font-family="var(--mono)">西瓜书</text>
+        <line x1="120" y1="72" x2="120" y2="90" stroke="#2ea043" stroke-width="1.5"/>
+        <!-- 之后的事 -->
+        <g font-size="11.5" fill="#aebcb4" text-anchor="middle" font-family="var(--mono)">
+          <text x="270" y="62">Transformer</text>
+          <text x="420" y="62">BERT / GPT</text>
+          <text x="600" y="62">GPT-3 · Scaling Law</text>
+          <text x="780" y="62">ChatGPT</text>
+          <text x="1000" y="62">今天</text>
+        </g>
+        <g stroke="#f2555f" stroke-width="1.2" stroke-dasharray="3 3">
+          <line x1="270" y1="70" x2="270" y2="90"/><line x1="420" y1="70" x2="420" y2="90"/>
+          <line x1="600" y1="70" x2="600" y2="90"/><line x1="780" y1="70" x2="780" y2="90"/>
+          <line x1="1000" y1="70" x2="1000" y2="90"/>
+        </g>
+        <rect x="170" y="130" width="920" height="26" rx="5" fill="#1c0e10" stroke="#63292f"/>
+        <text x="630" y="147" text-anchor="middle" font-size="12" fill="#ff9ba1">书里一个字都没有的十年</text>
+      </svg>
+      <div class="cap">纵线为事件,红色虚线段全部落在成书之后</div>
+    </div>
+    <div class="g3" style="flex:1">
+      <div class="card skip tight"><h3>❌ 错误期待</h3>
+        <p>"读完西瓜书就懂 GPT 了。"<br><br>读完你不会更懂 Transformer,因为书里根本没提。第 5 章的<span class="bk">深度学习</span>一节只有寥寥数页,连 CNN 都没展开。</p></div>
+      <div class="card must tight"><h3>✅ 正确期待</h3>
+        <p>它讲的是<strong>大模型上游的那门学科</strong>。<br><br>什么叫学习、凭什么能学会、学没学会怎么判断 —— 这些问题不随架构变化。GPT 换成别的,这些照样成立。</p></div>
+      <div class="card opt tight"><h3>所以怎么用</h3>
+        <p><strong>当词典和地图用,不当路线用。</strong><br><br>骨架搭好之前,一份按方法罗列的清单只会让人晕。这也是这份速读存在的理由:先给评级和路线。</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 5 出发点:挑西瓜 ═══════════ -->
+<section class="slide" data-t="全书的出发点:挑西瓜">
+  <div class="kick"><b>THE PREMISE</b></div>
+  <h2>全书从一个动作开始:挑一个好瓜</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g32 fill">
+      <div class="col">
+        <div class="fig" style="flex:none">
+          <svg viewBox="0 0 340 214">
+            <ellipse cx="170" cy="104" rx="118" ry="86" fill="#0f2416" stroke="#2ea043" stroke-width="2"/>
+            <path d="M52 104 Q170 62 288 104" stroke="#1f6f3a" stroke-width="1.5" fill="none"/>
+            <path d="M52 104 Q170 146 288 104" stroke="#1f6f3a" stroke-width="1.5" fill="none"/>
+            <path d="M96 40 Q112 104 96 168" stroke="#1f6f3a" stroke-width="1.5" fill="none"/>
+            <path d="M244 40 Q228 104 244 168" stroke="#1f6f3a" stroke-width="1.5" fill="none"/>
+            <path d="M170 18 q-10 -12 -22 -14 q14 -2 22 8 q8 -10 22 -8 q-12 2 -22 14z" fill="#2ea043"/>
+            <text x="170" y="112" text-anchor="middle" font-size="15" fill="#7ee0a0" font-family="var(--mono)">好瓜?</text>
+          </svg>
+          <div class="cap">书中的六个属性:色泽 · 根蒂 · 敲声 · 纹理 · 脐部 · 触感</div>
+        </div>
+        <div class="note warn"><span class="lb">现在你试一下</span>
+          把"怎么挑一个好瓜"写成一段<strong>准确的 if-else</strong>,交给完全没见过西瓜的人执行。<br>
+          敲声"浊响"到底是多少赫兹?根蒂"蜷缩"要蜷到什么程度?</div>
+      </div>
+      <div class="col">
+        <div class="q">机器学习所研究的主要内容,是关于在计算机上从数据中产生<strong>模型</strong>的算法,即<strong>学习算法</strong>。
+          <span class="src">—— 西瓜书 1.1 引言</span></div>
+        <p>周志华选这个例子不是为了亲切。它精确卡住了这门学科唯一的适用条件:</p>
+        <div class="note key"><span class="lb">这门学科的入场券</span>
+          <strong>你会做,但你写不出规则。</strong><br>
+          规则写得出来的事情一律不该用机器学习 —— 排序不用学,算税不用学,查数据库不用学。规则明确的地方,写代码又快又准,还能证明对错。<br><br>
+          <span class="hl">机器学习是"规则写不出来"时的退路。</span></div>
+        <p>于是只剩一条路:<strong>不描述规则,改成给例子。</strong>给一筐已经切开验证过的瓜,让机器自己去凑出一套判据。</p>
+        <p>全书 16 章,全部是这一句话的展开:例子怎么给、判据怎么凑、凑出来的怎么检验。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 6 §1 分隔 ═══════════ -->
+<section class="slide sec" data-t="§1 十六章全景">
+  <div class="body center" style="gap:0">
+    <div class="num">01</div>
+    <h1>十六章全景</h1>
+    <div class="sub" style="max-width:760px">先看清整本书的形状,再决定往哪里投时间。<br>
+      这一章给出:一页表 · 评级依据 · 四条路线。</div>
+    <div class="spine mini" style="margin-top:26px;max-width:760px">
+      <div class="sp must"><b>1</b></div><div class="sp must"><b>2</b></div><div class="sp opt"><b>3</b></div>
+      <div class="sp opt"><b>4</b></div><div class="sp must"><b>5</b></div><div class="sp skip"><b>6</b></div>
+      <div class="sp opt"><b>7</b></div><div class="sp opt"><b>8</b></div><div class="sp skip"><b>9</b></div>
+      <div class="sp skip"><b>10</b></div><div class="sp skip"><b>11</b></div><div class="sp must"><b>12</b></div>
+      <div class="sp skip"><b>13</b></div><div class="sp skip"><b>14</b></div><div class="sp skip"><b>15</b></div>
+      <div class="sp opt"><b>16</b></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 7 十六章一页看完 ═══════════ -->
+<section class="slide" data-t="十六章一页看完">
+  <div class="kick"><b>THE WHOLE BOOK</b><span>一句话 + 一个评级</span></div>
+  <h2>十六章,一页看完</h2>
+  <div class="rule" style="margin-bottom:12px"></div>
+  <div class="body">
+    <div class="g2 fill" style="gap:16px">
+      <table class="xs">
+        <tr><th style="width:38px">章</th><th>标题 / 它到底在讲什么</th><th style="width:52px">评级</th></tr>
+        <tr><td>1</td><td><span class="bk">绪论</span> —— 术语、假设空间、<strong>归纳偏好</strong>、NFL 定理</td><td><span class="pill must">必读</span></td></tr>
+        <tr><td>2</td><td><span class="bk">模型评估与选择</span> —— 过拟合、怎么切数据、怎么打分</td><td><span class="pill must">必读</span></td></tr>
+        <tr><td>3</td><td><span class="bk">线性模型</span> —— 线性回归、对数几率回归、LDA</td><td><span class="pill opt">选读</span></td></tr>
+        <tr><td>4</td><td><span class="bk">决策树</span> —— 信息增益、剪枝(西瓜例子的主场)</td><td><span class="pill opt">选读</span></td></tr>
+        <tr><td>5</td><td><span class="bk">神经网络</span> —— 感知机、<strong>误差逆传播</strong>、深度学习(几页)</td><td><span class="pill must">必读*</span></td></tr>
+        <tr><td>6</td><td><span class="bk">支持向量机</span> —— 间隔、对偶、核函数</td><td><span class="pill skip">跳过</span></td></tr>
+        <tr><td>7</td><td><span class="bk">贝叶斯分类器</span> —— 朴素贝叶斯、贝叶斯网、EM</td><td><span class="pill opt">选读</span></td></tr>
+        <tr><td>8</td><td><span class="bk">集成学习</span> —— Boosting、随机森林</td><td><span class="pill opt">选读</span></td></tr>
+      </table>
+      <table class="xs">
+        <tr><th style="width:38px">章</th><th>标题 / 它到底在讲什么</th><th style="width:52px">评级</th></tr>
+        <tr><td>9</td><td><span class="bk">聚类</span> —— k 均值、密度聚类、层次聚类</td><td><span class="pill skip">跳过</span></td></tr>
+        <tr><td>10</td><td><span class="bk">降维与度量学习</span> —— kNN、PCA、流形学习</td><td><span class="pill skip">跳过</span></td></tr>
+        <tr><td>11</td><td><span class="bk">特征选择与稀疏学习</span> —— LASSO、字典学习</td><td><span class="pill skip">跳过</span></td></tr>
+        <tr><td>12</td><td><span class="bk">计算学习理论</span> —— <strong>PAC</strong>、VC 维、稳定性</td><td><span class="pill must">必读</span></td></tr>
+        <tr><td>13</td><td><span class="bk">半监督学习</span> —— 用没标注的数据</td><td><span class="pill skip">跳过</span></td></tr>
+        <tr><td>14</td><td><span class="bk">概率图模型</span> —— HMM、CRF、话题模型</td><td><span class="pill skip">跳过</span></td></tr>
+        <tr><td>15</td><td><span class="bk">规则学习</span> —— 序贯覆盖、归纳逻辑程序设计</td><td><span class="pill skip">跳过</span></td></tr>
+        <tr><td>16</td><td><span class="bk">强化学习</span> —— 赌博机、值函数、模仿学习</td><td><span class="pill opt">选读</span></td></tr>
+      </table>
+    </div>
+    <div class="note" style="flex:none"><span class="lb">读法</span>
+      第 5 章带星号 —— <strong>只读 5.1 到 5.3</strong>(神经元、多层网络、误差逆传播),后面三节可以放掉。
+      按这个评级,必读部分加起来大约是全书的 <span class="hl">四分之一</span>。</div>
+  </div>
+</section>
+
+<!-- ═══════════ 8 评级依据 ═══════════ -->
+<section class="slide" data-t="评级用的三条判据">
+  <div class="kick"><b>THE CRITERIA</b></div>
+  <h2>凭什么这么评</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <p>评级不是按"重不重要",而是按<strong>对今天的你有没有用</strong>。三条判据,过一条加一分:</p>
+    <div class="g3" style="flex:none">
+      <div class="card must"><div class="t">判据 A</div><h3>是不是地基</h3>
+        <p>它讲的是<strong>整门学科的前提</strong>,还是一个具体方法?<br><br>
+          "什么叫学会了"是地基,"SVM 怎么解对偶"是方法。地基不随时代变。</p></div>
+      <div class="card must"><div class="t">判据 B</div><h3>今天还在不在用</h3>
+        <p>这个东西<strong>现在的论文和工程里还出现吗</strong>?<br><br>
+          AUC 天天在用,ROC 天天在画。字典学习基本看不到了。</p></div>
+      <div class="card must"><div class="t">判据 C</div><h3>对理解大模型有没有用</h3>
+        <p>知道它以后,<strong>看大模型的东西会不会更清楚</strong>?<br><br>
+          反向传播直接就是地基。核函数对理解 GPT 没有帮助。</p></div>
+    </div>
+    <div class="g2 fill">
+      <div class="card opt tight"><h3>三条全过 → 必读</h3>
+        <p>第 1、2、12 章 + 5.1–5.3。它们分别是:<strong>学科的前提</strong>(1)、<strong>验收标准</strong>(2)、<strong>理论边界</strong>(12)、<strong>训练机制</strong>(5)。<br>
+          这四块拼起来,正好是"机器学习到底是什么"的完整回答。</p></div>
+      <div class="card skip tight"><h3>只过 B、不过 A 和 C → 跳过</h3>
+        <p>典型是第 6 章 SVM。它今天在小数据场景仍有人用(过 B),但它既不是地基(不过 A),也不通向大模型(不过 C),而<strong>它的推导是全书最重的</strong>。<br>
+          <span class="hr">投入最大 × 收益最小 = 头号劝退点。</span></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 9 四条路线 ═══════════ -->
+<section class="slide" data-t="四条路线,按你的目的选">
+  <div class="kick"><b>ROUTES</b></div>
+  <h2>四条路线,按你的目的选一条</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <table class="sm">
+      <tr><th style="width:126px">你的目的</th><th style="width:74px">时间</th><th>读什么</th></tr>
+      <tr><td>只想听得懂行话</td><td class="num">~90 分钟</td>
+        <td>第 <span class="hb">1</span> 章全部 + 第 <span class="hb">2</span> 章的 2.1、2.2、2.3。<br>
+          <span style="color:var(--mut)">收获:假设空间、归纳偏好、过拟合、交叉验证、查准查全、AUC —— 中文语境里最高频的六个词全在这。</span></td></tr>
+      <tr><td>想把地基打实</td><td class="num">~1 周</td>
+        <td>上面那条 + 第 <span class="hb">2</span> 章剩下的 + <span class="hb">5.1–5.3</span> + 第 <span class="hb">12</span> 章(<strong>只看概念,证明全跳</strong>)。<br>
+          <span style="color:var(--mut)">收获:能自己判断一个模型的说法靠不靠谱,能看懂反向传播在干什么。</span></td></tr>
+      <tr><td>准备动手做项目</td><td class="num">~2 周</td>
+        <td>上面那条 + 第 <span class="hl">3</span> 章前半 + 第 <span class="hl">4</span> 章 + 第 <span class="hl">8</span> 章。<br>
+          <span style="color:var(--mut)">收获:表格数据上最实用的三件套 —— 逻辑回归、决策树、梯度提升 / 随机森林。<strong>非大模型的工业场景里,这三个今天仍占大多数。</strong></span></td></tr>
+      <tr><td>想读理论</td><td class="num">~1 月</td>
+        <td>加第 <span class="hb">12</span> 章的证明 + 第 <span class="hl">7</span> 章 + 第 <span style="color:var(--skip)">14</span> 章。<br>
+          <span style="color:var(--mut)">这条路会走到概率图模型,那是深度学习之前的主流范式。<strong>知道它长什么样,但别指望它通向今天。</strong></span></td></tr>
+    </table>
+    <div class="note key" style="flex:none"><span class="lb">共同的第一步</span>
+      不管选哪条,都<strong>从第 1 章开始,而且不要跳</strong>。第 1 章短,而且它是全书唯一一章在回答"这门学科凭什么成立"。
+      跳过它去读第 3 章,就是在没有地基的情况下背方法 —— 那正是大多数人读不下去的原因。</div>
+  </div>
+</section>
+
+<!-- ═══════════ 10 §2 分隔 ═══════════ -->
+<section class="slide sec" data-t="§2 必读四块 · 讲透">
+  <div class="body center" style="gap:0">
+    <div class="num">02</div>
+    <h1>必读的四块,讲透</h1>
+    <div class="sub" style="max-width:780px">
+      第 1 章 · 第 2 章 · 第 12 章 · 5.1–5.3。<br>
+      这四块里所有你可能没听过的概念,这里全部补上 —— <strong>不用公式</strong>。</div>
+    <div class="spine mini" style="margin-top:26px;max-width:760px">
+      <div class="sp must now"><b>1</b></div><div class="sp must now"><b>2</b></div><div class="sp opt"><b>3</b></div>
+      <div class="sp opt"><b>4</b></div><div class="sp must now"><b>5</b></div><div class="sp skip"><b>6</b></div>
+      <div class="sp opt"><b>7</b></div><div class="sp opt"><b>8</b></div><div class="sp skip"><b>9</b></div>
+      <div class="sp skip"><b>10</b></div><div class="sp skip"><b>11</b></div><div class="sp must now"><b>12</b></div>
+      <div class="sp skip"><b>13</b></div><div class="sp skip"><b>14</b></div><div class="sp skip"><b>15</b></div>
+      <div class="sp opt"><b>16</b></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 11 第1章:37个假设 ═══════════ -->
+<section class="slide" data-t="第1章:三十七个假设">
+  <div class="kick"><b>CH.1 · 1.2</b><span>假设空间 · 版本空间</span></div>
+  <h2>全书最重要的一个数字:37</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g23 fill">
+      <div class="col">
+        <p>书里只用三个属性举例。每个属性除了它本来的取值,还多一个<span class="bk">通配符 *</span>,意思是"这一项无所谓":</p>
+        <pre class="sm">色泽  青绿 / 乌黑 / 浅白 / <span class="f">*</span>        <span class="c">→ 4 种</span>
+根蒂  蜷缩 / 硬挺 / <span class="f">*</span>               <span class="c">→ 3 种</span>
+敲声  浊响 / 清脆 / <span class="f">*</span>               <span class="c">→ 3 种</span>
+
+<span class="a">4 × 3 × 3 = 36</span>
+再加一个<span class="k">空假设</span>("好瓜"这概念根本不成立)
+
+<span class="a">假设空间大小 = 37</span></pre>
+        <p><span class="bk">假设空间</span>:所有<strong>可能的判据</strong>摆在一起,就这 37 条。学习要干的事,就是从这 37 条里挑。</p>
+        <div class="note warn"><span class="lb">关键的一步</span>
+          现在给你几筐已经切开验证过的瓜。把和这些瓜<strong>全部对得上</strong>的假设留下 ——<br>
+          留下来的往往<strong>不止一条</strong>。这剩下的一小撮,书里叫<span class="bk">版本空间</span>。</div>
+      </div>
+      <div class="col">
+        <div class="fig">
+          <svg viewBox="0 0 330 196">
+            <rect x="8" y="8" width="314" height="180" rx="8" fill="#0f1714" stroke="#33453c"/>
+            <text x="18" y="26" font-size="11" fill="#7b8b83" font-family="var(--mono)">假设空间 · 37 条</text>
+            <g fill="#2a352f">
+              <!-- 背景点阵 -->
+              <circle cx="40" cy="52" r="4"/><circle cx="70" cy="44" r="4"/><circle cx="104" cy="58" r="4"/>
+              <circle cx="140" cy="42" r="4"/><circle cx="176" cy="56" r="4"/><circle cx="212" cy="44" r="4"/>
+              <circle cx="248" cy="58" r="4"/><circle cx="284" cy="46" r="4"/>
+              <circle cx="40" cy="90" r="4"/><circle cx="76" cy="96" r="4"/><circle cx="264" cy="92" r="4"/>
+              <circle cx="296" cy="86" r="4"/><circle cx="44" cy="130" r="4"/><circle cx="80" cy="140" r="4"/>
+              <circle cx="118" cy="150" r="4"/><circle cx="154" cy="158" r="4"/><circle cx="190" cy="150" r="4"/>
+              <circle cx="226" cy="158" r="4"/><circle cx="262" cy="146" r="4"/><circle cx="294" cy="132" r="4"/>
+              <circle cx="46" cy="168" r="4"/><circle cx="212" cy="128" r="4"/><circle cx="112" cy="112" r="4"/>
+            </g>
+            <ellipse cx="166" cy="106" rx="62" ry="30" fill="#0c1520" stroke="#58a6ff" stroke-width="1.6"/>
+            <g fill="#58a6ff">
+              <circle cx="140" cy="100" r="4.5"/><circle cx="166" cy="112" r="4.5"/><circle cx="192" cy="100" r="4.5"/>
+            </g>
+            <text x="166" y="150" text-anchor="middle" font-size="11.5" fill="#93bfe8" font-family="var(--mono)">版本空间</text>
+            <text x="166" y="166" text-anchor="middle" font-size="10.5" fill="#7b8b83">和训练数据全都对得上的那几条</text>
+          </svg>
+          <div class="cap">灰点 = 被数据排除的假设 · 蓝点 = 剩下的</div>
+        </div>
+        <div class="note key"><span class="lb">这一页就是全书的题眼</span>
+          数据只能<strong>排除</strong>假设,不能<strong>选出</strong>唯一一个。<br>
+          三个属性时剩下几条,属性一多就是天文数字;换成连续取值,那就是<strong>无穷多条</strong>。<br><br>
+          <span class="hl">那到底挑哪一条?数据不告诉你。</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 12 归纳偏好 ═══════════ -->
+<section class="slide" data-t="第1章:归纳偏好">
+  <div class="kick"><b>CH.1 · 1.3</b><span>归纳偏好 / inductive bias · 全书最该学会的词</span></div>
+  <h2>剩下几条一样好,凭什么挑?</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g32" style="flex:none">
+      <div class="fig">
+        <svg viewBox="0 0 320 168">
+          <line x1="24" y1="144" x2="304" y2="144" class="axis"/>
+          <line x1="24" y1="14" x2="24" y2="144" class="axis"/>
+          <path d="M46 118 Q100 46 154 88 Q208 130 278 44" stroke="#58a6ff" stroke-width="2" fill="none"/>
+          <path d="M46 118 C 84 130 70 30 106 42 C 142 54 128 118 154 88 C 186 52 190 146 224 118 C 252 96 244 60 278 44"
+                stroke="#e3b341" stroke-width="1.8" fill="none" stroke-dasharray="4 3"/>
+          <g fill="#e9f1ec">
+            <circle cx="46" cy="118" r="4"/><circle cx="106" cy="42" r="4"/><circle cx="154" cy="88" r="4"/>
+            <circle cx="224" cy="118" r="4"/><circle cx="278" cy="44" r="4"/>
+          </g>
+          <text x="292" y="126" text-anchor="end" font-size="10.5" fill="#8fc7ff" font-family="var(--mono)">假设 A</text>
+          <text x="292" y="140" text-anchor="end" font-size="10.5" fill="#d8b45a" font-family="var(--mono)">假设 B</text>
+        </svg>
+        <div class="cap">两条都完美穿过全部训练点。数据无法在两者之间做出区分</div>
+      </div>
+      <div class="col">
+        <div class="q">机器学习算法在学习过程中对某种类型假设的偏好,称为<strong>归纳偏好</strong>,或简称为偏好。
+          <span class="src">—— 西瓜书 1.3 归纳偏好</span></div>
+        <div class="note key"><span class="lb">翻成大白话</span>
+          <strong>归纳偏置 = 数据之外,你预先塞进去的一条假设。</strong><br>
+          它决定了在数据没说话的地方,机器往哪边猜。</div>
+      </div>
+    </div>
+    <div class="g3 fill">
+      <div class="card tight"><div class="t">它不是可选项</div>
+        <p>没有偏好的学习算法<strong>根本给不出答案</strong> —— 面对版本空间里的几条假设,它会随机挑,等于没学。<br>
+          <span class="hl">偏好不是缺陷,是学习能够发生的前提。</span></p></div>
+      <div class="card tight"><div class="t">书里给的例子</div>
+        <p><span class="bk">奥卡姆剃刀</span>:若有多个假设与观察一致,选<strong>最简单</strong>的那个。<br>
+          但周志华紧接着就点破:<strong>"更简单"本身就说不清</strong> —— 上图哪条更简单,换个描述方式答案就变。</p></div>
+      <div class="card tight"><div class="t">今天它长什么样</div>
+        <p>换了名字,还在原地:<br>
+          <span style="color:var(--mut)">CNN 假设"图像的局部相邻有意义"<br>
+          Transformer 假设"任意两个位置都可能相关"<br>
+          正则化假设"参数小一点更好"</span></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 13 NFL ═══════════ -->
+<section class="slide" data-t="第1章:NFL 定理最常被误读">
+  <div class="kick"><b>CH.1 · 1.4</b><span>没有免费的午餐 / No Free Lunch</span></div>
+  <h2>NFL 定理 —— 全书被误读得最狠的一页</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="q">若考虑<strong>所有潜在的问题</strong>,则所有学习算法都一样好。要谈论算法的相对优劣,必须要针对具体的学习问题。
+      <span class="src">—— 西瓜书 1.4 归纳偏好 · NFL 定理(意译)</span></div>
+    <div class="g2 fill">
+      <div class="col">
+        <div class="card skip"><h3 style="color:#ff9ba1">✗ 常见的误读</h3>
+          <ul>
+            <li>"所有算法一样好,所以选什么无所谓。"</li>
+            <li>"深度学习没有普适优势,是营销。"</li>
+            <li>"理论证明了不存在通用模型。"</li>
+          </ul>
+          <p style="margin-top:7px">这三句都是把定理的<strong>前提</strong>丢了之后剩下的空壳。</p></div>
+        <div class="note warn"><span class="lb">被丢掉的前提</span>
+          "所有潜在的问题<strong>出现机会相同</strong>"。<br><br>
+          也就是说:在这个前提下,"明天太阳照常升起"和"明天太阳从西边升起"是<strong>等概率</strong>的两个世界。</div>
+      </div>
+      <div class="col">
+        <div class="card must"><h3>✓ 它真正说的</h3>
+          <p><strong>脱离具体问题谈算法优劣,毫无意义。</strong><br><br>
+            这不是一个悲观结论,是一个<strong>方法论要求</strong>:任何人说"我这个方法更好",你就问一句 —— <span class="hl">在什么问题上?</span></p></div>
+        <div class="note key"><span class="lb">为什么深度学习照样能赢</span>
+          因为<strong>真实世界的问题不是均匀分布的</strong>。我们碰到的图像、语言、蛋白质,全都高度结构化 —— 局部相关、层次组合、长程依赖。<br><br>
+          NFL 说的是:<em>在所有可能世界的平均意义上</em>没有赢家。<br>
+          而我们只住在<strong>其中很小的一块</strong>。<span class="hl">在这一小块上,偏置对路的算法就是赢。</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 14 第2章:切数据 ═══════════ -->
+<section class="slide" data-t="第2章:为什么必须把数据切开">
+  <div class="kick"><b>CH.2 · 2.1–2.2</b><span>过拟合 · 评估方法</span></div>
+  <h2>为什么一定要把数据切开</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g23" style="flex:none">
+      <div class="col">
+        <div class="note key"><span class="lb">一句话</span>
+          <strong>在训练数据上做对,是零难度的。</strong><br>
+          极端做法:把全部训练样本原样背下来,查表输出。训练错误率严格为 0,一秒钟训完。<br>
+          没人这么干,原因只有一条 —— <span class="hl">它在第一个没见过的瓜上就完蛋。</span></div>
+        <div class="q">学习器把训练样本自身的一些特点当作了所有潜在样本都会具有的一般性质,这样就会导致泛化性能下降,这种现象称为<strong>过拟合</strong>。
+          <span class="src">—— 西瓜书 2.1 经验误差与过拟合</span></div>
+      </div>
+      <div class="fig">
+        <svg viewBox="0 0 300 178">
+          <line x1="30" y1="150" x2="286" y2="150" class="axis"/>
+          <line x1="30" y1="14" x2="30" y2="150" class="axis"/>
+          <text x="158" y="172" text-anchor="middle" class="tick">模型复杂度 →</text>
+          <text x="14" y="86" class="tick" transform="rotate(-90 14 86)" text-anchor="middle">误差</text>
+          <path d="M42 42 C 90 92 140 132 268 144" stroke="#58a6ff" stroke-width="2" fill="none"/>
+          <path d="M42 60 C 92 116 138 118 268 40" stroke="#e3b341" stroke-width="2" fill="none"/>
+          <line x1="140" y1="18" x2="140" y2="150" stroke="#2ea043" stroke-width="1.2" stroke-dasharray="3 3"/>
+          <text x="144" y="28" font-size="10" fill="#4ec26b" font-family="var(--mono)">刚刚好</text>
+          <text x="262" y="136" text-anchor="end" font-size="10.5" fill="#8fc7ff" font-family="var(--mono)">训练误差</text>
+          <text x="262" y="58" text-anchor="end" font-size="10.5" fill="#d8b45a" font-family="var(--mono)">泛化误差</text>
+        </svg>
+        <div class="cap">书里的经典图:训练误差一路降,泛化误差先降后升</div>
+      </div>
+    </div>
+    <div class="g3 fill">
+      <div class="card tight"><div class="t">2.2.1</div><h3><span class="bk">留出法</span></h3>
+        <p>直接切成两份,比如 7 : 3。<br><span style="color:var(--mut)">最简单。缺点:切法不同结果就抖,要多切几次取平均。</span></p></div>
+      <div class="card tight"><div class="t">2.2.2</div><h3><span class="bk">交叉验证法</span></h3>
+        <p>切成 k 份,轮流拿一份当测试,做 k 次取平均。<br><span style="color:var(--mut)"><strong>今天仍是标准做法</strong>,k 常取 10。</span></p></div>
+      <div class="card tight"><div class="t">2.2.3</div><h3><span class="bk">自助法</span></h3>
+        <p>有放回地抽 m 次组成训练集,没被抽到的当测试集。<br><span style="color:var(--mut)">数据特别少时用。它是随机森林里"每棵树看不同数据"的来源。</span></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 15 第2章:ROC / AUC ═══════════ -->
+<section class="slide" data-t="第2章:查准查全与 ROC/AUC">
+  <div class="kick"><b>CH.2 · 2.3</b><span>性能度量 —— 这一节今天天天在用</span></div>
+  <h2>光看"对了几个"是不够的</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g32 fill">
+      <div class="col">
+        <p>十个瓜,模型给每个打一个"是好瓜"的分,从高到低排。<strong>阈值划在哪,准确率就变一次</strong> —— 所以单个准确率没意义。</p>
+        <table class="xs">
+          <tr><th>阈值</th><th>查准率 P<br><span style="text-transform:none">挑出来的里有多少真好</span></th><th>查全率 R<br><span style="text-transform:none">好瓜里挑出来多少</span></th></tr>
+          <tr><td>0.85</td><td class="num">2/2 = 1.00</td><td class="num">2/5 = 0.40</td></tr>
+          <tr><td>0.66</td><td class="num">4/5 = 0.80</td><td class="num">4/5 = 0.80</td></tr>
+          <tr><td>0.48</td><td class="num">5/7 = 0.71</td><td class="num">5/5 = 1.00</td></tr>
+        </table>
+        <div class="note"><span class="lb">这就是那个著名的矛盾</span>
+          <strong>宁可错杀 → 查全高、查准低;宁可放过 → 查准高、查全低。</strong>
+          挑瓜可以放过几个,<span class="hr">癌症筛查不能</span> —— 度量选哪个,取决于代价,不取决于数学。</div>
+      </div>
+      <div class="col">
+        <div class="fig">
+          <svg viewBox="0 0 460 240">
+            <rect x="95" y="50" width="150" height="150" fill="none" class="grid"/>
+            <line x1="95" y1="200" x2="252" y2="200" class="axis"/>
+            <line x1="95" y1="44" x2="95" y2="200" class="axis"/>
+            <line x1="95" y1="200" x2="245" y2="50" stroke="#3a4a42" stroke-width="1" stroke-dasharray="4 3"/>
+            <polygon points="95,200 95,170 95,140 125,140 125,110 125,80 155,80 155,50 185,50 215,50 245,50 245,200"
+                     fill="#58a6ff" opacity="0.11"/>
+            <polyline points="95,200 95,170 95,140 125,140 125,110 125,80 155,80 155,50 185,50 215,50 245,50"
+                      fill="none" stroke="#58a6ff" stroke-width="2.2"/>
+            <g class="tick"><text x="95" y="216" text-anchor="middle">0</text><text x="245" y="216" text-anchor="middle">1</text>
+              <text x="87" y="204" text-anchor="end">0</text><text x="87" y="54" text-anchor="end">1</text></g>
+            <text x="170" y="234" text-anchor="middle" class="tick">假正例率 —— 坏瓜被当成好瓜</text>
+            <text x="68" y="125" class="tick" transform="rotate(-90 68 125)" text-anchor="middle">真正例率</text>
+            <text x="278" y="104" class="dlab em" font-size="16">AUC = 0.84</text>
+            <text x="278" y="124" class="dlab" font-size="10.5">= 蓝色区域的面积</text>
+            <text x="278" y="150" class="tick">虚线 = 瞎猜,AUC 0.5</text>
+            <text x="278" y="168" class="tick">越往左上鼓,模型越好</text>
+          </svg>
+          <div class="cap">用十个真实打分算出来的 ROC,不是示意图</div>
+        </div>
+        <div class="note key"><span class="lb">AUC 的一句话解释</span>
+          <strong>随便抓一个好瓜、一个坏瓜,模型给好瓜打分更高的概率。</strong><br>
+          0.5 = 瞎猜,1.0 = 完美。这里 0.84,就是 5×5=25 对里有 21 对排对了。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 16 偏差方差 + 双下降 ═══════════ -->
+<section class="slide" data-t="第2章:偏差方差与双下降">
+  <div class="kick"><b>CH.2 · 2.5</b><span>偏差与方差 —— 校准点在这</span></div>
+  <h2>那条 U 型曲线,在深度学习区间是错的</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g2" style="flex:none">
+      <div class="card tight"><h3><span class="bk">偏差</span> bias</h3>
+        <p>模型<strong>本身就不够格</strong>造成的错。<br>
+          <span style="color:var(--mut)">用一条直线去拟合弯曲的规律 —— 数据再多也白搭。这叫欠拟合。</span></p></div>
+      <div class="card tight"><h3><span class="bk">方差</span> variance</h3>
+        <p>模型<strong>对训练数据太敏感</strong>造成的错。<br>
+          <span style="color:var(--mut)">换一批训练数据,学出来的东西就大变样 —— 它在背噪声。这叫过拟合。</span></p></div>
+    </div>
+    <div class="g23 fill">
+      <div class="fig">
+        <svg viewBox="0 0 340 190">
+          <line x1="34" y1="158" x2="326" y2="158" class="axis"/>
+          <line x1="34" y1="12" x2="34" y2="158" class="axis"/>
+          <text x="180" y="180" text-anchor="middle" class="tick">模型规模 →</text>
+          <path d="M46 40 C 78 118 96 128 124 128 C 152 128 168 60 190 26" stroke="#8b9a92" stroke-width="1.8" fill="none"/>
+          <path d="M46 40 C 78 118 96 128 124 128 C 152 128 168 60 190 26 C 206 52 216 108 250 126 C 282 142 300 146 318 148"
+                stroke="#58a6ff" stroke-width="2.2" fill="none"/>
+          <line x1="190" y1="14" x2="190" y2="158" stroke="#f2555f" stroke-width="1.2" stroke-dasharray="3 3"/>
+          <text x="120" y="150" text-anchor="middle" font-size="10" fill="#8b9a92" font-family="var(--mono)">书上的 U 型</text>
+          <text x="196" y="22" font-size="10" fill="#ff9ba1" font-family="var(--mono)">参数量 = 数据量</text>
+          <text x="290" y="140" text-anchor="end" font-size="10.5" fill="#8fc7ff" font-family="var(--mono)">实际:再降一次</text>
+          <text x="14" y="86" class="tick" transform="rotate(-90 14 86)" text-anchor="middle">测试误差</text>
+        </svg>
+        <div class="cap">双下降 —— 灰线是教科书画的,蓝线是实际测出来的(示意)</div>
+      </div>
+      <div class="cal">
+        <span class="lb">今日校准 2 / 5</span>
+        <div class="then"><i>书上说</i><span>模型越复杂,测试误差<strong>先降后升</strong>。所以要在中间找那个"刚刚好"。</span></div>
+        <div class="now"><i>今天</i><span>降、升,<strong>然后再降</strong> —— 而且第二次降得比第一次的谷底更低。这叫<strong>双下降</strong>(2019 年被系统描述)。</span></div>
+        <p style="margin-top:4px">大模型全部工作在<strong>第二段下降</strong>上:参数量远超数据量,按 U 型曲线的说法应该完全不能用,实际却最好用。</p>
+        <p><strong>这不是书写错了</strong> —— 在 2016 年的模型规模里,U 型是对的。是这条曲线右边那一大截,当时还没人走到过。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 17 第12章:PAC ═══════════ -->
+<section class="slide" data-t="第12章:PAC 在说什么">
+  <div class="kick"><b>CH.12 · 12.2</b><span>计算学习理论 —— 只看它想干什么</span></div>
+  <h2>第 12 章想干的事:给"能学会"下一个定义</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <p>前面十一章都在讲<strong>怎么学</strong>。第 12 章问的是一个完全不同的问题:<span class="hl">凭什么保证学得会?能不能证明?</span></p>
+    <div class="g2" style="flex:none">
+      <div class="card must"><div class="t">PAC · Probably Approximately Correct</div>
+        <h3>大概 · 差不多 · 对</h3>
+        <p>拆开看这三个词,整个理论就明白了:</p>
+        <ul style="margin-top:6px">
+          <li><strong>对</strong> —— 学出来的东西和真实规律一致</li>
+          <li><strong>差不多</strong>(Approximately)—— 不要求完全一致,允许一个小误差 ε</li>
+          <li><strong>大概</strong>(Probably)—— 也不保证每次都行,允许有 δ 的概率失败</li>
+        </ul></div>
+      <div class="note key" style="display:flex;flex-direction:column;justify-content:center">
+        <span class="lb">为什么必须打这两个折扣</span>
+        <strong>因为一次都不能错、次次都成功,是做不到的。</strong><br><br>
+        你抽样本是随机的。运气足够差的时候,可能连着抽到十个畸形瓜 —— 任何算法在那批数据上都会学歪。<br><br>
+        所以理论上唯一能保证的形式,只能是:<span class="hl">在绝大多数抽样情况下,学出来的东西误差足够小。</span></div>
+    </div>
+    <div class="note" style="flex:none"><span class="lb">这一节真正的产出</span>
+      它给出了一个可以计算的量:<strong>要达到 ε 的误差、δ 的失败率,至少需要多少个样本。</strong>
+      这就是<span class="bk">样本复杂度</span>。第一次有人能回答"我到底需要多少数据"这个问题 —— <strong>哪怕答案粗糙得没法用,提问的方式本身是里程碑。</strong></div>
+    <div class="note warn" style="flex:none"><span class="lb">读法建议</span>
+      这一章的证明密度是全书第二(仅次于第 6 章)。<strong>建议只读每节开头的问题陈述和结论,证明全部跳过。</strong>
+      你要拿走的是"学习可以被形式化地保证"这个观念,不是不等式的推导。</div>
+  </div>
+</section>
+
+<!-- ═══════════ 18 VC维 + 界失效 ═══════════ -->
+<section class="slide" data-t="第12章:VC维与界的失效">
+  <div class="kick"><b>CH.12 · 12.4</b><span>VC 维 —— 第二处校准</span></div>
+  <h2>VC 维:衡量"一个模型有多能装"</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g23" style="flex:none">
+      <div class="col">
+        <p><span class="bk">VC 维</span>回答的是:<strong>这个模型最多能把多少个点,按任意方式打乱标签,都完美分开?</strong></p>
+        <div class="fig">
+          <svg viewBox="0 0 460 108">
+            <g>
+              <text x="14" y="20" class="tick">平面上一条直线,3 个点:任意标法都能分开 → VC 维 ≥ 3</text>
+              <g transform="translate(20,34)">
+                <circle cx="18" cy="42" r="6" fill="#58a6ff"/><circle cx="62" cy="14" r="6" fill="#58a6ff"/><circle cx="96" cy="48" r="6" fill="#e3b341"/>
+                <line x1="4" y1="8" x2="110" y2="58" stroke="#4ec26b" stroke-width="1.6"/>
+              </g>
+              <g transform="translate(160,34)">
+                <circle cx="18" cy="42" r="6" fill="#58a6ff"/><circle cx="62" cy="14" r="6" fill="#e3b341"/><circle cx="96" cy="48" r="6" fill="#58a6ff"/>
+                <path d="M48 2 L 74 62" stroke="#4ec26b" stroke-width="1.6"/>
+              </g>
+              <g transform="translate(300,34)">
+                <circle cx="18" cy="42" r="6" fill="#e3b341"/><circle cx="62" cy="14" r="6" fill="#58a6ff"/><circle cx="96" cy="48" r="6" fill="#58a6ff"/>
+                <path d="M2 22 L 106 4" stroke="#4ec26b" stroke-width="1.6"/>
+              </g>
+            </g>
+          </svg>
+          <div class="cap">VC 维越高 = 越能装 = 越容易把噪声也一起背下来</div>
+        </div>
+      </div>
+      <div class="note key" style="display:flex;flex-direction:column;justify-content:center">
+        <span class="lb">经典结论</span>
+        泛化误差的上界,大致随 <strong>√(VC维 / 样本数)</strong> 变化。<br><br>
+        翻译:<strong>模型容量越大、数据越少,越不可信。</strong><br><br>
+        所以经典理论的处方是 —— <span class="hl">别把模型做太大。</span></div>
+    </div>
+    <div class="cal fill" style="justify-content:center">
+      <span class="lb">今日校准 3 / 5</span>
+      <div class="then"><i>书上说</i><span>参数量远大于样本量 → 容量过剩 → <strong>必然过拟合</strong>,泛化界给不出任何有用的保证。</span></div>
+      <div class="now"><i>今天</i><span>大模型的参数量常常是训练样本量的<strong>几十倍</strong>。按这套理论应该完全不能用 —— 而它是目前最强的东西。</span></div>
+      <p style="margin-top:5px"><strong>2017 年一个实验把这件事钉死了:</strong>把图片标签<span class="hr">全部打乱成随机的</span>("猫"标成"卡车"),网络照样能训到训练集 100% 正确。
+        说明它的容量足够背下<strong>任何东西</strong> —— 那么"容量小所以泛化"这一类解释,全部作废。</p>
+      <p><strong>诚实的现状:模型确实泛化了,但没有一套理论能说清它为什么泛化。</strong>这不是科普的简化,是领域公开承认的开放问题。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 19 BP ═══════════ -->
+<section class="slide" data-t="5.1-5.3:反向传播">
+  <div class="kick"><b>CH.5 · 5.1–5.3</b><span>全书离今天最近的三十页</span></div>
+  <h2>误差逆传播 —— 深度学习真正的地基</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g23 fill">
+      <div class="col">
+        <div class="fig" style="flex:none">
+          <svg viewBox="0 0 420 168">
+            <g fill="#131b17" stroke="#33453c">
+              <circle cx="52" cy="44" r="16"/><circle cx="52" cy="96" r="16"/><circle cx="52" cy="148" r="16"/>
+              <circle cx="200" cy="60" r="16"/><circle cx="200" cy="118" r="16"/>
+              <circle cx="348" cy="88" r="16"/>
+            </g>
+            <g stroke="#2a3a32" stroke-width="1">
+              <line x1="68" y1="44" x2="184" y2="60"/><line x1="68" y1="44" x2="184" y2="118"/>
+              <line x1="68" y1="96" x2="184" y2="60"/><line x1="68" y1="96" x2="184" y2="118"/>
+              <line x1="68" y1="148" x2="184" y2="60"/><line x1="68" y1="148" x2="184" y2="118"/>
+              <line x1="216" y1="60" x2="332" y2="88"/><line x1="216" y1="118" x2="332" y2="88"/>
+            </g>
+            <path d="M60 20 L 340 20" stroke="#4ec26b" stroke-width="1.8" marker-end="url(#af)"/>
+            <path d="M340 164 L 60 164" stroke="#f2555f" stroke-width="1.8" marker-end="url(#ar)"/>
+            <defs>
+              <marker id="af" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#4ec26b"/></marker>
+              <marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 z" fill="#f2555f"/></marker>
+            </defs>
+            <text x="200" y="14" text-anchor="middle" font-size="11" fill="#4ec26b" font-family="var(--mono)">① 前向:算出答案</text>
+            <text x="200" y="158" text-anchor="middle" font-size="11" fill="#ff9ba1" font-family="var(--mono)">② 反向:把错怪到每个参数头上</text>
+            <text x="52" y="92" text-anchor="middle" font-size="10" fill="#7b8b83" font-family="var(--mono)"></text>
+          </svg>
+          <div class="cap">书里叫"误差逆传播",英文 back-propagation,今天简称 BP</div>
+        </div>
+        <div class="note key"><span class="lb">它解决的问题</span>
+          网络有几十层、上亿个参数。答错了 ——<strong>到底是哪个参数的错,该往哪边调多少?</strong><br>
+          BP 给出的答案是:<strong>从输出层的错开始,用链式法则一层层往回摊。</strong>一次前向 + 一次反向,所有参数的调整方向就全算出来了。</div>
+      </div>
+      <div class="col">
+        <div class="note warn"><span class="lb">为什么这三节今天照样必读</span>
+          <strong>GPT 的训练和这里讲的,是同一件事。</strong><br>
+          规模从几百个参数变成上万亿个,层数从 3 层变成上百层,激活函数换了,优化器换了 —— <span class="hl">但"前向算错、反向摊责、按梯度更新"这个循环,一个字没变。</span></div>
+        <div class="cal sm">
+          <span class="lb">今日校准 4 / 5</span>
+          <div class="then"><i>书上说</i><span>5.4 花大篇幅讲<strong>如何跳出局部极小</strong> —— 模拟退火、随机扰动、遗传算法。</span></div>
+          <div class="now"><i>今天</i><span>在高维空间里,<strong>局部极小几乎不是问题</strong>。参数一多,大部分驻点是鞍点而不是坑,而且不同的极小值点效果都差不多。这一节可以放心跳过。</span></div>
+        </div>
+        <div class="card skip tight"><h3>5.5 / 5.6 也可以放掉</h3>
+          <p>5.5 列举的 RBF、ART、SOM、Boltzmann 机,今天基本进博物馆了。<br>
+            5.6 的<span class="bk">深度学习</span>只有几页,还停留在"逐层预训练"的思路 —— <strong>那条路 2016 年之后就被放弃了。</strong></p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 20 §3 分隔 ═══════════ -->
+<section class="slide sec" data-t="§3 其余十二章怎么处理">
+  <div class="body center" style="gap:0">
+    <div class="num">03</div>
+    <h1>其余十二章怎么处理</h1>
+    <div class="sub" style="max-width:780px">
+      选读的给读法,跳过的给<strong>一句话遗产</strong> —— 拿走那句话,这一章就不欠你什么了。</div>
+    <div class="spine mini" style="margin-top:26px;max-width:760px">
+      <div class="sp must" style="opacity:.35"><b>1</b></div><div class="sp must" style="opacity:.35"><b>2</b></div>
+      <div class="sp opt now"><b>3</b></div><div class="sp opt now"><b>4</b></div>
+      <div class="sp must" style="opacity:.35"><b>5</b></div><div class="sp skip now" style="opacity:1"><b>6</b></div>
+      <div class="sp opt now"><b>7</b></div><div class="sp opt now"><b>8</b></div>
+      <div class="sp skip now" style="opacity:1"><b>9</b></div><div class="sp skip now" style="opacity:1"><b>10</b></div>
+      <div class="sp skip now" style="opacity:1"><b>11</b></div><div class="sp must" style="opacity:.35"><b>12</b></div>
+      <div class="sp skip now" style="opacity:1"><b>13</b></div><div class="sp skip now" style="opacity:1"><b>14</b></div>
+      <div class="sp skip now" style="opacity:1"><b>15</b></div><div class="sp opt now"><b>16</b></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 21 第4章 决策树 ═══════════ -->
+<section class="slide" data-t="第4章:决策树,西瓜例子的主场">
+  <div class="kick"><b>CH.4</b><span class="pill opt">选读</span><span>全书最好读的一章</span></div>
+  <h2>决策树:唯一一章你能用手算完的</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g23 fill">
+      <div class="col">
+        <p>这一章用<span class="bk">西瓜数据集 2.0</span>:17 个瓜,<strong>8 个好、9 个坏</strong>。要先挑一个属性来分叉 —— 挑哪个?</p>
+        <pre class="sm">先量一下"现在有多乱"(信息熵):
+  <span class="c">8 好 9 坏,几乎对半 → 最乱</span>
+  Ent(D) = <span class="a">0.998</span>   <span class="c">(满值是 1)</span>
+
+按<span class="f">纹理</span>分成三堆:
+  清晰 9 个(7好2坏)  Ent = 0.764
+  稍糊 5 个(1好4坏)  Ent = 0.722
+  模糊 3 个(0好3坏)  Ent = <span class="a">0.000</span>  <span class="c">← 全坏,纯了</span>
+
+乱度下降了多少(信息增益):
+  Gain(D, 纹理) = <span class="a">0.381</span></pre>
+        <p>对六个属性都算一遍,<strong>谁让乱度掉得最多就选谁</strong>。然后在每一堆里重复,直到分不动为止。整棵树就长出来了。</p>
+      </div>
+      <div class="col">
+        <div class="fig" style="flex:none">
+          <svg viewBox="0 0 300 156">
+            <rect x="110" y="6" width="80" height="26" rx="5" fill="#191408" stroke="#5c4a22"/>
+            <text x="150" y="23" text-anchor="middle" font-size="12" fill="#e3b341" font-family="var(--mono)">纹理?</text>
+            <g stroke="#33453c"><line x1="130" y1="32" x2="46" y2="66"/><line x1="150" y1="32" x2="150" y2="66"/><line x1="170" y1="32" x2="254" y2="66"/></g>
+            <g font-size="10" fill="#7b8b83" font-family="var(--mono)"><text x="76" y="52">清晰</text><text x="155" y="52">稍糊</text><text x="212" y="52">模糊</text></g>
+            <rect x="8" y="66" width="76" height="26" rx="5" fill="#131b17" stroke="#33453c"/>
+            <text x="46" y="83" text-anchor="middle" font-size="11" fill="#aebcb4" font-family="var(--mono)">根蒂?</text>
+            <rect x="112" y="66" width="76" height="26" rx="5" fill="#131b17" stroke="#33453c"/>
+            <text x="150" y="83" text-anchor="middle" font-size="11" fill="#aebcb4" font-family="var(--mono)">触感?</text>
+            <rect x="216" y="66" width="76" height="26" rx="5" fill="#1c0e10" stroke="#63292f"/>
+            <text x="254" y="83" text-anchor="middle" font-size="11" fill="#ff9ba1" font-family="var(--mono)">坏瓜</text>
+            <text x="254" y="112" text-anchor="middle" font-size="10" fill="#7b8b83">已经纯了,不用再分</text>
+            <text x="98" y="140" text-anchor="middle" font-size="10.5" fill="#7b8b83">继续分下去 ……</text>
+          </svg>
+          <div class="cap">树的第一层。这就是全书唯一一个能完整画出来的模型</div>
+        </div>
+        <div class="note key sm"><span class="lb">为什么值得花两小时</span>
+          它是全书<strong>唯一一个"打开看得见"的模型</strong>。每一步为什么这么分,都能用一句人话说清楚。<br>
+          在神经网络里这种可解释性<strong>彻底消失了</strong> —— 亲手体会过一次"看得见",才明白后来失去的是什么。</div>
+        <div class="note warn sm"><span class="lb">今天还在用吗</span>
+          <strong>在,而且是主力。</strong>表格类数据(风控、推荐、点击率)上,XGBoost / LightGBM 这类<strong>梯度提升树</strong>至今常常打不过 —— 它们就是决策树 + 第 8 章的集成。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 22 第3、8章 ═══════════ -->
+<section class="slide" data-t="第3章与第8章">
+  <div class="kick"><b>CH.3 · CH.8</b><span class="pill opt">选读</span></div>
+  <h2>另外两章值得花时间的</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g2 fill">
+      <div class="col">
+        <div class="card opt"><h3>第 3 章 · 线性模型</h3>
+          <p>只读 3.1 到 3.3 就够。核心是<span class="bk">对数几率回归</span>(就是大家说的 <strong>logistic regression</strong>,书里坚持用中文译名,这点要有心理准备)。</p></div>
+        <div class="note key"><span class="lb">为什么它重要</span>
+          <strong>一个逻辑回归,就是一个神经元。</strong><br><br>
+          <code>把几个输入加权求和 → 过一个 S 形函数 → 输出 0 到 1 之间的一个数</code><br><br>
+          这句话既是第 3 章的逻辑回归,也是第 5 章那张网络图里的<strong>每一个圆圈</strong>。<span class="hl">看懂第 3 章,第 5 章就只剩"把它堆起来"这一件事了。</span></div>
+        <div class="card skip tight"><h3>3.4 之后可以放</h3>
+          <p>LDA、多分类拆解、类别不平衡 —— 都是具体技巧,知道有这回事就行。</p></div>
+      </div>
+      <div class="col">
+        <div class="card opt"><h3>第 8 章 · 集成学习</h3>
+          <p>把一堆<strong>不太行</strong>的模型合起来,得到一个<strong>很行</strong>的。这件事听起来像骗人,但它是有严格道理的。</p></div>
+        <div class="note key"><span class="lb">道理在哪</span>
+          三个人独立判断,每人正确率 60%。<strong>少数服从多数</strong>之后,整体正确率 <span class="hl">64.8%</span>。人数继续加,还会继续涨。<br><br>
+          前提有一个,而且是全章的核心:<strong>他们犯的错必须不一样。</strong>三个人如果总是同时错在同一个地方,投票毫无意义。</div>
+        <div class="card tight"><h3>两条路线,记住区别就行</h3>
+          <p><strong><span class="bk">Bagging</span> / 随机森林</strong> —— 让每个模型看不同的数据、不同的特征,<span style="color:var(--mut)">强行制造分歧,然后投票。可以并行。</span></p>
+          <p style="margin-top:6px"><strong><span class="bk">Boosting</span> / AdaBoost</strong> —— 一个接一个地训,<span style="color:var(--mut)">每个新模型专门去补前面那个做错的地方。必须串行。</span></p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 23 知道即可的三章 ═══════════ -->
+<section class="slide" data-t="知道即可的三章">
+  <div class="kick"><b>CH.7 · 9 · 10</b><span>知道存在就够了</span></div>
+  <h2>这三章:知道它们在解决什么问题就行</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g3 fill">
+      <div class="col">
+        <div class="card opt"><div class="t">第 7 章 · 选读</div><h3>贝叶斯分类器</h3>
+          <p>先算"好瓜里青绿色占多少",反过来推"青绿色的是好瓜的概率"。</p></div>
+        <div class="note"><span class="lb">一句话遗产</span>
+          <span class="bk">朴素贝叶斯</span>的"朴素"二字,指的是它假设<strong>各个属性互相独立</strong> —— 色泽和根蒂毫无关系。<br><br>
+          这个假设<strong>明显是错的</strong>,但它照样好用。<span class="hl">这是全书最生动的一课:一个错的假设,只要错得有系统,就仍然有用。</span></div>
+        <div class="card skip tight"><p style="color:var(--mut)">7.5 贝叶斯网 / 7.6 EM 算法难度陡增,可略。</p></div>
+      </div>
+      <div class="col">
+        <div class="card skip"><div class="t">第 9 章 · 跳过</div><h3>聚类</h3>
+          <p>没有标签,只有一堆瓜,让机器自己把它们分成几堆。</p></div>
+        <div class="note"><span class="lb">一句话遗产</span>
+          聚类是<strong>无监督学习</strong>的代表:没人告诉你答案,自己从数据里找结构。<br><br>
+          今天的<strong>自监督学习</strong>(大模型预训练用的那个)在动机上是它的后代 —— 都是"没有标注也要学"。<span class="hl">但技术路线完全不同,别指望这一章能帮你理解预训练。</span></div>
+        <div class="card skip tight"><p style="color:var(--mut)">k 均值知道名字即可,几乎人人都会提到它。</p></div>
+      </div>
+      <div class="col">
+        <div class="card skip"><div class="t">第 10 章 · 跳过</div><h3>降维与度量学习</h3>
+          <p>几十个属性太多了,压成两三个,还要尽量不丢信息。</p></div>
+        <div class="note"><span class="lb">一句话遗产</span>
+          <strong>降维的目标 = 找一个更好的"表示"。</strong>这个念头,后来长成了整个深度学习的核心 —— <span class="bk">表示学习</span>。<br><br>
+          区别在于:<strong>PCA 是人设计好的固定压法,神经网络是把压法本身也学出来。</strong><span class="hl">embedding 就是学出来的降维。</span></div>
+        <div class="card skip tight"><p style="color:var(--mut)">PCA 会画在无数张 PPT 上,知道它在干什么就够。</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 24 建议跳过 ═══════════ -->
+<section class="slide" data-t="建议跳过的五章">
+  <div class="kick"><b>CH.6 · 11 · 13 · 14 · 15</b><span class="pill skip">跳过</span></div>
+  <h2>建议跳过的五章,和它们的一句话遗产</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <table class="sm">
+      <tr><th style="width:150px">章</th><th style="width:210px">为什么跳</th><th>拿走这一句就够了</th></tr>
+      <tr><td>6 支持向量机</td>
+        <td><span class="hr">头号劝退点。</span>全书公式最密,对偶问题 + KKT 条件 + 核技巧,读通要好几天</td>
+        <td><strong>核技巧:</strong>不用真的把数据升到高维,只要能算出"升维之后两个点的内积",就等于在高维里做了事。<br>
+          <span style="color:var(--mut)">这是个漂亮到今天仍值得知道的想法。但它<strong>不通向大模型</strong> —— 深度学习是"真的把维度堆上去",走的是相反的路。</span></td></tr>
+      <tr><td>11 特征选择与稀疏</td>
+        <td>整章的前提是<strong>"特征要人来挑"</strong>,而这件事已经被表示学习取代了</td>
+        <td><strong>L1 正则会把参数逼成 0</strong>,于是自动完成了特征筛选。<br>
+          <span style="color:var(--mut)">这个"稀疏"的念头今天以另一种形式回来了:MoE 里每次只激活一小部分专家。</span></td></tr>
+      <tr><td>13 半监督学习</td>
+        <td>它的场景是"标注很贵、无标注数据很多"—— 这个问题被<strong>自监督预训练</strong>用完全不同的办法解决掉了</td>
+        <td><strong>无标注的数据本身就带着信息。</strong><br>
+          <span style="color:var(--mut)">这个直觉是对的,而且今天被推到了极致 —— 只是实现方式完全不是这一章讲的那些。</span></td></tr>
+      <tr><td>14 概率图模型</td>
+        <td>深度学习之前 NLP 的<strong>主流范式</strong>(HMM、CRF)。历史价值很高,实用价值已经很低</td>
+        <td><strong>用图把变量之间的依赖关系画出来,再在图上做推断。</strong><br>
+          <span style="color:var(--mut)">这一章能让你看见"上一代 NLP 长什么样",从而明白 Transformer 到底替掉了什么。<span class="hl">想读历史可以读,想快就跳。</span></span></td></tr>
+      <tr><td>15 规则学习</td>
+        <td>符号主义的余脉。今天在主流机器学习里几乎看不到</td>
+        <td><strong>学出来的东西可以是"人能直接读的规则"。</strong><br>
+          <span style="color:var(--mut)">这是可解释性的极致 —— 也正是深度学习彻底放弃的那条路。知道有过这么一条路就好。</span></td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════ 25 第16章 强化学习 ═══════════ -->
+<section class="slide" data-t="第16章:强化学习又活过来了">
+  <div class="kick"><b>CH.16</b><span class="pill opt">选读 · 但它的地位变了</span></div>
+  <h2>第 16 章:唯一一章"重要性不降反升"的</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g23" style="flex:none">
+      <div class="col">
+        <p>前面十五章的设定都是:<strong>给你一堆带答案的例子</strong>。第 16 章换了个世界:</p>
+        <div class="note key"><span class="lb">强化学习的设定</span>
+          <strong>没有人告诉你正确答案,只有做完之后的一个好坏反馈。</strong><br>
+          而且反馈往往<strong>来得很晚</strong> —— 下完一整盘棋才知道输赢,那这一百步里到底哪一步走错了?</div>
+      </div>
+      <div class="cal">
+        <span class="lb">今日校准 5 / 5</span>
+        <div class="then"><i>2016 年</i><span>强化学习是个<strong>偏门方向</strong>,主要用在游戏和机器人控制上,和主流的监督学习基本不搭界。</span></div>
+        <div class="now"><i>今天</i><span>它是大模型<strong>后训练的核心</strong>。RLHF、DPO、RLVR —— 你用到的每一个聊天模型,最后那道工序都在这个框架里。</span></div>
+      </div>
+    </div>
+    <div class="g3 fill">
+      <div class="card must tight"><div class="t">16.1</div><h3>K 摇臂赌博机</h3>
+        <p>最小的强化学习问题:几台老虎机,该<strong>接着摇最赚的那台</strong>,还是<strong>去试试没摇过的</strong>?<br><br>
+          <span class="hl">探索 vs 利用</span> —— 这个取舍今天在推荐系统、A/B 测试、模型采样温度里到处都是。<strong>值得读。</strong></p></div>
+      <div class="card opt tight"><div class="t">16.2–16.4</div><h3>值函数与策略</h3>
+        <p>怎么把"最后的输赢"分摊回中间的每一步。这是强化学习的技术核心。<br><br>
+          <span style="color:var(--mut)">概念看一遍就好,公式可以跳。今天实际用的 PPO、GRPO 都不在这本书里。</span></p></div>
+      <div class="card opt tight"><div class="t">16.6</div><h3>模仿学习</h3>
+        <p>反馈太稀疏学不动,那就<strong>先照着专家的示范学一遍</strong>。<br><br>
+          <span class="hl">这就是 SFT。</span>大模型后训练的第一步,原理在这一节里已经写着了 —— <strong>只是当时没人想到它会用在这个地方。</strong></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 26 §4 分隔 ═══════════ -->
+<section class="slide sec" data-t="§4 今日校准总表">
+  <div class="body center" style="gap:0">
+    <div class="num">04</div>
+    <h1>今日校准</h1>
+    <div class="sub" style="max-width:780px">
+      合上书之前,把三件事分清楚:<br>
+      <span class="hr">哪些已经过时</span> · <span class="hl">哪些重心变了</span> · <span class="hb">哪些今天照样是硬道理</span></div>
+  </div>
+</section>
+
+<!-- ═══════════ 27 书里没有的五样 ═══════════ -->
+<section class="slide" data-t="2016到今天:书里没有的五样">
+  <div class="kick"><b>THE GAP</b></div>
+  <h2>书里一个字也没有的五样东西</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <table class="sm">
+      <tr><th style="width:170px">缺的东西</th><th style="width:64px">出现</th><th>为什么这是个断层,不是个遗漏</th></tr>
+      <tr><td>Transformer / 注意力</td><td class="num">2017</td>
+        <td>今天几乎所有强模型的<strong>唯一骨架</strong>。它把"哪些位置该互相看"这件事也交给学习来定 —— 这是一种和 CNN、RNN 都不同的归纳偏置。</td></tr>
+      <tr><td>大规模自监督预训练</td><td class="num">2018</td>
+        <td>书里的世界是"标注数据很贵所以要省着用"。今天是<strong>拿全互联网的文本做完形填空</strong>,标注需求归零。<span class="hl">这一条直接推翻了书里大半个第 13 章的动机。</span></td></tr>
+      <tr><td>Scaling Law</td><td class="num">2020</td>
+        <td>模型规模、数据量、算力和最终效果之间存在<strong>可预测的幂律关系</strong>。<br>
+          <span style="color:var(--mut)">这意味着"该做多大的模型"从一个靠经验的选择,变成了一个能算的工程题 —— 书里的"模型选择"整节因此被重排了优先级。</span></td></tr>
+      <tr><td>双下降 / 过参数化</td><td class="num">2019</td>
+        <td>参数量远超数据量反而更好。<span class="hr">直接和第 2.5 节那张 U 型图冲突。</span></td></tr>
+      <tr><td>涌现与上下文学习</td><td class="num">2020+</td>
+        <td>模型不改一个参数,只靠提示词里给的几个例子就能做新任务。<br>
+          <span style="color:var(--mut)">这件事在书的框架里<strong>没有对应的概念</strong> —— 它既不是训练,也不是推断,是第三种东西。</span></td></tr>
+    </table>
+    <div class="note warn" style="flex:none"><span class="lb">怎么看待这个断层</span>
+      <strong>不要指望靠这本书补上这十年。</strong> 它的作用是让你在遇到上面这些词的时候,知道它们<strong>相对于什么发生了改变</strong> ——
+      没有前一个坐标系,"变了"这件事本身是感觉不到的。</div>
+  </div>
+</section>
+
+<!-- ═══════════ 28 重心迁移 ═══════════ -->
+<section class="slide" data-t="重心迁移表">
+  <div class="kick"><b>THE SHIFT</b><span>不是对错之分,是重心之分</span></div>
+  <h2>同一门学科,重心搬了家</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <table class="sm">
+      <tr><th style="width:150px">议题</th><th style="width:40%">2016 年 · 书里的重心</th><th>今天的重心</th></tr>
+      <tr><td>特征从哪来</td><td>人来设计。<span style="color:var(--mut)">"色泽、根蒂、敲声"这六个属性是专家定的,占项目大半工作量</span></td>
+        <td><strong>模型自己学。</strong><span style="color:var(--mut)">端到端,原始输入直接进去。第 11 章整章的前提被抽掉了</span></td></tr>
+      <tr><td>数据规模</td><td>小。<span style="color:var(--mut)">17 个西瓜就能讲完一章。核心焦虑是"数据不够怎么办"</span></td>
+        <td><strong>大到需要重新组织。</strong><span style="color:var(--mut)">焦虑变成"数据质量怎么筛""数据要用完了"</span></td></tr>
+      <tr><td>最关键的选择</td><td>选哪个模型。<span style="color:var(--mut)">SVM 还是决策树还是贝叶斯 —— 第 2 章一半篇幅在讲怎么比</span></td>
+        <td><strong>基本没得选。</strong><span style="color:var(--mut)">大模型领域 Transformer 一统;选择转移到了数据配比和训练配方上</span></td></tr>
+      <tr><td>怎么用标注</td><td>监督为主,半监督补充</td>
+        <td><strong>自监督为主,监督只在最后一小步。</strong><span style="color:var(--mut)">99% 算力在预训练,不到 1% 在对齐</span></td></tr>
+      <tr><td>模型多大</td><td>越小越好,防过拟合</td><td><strong>越大越好,只要数据跟得上。</strong></td></tr>
+      <tr><td>可解释性</td><td>是个加分项,决策树因此受青睐</td>
+        <td><strong>基本放弃了。</strong><span style="color:var(--mut)">换成事后的机制可解释性研究,是另一个专门领域</span></td></tr>
+    </table>
+    <div class="note key" style="flex:none"><span class="lb">看这张表的正确方式</span>
+      <strong>右边这一列不是"书错了",是"能做的事变了"。</strong>
+      2016 年没人能拿到万亿 token 的数据和几万张卡 —— 在那个约束下,书里的每一条重心都是对的。
+      <span class="hl">约束一变,最优解就跟着变。这本身就是这门学科的一课。</span></div>
+  </div>
+</section>
+
+<!-- ═══════════ 29 真没过时的 ═══════════ -->
+<section class="slide" data-t="真正没过时的五条">
+  <div class="kick"><b>WHAT STILL HOLDS</b><span>这才是这本书今天的价值</span></div>
+  <h2>十年过去,这五条一个字都不用改</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g2 fill">
+      <div class="col">
+        <div class="card must tight"><div class="t">CH.1</div><h3>归纳偏置是学习的前提</h3>
+          <p>数据只能排除假设,不能选出唯一一个。<strong>能泛化,全靠从数据之外塞进去的假设。</strong><br>
+            <span style="color:var(--mut)">今天照样成立 —— Transformer 的"任意两处可能相关"就是一条偏置,只是塞得更弱、更让数据说话。</span></p></div>
+        <div class="card must tight"><div class="t">CH.1</div><h3>脱离问题谈优劣没有意义</h3>
+          <p>NFL 定理的方法论要求。<br>
+            <span style="color:var(--mut)">"这个模型更强"永远要追问"在什么任务、什么分布上"。今天满天飞的榜单,大半死在这一条上。</span></p></div>
+        <div class="card must tight"><div class="t">CH.2</div><h3>没测过就等于不知道</h3>
+          <p>训练集上的表现<strong>不构成任何证据</strong>。必须在没见过的数据上验。<br>
+            <span style="color:var(--mut)">今天最常见的翻车,叫<strong>测试集污染</strong> —— 评测题目本身就在训练数据里。这正是第 2 章那条规矩被违反的现代版本。</span></p></div>
+      </div>
+      <div class="col">
+        <div class="card must tight"><div class="t">CH.2</div><h3>度量选错,努力全废</h3>
+          <p>查准还是查全、要不要看 AUC,取决于<strong>犯错的代价</strong>,不取决于数学。<br>
+            <span style="color:var(--mut)">这一条今天更要命:大模型的能力是多维的,用一个总分排名本身就是在丢信息。</span></p></div>
+        <div class="card must tight"><div class="t">CH.5</div><h3>前向算错 · 反向摊责 · 按梯度更新</h3>
+          <p>这个循环从 1986 年活到今天,规模翻了上亿倍,<strong>逻辑一个字没变。</strong></p></div>
+        <div class="note key" style="flex:1;display:flex;flex-direction:column;justify-content:center">
+          <span class="lb">一句话总结这本书今天的价值</span>
+          <strong>它给你的不是答案,是一套提问的方式。</strong><br><br>
+          "你的偏置是什么""你在什么分布上测的""这个指标为什么是它" —— <span class="hl">这三个问题一旦成了本能,你就已经站在这门学科里面了,而不是外面。</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 30 三个坑 ═══════════ -->
+<section class="slide" data-t="读之前记住的三个坑">
+  <div class="kick"><b>PITFALLS</b></div>
+  <h2>动手读之前,记住这三个坑</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g3 fill">
+      <div class="card skip"><div class="t">坑 1</div><h3>把它当成通往大模型的路</h3>
+        <p>读完不会更懂 GPT。<strong>它是上游那门学科的教材。</strong></p>
+        <p style="margin-top:8px;color:var(--mut)">症状:读到第 5 章发现"深度学习"只有几页,以为自己读错了版本。<br><br>
+          <span style="color:var(--tx2)">解药:一开始就把预期定成"补地基",不是"追前沿"。</span></p></div>
+      <div class="card skip"><div class="t">坑 2</div><h3>从第一页顺序读到最后一页</h3>
+        <p>第 3–11 章是<strong>方法目录</strong>,不是递进的论证。</p>
+        <p style="margin-top:8px;color:var(--mut)">症状:在第 6 章 SVM 的对偶推导里卡住,自我怀疑,然后彻底放下这本书。<br><br>
+          <span style="color:var(--tx2)">解药:按前面那四条路线之一读。<span class="hl">跳章不是偷懒,是这本书的正确用法。</span></span></p></div>
+      <div class="card skip"><div class="t">坑 3</div><h3>把公式当成理解的前提</h3>
+        <p>它是公式驱动的教材,但<strong>大部分公式可以先欠着。</strong></p>
+        <p style="margin-top:8px;color:var(--mut)">症状:每个符号都要查清楚,一天读三页,两周后放弃。<br><br>
+          <span style="color:var(--tx2)">解药:第一遍<strong>只读文字、图和结论</strong>,公式一律跳过。哪里觉得"这里必须懂"再回来啃。<br>
+          《南瓜书》是第二遍才用的东西,不要第一遍就配着看。</span></p></div>
+    </div>
+    <div class="note warn" style="flex:none"><span class="lb">最后一句提醒</span>
+      这三个坑有一个共同点:<strong>都是把"读完一本书"当成了目标。</strong>
+      目标应该是<span class="hl">拿到那套提问方式</span> —— 按这个标准,读四章就够了,读十六章反而可能被淹没。</div>
+  </div>
+</section>
+
+<!-- ═══════════ 31 速读清单 ═══════════ -->
+<section class="slide" data-t="90分钟速读清单">
+  <div class="kick"><b>THE CHECKLIST</b><span>可以直接照着做</span></div>
+  <h2>九十分钟清单 —— 精确到节</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g2 fill">
+      <div class="col">
+        <table class="xs">
+          <tr><th style="width:56px">节</th><th>标题</th><th style="width:52px">分钟</th></tr>
+          <tr><td>1.1</td><td>引言 —— 挑西瓜,以及为什么写不出规则</td><td class="num">5</td></tr>
+          <tr><td>1.2</td><td><strong>假设空间</strong> —— 那个 37</td><td class="num">10</td></tr>
+          <tr><td>1.3</td><td><strong>归纳偏好</strong> —— 全书的题眼</td><td class="num">15</td></tr>
+          <tr><td>1.4</td><td>NFL 定理 —— 只看结论那段话</td><td class="num">5</td></tr>
+          <tr><td>2.1</td><td>经验误差与<strong>过拟合</strong></td><td class="num">10</td></tr>
+          <tr><td>2.2</td><td>评估方法 —— 留出 / 交叉验证 / 自助</td><td class="num">15</td></tr>
+          <tr><td>2.3</td><td>性能度量 —— 查准查全 / P-R / <strong>ROC 与 AUC</strong></td><td class="num">20</td></tr>
+          <tr><td>2.5</td><td>偏差与方差 —— <span class="hr">读完记得回来看第 16 页的校准</span></td><td class="num">10</td></tr>
+          <tr><td colspan="2" style="color:var(--tx);font-weight:700">合计</td><td class="num" style="color:var(--rind);font-weight:700">90</td></tr>
+        </table>
+        <div class="note"><span class="lb">2.4 呢</span>
+          <strong>2.4 比较检验跳过。</strong>假设检验、t 检验、Friedman 检验 —— 是统计工具,今天的模型评测基本不这么做。</div>
+      </div>
+      <div class="col">
+        <div class="note key"><span class="lb">读完这 90 分钟,你应该能回答</span>
+          <ul style="margin-top:6px">
+            <li>为什么"在训练数据上全对"说明不了任何问题?</li>
+            <li>数据不能唯一决定模型,那缺的那一块从哪来?</li>
+            <li>有人说他的模型准确率 95%,你该追问哪三件事?</li>
+            <li>查准率和查全率为什么不能同时拉满?</li>
+            <li>"没有免费的午餐"到底否定了什么、没否定什么?</li>
+          </ul>
+          <p style="margin-top:8px">五个都能用自己的话说清楚 —— <strong>这本书对你的主要价值就已经拿到了。</strong></p></div>
+        <div class="card opt tight"><h3>还想再花一周</h3>
+          <p>按这个顺序加:<br>
+            <code>5.1 → 5.2 → 5.3</code> 反向传播(约 3 小时)<br>
+            <code>12.1 → 12.2</code> PAC,跳证明(约 2 小时)<br>
+            <code>4.1 → 4.2</code> 决策树 + 手算一次信息增益(约 2 小时)<br>
+            <code>8.1 → 8.3</code> 集成学习(约 2 小时)</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 32 出师标准 ═══════════ -->
+<section class="slide" data-t="出师标准">
+  <div class="kick"><b>THE BAR</b></div>
+  <h2>怎么算读明白了</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <p>不是能复述定义,是<strong>下面这三种场合你的反应变了</strong>:</p>
+    <div class="g3" style="flex:none">
+      <div class="card must"><div class="t">场合一</div><h3>有人说"我这模型准确率 98%"</h3>
+        <p style="margin-top:6px">你的第一反应变成三个问题:<br>
+          <span class="hl">在什么数据上测的?</span><br>
+          <span class="hl">测试数据和训练数据分开了吗?</span><br>
+          <span class="hl">正负样本比例是多少?</span><br><br>
+          <span style="color:var(--mut)">如果 100 个瓜里只有 2 个坏瓜,全判"好瓜"就有 98%。</span></p></div>
+      <div class="card must"><div class="t">场合二</div><h3>有人说"这个新架构更强"</h3>
+        <p style="margin-top:6px">你的第一反应变成:<br>
+          <span class="hl">它塞进去的假设是什么?</span><br>
+          <span class="hl">这个假设在什么数据上成立?</span><br><br>
+          <span style="color:var(--mut)">而不是去比参数量。NFL 定理的实际用法就是这个。</span></p></div>
+      <div class="card must"><div class="t">场合三</div><h3>看到"AI 无法真正理解"这类断言</h3>
+        <p style="margin-top:6px">你能分清哪一句是<strong>有定义的技术判断</strong>,哪一句是<strong>没有定义的哲学表态</strong>。<br><br>
+          <span style="color:var(--mut)">"泛化到分布外会失败"可以测。"不是真正理解"没法测 —— 后者不构成一个技术论断。</span></p></div>
+    </div>
+    <div class="note key" style="flex:none"><span class="lb">最后一条,也是最重要的</span>
+      你不再觉得机器学习是<strong>一堆需要背下来的算法</strong>。<br>
+      它是一件很朴素的事:<span class="bk">人有些本事说不清楚,那就别说了,给例子。</span>剩下所有的复杂度 —— 全书十六章、这十年所有的论文 ——
+      <span class="hl">都是在处理同一个问题:给了例子之后,凭什么相信它在没见过的东西上也对。</span></div>
+  </div>
+</section>
+
+<!-- ═══════════ 33 接下来 ═══════════ -->
+<section class="slide" data-t="接下来读什么">
+  <div class="kick"><b>NEXT</b></div>
+  <h2>接下来</h2>
+  <div class="rule"></div>
+  <div class="body">
+    <div class="g3" style="flex:none">
+      <div class="card must"><div class="t">第一步 · 已经在这了</div><h3>骨架</h3>
+        <p>这门学科在干什么、为什么这些算法长这样。<br>
+          <span style="color:var(--mut)">姊妹篇《机器学习 · 深度学习 · Transformer》讲的就是这一层。</span></p></div>
+      <div class="card opt"><div class="t">第二步 · 这份清单</div><h3>术语校准</h3>
+        <p>西瓜书 1、2 章 + 5.1–5.3 + 12 章。<br>
+          <span style="color:var(--mut)">把已有的直觉换成标准说法,以后听得懂别人讲话。</span></p></div>
+      <div class="card opt"><div class="t">第三步 · 另找材料</div><h3>大模型本身</h3>
+        <p>Transformer、预训练、后训练。<br>
+          <span style="color:var(--mut)">姊妹篇《一个大模型是怎么练出来的》讲这一层。西瓜书在这里帮不上忙。</span></p></div>
+    </div>
+    <div class="g2 fill">
+      <div class="note warn"><span class="lb">关于《南瓜书》</span>
+        它是《机器学习公式详解》的民间称呼,专门补西瓜书省略的推导步骤。<br><br>
+        <strong>它解决的是"这一步怎么推出来的",不是"这在讲什么"。</strong>
+        <span class="hr">第一遍读千万别配着看</span> —— 你会掉进推导里,把速读变成两个月。等你确定某个结论必须自己推一遍时,再去找它。</div>
+      <div class="note key"><span class="lb">一个使用建议</span>
+        把这本书<strong>放在手边而不是读完</strong>。<br><br>
+        以后碰到不认识的词 —— 有人说"这里方差太大""这个属于半监督""要看 AUC 不看准确率" —— 回来翻对应那一节的开头两页。<br><br>
+        <span class="hl">它作为字典的价值,远高于作为读物的价值。</span>这也是本篇从第一页就在说的那句话:<strong>当地图用,不当路线用。</strong></div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<div id="bar"></div>
+<div id="nav">
+  <button id="prev" aria-label="上一页">←</button><button id="next" aria-label="下一页">→</button><button id="tocBtn">目录</button>
+</div>
+<div id="hud"><b id="cur">1</b> / <span id="tot">33</span></div>
+
+<div id="toc">
+  <h2>目录 <span style="font-size:13px;color:var(--mut);font-weight:400">— 点击跳转 · 按 O 或 Esc 关闭</span></h2>
+  <div class="grid" id="tocGrid"></div>
+</div>
+
+<script>
+(function(){
+  var slides = [].slice.call(document.querySelectorAll('.slide'));
+  var i = 0, n = slides.length;
+  var bar = document.getElementById('bar'), cur = document.getElementById('cur');
+  document.getElementById('tot').textContent = n;
+  var toc = document.getElementById('toc'), grid = document.getElementById('tocGrid');
+
+  slides.forEach(function(s, k){
+    var a = document.createElement('a');
+    a.href = '#' + (k+1);
+    a.innerHTML = '<i>' + String(k+1).padStart(2,'0') + '</i>' + (s.dataset.t || ('第 '+(k+1)+' 页'));
+    if (s.classList.contains('sec')) a.className = 's';
+    a.onclick = function(e){ e.preventDefault(); go(k); toc.classList.remove('on'); };
+    grid.appendChild(a);
+  });
+
+  function go(k){
+    i = Math.max(0, Math.min(n-1, k));
+    slides.forEach(function(s,x){ s.classList.toggle('on', x===i); });
+    bar.style.width = ((i+1)/n*100) + '%';
+    cur.textContent = i+1;
+    try { location.hash = String(i+1); } catch(e){}
+  }
+
+  document.getElementById('prev').onclick = function(){ go(i-1); };
+  document.getElementById('next').onclick = function(){ go(i+1); };
+  document.getElementById('tocBtn').onclick = function(){ toc.classList.toggle('on'); };
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') { toc.classList.remove('on'); return; }
+    if (e.key === 'o' || e.key === 'O') { toc.classList.toggle('on'); return; }
+    if (toc.classList.contains('on')) return;
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); go(i+1); }
+    if (e.key === 'ArrowLeft'  || e.key === 'PageUp')                    { e.preventDefault(); go(i-1); }
+    if (e.key === 'Home') go(0);
+    if (e.key === 'End')  go(n-1);
+  });
+
+  document.addEventListener('click', function(e){
+    if (e.target.closest('#nav') || e.target.closest('#toc') || e.target.closest('a')) return;
+    if (e.clientY > window.innerHeight - 48) return;
+    go(e.clientX < window.innerWidth/2 ? i-1 : i+1);
+  });
+
+  var x0 = null;
+  document.addEventListener('touchstart', function(e){ x0 = e.touches[0].clientX; }, {passive:true});
+  document.addEventListener('touchend', function(e){
+    if (x0 === null) return;
+    var dx = e.changedTouches[0].clientX - x0;
+    if (Math.abs(dx) > 46) go(dx < 0 ? i+1 : i-1);
+    x0 = null;
+  }, {passive:true});
+
+  function fit(){
+    var d = document.getElementById('deck');
+    var s = Math.min(window.innerWidth / 1280, window.innerHeight / 720) * 0.965;
+    d.style.transform = 'scale(' + s + ')';
+  }
+  window.addEventListener('resize', fit);
+  fit();
+
+  var h = parseInt((location.hash || '').replace('#',''), 10);
+  go(isFinite(h) && h > 0 ? h-1 : 0);
+})();
+</script>
+</body>
+</html>
