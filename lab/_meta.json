@@ -23,6 +23,10 @@
     "desc": "2026-07 之前的 9 篇技术笔记，原来列在首页。index.html 保留了原来的分类过滤器",
     "src": "原站点 posts/*.html"
   },
+  "deep-learning-two-books": {
+    "desc": "深度学习速读:它和机器学习差在哪,《动手学》与《理解深度学习》各读哪一半",
+    "src": "C:/Users/think/build-dl-deck/deep-learning-two-books"
+  },
   "ha2fde-book": {
     "desc": "AI Agent 实战手册七章（第二代）。站上曾发布的成品版 ch01–ch07 + 附录",
     "src": "原站点根目录 /ha2fde-book/"
