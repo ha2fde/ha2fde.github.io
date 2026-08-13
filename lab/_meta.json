@@ -1,4 +1,8 @@
 {
+  "agent-principles-ch2-v4": {
+    "desc": "第二章 v4 候选稿：知识是怎么进到机器里的（28 页，待审，未替换线上）",
+    "src": "C:/Users/think/build-ch2/deliver/agent-principles-ch2-v4"
+  },
   "agent-principles-ch2-versions": {
     "desc": "第二章重写三次的四个版本（含废弃的公理推导版）+ 每版为什么塌的复盘",
     "src": "/tmp/ch2-versions"
