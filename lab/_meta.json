@@ -1,4 +1,8 @@
 {
+  "agent-principles-ch2-textbook": {
+    "desc": "第二章教材版：机器学习到大模型的知识底座，46 页，每页一个自足知识块（候选稿，未替换线上 ch2）",
+    "src": "C:/Users/think/build-ch2t/deliver/agent-principles-ch2-textbook"
+  },
   "agent-principles-ch2-v4": {
     "desc": "第二章 v4 候选稿：知识是怎么进到机器里的（28 页，待审，未替换线上）",
     "src": "C:/Users/think/build-ch2/deliver/agent-principles-ch2-v4"
