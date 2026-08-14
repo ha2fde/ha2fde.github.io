@@ -8,8 +8,8 @@
     "src": "C:/Users/think/build-ch2/deliver/agent-principles-ch2-v4"
   },
   "agent-principles-ch2-versions": {
-    "desc": "第二章重写三次的四个版本（含废弃的公理推导版）+ 每版为什么塌的复盘",
-    "src": "/tmp/ch2-versions"
+    "desc": "第二章的四个历史版本 + 每一版是怎么塌的；v0 是 2026-08-14 换下的线上原件",
+    "src": "C:/Users/think/_stage/agent-principles-ch2-versions"
   },
   "agent-principles-flash": {
     "desc": "同一套提示词交给 DeepSeek Flash 生成的六章版本，可与 posts/agent-principles/ 对照看模型差异。_parts/ 是分片源和拼装脚本",
