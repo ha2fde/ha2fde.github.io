@@ -285,8 +285,8 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
             <text x="396" y="28" text-anchor="middle" font-size="13" fill="#c2410c">验证集 20%</text>
             <rect x="456" y="8" width="104" height="30" rx="4" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
             <text x="508" y="28" text-anchor="middle" font-size="13" fill="#0e9f6e">测试集 20%</text>
-            <text x="168" y="60" text-anchor="middle" font-size="12" fill="#5b6675">调<b>参数</b>：梯度下降在这上面跑</text>
-            <text x="396" y="60" text-anchor="middle" font-size="12" fill="#5b6675">选<b>超参数</b>和模型</text>
+            <text x="168" y="60" text-anchor="middle" font-size="12" fill="#5b6675">调<tspan font-weight="700">参数</tspan>：梯度下降在这上面跑</text>
+            <text x="396" y="60" text-anchor="middle" font-size="12" fill="#5b6675">选<tspan font-weight="700">超参数</tspan>和模型</text>
             <text x="508" y="60" text-anchor="middle" font-size="12" fill="#5b6675">最后估一次</text>
             <text x="396" y="82" text-anchor="middle" font-size="12" fill="#94a3b8">可反复用</text>
             <text x="508" y="82" text-anchor="middle" font-size="12" fill="#dc2626">只能用一次</text>
@@ -556,11 +556,11 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
           <text x="204" y="105" text-anchor="middle" font-size="12" fill="#7c3aed">→ σ( · )</text>
           <line x1="256" y1="90" x2="300" y2="90" stroke="#94a3b8" stroke-width="1.5"/><path d="M300 90 l-8 -4 v8 z" fill="#94a3b8"/>
           <circle cx="322" cy="90" r="16" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/><text x="322" y="95" text-anchor="middle" font-size="12" fill="#0e9f6e">a</text>
-          <text x="0" y="176" font-size="12" font-weight="600" fill="#5b6675">写成矩阵，一整层就是一行：</text>
+          <text x="0" y="176" font-size="12" font-weight="600" fill="#5b6675">写成矩阵，一整层就是一行（上标 (l) 表示第 l 层）：</text>
           <rect x="0" y="188" width="430" height="34" rx="6" fill="#f4f7fb" stroke="#e2e8f0" stroke-width="1.5"/>
-          <text x="215" y="210" text-anchor="middle" font-size="15" font-family="Consolas,monospace" fill="#1f2937">a⁽ˡ⁾ = σ( W⁽ˡ⁾ a⁽ˡ⁻¹⁾ + b⁽ˡ⁾ )</text>
+          <text x="215" y="210" text-anchor="middle" font-size="15" font-family="Consolas,monospace" fill="#1f2937">a^(l) = σ( W^(l) · a^(l-1) + b^(l) )</text>
           <text x="0" y="242" font-size="12" fill="#94a3b8">W 是权重矩阵（形状 = 本层宽 × 上层宽），b 是偏置向量，</text>
-          <text x="0" y="258" font-size="12" fill="#94a3b8">σ 是激活函数。整个网络就是这一行<b>套 L 次</b>。</text>
+          <text x="0" y="258" font-size="12" fill="#94a3b8">σ 是激活函数。整个网络就是这一行<tspan font-weight="700">套 L 次</tspan>。</text>
         </svg>
       </div>
       <div>
@@ -1156,10 +1156,10 @@ vec(巴黎) − vec(法国) + vec(意大利) ≈ vec(罗马)</div>
           <table class="tbl s" style="margin-top:8px">
             <tr><th style="width:130px">部件</th><th style="width:190px">算式</th><th>参数量</th></tr>
             <tr><td>词嵌入</td><td>128,256 × 4096</td><td>约 5.25 亿</td></tr>
-            <tr><td>注意力（每层）</td><td>W_Q,W_K,W_V,W_O<br>≈ 4 × 4096 × 4096</td><td>约 6700 万<br><span class="dim">用 GQA 后 K/V 更小</span></td></tr>
+            <tr><td>注意力（每层）</td><td>W_Q,W_K,W_V,W_O<br>本例用 GQA（8 组 K/V）</td><td>约 4200 万<br><span class="dim">不用 GQA 则 6700 万</span></td></tr>
             <tr><td>FFN（每层）</td><td>SwiGLU 三个矩阵<br>3 × 4096 × 14336</td><td><b>约 1.76 亿</b></td></tr>
-            <tr><td>每层小计</td><td>注意力 + FFN</td><td>约 2.4 亿</td></tr>
-            <tr><td>32 层合计</td><td>32 × 2.4 亿</td><td><b>约 77 亿</b></td></tr>
+            <tr><td>每层小计</td><td>注意力 + FFN</td><td>约 2.2 亿</td></tr>
+            <tr><td>32 层合计</td><td>32 × 2.2 亿</td><td><b>约 70 亿</b></td></tr>
             <tr><td>输出投影</td><td>4096 × 128,256</td><td>约 5.25 亿<span class="dim">（常与词嵌入共享）</span></td></tr>
             <tr class="t-green"><td><b>总计</b></td><td>—</td><td><b>约 80 亿 = 8B</b></td></tr>
           </table></div>
@@ -1167,7 +1167,7 @@ vec(巴黎) − vec(法国) + vec(意大利) ≈ vec(罗马)</div>
       <div>
         <div class="card t-orange"><div class="t orange">三个能直接用的结论</div>
           <table class="tbl s" style="margin-top:8px">
-            <tr><td style="width:32px" class="num">1</td><td><b>FFN 占大头。</b>每层 FFN 约 1.76 亿、注意力约 0.67 亿 —— <b>FFN 吃掉约 2/3 参数</b>。「知识存在哪」这个问题，答案首先指向 FFN</td></tr>
+            <tr><td style="width:32px" class="num">1</td><td><b>FFN 占大头。</b>每层 FFN 约 1.76 亿、注意力约 0.42 亿 —— <b>FFN 吃掉约 3/4 参数</b>。「知识存在哪」这个问题，答案首先指向 FFN</td></tr>
             <tr><td class="num">2</td><td><b>参数量与上下文长度无关。</b>整张表里没有一项含 n。上下文变长，涨的是<b>激活值和 KV cache</b>，不是参数</td></tr>
             <tr><td class="num">3</td><td><b>参数量 ≈ 12 × L × d²</b>（词表另算）。快速估一个模型多大，这个式子就够了</td></tr>
           </table></div>
@@ -1471,7 +1471,7 @@ vec(巴黎) − vec(法国) + vec(意大利) ≈ vec(罗马)</div>
           <table class="tbl s" style="margin-top:8px">
             <tr><th style="width:170px">项</th><th>数值</th></tr>
             <tr><td>集群</td><td><b>16,384</b> 张 H100</td></tr>
-            <tr><td>时长 / 算力</td><td><b>54 天</b>，累计 <b>3930 万</b> GPU 小时</td></tr>
+            <tr><td>时长 / 算力</td><td>连续 <b>54 天</b>，约 <b>2100 万</b> GPU 小时</td></tr>
             <tr><td>数据</td><td><b>15.6 万亿</b> token</td></tr>
             <tr><td class="red">意外中断</td><td><b>466 次</b>，其中 <b>419 次</b>是非计划的</td></tr>
             <tr><td>故障来源</td><td><b>78%</b> 可归因到硬件：GPU 本身约 <b>58.7%</b>，HBM3 显存约 <b>17.2%</b></td></tr>
@@ -1512,7 +1512,7 @@ vec(巴黎) − vec(法国) + vec(意大利) ≈ vec(罗马)</div>
           <div class="sub mt" style="margin-top:10px">因为 r 远小于 d，需要训练的参数量降到原来的<b>千分之几</b>。</div>
           <table class="tbl s" style="margin-top:10px">
             <tr><th style="width:110px">好处</th><th>说明</th></tr>
-            <tr><td>省显存</td><td>不需要为原参数存梯度和优化器状态 —— 省掉的正是最贵的那 12 字节/参数</td></tr>
+            <tr><td>省显存</td><td>原参数不需要梯度、FP32 主权重和优化器状态 —— 省掉的正是最贵的那 14 字节/参数</td></tr>
             <tr><td>可插拔</td><td>一个底座模型 + N 个几十 MB 的 LoRA，按场景切换</td></tr>
             <tr><td>可合并</td><td>用完把 B·A 加回 W，<b>推理时零额外开销</b></td></tr>
             <tr><td>QLoRA</td><td>底座再用 4-bit 量化装载，<b>单张消费级显卡就能微调几十 B 的模型</b></td></tr>
