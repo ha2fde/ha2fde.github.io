@@ -11,6 +11,10 @@
     "desc": "第二章的四个历史版本 + 每一版是怎么塌的；v0 是 2026-08-14 换下的线上原件",
     "src": "C:/Users/think/_stage/agent-principles-ch2-versions"
   },
+  "agent-principles-ch6-rsi": {
+    "desc": "第六章另一版：以 RSI 递归自我改进回路为主线重组，24 页，图表为主，不替换对外版",
+    "src": "C:\\Users\\think\\_stage\\agent-principles-ch6-rsi"
+  },
   "agent-principles-flash": {
     "desc": "同一套提示词交给 DeepSeek Flash 生成的六章版本，可与 posts/agent-principles/ 对照看模型差异。_parts/ 是分片源和拼装脚本",
     "src": "/Users/fde/Documents/agent ppt flash"
