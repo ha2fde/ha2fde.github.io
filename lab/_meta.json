@@ -15,6 +15,10 @@
     "desc": "第六章另一版：以 RSI 递归自我改进回路为主线重组，24 页，图表为主，不替换对外版",
     "src": "C:\\Users\\think\\_stage\\agent-principles-ch6-rsi"
   },
+  "agent-principles-ch6-rsi-v2": {
+    "desc": "第六章 RSI 版 v2：去掉五条路线，按「被优化的对象」五级阶梯重讲，29 页",
+    "src": "C:\\Users\\think\\_stage\\agent-principles-ch6-rsi-v2"
+  },
   "agent-principles-flash": {
     "desc": "同一套提示词交给 DeepSeek Flash 生成的六章版本，可与 posts/agent-principles/ 对照看模型差异。_parts/ 是分片源和拼装脚本",
     "src": "/Users/fde/Documents/agent ppt flash"

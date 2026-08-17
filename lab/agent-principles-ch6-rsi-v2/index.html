@@ -1,0 +1,1445 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第六章 · 让 Agent 改进它自己</title>
+<style>
+:root{
+  --bg:#e9edf3; --slide:#fff; --panel:#f4f7fb; --line:#e2e8f0;
+  --ink:#1f2937; --sub:#5b6675; --faint:#94a3b8;
+  --blue:#2563eb; --green:#0e9f6e; --orange:#c2410c; --purple:#7c3aed; --red:#dc2626;
+  --tblue:#eff6ff; --tgreen:#ecfdf5; --torange:#fff7ed; --tpurple:#f5f3ff; --tred:#fef2f2;
+  --font:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);font-family:var(--font);color:var(--ink);overflow:hidden;-webkit-font-smoothing:antialiased}
+#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;flex:none;position:relative;transform-origin:center center;
+      background:var(--slide);border-radius:6px;overflow:hidden;box-shadow:0 18px 60px rgba(15,23,42,.16)}
+#bar{position:absolute;top:0;left:0;height:2px;background:var(--blue);opacity:.55;z-index:5;width:0}
+
+/* ── 页眉 72 / 正文 608 / 页脚 40 ───────────────────────── */
+.slide{position:absolute;inset:0;display:none;flex-direction:column;padding:0 56px}
+.slide.on{display:flex;animation:fi .15s ease}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+.hd{height:72px;flex:none;display:flex;align-items:flex-end;justify-content:space-between;
+    gap:24px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.hd h2{font-size:30px;font-weight:600;line-height:1.2;letter-spacing:-.01em}
+.hd b{font-size:13px;font-weight:500;color:var(--faint);letter-spacing:.08em;white-space:nowrap;padding-bottom:5px}
+.bd{flex:1;min-height:0;overflow:hidden;padding:24px 0 0}
+.ft{height:40px;flex:none;display:flex;align-items:center;justify-content:flex-end}
+.pg{font-size:13px;color:var(--faint);letter-spacing:.04em}
+
+/* ── 文字层级：字号 + 字重 + 颜色三者一起做 ─────────────── */
+.lead{font-size:21px;font-weight:600;line-height:1.5;margin-bottom:14px}
+.p{font-size:18px;line-height:1.6}
+.p+.p{margin-top:10px}
+.sub{font-size:15px;line-height:1.6;color:var(--sub)}
+.cap{font-size:13px;line-height:1.55;color:var(--faint)}
+.h3{font-size:21px;font-weight:600;margin-bottom:8px}
+.mt{margin-top:16px}.mt2{margin-top:24px}.mb{margin-bottom:12px}
+b,strong{font-weight:600}
+em{font-style:normal;font-weight:600}
+.ul{list-style:none}
+.ul li{font-size:18px;line-height:1.55;padding-left:20px;position:relative;margin-bottom:9px}
+.ul li:before{content:"";position:absolute;left:2px;top:11px;width:6px;height:6px;border-radius:50%;background:var(--faint)}
+.ul.s li{font-size:15px;line-height:1.55;margin-bottom:6px;color:var(--sub)}
+.ul.s li:before{top:9px;width:4px;height:4px}
+.ol{counter-reset:n;list-style:none}
+.ol li{font-size:18px;line-height:1.55;padding-left:30px;position:relative;margin-bottom:10px;counter-increment:n}
+.ol li:before{content:counter(n);position:absolute;left:0;top:2px;width:21px;height:21px;border-radius:50%;
+  background:var(--panel);color:var(--sub);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center}
+
+/* ── 组件 ──────────────────────────────────────────────── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.g23{display:grid;grid-template-columns:2fr 3fr;gap:22px}
+.g32{display:grid;grid-template-columns:3fr 2fr;gap:22px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px 18px}
+.card .t{font-size:16px;font-weight:600;margin-bottom:7px}
+.card .p,.card .sub{font-size:15px;line-height:1.55}
+.card.w{background:#fff}
+.note{border-left:3px solid var(--faint);padding:2px 0 2px 16px}
+.note .t{font-size:15px;font-weight:600;margin-bottom:4px}
+.tbl{width:100%;border-collapse:collapse;font-size:15px;line-height:1.45}
+.tbl th{font-size:13px;font-weight:600;color:var(--faint);text-align:left;
+        padding:0 12px 7px;border-bottom:1.5px solid var(--line);letter-spacing:.03em}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl td:first-child{font-weight:600}
+.tbl.s{font-size:14px}.tbl.s td{padding:7px 10px}
+.code{font-family:var(--mono);font-size:13.5px;line-height:1.6;background:var(--panel);
+      border:1px solid var(--line);border-radius:6px;padding:12px 14px;white-space:pre;overflow:hidden}
+.code .c{color:var(--faint)}
+.kbd{font-family:var(--mono);font-size:13px;background:var(--panel);border:1px solid var(--line);
+     border-radius:4px;padding:1px 6px}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:11px;
+     background:var(--panel);color:var(--sub);letter-spacing:.02em}
+.num{font-size:34px;font-weight:600;line-height:1.1;letter-spacing:-.02em}
+.src{font-size:12px;color:var(--faint);line-height:1.5}
+.src a{color:var(--faint)}
+a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,.3)}
+
+.blue{color:var(--blue)}.green{color:var(--green)}.orange{color:var(--orange)}
+.purple{color:var(--purple)}.red{color:var(--red)}.dim{color:var(--sub)}
+.b-blue{border-left-color:var(--blue)}.b-green{border-left-color:var(--green)}
+.b-orange{border-left-color:var(--orange)}.b-purple{border-left-color:var(--purple)}
+.b-red{border-left-color:var(--red)}
+.t-blue{background:var(--tblue);border-color:#dbeafe}.t-green{background:var(--tgreen);border-color:#d1fae5}
+.t-orange{background:var(--torange);border-color:#fed7aa}.t-purple{background:var(--tpurple);border-color:#ede9fe}
+.t-red{background:var(--tred);border-color:#fecaca}
+
+/* ── 封面 ──────────────────────────────────────────────── */
+.slide.cover{padding:0 96px;justify-content:center}
+.cover .ser{font-size:15px;font-weight:600;color:var(--faint);letter-spacing:.22em;margin-bottom:22px}
+.cover h1{font-size:44px;font-weight:600;line-height:1.25;letter-spacing:-.02em}
+.cover .sl{font-size:21px;color:var(--sub);line-height:1.6;margin-top:18px;max-width:820px}
+.cover .rule{width:64px;height:3px;background:var(--blue);margin:26px 0;opacity:.7}
+.cover .meta{font-size:13px;color:var(--faint);letter-spacing:.04em}
+
+/* ── 概览网格 ──────────────────────────────────────────── */
+#ov{position:fixed;inset:0;background:rgba(233,237,243,.97);z-index:20;display:none;
+    overflow-y:auto;padding:28px 32px}
+#ov.on{display:block}
+#ovg{display:grid;grid-template-columns:repeat(5,218px);gap:16px;justify-content:center}
+.ovc{position:relative;width:218px;height:123px;overflow:hidden;background:#fff;cursor:pointer;
+     border:1px solid var(--line);border-radius:4px}
+.ovc:hover{border-color:var(--blue)}
+.ovi{position:absolute;top:0;left:0;width:1280px;height:720px;transform:scale(.17);transform-origin:top left}
+.ovi .slide{display:flex}
+.ovn{position:absolute;right:4px;bottom:3px;font-size:11px;color:var(--faint);background:rgba(255,255,255,.9);
+     padding:0 4px;border-radius:3px}
+</style>
+</head>
+<body>
+<div id="stage"><div id="deck"><div id="bar"></div>
+<main id="slides">
+
+
+<section class="slide cover">
+  <div class="ser">AGENT 原理与实践 · 第六章</div>
+  <h1>让 Agent 改进它自己</h1>
+  <div class="rule"></div>
+  <div class="sl">递归自我改进（RSI）今天真实的形态：<b>不是模型去改自己的权重，是模型去改自己的外壳。</b><br>外壳是代码，代码可读、可写、可执行、可评估、可回滚——所以它先被改起来了。</div>
+  <div class="meta" style="margin-top:34px">机制型 · 只讲这一件事 · 全部结论都指向可观察的对象</div>
+  <div class="meta" style="margin-top:10px">← → 翻页　·　O 概览　·　F 全屏</div>
+</section>
+
+<section class="slide" data-act="开场">
+  <div class="hd"><h2>递归自我改进：这个词到底在说什么</h2></div>
+  <div class="bd">
+    <div class="p mb">日常说「AI 越来越强」是含糊的。RSI 有一个很窄的意思：<b>系统用它当前的能力，去改进「产生这份能力的那套机制」。</b>改的不是答案，是产答案的东西。下面三档必须分开——它们经常被混着说，但性质完全不同。</div>
+    <svg viewBox="0 0 1168 214" width="100%" style="display:block">
+      <defs><marker id="ar1" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 z" fill="#94a3b8"/></marker>
+      <marker id="ar1p" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 z" fill="#7c3aed"/></marker></defs>
+
+      <rect x="0" y="6" width="376" height="200" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="18" y="34" font-size="15" font-weight="700" fill="#5b6675">第 0 档 · 自动化</text>
+      <rect x="26" y="56" width="142" height="36" rx="7" fill="#fff" stroke="#94a3b8" stroke-width="1.5"/>
+      <text x="97" y="79" text-anchor="middle" font-size="13" fill="#5b6675">人定义流程</text>
+      <rect x="208" y="56" width="142" height="36" rx="7" fill="#fff" stroke="#94a3b8" stroke-width="1.5"/>
+      <text x="279" y="79" text-anchor="middle" font-size="13" fill="#5b6675">系统照着执行</text>
+      <path d="M172 74 L 202 74" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ar1)"/>
+      <path d="M279 96 L 279 124 L 97 124 L 97 98" stroke="#94a3b8" stroke-width="1.6" stroke-dasharray="4 4" marker-end="url(#ar1)"/>
+      <text x="188" y="146" text-anchor="middle" font-size="12" fill="#94a3b8">要变好，人再回来改一次</text>
+      <text x="18" y="180" font-size="12" fill="#5b6675">系统自己一点没变。</text>
+      <text x="18" y="197" font-size="12" fill="#5b6675">今天绝大多数「AI 工作流」停在这里。</text>
+
+      <rect x="396" y="6" width="376" height="200" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="414" y="34" font-size="15" font-weight="700" fill="#2563eb">第 1 档 · 自我改进</text>
+      <rect x="422" y="56" width="142" height="36" rx="7" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="493" y="79" text-anchor="middle" font-size="13" fill="#2563eb">做事</text>
+      <rect x="604" y="56" width="142" height="36" rx="7" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="675" y="79" text-anchor="middle" font-size="13" fill="#2563eb">把经验记下来</text>
+      <path d="M568 74 L 598 74" stroke="#2563eb" stroke-width="1.6" marker-end="url(#ar1)"/>
+      <path d="M675 96 L 675 124 L 493 124 L 493 98" stroke="#2563eb" stroke-width="1.6" marker-end="url(#ar1)"/>
+      <text x="584" y="146" text-anchor="middle" font-size="12" fill="#2563eb">下一次同类任务做得更好</text>
+      <text x="414" y="180" font-size="12" fill="#5b6675">系统变好了，但「怎么变好」这套办法</text>
+      <text x="414" y="197" font-size="12" fill="#5b6675">是人写死的，一轮轮下去增益会衰减。</text>
+
+      <rect x="792" y="6" width="376" height="200" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="810" y="34" font-size="15" font-weight="700" fill="#7c3aed">第 2 档 · 递归自我改进</text>
+      <rect x="806" y="56" width="112" height="36" rx="7" fill="#fff" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="862" y="79" text-anchor="middle" font-size="13" fill="#7c3aed">做事</text>
+      <rect x="942" y="56" width="112" height="36" rx="7" fill="#fff" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="998" y="79" text-anchor="middle" font-size="13" fill="#7c3aed">记经验</text>
+      <rect x="874" y="118" width="212" height="36" rx="7" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+      <text x="980" y="141" text-anchor="middle" font-size="13" font-weight="700" fill="#7c3aed">改「怎么记、怎么改」本身</text>
+      <path d="M922 74 L 936 74" stroke="#7c3aed" stroke-width="1.6" marker-end="url(#ar1p)"/>
+      <path d="M1030 96 L 1060 116" stroke="#7c3aed" stroke-width="1.6" marker-end="url(#ar1p)"/>
+      <path d="M888 116 L 848 96" stroke="#7c3aed" stroke-width="1.6" marker-end="url(#ar1p)"/>
+      <text x="810" y="180" font-size="12" fill="#5b6675">改进机制自己进了回路。<tspan font-weight="700" fill="#7c3aed">这一档才叫递归——</tspan></text>
+      <text x="810" y="197" font-size="12" fill="#5b6675">增益不衰减，甚至可能一轮比一轮大。</text>
+    </svg>
+    <div class="g3 mt2">
+      <div class="card t-blue"><div class="t blue">词的来历</div>
+        <div class="cap">1965 年 I. J. Good 说：如果一台机器在所有智力活动上都超过人，那么<b>「设计机器」这件事本身也在其中</b>，于是它能设计出更好的机器。<br>2008 年 Yudkowsky 给这个反馈回路取了名字：<b>recursive self-improvement</b>——AI 用当前的智能去改进产生智能的那套认知机制。</div></div>
+      <div class="card t-orange"><div class="t orange">今天它有三种可能形态</div>
+        <div class="cap">① <b>直接改自己的权重</b>——最激进，也最遥远<br>② <b>改训练流程</b>——数据、目标、课程<br>③ <b>改部署系统</b>——模型之外那一整套让它能干活的东西<br><br>本章只讲 ③。<b>因为近期真实发生的 RSI，几乎全在 ③ 上。</b></div></div>
+      <div class="card t-purple"><div class="t purple">本章的边界，先说清楚</div>
+        <div class="cap">不讲 self-play、合成数据、test-time training、连续学习——那些是在改<b>模型</b>，是另一条线。<br><br>本章只跟一件事：<b>模型之外的那层系统，能不能被模型自己改，改到什么程度，为什么现在卡住。</b></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="开场">
+  <div class="hd"><h2>被改的那个东西叫「外壳」（harness）</h2></div>
+  <div class="bd">
+    <div class="p mb">外壳是<b>包在基座模型外面、编排整个执行过程的那套系统</b>：它决定模型怎么想和规划、怎么调工具和行动、怎么感知和管理上下文、把产物存到哪、以及结果算不算对。<b>你实际用到的能力 = 模型 × 外壳</b>，而这两半的改法完全不同。</div>
+    <svg viewBox="0 0 1168 262" width="100%" style="display:block">
+      <circle cx="584" cy="131" r="76" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+      <text x="584" y="126" text-anchor="middle" font-size="17" font-weight="700" fill="#7c3aed">基座模型</text>
+      <text x="584" y="148" text-anchor="middle" font-size="12" fill="#7c3aed">权重 · 你改不动</text>
+
+      <rect x="0" y="6" width="266" height="66" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="14" y="30" font-size="14" font-weight="700" fill="#2563eb">① 编排执行</text>
+      <text x="14" y="52" font-size="12" fill="#5b6675">一轮循环怎么走：想 → 做 → 看 → 再想</text>
+      <rect x="0" y="98" width="266" height="66" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="14" y="122" font-size="14" font-weight="700" fill="#2563eb">② 上下文管理</text>
+      <text x="14" y="144" font-size="12" fill="#5b6675">这一步给它看什么，不给它看什么</text>
+      <rect x="0" y="190" width="266" height="66" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="14" y="214" font-size="14" font-weight="700" fill="#2563eb">③ 工具与行动</text>
+      <text x="14" y="236" font-size="12" fill="#5b6675">有哪些工具，怎么描述，怎么实现</text>
+
+      <rect x="902" y="6" width="266" height="66" rx="8" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="916" y="30" font-size="14" font-weight="700" fill="#0e9f6e">④ 产物与持久状态</text>
+      <text x="916" y="52" font-size="12" fill="#5b6675">日志、代码、笔记落到文件系统上</text>
+      <rect x="902" y="98" width="266" height="66" rx="8" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="916" y="122" font-size="14" font-weight="700" fill="#0e9f6e">⑤ 评估</text>
+      <text x="916" y="144" font-size="12" fill="#5b6675">这次到底算成功还是失败，谁说了算</text>
+      <rect x="902" y="190" width="266" height="66" rx="8" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/>
+      <text x="916" y="214" font-size="14" font-weight="700" fill="#c2410c">⑥ 权限控制</text>
+      <text x="916" y="236" font-size="12" fill="#5b6675">哪些事不许它自己做主</text>
+
+      <path d="M270 39 L 520 96" stroke="#cbd5e1" stroke-width="1.6"/>
+      <path d="M270 131 L 506 131" stroke="#cbd5e1" stroke-width="1.6"/>
+      <path d="M270 223 L 520 166" stroke="#cbd5e1" stroke-width="1.6"/>
+      <path d="M648 96 L 898 39" stroke="#cbd5e1" stroke-width="1.6"/>
+      <path d="M662 131 L 898 131" stroke="#cbd5e1" stroke-width="1.6"/>
+      <path d="M648 166 L 898 223" stroke="#cbd5e1" stroke-width="1.6"/>
+      <text x="584" y="228" text-anchor="middle" font-size="13" font-weight="700" fill="#5b6675">这六件事全部是代码和配置 —— 全部可以被读、被写、被跑、被回滚</text>
+    </svg>
+    <div class="g3 mt2">
+      <div class="note b-purple"><div class="t purple">和早期「Agent = LLM + 记忆 + 工具 + 规划 + 行动」的区别</div>
+        <div class="cap">外壳视角额外要求四样东西：<b>工作流设计（循环怎么写）、评估、权限控制、持久状态管理</b>。<br>这四样都不是提示词技巧，<b>更接近运行时和软件系统设计</b>。</div></div>
+      <div class="note b-orange"><div class="t orange">一个好用的类比：操作系统</div>
+        <div class="cap">操作系统的价值在于<b>把复杂逻辑封装进去，把接口留得简单</b>。外壳正在走同一条路——配置格式、工具接口、协议会逐步标准化，上层只面对稳定的调用面。</div></div>
+      <div class="note b-green"><div class="t green">为什么 RSI 先发生在这一层</div>
+        <div class="cap">改权重需要训练、需要数据、需要评估权重好坏，任何一步都以天计且难以回退。<br>改外壳只需要<b>写一个 diff、跑一遍测试、不行就 revert</b>——<b>这是一个模型今天就能操作的对象。</b></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="开场">
+  <div class="hd"><h2>本章的主轴：被优化的对象，一级一级往上抬</h2></div>
+  <div class="bd">
+    <div class="p mb">把这几年围绕外壳的工作按<b>「到底在优化什么」</b>排一排，会看到一条很清楚的阶梯。它不是流派之分，是<b>同一件事的深度递进</b>——每上一级，能改的东西更多、搜索空间更大、对底座模型的要求更高、评估也更难。</div>
+    <svg viewBox="0 0 1168 292" width="100%" style="display:block">
+      <defs><marker id="ar2" markerWidth="9" markerHeight="9" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#7c3aed"/></marker></defs>
+      <path d="M8 284 L 1120 284" stroke="#e2e8f0" stroke-width="1.5"/>
+
+      <rect x="0" y="176" width="227" height="96" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
+      <text x="14" y="200" font-size="14" font-weight="700" fill="#5b6675">① 指令提示词</text>
+      <text x="14" y="222" font-size="12" fill="#5b6675">那段话该怎么写</text>
+      <text x="14" y="240" font-size="12" fill="#5b6675">人手写，一次改一处</text>
+      <text x="14" y="262" font-size="12" fill="#94a3b8">提示词工程</text>
+
+      <rect x="235" y="144" width="227" height="96" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="249" y="168" font-size="14" font-weight="700" fill="#2563eb">② 结构化上下文</text>
+      <text x="249" y="190" font-size="12" fill="#5b6675">给它看什么、怎么组织</text>
+      <text x="249" y="208" font-size="12" fill="#5b6675">条目化增删，程序合并</text>
+      <text x="249" y="230" font-size="12" fill="#2563eb">ACE · MCE</text>
+
+      <rect x="470" y="112" width="227" height="96" rx="8" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="484" y="136" font-size="14" font-weight="700" fill="#0e9f6e">③ 工作流</text>
+      <text x="484" y="158" font-size="12" fill="#5b6675">按什么步骤走、谁调谁</text>
+      <text x="484" y="176" font-size="12" fill="#5b6675">在流程图上做搜索</text>
+      <text x="484" y="198" font-size="12" fill="#0e9f6e">ADAS · AFlow</text>
+
+      <rect x="705" y="80" width="227" height="96" rx="8" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/>
+      <text x="719" y="104" font-size="14" font-weight="700" fill="#c2410c">④ 外壳代码</text>
+      <text x="719" y="126" font-size="12" fill="#5b6675">执行系统本身的源码</text>
+      <text x="719" y="144" font-size="12" fill="#5b6675">读日志 → 提交 diff → 回归</text>
+      <text x="719" y="166" font-size="12" fill="#c2410c">Self-Harness · AHE · DGM</text>
+
+      <rect x="940" y="48" width="228" height="96" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+      <text x="954" y="72" font-size="14" font-weight="700" fill="#7c3aed">⑤ 优化器代码</text>
+      <text x="954" y="94" font-size="12" fill="#5b6675">「怎么改」这件事本身</text>
+      <text x="954" y="112" font-size="12" fill="#5b6675">递归作用在自己身上</text>
+      <text x="954" y="134" font-size="12" fill="#7c3aed">STOP · Meta-Harness</text>
+
+      <path d="M60 26 L 1108 26" stroke="#7c3aed" stroke-width="1.8" marker-end="url(#ar2)"/>
+      <text x="60" y="18" font-size="13" font-weight="700" fill="#7c3aed">越往右：搜索空间越大 · 对底座模型的要求越高 · 评估越难 · 出错的代价越大</text>
+    </svg>
+    <div class="g2 mt2">
+      <div class="note b-purple"><div class="t purple">这条阶梯就是本章第 8–18 页的顺序</div>
+        <div class="cap">每一级都会讲：<b>被改的具体是什么、谁来提改动、怎么判断改得对不对、以及这一级现在做到哪儿了。</b>五级看完，你会有一张完整的地图，知道任何一篇新论文该挂在哪一格上。</div></div>
+      <div class="note b-orange"><div class="t orange">分界线在 ③ 和 ④ 之间</div>
+        <div class="cap">前三级改的是<b>模型被怎么使用</b>，后两级改的是<b>使用它的那套程序</b>。<br>跨过这条线之后，被优化的对象变成了<b>可执行代码</b>——搜索空间从「几种写法」变成「所有程序」，RSI 的味道也是从这里才真正出现的。</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="外壳">
+  <div class="hd"><h2>外壳先长出了三个稳定的设计模式</h2></div>
+  <div class="bd">
+    <div class="p mb">在谈「让模型改外壳」之前，先看人已经把外壳做成了什么样。这三个模式今天几乎出现在每一个严肃的 Agent 系统里，<b>而且它们恰好是后面自动优化能下手的地方</b>。</div>
+    <svg viewBox="0 0 1168 208" width="100%" style="display:block">
+      <defs><marker id="ar3" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 z" fill="#94a3b8"/></marker>
+      <marker id="ar3g" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 z" fill="#0e9f6e"/></marker></defs>
+
+      <rect x="0" y="0" width="376" height="208" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="18" y="28" font-size="14" font-weight="700" fill="#2563eb">模式一 · 工作流自动化</text>
+      <rect x="26" y="46" width="150" height="34" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="101" y="68" text-anchor="middle" font-size="12.5" fill="#2563eb">① 规划</text>
+      <rect x="200" y="46" width="150" height="34" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="275" y="68" text-anchor="middle" font-size="12.5" fill="#2563eb">② 执行</text>
+      <rect x="200" y="104" width="150" height="34" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="275" y="126" text-anchor="middle" font-size="12.5" fill="#2563eb">③ 观测 / 跑测试</text>
+      <rect x="26" y="104" width="150" height="34" rx="6" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="101" y="126" text-anchor="middle" font-size="12.5" fill="#2563eb">④ 改进</text>
+      <path d="M180 63 L 196 63" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ar3)"/>
+      <path d="M275 84 L 275 100" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ar3)"/>
+      <path d="M196 121 L 180 121" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ar3)"/>
+      <path d="M101 100 L 101 84" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ar3)"/>
+      <text x="18" y="166" font-size="12" fill="#5b6675">不是一条静态的流水线模板，</text>
+      <text x="18" y="184" font-size="12" fill="#5b6675">是一个能自己转起来的运行时；</text>
+      <text x="18" y="202" font-size="12" fill="#5b6675">卡住时可以<tspan font-weight="700">主动回头问人</tspan>。</text>
+
+      <rect x="396" y="0" width="376" height="208" rx="10" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="414" y="28" font-size="14" font-weight="700" fill="#0e9f6e">模式二 · 文件系统当持久记忆</text>
+      <rect x="422" y="48" width="130" height="52" rx="6" fill="#fff" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <text x="487" y="70" text-anchor="middle" font-size="12.5" fill="#5b6675">上下文窗口</text>
+      <text x="487" y="88" text-anchor="middle" font-size="12" fill="#94a3b8">装得下的就这么多</text>
+      <rect x="612" y="34" width="140" height="118" rx="6" fill="#fff" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="682" y="56" text-anchor="middle" font-size="12.5" font-weight="700" fill="#0e9f6e">文件系统</text>
+      <text x="624" y="78" font-size="12" fill="#5b6675">实验日志 · 代码 diff</text>
+      <text x="624" y="97" font-size="12" fill="#5b6675">论文摘要 · 错误堆栈</text>
+      <text x="624" y="116" font-size="12" fill="#5b6675">历史 rollout 轨迹</text>
+      <text x="624" y="139" font-size="12" fill="#94a3b8">按需 grep 回来</text>
+      <path d="M556 74 L 606 74" stroke="#0e9f6e" stroke-width="1.6" marker-end="url(#ar3g)"/>
+      <text x="414" y="184" font-size="12" fill="#5b6675">读写文件靠的是 bash，是基础技能——</text>
+      <text x="414" y="202" font-size="12" fill="#5b6675"><tspan font-weight="700">模型每变强一次，这一层自动跟着变强。</tspan></text>
+
+      <rect x="792" y="0" width="376" height="208" rx="10" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/>
+      <text x="810" y="28" font-size="14" font-weight="700" fill="#c2410c">模式三 · 子 Agent 与后台作业</text>
+      <rect x="866" y="44" width="120" height="32" rx="6" fill="#fff" stroke="#c2410c" stroke-width="1.5"/>
+      <text x="926" y="65" text-anchor="middle" font-size="12.5" fill="#c2410c">主 Agent</text>
+      <rect x="810" y="102" width="102" height="30" rx="6" fill="#fff" stroke="#c2410c" stroke-width="1.5"/>
+      <text x="861" y="122" text-anchor="middle" font-size="12" fill="#c2410c">子作业 A</text>
+      <rect x="932" y="102" width="102" height="30" rx="6" fill="#fff" stroke="#c2410c" stroke-width="1.5"/>
+      <text x="983" y="122" text-anchor="middle" font-size="12" fill="#c2410c">子作业 B</text>
+      <rect x="1054" y="102" width="102" height="30" rx="6" fill="#fff" stroke="#c2410c" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <text x="1105" y="122" text-anchor="middle" font-size="12" fill="#94a3b8">已取消</text>
+      <path d="M900 80 L 866 98" stroke="#c2410c" stroke-width="1.5"/>
+      <path d="M950 80 L 970 98" stroke="#c2410c" stroke-width="1.5"/>
+      <path d="M978 80 L 1080 98" stroke="#c2410c" stroke-width="1.5"/>
+      <text x="810" y="166" font-size="12" fill="#5b6675">主 Agent 得像个小型进程管理器：</text>
+      <text x="810" y="184" font-size="12" fill="#5b6675">起任务、看日志、掐掉跑废的、合结果。</text>
+      <text x="810" y="202" font-size="12" fill="#5b6675"><tspan font-weight="700">并行必须是显式的、可检查的。</tspan></text>
+    </svg>
+    <div class="note b-red mt2"><div class="t red">三个模式背后是同一条原则：把状态从对话里赶出去</div>
+      <div class="cap">只活在临时对话上下文里的产出，<b>会随着对话推进而过期、被截断、被后面的内容淹没，而且没人能回头审它</b>。落到文件系统上的产出才可以被别的进程读、被下一轮引用、被人检查、被自动化流程当输入。<b>这一条在下半章会反复出现：一个东西要能被自动改进，前提是它先能被稳定地观察到。</b></div></div>
+  </div>
+</section>
+
+<section class="slide" data-act="外壳">
+  <div class="hd"><h2>看一个真实外壳：编程 Agent 装了哪些工具</h2></div>
+  <div class="bd">
+    <div class="p mb">编程 Agent 是目前外壳做得最成熟的一类，因为它天然满足两个条件：<b>产物是文本，判据是能不能跑通</b>。把它的工具面摊开，就能看清「外壳」具体是些什么东西。</div>
+    <table class="tbl s mb">
+      <tr><th style="width:15%">工具组</th><th style="width:40%">典型工具</th><th>这一组在外壳里承担什么</th></tr>
+      <tr><td class="blue"><b>文件系统</b></td><td><span class="kbd">glob</span> <span class="kbd">grep</span> <span class="kbd">ls</span> <span class="kbd">read</span> <span class="kbd">read_many</span> <span class="kbd">write</span> <span class="kbd">edit</span> <span class="kbd">multi_edit</span> <span class="kbd">apply_patch</span></td><td>持久记忆的读写口。<b>整个外壳的地基</b>——后面所有自动优化都要靠它把状态存下来再找回来</td></tr>
+      <tr><td class="blue"><b>Shell</b></td><td><span class="kbd">bash</span> <span class="kbd">powershell</span></td><td>唯一的「通用行动」出口。装依赖、跑测试、起服务都从这儿走</td></tr>
+      <tr><td class="green"><b>代码理解与版本</b></td><td><span class="kbd">lsp</span> <span class="kbd">git_status</span> <span class="kbd">git_diff</span> <span class="kbd">git_commit</span></td><td>让「我改了什么」变成结构化事实，而不是模型自己的回忆。<b>归因的前提</b></td></tr>
+      <tr><td class="green"><b>外部上下文</b></td><td><span class="kbd">MCP</span> 工具 · <span class="kbd">Skills</span></td><td>把公司内部系统、领域知识、可复用手册接进来（协议层见第四章）</td></tr>
+      <tr><td class="purple"><b>网页</b></td><td><span class="kbd">web_search</span> <span class="kbd">web_fetch</span> <span class="kbd">browser</span></td><td>补训练数据里没有的、或已经过期的信息</td></tr>
+      <tr><td class="purple"><b>产物</b></td><td>读文档 / 读图 · 生成 HTML、图表、图片</td><td>让输出不止是纯文本，能被人直接验收</td></tr>
+      <tr><td class="orange"><b>后台进程</b></td><td><span class="kbd">CronCreate</span> <span class="kbd">CronList</span> <span class="kbd">CronDelete</span></td><td>跨会话的定时与长任务。<b>「无人值守地跑很久」的必要条件</b></td></tr>
+      <tr><td class="orange"><b>Agent 委派</b></td><td><span class="kbd">spawn_agent</span> <span class="kbd">resume_agent</span> <span class="kbd">wait_agent</span> <span class="kbd">list_agents</span> <span class="kbd">close_agent</span> <span class="kbd">interrupt_agent</span></td><td>把并行做成可管理的对象：能起、能等、能查、能中断、能关</td></tr>
+    </table>
+    <div class="g2">
+      <div class="note b-purple"><div class="t purple">注意最后两组</div>
+        <div class="cap">前六组是「让它把一件事做完」，<b>最后两组是「让它同时推进很多件事，并且事后还查得清」</b>。<br>自动优化外壳这件事，需要一轮跑几十上百次实验——<b>没有这两组工具，回路根本转不起来。</b></div></div>
+      <div class="note b-green"><div class="t green">这张表就是「可编辑面」的雏形</div>
+        <div class="cap">后面讲自动改外壳时，模型能动的东西基本就在这张表的框架内：<b>工具的描述怎么写、工具的实现怎么改、哪些工具该加、哪些该删、什么时候该派子 agent。</b><br>第 15 页会把可编辑面正式切成七个部件。</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="外壳">
+  <div class="hd"><h2>外壳会不会被模型自己吃掉？</h2></div>
+  <div class="bd">
+    <div class="p mb">这是个真问题：今天写在外壳里的东西，很多是在<b>绕过模型的短板</b>。模型变强之后，这些补丁本来就该删掉。那外壳工程是不是一门注定短命的手艺？<b>参照提示词工程的历史，答案是「一部分会消失，一部分不会」。</b></div>
+    <svg viewBox="0 0 1168 224" width="100%" style="display:block">
+      <defs><marker id="ar4" markerWidth="9" markerHeight="9" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#94a3b8"/></marker></defs>
+      <text x="0" y="16" font-size="12.5" font-weight="700" fill="#94a3b8">今天写在外壳（或提示词）里</text>
+      <text x="700" y="16" font-size="12.5" font-weight="700" fill="#94a3b8">模型继续变强之后</text>
+      <path d="M660 46 L 692 46" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ar4)"/>
+      <path d="M660 118 L 692 118" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ar4)"/>
+      <path d="M660 190 L 692 190" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ar4)"/>
+
+      <rect x="0" y="26" width="650" height="42" rx="7" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="14" y="52" font-size="13" fill="#94a3b8">「一步一步想」「你是一位资深…」「务必输出合法 JSON」</text>
+      <rect x="700" y="26" width="468" height="42" rx="7" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="714" y="52" font-size="13" fill="#94a3b8">已经被指令微调吃掉了 —— 不用再写</text>
+
+      <rect x="0" y="98" width="650" height="42" rx="7" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/>
+      <text x="14" y="124" font-size="13" fill="#c2410c">循环怎么写 · 上下文什么时候裁 · 什么时候该开子 agent · 记忆怎么组织</text>
+      <rect x="700" y="98" width="468" height="42" rx="7" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/>
+      <text x="714" y="124" font-size="13" fill="#c2410c">大概率被内化 —— <tspan font-weight="700">但今天还必须自己写</tspan></text>
+
+      <rect x="0" y="170" width="650" height="42" rx="7" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="14" y="196" font-size="13" fill="#0e9f6e">接哪些外部系统 · 权限边界在哪 · 什么算成功 · 目标和约束是什么</text>
+      <rect x="700" y="170" width="468" height="42" rx="7" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="714" y="196" font-size="13" font-weight="700" fill="#0e9f6e">留下来 —— 这是接口，不是补丁</text>
+    </svg>
+    <div class="g3 mt2">
+      <div class="note b-orange"><div class="t orange">外壳工程正在往「元方法」上走</div>
+        <div class="cap">它优化的不再是<b>某个答案</b>，而是<b>「得到更好答案的那套机制」</b>。<br>这一句听起来抽象，但它就是本章阶梯从 ① 走到 ⑤ 的全部含义。</div></div>
+      <div class="note b-green"><div class="t green">两个方向互相制约，这是好事</div>
+        <div class="cap">成熟的外壳让自动研究成为可能；<br>反过来，<b>更聪明的模型会防止外壳被过度工程化</b>——很多复杂设计只是在补模型的洞，洞补上了，设计就该拆掉。</div></div>
+      <div class="note b-red"><div class="t red">所以这一章讲的不是「怎么写外壳」</div>
+        <div class="cap">写法会过时。<b>不会过时的是那个问题：一个系统凭什么能可靠地把自己改好？</b><br>接下来五级阶梯，回答的都是这一个问题。</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="阶梯">
+  <div class="hd"><h2>第二级 · 把上下文当成一本会长大的手册</h2></div>
+  <div class="bd">
+    <div class="p mb">最朴素的「让它记住教训」是：把经验追加进提示词，让模型定期重写一遍。<b>这个做法会稳定地失败</b>，而且失败方式很有意思——它正是后面所有自动优化都要防的那类病。</div>
+    <svg viewBox="0 0 1168 236" width="100%" style="display:block">
+      <defs><marker id="ar5" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 z" fill="#2563eb"/></marker></defs>
+      <rect x="0" y="10" width="196" height="52" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="98" y="34" text-anchor="middle" font-size="14" font-weight="700" fill="#2563eb">Generator</text>
+      <text x="98" y="53" text-anchor="middle" font-size="12" fill="#5b6675">带着手册去跑任务</text>
+      <rect x="0" y="92" width="196" height="52" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="98" y="116" text-anchor="middle" font-size="14" font-weight="700" fill="#2563eb">Reflector</text>
+      <text x="98" y="135" text-anchor="middle" font-size="12" fill="#5b6675">从成功和失败里提炼</text>
+      <rect x="0" y="174" width="196" height="52" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="98" y="198" text-anchor="middle" font-size="14" font-weight="700" fill="#2563eb">Curator</text>
+      <text x="98" y="217" text-anchor="middle" font-size="12" fill="#5b6675">写成条目，交给程序合并</text>
+      <path d="M98 66 L 98 88" stroke="#2563eb" stroke-width="1.6" marker-end="url(#ar5)"/>
+      <path d="M98 148 L 98 170" stroke="#2563eb" stroke-width="1.6" marker-end="url(#ar5)"/>
+      <path d="M200 200 L 226 200 L 226 36 L 200 36" fill="none" stroke="#2563eb" stroke-width="1.6" marker-end="url(#ar5)"/>
+      <text x="236" y="122" font-size="12" fill="#94a3b8">下一轮</text>
+
+      <rect x="300" y="10" width="380" height="216" rx="8" fill="#fff" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="316" y="34" font-size="14" font-weight="700" fill="#0e9f6e">手册（playbook）· 条目化</text>
+      <text x="316" y="60" font-size="12.5" fill="#0e9f6e">+ 新增</text>
+      <text x="360" y="60" font-size="12.5" fill="#5b6675">［db-07］连接串里带端口时先探活</text>
+      <text x="316" y="84" font-size="12.5" fill="#0e9f6e">+ 新增</text>
+      <text x="360" y="84" font-size="12.5" fill="#5b6675">［test-12］失败先看是不是环境没起</text>
+      <text x="316" y="108" font-size="12.5" fill="#c2410c">~ 改写</text>
+      <text x="360" y="108" font-size="12.5" fill="#5b6675">［io-03］超时从 30s 调到 90s</text>
+      <text x="316" y="132" font-size="12.5" fill="#94a3b8">− 删除</text>
+      <text x="360" y="132" font-size="12.5" fill="#94a3b8">［io-05］与 io-03 重复</text>
+      <text x="316" y="156" font-size="12.5" fill="#94a3b8">· 保留</text>
+      <text x="360" y="156" font-size="12.5" fill="#94a3b8">其余 214 条原样不动</text>
+      <path d="M316 174 L 664 174" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="316" y="196" font-size="12.5" font-weight="700" fill="#0e9f6e">合并由确定性程序执行，不是让模型重写全文</text>
+      <text x="316" y="216" font-size="12" fill="#5b6675">再周期性地做一次精简与去重</text>
+
+      <rect x="716" y="10" width="452" height="100" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
+      <text x="732" y="34" font-size="14" font-weight="700" fill="#dc2626">病一 · 上下文坍缩</text>
+      <text x="732" y="58" font-size="12.5" fill="#5b6675">让模型「重写整篇手册」，每重写一次就</text>
+      <text x="732" y="78" font-size="12.5" fill="#5b6675">丢一批具体细节。几轮之后，当初辛苦</text>
+      <text x="732" y="98" font-size="12.5" fill="#5b6675">攒下的特例全变成了几句正确的废话。</text>
+      <rect x="716" y="126" width="452" height="100" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
+      <text x="732" y="150" font-size="14" font-weight="700" fill="#dc2626">病二 · 求简偏好</text>
+      <text x="732" y="174" font-size="12.5" fill="#5b6675">模型天然偏好写得短、写得漂亮。而经验</text>
+      <text x="732" y="194" font-size="12.5" fill="#5b6675">的价值恰恰在啰嗦的那部分——<tspan font-weight="700">哪个版本、</tspan></text>
+      <text x="732" y="214" font-size="12.5" font-weight="700" fill="#5b6675">哪个参数、哪台机器上会出这个错。</text>
+    </svg>
+    <div class="g2 mt2">
+      <div class="note b-blue"><div class="t blue">ACE 的解法只有一句话：让模型输出「差分」，不要让它输出「全文」</div>
+        <div class="cap">Curator 产出的是一条条带标识符的结构化条目（<span class="kbd">identifier</span> + <span class="kbd">description</span>），增删改由外面的确定性逻辑执行。<b>模型负责判断，程序负责落笔</b>——两种病同时被堵住。</div>
+        <div class="src">Zhang et al., Agentic Context Engineering (ACE), 2025 / ICLR 2026</div></div>
+      <div class="note b-orange"><div class="t orange">这一页的方法论价值大于它的技术含量</div>
+        <div class="cap">「让模型提议、让程序执行、让改动可寻址可回退」——<b>这个模式会在第 13、14、17 页原样重现</b>，只不过被改的东西从手册条目换成了外壳源码、再换成优化器本身。<br>阶梯往上走，这条原则一直不变。</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="阶梯">
+  <div class="hd"><h2>第二级续 · 把「怎么管上下文」和「上下文里是什么」拆开</h2></div>
+  <div class="bd">
+    <div class="p mb">ACE 优化的是<b>内容</b>：手册里写什么。但决定内容好坏的其实是上一层——<b>用什么办法去检索、筛选、排版</b>。MCE 把这两件事正式分开，于是优化对象从「一段文本」变成了「一个目录加一组算子」。<b>阶梯就是在这里开始向代码倾斜的。</b></div>
+    <svg viewBox="0 0 1168 244" width="100%" style="display:block">
+      <defs><marker id="ar6" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 z" fill="#7c3aed"/></marker></defs>
+      <rect x="0" y="0" width="700" height="112" rx="9" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+      <text x="16" y="26" font-size="14" font-weight="700" fill="#7c3aed">外层 · 演化「机制」（meta 层）</text>
+      <text x="16" y="50" font-size="12.5" fill="#5b6675">元 Agent 读历史库 H = {(技能, 上下文, 训练分, 验证分)}，</text>
+      <text x="16" y="70" font-size="12.5" fill="#5b6675">把过去表现好的技能<tspan font-weight="700" fill="#7c3aed">交叉重组</tspan>成一个新技能 s，交给内层去调。</text>
+      <text x="16" y="96" font-size="12.5" fill="#7c3aed">选择依据：验证集分数 —— 防的是内层在训练集上过拟合</text>
+
+      <rect x="0" y="132" width="700" height="112" rx="9" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="16" y="158" font-size="14" font-weight="700" fill="#2563eb">内层 · 优化「内容」（base 层）</text>
+      <text x="16" y="182" font-size="12.5" fill="#5b6675">给定技能 s，反复调它的上下文：加什么资料、检索怎么写、</text>
+      <text x="16" y="202" font-size="12.5" fill="#5b6675">保留哪些片段、按什么顺序排版，直到训练集分数不再涨。</text>
+      <text x="16" y="228" font-size="12.5" fill="#2563eb">这一层做的事和 ACE 基本同类</text>
+
+      <path d="M352 116 L 352 128" stroke="#7c3aed" stroke-width="1.8" marker-end="url(#ar6)"/>
+      <path d="M660 128 L 660 116" stroke="#7c3aed" stroke-width="1.8" marker-end="url(#ar6)"/>
+      <text x="366" y="126" font-size="12" fill="#94a3b8">下发技能</text>
+      <text x="524" y="126" font-size="12" fill="#94a3b8">回报分数</text>
+
+      <rect x="732" y="0" width="436" height="112" rx="9" fill="#fff" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="748" y="26" font-size="14" font-weight="700" fill="#0e9f6e">一个「技能」被拆成两半</text>
+      <text x="748" y="52" font-size="12.5" fill="#5b6675"><tspan font-weight="700">ρ 静态组件</tspan>：提示词、知识库、代码库</text>
+      <text x="748" y="74" font-size="12.5" fill="#5b6675"><tspan font-weight="700">F 动态算子</tspan>：检索、选择、过滤、格式化</text>
+      <text x="748" y="100" font-size="12.5" fill="#0e9f6e">前者是素材，后者是拿素材的办法</text>
+
+      <rect x="732" y="132" width="436" height="112" rx="9" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/>
+      <text x="748" y="158" font-size="14" font-weight="700" fill="#c2410c">落地形态：就是磁盘上一个目录</text>
+      <text x="748" y="182" font-size="12.5" fill="#5b6675"><tspan font-family="ui-monospace,monospace">skill.md</tspan> 存静态部分，rollout 数据存动态部分</text>
+      <text x="748" y="204" font-size="12.5" fill="#5b6675">元 Agent 的工具只有七个：Read / Write / Edit /</text>
+      <text x="748" y="224" font-size="12.5" fill="#5b6675">Bash / Glob / Grep / TodoWrite</text>
+    </svg>
+    <div class="g2 mt2">
+      <div class="note b-purple"><div class="t purple">双层优化写成两行式子就是</div>
+        <div class="cap"><b>内层</b>：给定技能 s，找最好的上下文 —— <span class="kbd">c* = argmax_c J_train(c ; s)</span><br><b>外层</b>：在这个前提下，找最好的技能 —— <span class="kbd">s* = argmax_s J_val(c* ; s)</span><br><b>内外用不同的数据集，是这套东西不塌掉的关键</b>：内层随便过拟合，外层负责把过拟合的选下去。<div class="src">Ye et al., Meta Context Engineering (MCE), 2026</div></div></div>
+      <div class="note b-green"><div class="t green">为什么说这一页是个转折点</div>
+        <div class="cap">当「技能」被表示成<b>文件系统上的一个目录</b>，而元 Agent 手里只有一套通用的读写工具时，<b>「优化上下文」和「写代码」已经是同一件事了</b>。<br>再往上一级，被编辑的对象直接换成外壳自己的源码——中间没有台阶，是平的。</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="阶梯">
+  <div class="hd"><h2>第三级 · 工作流：人能手写到什么程度</h2></div>
+  <div class="bd">
+    <div class="p mb">再往上一级，被优化的是<b>步骤本身</b>：先做什么后做什么、谁调谁、什么时候回头。先看三个由人设计的完整工作流，它们分别把三件不同的事推到了当前的上限。</div>
+    <svg viewBox="0 0 1168 132" width="100%" style="display:block">
+      <defs><marker id="ar7" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 z" fill="#94a3b8"/></marker></defs>
+      <text x="0" y="16" font-size="13" font-weight="700" fill="#0e9f6e">AI Scientist · 把整条科研链路跑通，最后产出一篇可投稿的论文</text>
+      <rect x="0" y="30" width="176" height="44" rx="7" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="88" y="58" text-anchor="middle" font-size="13" fill="#0e9f6e">① 提出想法</text>
+      <rect x="198" y="30" width="176" height="44" rx="7" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="286" y="58" text-anchor="middle" font-size="13" fill="#0e9f6e">② 写实现代码</text>
+      <rect x="396" y="30" width="176" height="44" rx="7" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="484" y="58" text-anchor="middle" font-size="13" fill="#0e9f6e">③ 跑实验</text>
+      <rect x="594" y="30" width="176" height="44" rx="7" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="682" y="58" text-anchor="middle" font-size="13" fill="#0e9f6e">④ 分析结果</text>
+      <rect x="792" y="30" width="176" height="44" rx="7" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="880" y="58" text-anchor="middle" font-size="13" fill="#0e9f6e">⑤ 写成论文</text>
+      <rect x="990" y="30" width="178" height="44" rx="7" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="2"/>
+      <text x="1079" y="58" text-anchor="middle" font-size="13" font-weight="700" fill="#0e9f6e">⑥ 同行评审</text>
+      <path d="M180 52 L 194 52" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ar7)"/>
+      <path d="M378 52 L 392 52" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ar7)"/>
+      <path d="M576 52 L 590 52" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ar7)"/>
+      <path d="M774 52 L 788 52" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ar7)"/>
+      <path d="M972 52 L 986 52" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ar7)"/>
+      <path d="M1079 78 L 1079 100 L 88 100 L 88 78" fill="none" stroke="#94a3b8" stroke-width="1.6" stroke-dasharray="4 4" marker-end="url(#ar7)"/>
+      <text x="584" y="120" text-anchor="middle" font-size="12" fill="#94a3b8">评审意见回流，构成下一轮的输入 —— 这就是一个完整的闭环工作流</text>
+    </svg>
+    <div class="g2 mt2 mb">
+      <div class="card t-blue"><div class="t blue">ScientistOne · 把「可验证」提到中心位置</div>
+        <div class="cap">它的中心约束不是「能不能做完」，而是<b>「每一句话能不能追到证据」</b>。<br>引用、数值、方法、结论——四类主张全都要挂到一个具体的证据源上，再由一条<b>证据链（Chain-of-Evidence）</b>去审计。<br><b>为什么这重要</b>：自动研究最大的失败方式不是做不出来，是<b>做出来一份看起来很像样、但没人能核对的东西</b>。把可追溯性做成硬约束，是目前唯一有效的对策。</div></div>
+      <div class="card t-orange"><div class="t orange">Autodata · 自动造题，专造「刚好难」的题</div>
+        <div class="cap">四个角色：<b>出题者</b>造任务，<b>弱解题者</b>和<b>强解题者</b>分别去做，<b>验证判定者</b>裁决。<br>目标区间很讲究：<b>强的能做出来、弱的做不出来</b>——太简单没信息量，太难没有可学的信号。<br><b>但作者给了个降温的评价</b>：合成出来的任务最后只拿去微调弱解题者，<b>更像是一种间接蒸馏</b>，系统整体的上限并没有被自己顶上去，RSI 的味道其实很淡。</div></div>
+    </div>
+    <div class="note b-purple"><div class="t purple">三个例子放在一起，正好指出了工作流这一级的天花板</div>
+      <div class="cap">它们都很强，但<b>每一条流水线的形状都是人定的</b>：几个阶段、谁调谁、什么时候回头、什么时候停。系统只在人画好的图上跑，跑得再好也不会自己改这张图。<b>要突破这一点，得让「流水线本身」变成被搜索的对象——下一页。</b></div></div>
+  </div>
+</section>
+
+<section class="slide" data-act="阶梯">
+  <div class="hd"><h2>第三级续 · 让工作流自己被搜出来</h2></div>
+  <div class="bd">
+    <div class="p mb">既然工作流的好坏可以被评测，那它就可以被搜索。两条路线：<b>ADAS 把 Agent 当成代码去生成，AFlow 把工作流当成图去搜。</b>共同点是——从这里开始，流程图不再是人画的了。</div>
+    <svg viewBox="0 0 1168 250" width="100%" style="display:block">
+      <defs><marker id="ar8" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 z" fill="#94a3b8"/></marker></defs>
+      <rect x="0" y="0" width="572" height="250" rx="9" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/>
+      <text x="16" y="26" font-size="14" font-weight="700" fill="#c2410c">ADAS · 元 Agent 用代码写新 Agent</text>
+      <rect x="16" y="44" width="150" height="76" rx="7" fill="#fff" stroke="#c2410c" stroke-width="1.5"/>
+      <text x="91" y="66" text-anchor="middle" font-size="12.5" font-weight="700" fill="#c2410c">档案库</text>
+      <text x="91" y="86" text-anchor="middle" font-size="12" fill="#5b6675">起步放已知的</text>
+      <text x="91" y="104" text-anchor="middle" font-size="12" fill="#5b6675">CoT、self-refine…</text>
+      <rect x="206" y="44" width="150" height="76" rx="7" fill="#fff" stroke="#c2410c" stroke-width="1.5"/>
+      <text x="281" y="66" text-anchor="middle" font-size="12.5" font-weight="700" fill="#c2410c">元 Agent 提案</text>
+      <text x="281" y="86" text-anchor="middle" font-size="12" fill="#5b6675">先写清楚思路，</text>
+      <text x="281" y="104" text-anchor="middle" font-size="12" fill="#5b6675">再写成可运行代码</text>
+      <rect x="396" y="44" width="160" height="76" rx="7" fill="#fff" stroke="#c2410c" stroke-width="1.5"/>
+      <text x="476" y="66" text-anchor="middle" font-size="12.5" font-weight="700" fill="#c2410c">两轮自我修订</text>
+      <text x="476" y="86" text-anchor="middle" font-size="12" fill="#5b6675">查新颖性、查能不能跑</text>
+      <text x="476" y="104" text-anchor="middle" font-size="12" fill="#5b6675">再交去评测</text>
+      <path d="M170 82 L 202 82" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ar8)"/>
+      <path d="M360 82 L 392 82" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ar8)"/>
+      <path d="M476 124 L 476 148 L 91 148 L 91 124" fill="none" stroke="#c2410c" stroke-width="1.8" marker-end="url(#ar8)"/>
+      <text x="290" y="168" text-anchor="middle" font-size="12" font-weight="700" fill="#c2410c">评测过关的，回填进档案库，成为下一轮的素材</text>
+      <text x="16" y="200" font-size="12.5" fill="#5b6675">被搜索的对象是<tspan font-weight="700">一段 Agent 代码</tspan>。档案库让搜索有记忆，</text>
+      <text x="16" y="220" font-size="12.5" fill="#5b6675">「先描述后实现」把提案从随机改码变成有理由的设计。</text>
+      <text x="16" y="240" font-size="12" fill="#94a3b8">Hu et al., ADAS, 2025 / ICLR</text>
+
+      <rect x="596" y="0" width="572" height="250" rx="9" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="612" y="26" font-size="14" font-weight="700" fill="#7c3aed">AFlow · 把工作流当成图，用 MCTS 搜</text>
+      <text x="612" y="50" font-size="12.5" fill="#5b6675">节点 = 一次 LLM 调用　　边 = 连接它们的代码逻辑</text>
+      <circle cx="700" cy="96" r="17" fill="#fff" stroke="#7c3aed" stroke-width="1.8"/>
+      <text x="700" y="101" text-anchor="middle" font-size="12" fill="#7c3aed">W₀</text>
+      <circle cx="790" cy="72" r="15" fill="#fff" stroke="#7c3aed" stroke-width="1.5"/>
+      <circle cx="790" cy="126" r="15" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+      <circle cx="880" cy="54" r="15" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/>
+      <circle cx="880" cy="104" r="15" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.5"/>
+      <circle cx="880" cy="150" r="15" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/>
+      <circle cx="970" cy="104" r="15" fill="#7c3aed" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="970" y="109" text-anchor="middle" font-size="11.5" fill="#fff">★</text>
+      <path d="M715 90 L 776 76" stroke="#94a3b8" stroke-width="1.4"/>
+      <path d="M715 104 L 776 120" stroke="#94a3b8" stroke-width="1.4"/>
+      <path d="M804 66 L 866 57" stroke="#cbd5e1" stroke-width="1.4"/>
+      <path d="M804 120 L 866 108" stroke="#94a3b8" stroke-width="1.4"/>
+      <path d="M804 132 L 866 146" stroke="#cbd5e1" stroke-width="1.4"/>
+      <path d="M895 104 L 954 104" stroke="#94a3b8" stroke-width="1.4"/>
+      <text x="1000" y="80" font-size="12" fill="#5b6675">选点：分数与</text>
+      <text x="1000" y="98" font-size="12" fill="#5b6675">均匀探索的软混合</text>
+      <text x="1000" y="122" font-size="12" fill="#5b6675">扩展：让 LLM 看着</text>
+      <text x="1000" y="140" font-size="12" fill="#5b6675">评测表现去改图</text>
+      <text x="612" y="188" font-size="12.5" fill="#5b6675">跑完就评测，有提升才在预算 N 内回填；<tspan font-weight="700">前 k 名的平均分</tspan></text>
+      <text x="612" y="208" font-size="12.5" fill="#5b6675"><tspan font-weight="700">不再上涨就停</tspan>。在问答、代码、数学上同时赢过人写的工作流和 ADAS。</text>
+      <text x="612" y="240" font-size="12" fill="#94a3b8">Zhang et al., AFlow, 2025 / ICLR</text>
+    </svg>
+    <div class="note b-red mt2"><div class="t red">这一级的边界也很清楚：搜出来的还是「流程」，不是「系统」</div>
+      <div class="cap">ADAS 和 AFlow 优化的都是<b>模型被怎么调用</b>——提示怎么组、调几次、结果怎么合。但外壳的其余部分（工具怎么实现、上下文怎么裁、什么算成功、权限到哪）还是人写死的，<b>它们不在搜索空间里</b>。<br><b>下一级把整个外壳的源码放进搜索空间——这才是本章真正要讲的那一格。</b></div></div>
+  </div>
+</section>
+
+<section class="slide" data-act="阶梯">
+  <div class="hd"><h2>第四级 · 把外壳的源码本身放进搜索空间</h2></div>
+  <div class="bd">
+    <div class="p mb"><b>代码是定义程序和系统的通用语言。</b>如果一个模型能优化「执行 Agent 的那段代码」，它能触及的设计空间就比手写提示词大得多——大到几乎没有边界。<b>而空间一大，绝大部分候选都是垃圾</b>，所以这一级真正的技术含量不在「怎么改」，在「凭什么相信这次改对了」。</div>
+    <svg viewBox="0 0 1168 258" width="100%" style="display:block">
+      <defs><marker id="ar9" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 z" fill="#94a3b8"/></marker>
+      <marker id="ar9o" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 z" fill="#c2410c"/></marker></defs>
+      <rect x="0" y="18" width="222" height="58" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="111" y="43" text-anchor="middle" font-size="13.5" font-weight="700" fill="#2563eb">① 跑一批任务</text>
+      <text x="111" y="63" text-anchor="middle" font-size="12" fill="#5b6675">留下完整轨迹</text>
+      <rect x="236" y="18" width="222" height="58" rx="8" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/>
+      <text x="347" y="43" text-anchor="middle" font-size="13.5" font-weight="700" fill="#c2410c">② 定位失败的根因</text>
+      <text x="347" y="63" text-anchor="middle" font-size="12" fill="#5b6675">不是「哪儿错了」，是「为什么」</text>
+      <rect x="472" y="18" width="222" height="58" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="583" y="43" text-anchor="middle" font-size="13.5" font-weight="700" fill="#7c3aed">③ 提出一处编辑</text>
+      <text x="583" y="63" text-anchor="middle" font-size="12" fill="#5b6675">落到外壳源码的某个文件上</text>
+      <rect x="708" y="18" width="222" height="58" rx="8" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="819" y="43" text-anchor="middle" font-size="13.5" font-weight="700" fill="#0e9f6e">④ 在留出集上验证</text>
+      <text x="819" y="63" text-anchor="middle" font-size="12" fill="#5b6675">修好了什么，弄坏了什么</text>
+      <rect x="944" y="18" width="224" height="58" rx="8" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="2"/>
+      <text x="1056" y="43" text-anchor="middle" font-size="13.5" font-weight="700" fill="#0e9f6e">⑤ 接受，或回退</text>
+      <text x="1056" y="63" text-anchor="middle" font-size="12" fill="#5b6675">拒掉的也要留档</text>
+      <path d="M226 47 L 232 47" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ar9)"/>
+      <path d="M462 47 L 468 47" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ar9)"/>
+      <path d="M698 47 L 704 47" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ar9)"/>
+      <path d="M934 47 L 940 47" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ar9)"/>
+      <path d="M1056 80 L 1056 104 L 111 104 L 111 80" fill="none" stroke="#c2410c" stroke-width="1.8" marker-end="url(#ar9o)"/>
+      <text x="583" y="98" text-anchor="middle" font-size="12" font-weight="700" fill="#c2410c">改好的外壳去跑下一轮 —— 回路闭合</text>
+
+      <rect x="0" y="130" width="376" height="118" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="16" y="156" font-size="14" font-weight="700" fill="#2563eb">前提一 · 看得见</text>
+      <text x="16" y="180" font-size="12.5" fill="#5b6675">每个可改的部件都得在文件系统上有</text>
+      <text x="16" y="200" font-size="12.5" fill="#5b6675">对应表示；每一次运行都得留下能被</text>
+      <text x="16" y="220" font-size="12.5" fill="#5b6675">回读的轨迹。<tspan font-weight="700">看不见的东西改不了。</tspan></text>
+      <text x="16" y="240" font-size="12" fill="#94a3b8">→ 第 15 页</text>
+
+      <rect x="396" y="130" width="376" height="118" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="412" y="156" font-size="14" font-weight="700" fill="#0e9f6e">前提二 · 判得准</text>
+      <text x="412" y="180" font-size="12.5" fill="#5b6675">必须有一个不被这个回路影响的判据，</text>
+      <text x="412" y="200" font-size="12.5" fill="#5b6675">而且要分「练手的题」和「没见过的题」。</text>
+      <text x="412" y="220" font-size="12.5" font-weight="700" fill="#5b6675">判据在回路里，就等于没有判据。</text>
+      <text x="412" y="240" font-size="12" fill="#94a3b8">→ 第 13、23 页</text>
+
+      <rect x="792" y="130" width="376" height="118" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="808" y="156" font-size="14" font-weight="700" fill="#7c3aed">前提三 · 退得回</text>
+      <text x="808" y="180" font-size="12.5" fill="#5b6675">改动要小、要可寻址、要能一条条撤。</text>
+      <text x="808" y="200" font-size="12.5" fill="#5b6675">大重写没法归因，也没法回退——</text>
+      <text x="808" y="220" font-size="12.5" fill="#5b6675">一旦分数掉了，你不知道该撤哪一处。</text>
+      <text x="808" y="240" font-size="12" fill="#94a3b8">→ 第 13、14 页</text>
+    </svg>
+    <div class="note b-purple mt2"><div class="t purple">这三条前提，就是第 13 到 15 页三篇工作各自解决的问题</div>
+      <div class="cap">Self-Harness 主要在解「<b>提得准、判得住</b>」，AHE 主要在解「<b>看得见、归得了因</b>」。它们的具体做法不同，但都在回答同一个问题——<b>怎么让一次自动修改，成为一件可以被检验的事，而不是一次赌博。</b></div></div>
+  </div>
+</section>
+
+<section class="slide" data-act="阶梯">
+  <div class="hd"><h2>Self-Harness：提案 → 验证 → 接受，三段都有讲究</h2></div>
+  <div class="bd">
+    <div class="p mb">这套流程听上去平平无奇，<b>但每一段都有一个不做就会塌掉的细节</b>。这三个细节比流程本身更值得记。</div>
+    <svg viewBox="0 0 1168 244" width="100%" style="display:block">
+      <defs><marker id="ar10" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 z" fill="#94a3b8"/></marker></defs>
+      <rect x="0" y="0" width="372" height="244" rx="9" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/>
+      <text x="16" y="28" font-size="14.5" font-weight="700" fill="#c2410c">① 弱点挖掘</text>
+      <text x="16" y="52" font-size="12.5" fill="#5b6675">把大量失败聚成若干「失败模式」，</text>
+      <text x="16" y="72" font-size="12.5" fill="#5b6675">每一类都要挂在验证器给出的客观结果上。</text>
+      <rect x="16" y="88" width="340" height="112" rx="7" fill="#fff" stroke="#c2410c" stroke-width="1.5"/>
+      <text x="30" y="112" font-size="12.5" font-weight="700" fill="#c2410c">一条失败记录必须写清三件事</text>
+      <text x="30" y="136" font-size="12.5" fill="#5b6675">· 验证器层面的终态原因是什么</text>
+      <text x="30" y="158" font-size="12.5" fill="#5b6675">· 相关的 Agent 行为，是因还是果</text>
+      <text x="30" y="180" font-size="12.5" fill="#5b6675">· 轨迹暴露出的抽象机制是哪一类</text>
+      <text x="16" y="216" font-size="12.5" fill="#dc2626">两次跑都「超时」，机制可能完全不同：</text>
+      <text x="16" y="234" font-size="12.5" fill="#dc2626">一个是死循环，一个是在等一个永远不来的锁。</text>
+
+      <rect x="398" y="0" width="372" height="244" rx="9" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="414" y="28" font-size="14.5" font-weight="700" fill="#7c3aed">② 有界提案</text>
+      <text x="414" y="52" font-size="12.5" fill="#5b6675">提案 Agent 拿到的上下文是<tspan font-weight="700" fill="#7c3aed">刻意受限</tspan>的，</text>
+      <text x="414" y="72" font-size="12.5" fill="#5b6675">只给这四样，别的一概不给：</text>
+      <rect x="414" y="88" width="340" height="112" rx="7" fill="#fff" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="428" y="112" font-size="12.5" fill="#5b6675">· 哪些地方允许改（可编辑面）</text>
+      <text x="428" y="136" font-size="12.5" fill="#5b6675">· 这一轮总结出的失败模式</text>
+      <text x="428" y="158" font-size="12.5" fill="#5b6675">· <tspan font-weight="700">当前已经能过的行为，必须保住</tspan></text>
+      <text x="428" y="180" font-size="12.5" fill="#5b6675">· 以前试过哪些编辑，结果如何</text>
+      <text x="414" y="216" font-size="12.5" fill="#7c3aed">优先挑<tspan font-weight="700">反复出现、能定位、窄改动就能修</tspan>的问题；</text>
+      <text x="414" y="234" font-size="12.5" fill="#7c3aed">同一轮的几个候选之间必须彼此不同。</text>
+
+      <rect x="796" y="0" width="372" height="244" rx="9" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="812" y="28" font-size="14.5" font-weight="700" fill="#0e9f6e">③ 验证与合入</text>
+      <text x="812" y="52" font-size="12.5" fill="#5b6675">每个候选都要跑两套回归，缺一不可：</text>
+      <rect x="812" y="70" width="340" height="52" rx="7" fill="#fff" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="826" y="92" font-size="12.5" font-weight="700" fill="#0e9f6e">练手集 D_in</text>
+      <text x="826" y="112" font-size="12.5" fill="#5b6675">问：想修的那批，真修好了吗</text>
+      <rect x="812" y="132" width="340" height="52" rx="7" fill="#fff" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="826" y="154" font-size="12.5" font-weight="700" fill="#0e9f6e">留出集 D_out</text>
+      <text x="826" y="174" font-size="12.5" fill="#5b6675">问：有没有顺手弄坏别的</text>
+      <path d="M982 188 L 982 200" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ar10)"/>
+      <text x="812" y="216" font-size="12.5" font-weight="700" fill="#0e9f6e">两边都不退步，才允许合进正在用的外壳。</text>
+      <text x="812" y="234" font-size="12.5" fill="#5b6675">被拒的候选照样存档，但一个字也不落地。</text>
+    </svg>
+    <div class="g2 mt2">
+      <div class="note b-green"><div class="t green">实验里一个容易被略过的观察</div>
+        <div class="cap">同一套流程在 MiniMax M2.5、Qwen3.5-35B-A3B、GLM-5 上分别跑 Terminal-Bench-2，<b>学出来的指令是「因模型而异」的</b>——不同底座模型需要被提醒的事情不一样。<br><b>这说明外壳不是一份放之四海皆准的最佳实践，它是对「这个模型的具体短板」的补偿。</b>换模型，外壳大概率要重学。
+        <div class="src">Zhang et al., Self-Harness, 2026</div></div></div>
+      <div class="note b-red"><div class="t red">作者在这里插了一句很重的话</div>
+        <div class="cap">「如果允许一个程序去编辑操作系统本身，抽象边界就被打破了。」<br><b>可编辑面必须被主动设计，而权限控制和安全层必须活在这个回路之外。</b><br>这不是一句免责声明——下一页的 AHE 把这句话直接做成了硬约束，而它恰好也是那套方法能拿到干净结果的原因。</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="阶梯">
+  <div class="hd"><h2>AHE 之一：切开可编辑面，然后把剩下的锁死</h2></div>
+  <div class="bd">
+    <div class="p mb">要让模型改外壳，第一件事是回答：<b>「外壳」到底由哪几块组成，哪几块允许它动。</b>AHE 给出的答案是七个部件——外加一条把剩余部分全部设成只读的分界线。</div>
+    <svg viewBox="0 0 1168 272" width="100%" style="display:block">
+      <rect x="0" y="0" width="740" height="272" rx="9" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+      <text x="16" y="26" font-size="14.5" font-weight="700" fill="#7c3aed">可编辑工作区 —— 演化 Agent 能动的全部东西，共七个部件</text>
+      <rect x="16" y="40" width="348" height="42" rx="6" fill="#fff" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="30" y="58" font-size="12.5" font-weight="700" fill="#7c3aed">① 系统提示词</text>
+      <text x="30" y="76" font-size="12" fill="#5b6675">整体行为基调、通用注意事项</text>
+      <rect x="376" y="40" width="348" height="42" rx="6" fill="#fff" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="390" y="58" font-size="12.5" font-weight="700" fill="#7c3aed">② 工具描述</text>
+      <text x="390" y="76" font-size="12" fill="#5b6675">什么时候该用它、参数怎么填</text>
+      <rect x="16" y="94" width="348" height="42" rx="6" fill="#fff" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="30" y="112" font-size="12.5" font-weight="700" fill="#7c3aed">③ 工具实现</text>
+      <text x="30" y="130" font-size="12" fill="#5b6675">工具本身的代码：超时、重试、返回格式</text>
+      <rect x="376" y="94" width="348" height="42" rx="6" fill="#fff" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="390" y="112" font-size="12.5" font-weight="700" fill="#7c3aed">④ 中间件</text>
+      <text x="390" y="130" font-size="12" fill="#5b6675">每一步前后插的处理：截断、注入、拦截</text>
+      <rect x="16" y="148" width="348" height="42" rx="6" fill="#fff" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="30" y="166" font-size="12.5" font-weight="700" fill="#7c3aed">⑤ 技能</text>
+      <text x="30" y="184" font-size="12" fill="#5b6675">可复用的操作手册与配套脚本</text>
+      <rect x="376" y="148" width="348" height="42" rx="6" fill="#fff" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="390" y="166" font-size="12.5" font-weight="700" fill="#7c3aed">⑥ 子 Agent 配置</text>
+      <text x="390" y="184" font-size="12" fill="#5b6675">派不派、派几个、给什么权限和上下文</text>
+      <rect x="16" y="202" width="348" height="42" rx="6" fill="#fff" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="30" y="220" font-size="12.5" font-weight="700" fill="#7c3aed">⑦ 长期记忆</text>
+      <text x="30" y="238" font-size="12" fill="#5b6675">跨任务留下来的结论怎么存、怎么取</text>
+      <text x="378" y="216" font-size="12.5" font-weight="700" fill="#7c3aed">每一类失败模式，都要能指到其中一个部件上。</text>
+      <text x="378" y="236" font-size="12.5" fill="#5b6675">指不到，说明根因还没找准，不许提改动。</text>
+      <text x="16" y="264" font-size="12.5" fill="#5b6675">七个部件全部在文件系统上有对应的文件 —— 这就是「组件可观测」。</text>
+
+      <rect x="772" y="0" width="396" height="272" rx="9" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+      <text x="788" y="26" font-size="14.5" font-weight="700" fill="#dc2626">只读区 —— 回路碰不到的地方</text>
+      <rect x="788" y="40" width="364" height="38" rx="6" fill="#fff" stroke="#dc2626" stroke-width="1.5"/>
+      <text x="802" y="64" font-size="12.5" fill="#dc2626">运行记录目录（历史轨迹与分数）</text>
+      <rect x="788" y="86" width="364" height="38" rx="6" fill="#fff" stroke="#dc2626" stroke-width="1.5"/>
+      <text x="802" y="110" font-size="12.5" fill="#dc2626">追踪器（tracer）</text>
+      <rect x="788" y="132" width="364" height="38" rx="6" fill="#fff" stroke="#dc2626" stroke-width="1.5"/>
+      <text x="802" y="156" font-size="12.5" fill="#dc2626">验证器（verifier）</text>
+      <rect x="788" y="178" width="364" height="38" rx="6" fill="#fff" stroke="#dc2626" stroke-width="1.5"/>
+      <text x="802" y="202" font-size="12.5" fill="#dc2626">模型配置：用哪个模型、推理预算多少</text>
+      <text x="788" y="240" font-size="12.5" font-weight="700" fill="#dc2626">这四样锁死之后，三条最省事的作弊路</text>
+      <text x="788" y="260" font-size="12.5" font-weight="700" fill="#dc2626">被结构性地封掉了 —— 见下方。</text>
+    </svg>
+    <div class="g2 mt2">
+      <div class="note b-red"><div class="t red">被封掉的三条路，每一条都是真实会发生的</div>
+        <div class="cap">① <b>把验证器关了或改松</b>——分数立刻好看　② <b>偷偷换个更强的模型</b>——涨分与外壳无关　③ <b>把推理预算调高</b>——花钱买分数<br><b>它们都不是「模型学坏了」，而是回路给了它这个口子。</b>把口子焊死之后，剩下的每一分提升都只能来自外壳编辑本身——<b>结论也就有了归因。</b></div></div>
+      <div class="note b-orange"><div class="t orange">第二条硬约束：每一次编辑都得附一份「证据说明」</div>
+        <div class="cap">格式是固定的四段：<b>依据哪条失败证据 · 推断的根因是什么 · 针对性的修法 · 预期影响</b>。<br>其中「预期影响」必须同时写<b>预计能修好哪些</b>和<b>可能被拖坏哪些</b>。<br><b>写完就成了一条可证伪的断言，下一轮的数据直接判它对错。</b></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="阶梯">
+  <div class="hd"><h2>AHE 之二：真正的瓶颈不是「会不会改」，是「看不看得清」</h2></div>
+  <div class="bd">
+    <div class="p mb">这套方法的判断是：模型早就有能力写出合理的外壳改动，<b>卡住的地方在于它看不清自己上一轮到底怎么错的</b>。于是重点全放在可观测性上，切成三根支柱。</div>
+    <svg viewBox="0 0 1168 236" width="100%" style="display:block">
+      <defs><marker id="ar11" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 z" fill="#0e9f6e"/></marker></defs>
+      <rect x="0" y="0" width="376" height="236" rx="9" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="16" y="28" font-size="14.5" font-weight="700" fill="#2563eb">支柱一 · 组件可观测</text>
+      <text x="16" y="54" font-size="12.5" fill="#5b6675">上一页那七个部件，每一个在磁盘上</text>
+      <text x="16" y="74" font-size="12.5" fill="#5b6675">都有确定的文件位置。</text>
+      <rect x="16" y="92" width="344" height="76" rx="7" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="30" y="116" font-size="12.5" fill="#5b6675">失败模式 ──────→ 某个具体部件</text>
+      <text x="30" y="140" font-size="12.5" fill="#5b6675">部件 ──────→ 某个具体文件</text>
+      <text x="30" y="160" font-size="12" fill="#94a3b8">两跳都必须落地，中间不许含糊</text>
+      <text x="16" y="190" font-size="12.5" fill="#5b6675">「这个外壳记忆管得不好」不是一个</text>
+      <text x="16" y="210" font-size="12.5" fill="#5b6675">可执行的判断；<tspan font-weight="700">「⑦ 号部件的写入策略</tspan></text>
+      <text x="16" y="228" font-size="12.5" font-weight="700" fill="#5b6675">漏了失败案例」才是。</text>
+
+      <rect x="396" y="0" width="376" height="236" rx="9" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="412" y="28" font-size="14.5" font-weight="700" fill="#0e9f6e">支柱二 · 经验可观测</text>
+      <text x="412" y="54" font-size="12.5" fill="#5b6675">每个候选外壳跑 k 条轨迹，然后分三层</text>
+      <text x="412" y="74" font-size="12.5" fill="#5b6675">往上收 —— 这是为了省 token。</text>
+      <rect x="412" y="90" width="344" height="34" rx="6" fill="#fff" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="426" y="112" font-size="12.5" fill="#0e9f6e">第三层：整个基准的总览</text>
+      <rect x="412" y="132" width="344" height="34" rx="6" fill="#fff" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="426" y="154" font-size="12.5" fill="#0e9f6e">第二层：每个任务一份根因报告</text>
+      <rect x="412" y="174" width="344" height="34" rx="6" fill="#fff" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="426" y="196" font-size="12.5" fill="#0e9f6e">第一层：原始轨迹，按需拉取</text>
+      <path d="M584 170 L 584 158" stroke="#0e9f6e" stroke-width="1.6" marker-end="url(#ar11)"/>
+      <path d="M584 128 L 584 116" stroke="#0e9f6e" stroke-width="1.6" marker-end="url(#ar11)"/>
+      <text x="412" y="230" font-size="12.5" fill="#5b6675">根因报告由一个专职的「调试 Agent」写。</text>
+
+      <rect x="792" y="0" width="376" height="236" rx="9" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="808" y="28" font-size="14.5" font-weight="700" fill="#7c3aed">支柱三 · 决策可观测</text>
+      <text x="808" y="54" font-size="12.5" fill="#5b6675">「演化 Agent」不只交出一个 diff，</text>
+      <text x="808" y="74" font-size="12.5" fill="#5b6675">还要交出选择的理由和预测。</text>
+      <rect x="808" y="92" width="344" height="100" rx="7" fill="#fff" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="822" y="116" font-size="12.5" fill="#5b6675">· 我为什么挑这个部件</text>
+      <text x="822" y="140" font-size="12.5" fill="#5b6675">· 我改了哪个文件的哪几行</text>
+      <text x="822" y="164" font-size="12.5" fill="#5b6675">· 我预计下一轮会发生什么</text>
+      <text x="822" y="184" font-size="12" fill="#94a3b8">全部写进一份可追溯的清单</text>
+      <text x="808" y="212" font-size="12.5" font-weight="700" fill="#7c3aed">每一次编辑因此变成一条文件级的</text>
+      <text x="808" y="230" font-size="12.5" font-weight="700" fill="#7c3aed">可证伪断言，下一轮直接验它。</text>
+    </svg>
+    <div class="g2 mt2">
+      <div class="note b-green"><div class="t green">结果：在 Terminal-Bench-2 上赢过人手工设计的外壳</div>
+        <div class="cap">对比对象包括 OpenCode、Terminus-2、Codex 这些成熟的工程产物——<b>除了最难那一档之外全部超过</b>；同时也超过 ACE 和 TF-GRPO 这类只改上下文或只调权重的路线。<b>这是「模型改外壳」第一次在成熟基准上正面赢过资深工程师的手笔。</b>
+        <div class="src">Lin et al., Agentic Harness Evolution (AHE), 2026</div></div></div>
+      <div class="note b-purple"><div class="t purple">比赢更值得注意的是：它能迁移</div>
+        <div class="cap">把演化出来的外壳<b>冻住</b>，直接搬到 SWE-bench-verified 上，<b>照样有效</b>。<br>这说明它学到的不是「怎么在 Terminal-Bench 上拿分」的技巧，而是<b>某种可以带走的工程经验</b>——这一条比排行榜名次重要得多，因为它正面回应了「是不是又在刷榜」这个质疑。</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="阶梯">
+  <div class="hd"><h2>一个反直觉的结果：会改外壳 ≠ 用得上外壳</h2></div>
+  <div class="bd">
+    <div class="p mb">直觉上「模型越强，这套回路转得越快」。但把能力拆成两个轴分别测，结论完全不是这样——<b>而这个结论直接决定了这套方法今天该怎么用。</b></div>
+    <svg viewBox="0 0 1168 250" width="100%" style="display:block">
+      <path d="M96 216 L 1140 216" stroke="#cbd5e1" stroke-width="1.5"/>
+      <path d="M96 216 L 96 20" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="96" y="242" text-anchor="middle" font-size="12" fill="#94a3b8">9B</text>
+      <text x="356" y="242" text-anchor="middle" font-size="12" fill="#94a3b8">32B</text>
+      <text x="616" y="242" text-anchor="middle" font-size="12" fill="#94a3b8">中档闭源</text>
+      <text x="876" y="242" text-anchor="middle" font-size="12" fill="#94a3b8">大</text>
+      <text x="1090" y="242" text-anchor="middle" font-size="12" fill="#94a3b8">Opus 4.6</text>
+      <text x="616" y="14" text-anchor="middle" font-size="12" fill="#94a3b8">底座模型能力 →</text>
+
+      <path d="M96 74 L 356 70 L 616 76 L 876 66 L 1090 64" fill="none" stroke="#2563eb" stroke-width="2.5"/>
+      <circle cx="96" cy="74" r="5" fill="#2563eb"/><circle cx="356" cy="70" r="5" fill="#2563eb"/>
+      <circle cx="616" cy="76" r="5" fill="#2563eb"/><circle cx="876" cy="66" r="5" fill="#2563eb"/>
+      <circle cx="1090" cy="64" r="5" fill="#2563eb"/>
+      <text x="110" y="52" font-size="13" font-weight="700" fill="#2563eb">A · 写得出改动的能力 —— 几乎是一条平线</text>
+
+      <path d="M96 202 C 200 190, 260 140, 356 128 C 470 114, 540 74, 616 72 C 700 70, 790 104, 876 122 C 960 140, 1030 152, 1090 158" fill="none" stroke="#c2410c" stroke-width="2.5"/>
+      <circle cx="96" cy="202" r="5" fill="#c2410c"/><circle cx="356" cy="128" r="5" fill="#c2410c"/>
+      <circle cx="616" cy="72" r="5" fill="#c2410c"/><circle cx="876" cy="122" r="5" fill="#c2410c"/>
+      <circle cx="1090" cy="158" r="5" fill="#c2410c"/>
+      <text x="640" y="188" font-size="13" font-weight="700" fill="#c2410c">B · 用得上改动的能力 —— 一条倒 U，中档模型收益最大</text>
+      <path d="M96 216 L 96 210" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="60" y="80" text-anchor="middle" font-size="12" fill="#94a3b8">高</text>
+      <text x="60" y="206" text-anchor="middle" font-size="12" fill="#94a3b8">低</text>
+      <text x="1104" y="196" font-size="12" fill="#94a3b8">示意，非精确复刻</text>
+    </svg>
+    <div class="g3 mt2">
+      <div class="note b-blue"><div class="t blue">发现 A · 写改动这件事，小模型没比大模型差多少</div>
+        <div class="cap">从 9B、32B 一路测到 Opus 4.6，<b>产出有用外壳编辑的能力基本持平</b>。一个 9B 模型写出来的技能文件，在流程结构上和顶配模型写的<b>是同构的</b>。<br>原因不难理解：外壳改动本质是「把踩过的坑写清楚」，这是个总结性任务，不是推理难题。</div>
+        <div class="src">Lin et al., Harness Updating Is Not Harness Benefit, 2026</div></div>
+      <div class="note b-orange"><div class="t orange">发现 B · 用得上，才是真门槛，而且不是越强越好</div>
+        <div class="cap">要吃到外壳的好处，模型得同时做到两件事：<b>在正确的时机正确地调用那些技能和工具</b>，以及<b>在很长的任务里一直记着遵守这些约定</b>。<br>太弱的做不到第二条，改了也白改；<b>太强的本来就会，外壳给的边际收益反而小</b>——于是中间那一档收益最大。</div></div>
+      <div class="note b-purple"><div class="t purple">推论：提改动和执行任务，本来就该由不同的模型干</div>
+        <div class="cap">既然「写」这一侧对模型能力不敏感，那就<b>用便宜的模型批量产候选</b>；既然「用」这一侧才是瓶颈，那就<b>把强模型的预算留给执行和验证</b>。<br><b>这不是省钱技巧，这是这条曲线直接给出的分工方案。</b></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="阶梯">
+  <div class="hd"><h2>另一种走法：不推理，直接演化</h2></div>
+  <div class="bd">
+    <div class="p mb">前面几页都是「看日志 → 想清楚 → 改一处」。还有一条完全不同的路子：<b>不要求想明白，只要求大量生成、严格筛选。</b>什么时候该用它有两个判据——<b>搜索空间大且形状怪，以及梯度难求但评估便宜。</b>研究类问题常常正好命中这两条。</div>
+    <svg viewBox="0 0 1168 232" width="100%" style="display:block">
+      <defs><marker id="ar12" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 z" fill="#94a3b8"/></marker></defs>
+      <rect x="0" y="0" width="620" height="232" rx="9" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="16" y="26" font-size="14.5" font-weight="700" fill="#0e9f6e">AlphaEvolve 一类：模型只负责生成 diff</text>
+      <rect x="16" y="42" width="164" height="66" rx="7" fill="#fff" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="98" y="66" text-anchor="middle" font-size="12.5" font-weight="700" fill="#0e9f6e">候选程序池</text>
+      <text x="98" y="88" text-anchor="middle" font-size="12" fill="#5b6675">带着各自的分数</text>
+      <rect x="228" y="42" width="164" height="66" rx="7" fill="#fff" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="310" y="60" text-anchor="middle" font-size="12.5" font-weight="700" fill="#0e9f6e">冻结的 LLM</text>
+      <text x="310" y="80" text-anchor="middle" font-size="12" fill="#5b6675">看父程序 + 结果 +</text>
+      <text x="310" y="98" text-anchor="middle" font-size="12" fill="#5b6675">指令，产出一个 diff</text>
+      <rect x="440" y="42" width="164" height="66" rx="7" fill="#fff" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="522" y="66" text-anchor="middle" font-size="12.5" font-weight="700" fill="#0e9f6e">自动评分</text>
+      <text x="522" y="88" text-anchor="middle" font-size="12" fill="#5b6675">好的留下，回池子</text>
+      <path d="M184 75 L 222 75" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ar12)"/>
+      <path d="M396 75 L 434 75" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ar12)"/>
+      <path d="M522 112 L 522 124 L 98 124 L 98 112" fill="none" stroke="#0e9f6e" stroke-width="1.8" marker-end="url(#ar12)"/>
+      <rect x="16" y="140" width="588" height="76" rx="7" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="30" y="162" font-size="12" fill="#94a3b8" font-family="ui-monospace,monospace"># EVOLVE-BLOCK-START</text>
+      <text x="30" y="182" font-size="12" fill="#5b6675" font-family="ui-monospace,monospace">    ...  只有夹在这两行之间的代码允许被改写  ...</text>
+      <text x="30" y="202" font-size="12" fill="#94a3b8" font-family="ui-monospace,monospace"># EVOLVE-BLOCK-END</text>
+      <text x="360" y="202" font-size="12" fill="#0e9f6e">连生成 diff 用的元提示，本身也在一起演化</text>
+
+      <rect x="644" y="0" width="524" height="232" rx="9" fill="#fff7ed" stroke="#c2410c" stroke-width="2"/>
+      <text x="660" y="26" font-size="14.5" font-weight="700" fill="#c2410c">DGM · 直接演化一个能改自己的编程 Agent</text>
+      <text x="660" y="52" font-size="12.5" fill="#5b6675">被演化的对象就是这个 Agent <tspan font-weight="700">自己的代码仓库</tspan>。</text>
+      <text x="660" y="74" font-size="12.5" fill="#5b6675">父代读自己的评测日志，然后改自己——手上</text>
+      <text x="660" y="94" font-size="12.5" fill="#5b6675">只有两个工具：<tspan font-family="ui-monospace,monospace">bash</tspan> 和 <tspan font-family="ui-monospace,monospace">editor</tspan>。</text>
+      <text x="660" y="120" font-size="12.5" fill="#c2410c">挑父代的概率 ∝ 表现，同时 ∝ 1 / 已有子代数</text>
+      <text x="660" y="140" font-size="12" fill="#94a3b8">—— 好的多生，但生过的降权，防止全池子挤成一个样</text>
+      <rect x="660" y="156" width="240" height="60" rx="7" fill="#fff" stroke="#c2410c" stroke-width="1.5"/>
+      <text x="780" y="180" text-anchor="middle" font-size="13" font-weight="700" fill="#c2410c">SWE-bench Verified</text>
+      <text x="780" y="204" text-anchor="middle" font-size="16" font-weight="700" fill="#c2410c">20% → 50%</text>
+      <rect x="916" y="156" width="236" height="60" rx="7" fill="#fff" stroke="#c2410c" stroke-width="1.5"/>
+      <text x="1034" y="180" text-anchor="middle" font-size="13" font-weight="700" fill="#c2410c">Polyglot</text>
+      <text x="1034" y="204" text-anchor="middle" font-size="16" font-weight="700" fill="#c2410c">14.2% → 30.7%</text>
+    </svg>
+    <div class="g3 mt2">
+      <div class="note b-purple"><div class="t purple">这个数字最该被读出的一层意思</div>
+        <div class="cap">整个过程里<b>模型权重一个字节都没变</b>——用的一直是同一个 Claude 3.5 Sonnet。<br><b>翻倍的性能全部来自外壳代码被改好了。</b><br>这是本章最直接的一个证据：<b>今天可动用的 RSI，主要就在这一层。</b></div></div>
+      <div class="note b-orange"><div class="t orange">演化要防的两件事，前人已经踩过</div>
+        <div class="cap">· <b>多样性会塌</b>：ShinkaEvolve 用嵌入相似度做新颖性拒绝采样，太像的候选直接不要<br>· <b>经验会丢</b>：它另外维护一个记录成功模式的元便签，让后代不用重新踩坑<br>· 更早的 Promptbreeder 更彻底——<b>连「怎么变异」的提示词自己都在演化</b></div></div>
+      <div class="note b-red"><div class="t red">它的适用范围其实很窄</div>
+        <div class="cap">能跑通的地方有个共同点：<b>打分是自动的、快的、明确的</b>——矩阵乘法、GPU kernel、算法竞赛、数据中心调度。<br>一旦评估变慢、变模糊、或者要靠启发式，这条路立刻失效。<b>再加上算力开销本身就很可观。</b></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="阶梯">
+  <div class="hd"><h2>第五级 · 不改答案，不改外壳，改「改的那套程序」</h2></div>
+  <div class="bd">
+    <div class="p mb">阶梯的最后一级，把递归这件事做到了字面意义上：<b>被优化的对象，就是那个负责做优化的程序自己。</b>这是 RSI 定义里那句「用当前的智能改进产生智能的机制」最直接的一次实现。</div>
+    <svg viewBox="0 0 1168 216" width="100%" style="display:block">
+      <defs><marker id="ar13" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 z" fill="#7c3aed"/></marker></defs>
+      <rect x="0" y="0" width="620" height="216" rx="9" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+      <text x="16" y="26" font-size="14.5" font-weight="700" fill="#7c3aed">STOP · 目标不是把程序改好，是把「改进器」改好</text>
+      <rect x="16" y="42" width="588" height="40" rx="6" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="30" y="67" font-size="13" fill="#5b6675" font-family="ui-monospace,monospace">s′ = I(u, s ; M)</text>
+      <text x="220" y="67" font-size="12.5" fill="#5b6675">改进器 I 拿着效用函数 u 和一个程序 s，用模型 M 产出更好的 s′</text>
+      <rect x="16" y="92" width="588" height="40" rx="6" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="30" y="117" font-size="13" fill="#5b6675" font-family="ui-monospace,monospace">û(I) = avg u(I(u, s ; M))</text>
+      <text x="290" y="117" font-size="12.5" fill="#5b6675">在一批任务上取平均 = 这个改进器有多能改</text>
+      <rect x="16" y="142" width="588" height="40" rx="6" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+      <text x="30" y="167" font-size="13" font-weight="700" fill="#7c3aed" font-family="ui-monospace,monospace">I_t = I_{t−1}(û, I_{t−1} ; M)</text>
+      <text x="300" y="167" font-size="12.5" font-weight="700" fill="#7c3aed">把上一版改进器，交给它自己去改进</text>
+      <text x="16" y="204" font-size="12.5" fill="#5b6675">它自己摸索出来的策略包括：遗传算法、拆成小块逐块改、多臂老虎机式地挑提示、模拟退火、调温度、束搜索与树搜索。</text>
+
+      <rect x="644" y="0" width="524" height="216" rx="9" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/>
+      <text x="660" y="26" font-size="14.5" font-weight="700" fill="#c2410c">Meta-Harness · 一个用来优化外壳的外壳</text>
+      <text x="660" y="52" font-size="12.5" fill="#5b6675">它优化的是那段决定「什么被存下来、什么被</text>
+      <text x="660" y="72" font-size="12.5" fill="#5b6675">取回来、怎么呈现给模型」的代码。</text>
+      <text x="660" y="98" font-size="12.5" fill="#c2410c">· 提案者本身就是一个编程 Agent</text>
+      <text x="660" y="120" font-size="12.5" fill="#c2410c">· 执行历史直接用 grep / cat 从文件系统读回</text>
+      <text x="660" y="142" font-size="12.5" fill="#c2410c">· 每个候选外壳 = 一个目录，装着自己的源码、</text>
+      <text x="676" y="162" font-size="12.5" fill="#c2410c">分数、轨迹和状态更新</text>
+      <text x="660" y="188" font-size="12.5" font-weight="700" fill="#c2410c">· 产出不是一个最优解，是一条 Pareto 前沿</text>
+      <text x="660" y="208" font-size="12" fill="#94a3b8">在 TerminalBench-2 上从两个成熟外壳出发做搜索</text>
+    </svg>
+    <div class="g3 mt2">
+      <div class="note b-red"><div class="t red">这一级有一条硬门槛，而且已经被实验撞到过</div>
+        <div class="cap">同一套 STOP：<b>换成 GPT-4 能自我改进，换成 GPT-3.5 和 Mixtral 反而越改越差。</b><br><b>递归结构本身不产生增益。</b>底座模型必须强到「有能力改进一套机制」，这个回路才是正的；否则它只是在放大自己的错误。</div>
+        <div class="src">Zelikman et al., STOP, 2023 / COLM 2024</div></div>
+      <div class="note b-orange"><div class="t orange">和第 16 页那条平线并不矛盾</div>
+        <div class="cap">第 16 页测的是<b>「写出一条有用的外壳编辑」</b>——总结性任务，小模型也做得来。<br>这一页要的是<b>「改进那个产生编辑的程序」</b>——要理解机制、预判后果、判断哪种搜索策略更好。<b>后者难得多，也就有了门槛。</b></div></div>
+      <div class="note b-purple"><div class="t purple">这一级最该记住的一句话</div>
+        <div class="cap">一旦外壳设计变成了<b>一个可执行的搜索空间</b>，一个足够强的编程 Agent 就能进入<b>人类工程师用的同一片设计空间</b>。<br>它不需要什么新能力——<b>它只需要那个空间被表示成代码。</b></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="阶梯">
+  <div class="hd"><h2>再往前一步：把权重也放进同一个回路</h2></div>
+  <div class="bd">
+    <div class="p mb">到这里为止，模型权重一直是冻着的——所有增益都来自外壳。<b>最后一步是把「改外壳」和「改权重」放进同一个决策回路，每一轮自己决定改哪边。</b>方向上这是完整的 RSI，但目前它也是本章证据最薄的一格。</div>
+    <svg viewBox="0 0 1168 228" width="100%" style="display:block">
+      <defs><marker id="ar14" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 z" fill="#94a3b8"/></marker>
+      <marker id="ar14b" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 z" fill="#2563eb"/></marker>
+      <marker id="ar14p" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 z" fill="#7c3aed"/></marker></defs>
+      <rect x="0" y="60" width="212" height="72" rx="8" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/>
+      <text x="106" y="90" text-anchor="middle" font-size="13.5" font-weight="700" fill="#c2410c">元 Agent</text>
+      <text x="106" y="112" text-anchor="middle" font-size="12" fill="#5b6675">先造一个初始外壳</text>
+      <rect x="266" y="60" width="212" height="72" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="372" y="90" text-anchor="middle" font-size="13.5" font-weight="700" fill="#2563eb">任务 Agent</text>
+      <text x="372" y="112" text-anchor="middle" font-size="12" fill="#5b6675">带着外壳去干活，留轨迹</text>
+      <rect x="532" y="60" width="212" height="72" rx="8" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="2"/>
+      <text x="638" y="90" text-anchor="middle" font-size="13.5" font-weight="700" fill="#0e9f6e">反馈 Agent</text>
+      <text x="638" y="112" text-anchor="middle" font-size="12" fill="#5b6675">这一轮该改哪一边？</text>
+      <path d="M216 96 L 260 96" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ar14)"/>
+      <path d="M482 96 L 526 96" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ar14)"/>
+
+      <rect x="812" y="12" width="356" height="72" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="828" y="40" font-size="13.5" font-weight="700" fill="#2563eb">改外壳</text>
+      <text x="828" y="64" font-size="12" fill="#5b6675">便宜、快、可回退 —— 前面十几页讲的全部</text>
+      <rect x="812" y="108" width="356" height="72" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="828" y="136" font-size="13.5" font-weight="700" fill="#7c3aed">改权重</text>
+      <text x="828" y="160" font-size="12" fill="#5b6675">贵、慢、难回退 —— 但能改动模型本身的短板</text>
+      <path d="M748 82 L 806 48" stroke="#2563eb" stroke-width="1.8" marker-end="url(#ar14b)"/>
+      <path d="M748 110 L 806 144" stroke="#7c3aed" stroke-width="1.8" marker-end="url(#ar14p)"/>
+      <path d="M638 136 L 638 200 L 106 200 L 106 136" fill="none" stroke="#94a3b8" stroke-width="1.6" stroke-dasharray="4 4" marker-end="url(#ar14)"/>
+      <text x="372" y="220" text-anchor="middle" font-size="12" fill="#94a3b8">改完，回到下一轮</text>
+    </svg>
+    <div class="g3 mt2">
+      <div class="note b-orange"><div class="t orange">为什么这一步在概念上很重要</div>
+        <div class="cap">前面所有工作都默认「权重不可动」，于是外壳的天花板就是模型的天花板。<b>一旦权重进了回路，天花板原则上就没有了。</b><br>这也正是本章第 2 页说的三种 RSI 形态里，②③ 第一次被接在一起。</div></div>
+      <div class="note b-red"><div class="t red">但这份证据必须打折看</div>
+        <div class="cap">实验里<b>任务 Agent 用的是 gpt-oss-120b，而元 Agent 和反馈 Agent 用的是 Claude Sonnet 4.6</b>——两侧能力差得太多，涨的分究竟来自「自我改进」还是来自「强模型在指导弱模型」，分不开。<b>对照组也偏弱。</b><br>原作者的评价是：<b>方向有意思，证据是暂定的。</b>
+        <div class="src">Hebbar et al., SIA, 2026</div></div></div>
+      <div class="note b-purple"><div class="t purple">两个真问题还没有答案</div>
+        <div class="cap">· <b>训练稳定性</b>：外壳每轮都在变，等于给权重训练换了个会动的地面<br>· <b>Goodhart 效应</b>：两条改进通路都盯着同一个分数，钻空子的机会翻倍<br><br>另一条相邻工作（Continual Harness）走得更保守：在长程游戏里一边更新外壳，一边<b>把强教师在低回报轨迹上的判断蒸馏进策略</b>，两者共同学习。</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="阶梯">
+  <div class="hd"><h2>五级阶梯，横着看一遍</h2></div>
+  <div class="bd">
+    <table class="tbl s mb">
+      <tr><th style="width:13%">级</th><th style="width:17%">被优化的是什么</th><th style="width:15%">谁提改动</th><th style="width:20%">靠什么判断改对了</th><th style="width:16%">代表工作</th><th>今天到哪儿了</th></tr>
+      <tr>
+        <td class="dim"><b>① 指令提示词</b></td>
+        <td>一段自然语言</td>
+        <td class="dim">人</td>
+        <td>人看结果，凭感觉</td>
+        <td class="dim">提示词工程</td>
+        <td class="dim">大部分技巧已被指令微调吃掉，剩下的价值在「把目标和约束说清楚」</td>
+      </tr>
+      <tr>
+        <td class="blue"><b>② 结构化上下文</b></td>
+        <td>一本条目化的手册 + 取用它的算子</td>
+        <td class="blue">模型提条目，<b>程序负责合并</b></td>
+        <td>任务分数，训练集与验证集分开</td>
+        <td class="blue">ACE · MCE</td>
+        <td>已经工程可用。要防的两个病是<b>上下文坍缩</b>和<b>求简偏好</b></td>
+      </tr>
+      <tr>
+        <td class="green"><b>③ 工作流</b></td>
+        <td>步骤图：几个阶段、谁调谁、何时回头</td>
+        <td class="green">元 Agent 写代码 / MCTS 搜图</td>
+        <td>基准分数；档案库保留历史最优</td>
+        <td class="green">AI Scientist · ADAS · AFlow</td>
+        <td>搜出来的工作流已能赢过人手写的。但外壳的其余部分还在搜索空间之外</td>
+      </tr>
+      <tr>
+        <td class="orange"><b>④ 外壳代码</b></td>
+        <td><b>执行系统本身的源码</b>，七个可编辑部件</td>
+        <td class="orange">编程 Agent 读日志、提 diff</td>
+        <td class="orange"><b>练手集 + 留出集双回归，都不退步才收</b></td>
+        <td class="orange">Self-Harness · AHE · DGM</td>
+        <td class="orange"><b>本章重点。已在成熟基准上赢过人设计的外壳，且冻结后能跨基准迁移</b></td>
+      </tr>
+      <tr>
+        <td class="purple"><b>⑤ 优化器代码</b></td>
+        <td>那个负责做改进的程序自己</td>
+        <td class="purple">上一版的自己</td>
+        <td>元效用：在一批任务上平均「它改得有多好」</td>
+        <td class="purple">STOP · Meta-Harness</td>
+        <td class="red">可行，但<b>对底座模型有硬门槛</b>——模型不够强时，递归会把错误一起放大</td>
+      </tr>
+    </table>
+    <div class="g2">
+      <div class="note b-green"><div class="t green">纵向看，有三件事从头到尾没变过</div>
+        <div class="cap">① <b>模型提议，程序执行</b>——从 ACE 的条目合并到 AHE 的 diff 落盘，落笔那一下始终不交给模型<br>② <b>改动要小、要可寻址、要能撤</b>——大重写在每一级都是错的<br>③ <b>判据必须在回路外</b>——这一条在下半章会变成最大的那个瓶颈</div></div>
+      <div class="note b-purple"><div class="t purple">横向看，越往下走，「谁在改」这个问题越有意思</div>
+        <div class="cap">①②③ 级里，人还是那个定框架的人；<b>④ 级开始，框架里的每一块都成了变量</b>；⑤ 级连「怎么改框架」也成了变量。<br><b>但要注意：到 ⑤ 为止，被改的东西全部还在模型外面。</b>权重那一步（第 19 页）刚起步，且证据薄弱。<br><b>换句话说，今天真实存在的 RSI，边界就画在这里。</b></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="边界">
+  <div class="hd"><h2>卡在哪：七个瓶颈，各自挂在回路的哪一段</h2></div>
+  <div class="bd">
+    <div class="p mb">前面十几页讲的是「已经能做到什么」。接下来五页讲反面。<b>把七个公认的瓶颈挂回第 12 页那个回路上，会发现它们并不是七个孤立的难题——它们全部集中在两个位置。</b></div>
+    <svg viewBox="0 0 1168 302" width="100%" style="display:block">
+      <defs><marker id="ar15" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 z" fill="#dc2626"/></marker>
+      <marker id="ar15g" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 z" fill="#94a3b8"/></marker></defs>
+
+      <rect x="54" y="0" width="196" height="54" rx="7" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
+      <text x="66" y="22" font-size="13" font-weight="700" fill="#dc2626">② 上下文与记忆</text>
+      <text x="66" y="42" font-size="12" fill="#5b6675">存了，但取不回来该用的</text>
+      <rect x="270" y="0" width="196" height="54" rx="7" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
+      <text x="282" y="22" font-size="13" font-weight="700" fill="#dc2626">③ 负结果丢失</text>
+      <text x="282" y="42" font-size="12" fill="#5b6675">失败没被留下，白踩</text>
+      <rect x="486" y="0" width="196" height="54" rx="7" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
+      <text x="498" y="22" font-size="13" font-weight="700" fill="#dc2626">④ 多样性坍缩</text>
+      <text x="498" y="42" font-size="12" fill="#5b6675">几十个候选是同一个解</text>
+      <rect x="702" y="0" width="196" height="54" rx="7" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+      <text x="714" y="22" font-size="13" font-weight="700" fill="#dc2626">① 评判器又弱又模糊</text>
+      <text x="714" y="42" font-size="12" fill="#5b6675">最硬的一个，见下页</text>
+
+      <path d="M152 58 L 152 84" stroke="#dc2626" stroke-width="1.6" marker-end="url(#ar15)"/>
+      <path d="M368 58 L 368 84" stroke="#dc2626" stroke-width="1.6" marker-end="url(#ar15)"/>
+      <path d="M584 58 L 584 84" stroke="#dc2626" stroke-width="1.6" marker-end="url(#ar15)"/>
+      <path d="M800 58 L 800 84" stroke="#dc2626" stroke-width="1.8" marker-end="url(#ar15)"/>
+
+      <rect x="54" y="90" width="196" height="48" rx="7" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="152" y="119" text-anchor="middle" font-size="13" font-weight="700" fill="#2563eb">① 跑任务</text>
+      <rect x="270" y="90" width="196" height="48" rx="7" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/>
+      <text x="368" y="119" text-anchor="middle" font-size="13" font-weight="700" fill="#c2410c">② 归因</text>
+      <rect x="486" y="90" width="196" height="48" rx="7" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="584" y="119" text-anchor="middle" font-size="13" font-weight="700" fill="#7c3aed">③ 提改动</text>
+      <rect x="702" y="90" width="196" height="48" rx="7" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="800" y="119" text-anchor="middle" font-size="13" font-weight="700" fill="#0e9f6e">④ 验证</text>
+      <rect x="918" y="90" width="196" height="48" rx="7" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="1016" y="119" text-anchor="middle" font-size="13" font-weight="700" fill="#0e9f6e">⑤ 接受或回退</text>
+      <path d="M254 114 L 264 114" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#ar15g)"/>
+      <path d="M470 114 L 480 114" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#ar15g)"/>
+      <path d="M686 114 L 696 114" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#ar15g)"/>
+      <path d="M902 114 L 912 114" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#ar15g)"/>
+
+      <path d="M800 168 L 800 144" stroke="#dc2626" stroke-width="1.8" marker-end="url(#ar15)"/>
+      <path d="M1016 168 L 1016 144" stroke="#dc2626" stroke-width="1.6" marker-end="url(#ar15)"/>
+      <rect x="702" y="174" width="196" height="54" rx="7" fill="#fef2f2" stroke="#dc2626" stroke-width="2"/>
+      <text x="714" y="196" font-size="13" font-weight="700" fill="#dc2626">⑤ 钻空子</text>
+      <text x="714" y="216" font-size="12" fill="#5b6675">分数涨了，事没做成</text>
+      <rect x="918" y="174" width="196" height="54" rx="7" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
+      <text x="930" y="196" font-size="13" font-weight="700" fill="#dc2626">⑥ 长期价值</text>
+      <text x="930" y="216" font-size="12" fill="#5b6675">沙盒里根本测不到</text>
+
+      <rect x="54" y="174" width="628" height="54" rx="7" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="70" y="196" font-size="13" font-weight="700" fill="#5b6675">七个里有四个压在「④ 验证」这一段上</text>
+      <text x="70" y="216" font-size="12" fill="#5b6675">评判器弱、能被钻空子、测不到长期价值、留出集也未必够——<tspan font-weight="700">整条回路的上限就在这里。</tspan></text>
+
+      <rect x="54" y="244" width="1060" height="54" rx="7" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+      <text x="70" y="266" font-size="13" font-weight="700" fill="#7c3aed">⑦ 人的角色 —— 唯一一个不在回路里的瓶颈</text>
+      <text x="70" y="286" font-size="12" fill="#5b6675">人不该被移出回路，而应该<tspan font-weight="700">往上挪一层</tspan>：不再逐条审改动，而是在对的时间、对的抽象层级上设置监督点——<tspan font-weight="700">而且这些接触点必须是被设计出来的，不是出事之后临时补的。</tspan></text>
+    </svg>
+  </div>
+</section>
+
+<section class="slide" data-act="边界">
+  <div class="hd"><h2>瓶颈之首：评判器又弱又模糊</h2></div>
+  <div class="bd">
+    <div class="p mb">这套回路在<b>「指标可测且客观」</b>的地方转得最好——和强化学习能起效的条件是同一条。而它转不动的地方，原因也永远是同一个：<b>没有人能写出一个函数，告诉系统这次做得好不好。</b></div>
+    <div class="g2 mb">
+      <div class="card t-green"><div class="t green">回路转得动的那一侧</div>
+        <div class="cap"><b>共同点：判据是程序，不是人。</b><br>· 单元测试过不过<br>· 编译器报不报错<br>· kernel 算得对不对、比基线快多少<br>· 算法竞赛的提交判定<br>· 数据中心调度的成本数字<br><br><b>这些地方今天已经能自动跑几百上千轮，而且分数是可信的。</b>第 17 页那些翻倍的数字，全部来自这一侧。</div></div>
+      <div class="card t-red"><div class="t red">回路转不动的那一侧</div>
+        <div class="cap"><b>共同点：判据本身就是研究对象。</b><br>· 这个问题值不值得做<br>· 这个实验设计得对不对<br>· 这个反常结果是噪声还是线索<br>· 这段代码三年后好不好维护<br>· 这篇论文有没有真正的贡献<br><br><b>「研究品味」不是一种可以打分的能力</b>，它混着问题框定、实验设计、和「哪个意外值得追下去」的判断。</div></div>
+    </div>
+    <div class="g3">
+      <div class="note b-orange"><div class="t orange">于是有了一个很实在的推论</div>
+        <div class="cap"><b>「可验证的边界」往外挪一寸，这套回路的适用面就大一片。</b><br>所以真正值钱的工作往往不是把 Agent 调得更聪明，而是<b>给一类原本靠人判的事，造出一个可信的自动判据</b>。</div></div>
+      <div class="note b-red"><div class="t red">而且弱判据不是「差一点」，是会被主动利用</div>
+        <div class="cap">在一个会持续优化自己的回路里，<b>判据的每一个漏洞都会被系统性地找到并放大</b>——这不是模型学坏了，这是优化的定义。<br>下一页专门讲这件事。</div></div>
+      <div class="note b-purple"><div class="t purple">这也解释了为什么 ④ 级做得比 ⑤ 级实在</div>
+        <div class="cap">改外壳代码，判据可以是「基准分数 + 留出集不退步」——虽然粗糙，但客观。<br>改优化器，判据变成「这个改进器有多能改」，<b>它本身就是一个需要被估计的量，噪声大得多。</b></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="边界">
+  <div class="hd"><h2>钻空子：为什么它在自我改进的回路里格外危险</h2></div>
+  <div class="bd">
+    <div class="p mb">单次任务里钻空子只是一次失败，改了就好。<b>但在一个会把「涨分的改动」保留下来的回路里，钻空子的收益会被复利。</b>每一轮它都比老实做事更划算——于是它一定会被找到。</div>
+    <table class="tbl s mb">
+      <tr><th style="width:24%">你把什么当判据</th><th style="width:38%">它会怎么钻</th><th>为什么在回路里更严重</th></tr>
+      <tr><td class="green"><b>单元测试</b></td><td>写出刚好让这些测试通过的代码；或者直接改测试、跳过测试、给断言加宽松条件</td><td>过拟合测试的外壳会被<b>保留下来当作父代</b>，后代继承这个策略</td></tr>
+      <tr><td class="green"><b>模型评委</b></td><td>学会这个评委的偏好：更长、更自信、格式更漂亮、带上它喜欢的关键词</td><td>评委的偏好是稳定的，<b>所以针对它的技巧可以被稳定地积累</b></td></tr>
+      <tr><td class="green"><b>基准分数</b></td><td>利用基准本身的规律：题目分布、答案格式、评分脚本的边界情况</td><td>分数照涨，<b>但换个基准就原形毕露</b>——第 15 页那个迁移实验正是为了排除这种情况</td></tr>
+      <tr><td class="orange"><b>「实验成功了」</b></td><td>在噪声结果上宣布成功、挑对自己有利的那次运行、用一堆参数把数字凑到好看</td><td>没有外部核对时，<b>系统会持续说服自己在进步</b>——下一页把这类失败单独拆开讲</td></tr>
+    </table>
+    <div class="g2">
+      <div class="note b-red"><div class="t red">唯一有效的结构性对策：把判据挪到回路外面</div>
+        <div class="cap"><b>评判器和权限控制，都不应该待在那个演化外壳的回路里。</b>再配上三样东西：<b>留出测试</b>（防过拟合）、<b>轨迹审计</b>（防「结果对但过程是假的」）、以及<b>在真正重要的决策点上让人过一遍</b>。<br><b>这不是加一层保险，这是让「分数上涨」这件事重新变得有意义的前提。</b></div></div>
+      <div class="note b-green"><div class="t green">第 14 页那张图，现在可以重新读一遍</div>
+        <div class="cap">AHE 把运行记录、追踪器、验证器、模型配置<b>全部设成只读</b>，不是出于洁癖——<b>那正是这一页说的「把判据挪出回路」的一次具体实现</b>。<br>口子焊死之后，「关掉验证器」「换个更强的模型」「加大推理预算」这三条最省事的路一次性消失，剩下的涨分才可归因。</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="边界">
+  <div class="hd"><h2>另外三个瓶颈：失败没留住、候选长一个样、长期账算不出来</h2></div>
+  <div class="bd">
+    <div class="p mb">这三个不像评判器那样显眼，但它们决定的是<b>回路能不能一直转下去</b>——前者决定天花板，这三个决定衰减速度。</div>
+    <div class="g3 mb">
+      <div class="card t-red"><div class="t red">负结果没被留住</div>
+        <div class="cap">公开文献天然偏向成功案例，模型也就跟着<b>不擅长放弃一个假设</b>——它更容易再试一次，而不是判断这条路本来就不通。<br><br><b>作者的建议很具体</b>：一个研究外壳应该<b>让失败的尝试很容易被保存下来</b>。<br><br>因为<b>从失败里学习，是缩小任务搜索空间最有效的办法</b>——「这条路走不通」排除的分支，比「这条路走通了」多得多。</div></div>
+      <div class="card t-red"><div class="t red">多样性坍缩</div>
+        <div class="cap">回路跑几轮之后，几十个候选会塌成同一个解的若干变体。因为<b>每一轮都在当前评判器下选最优，而最优的邻域是自我强化的。</b><br><br><b>对开放式研究尤其致命</b>：真正好的路子，在早期用当前的评判器去看，<b>往往比平庸的路子分数更低</b>。<br><br>第 17 页 ShinkaEvolve 的新颖性拒绝采样、DGM 按子代数降权，都是在硬顶着这件事。</div></div>
+      <div class="card t-red"><div class="t red">长期价值算不出来</div>
+        <div class="cap">沙盒里的可验证奖励几乎捕捉不到这些东西：<br>· 可维护性<br>· 责任边界清不清楚<br>· 以后迁移的成本<br>· 向后兼容<br>· 将来调试这段代码的负担<br><br><b>而这些恰恰是真实工程里决定成败的部分。</b>一个在沙盒里刷到很高分的外壳，完全可能在真实系统里是负资产。</div></div>
+    </div>
+    <div class="note b-purple"><div class="t purple">还有第四个，但它的性质不太一样：上下文与记忆的生命周期</div>
+      <div class="cap">今天的做法是把记忆当成一个外挂的软件模块——存进去、检索回来、拼进提示词。它能用，但它是个补丁：<b>什么该记、什么该忘、什么时候该主动回想，全靠外面写死的规则。</b><br>作者在这里下了一个明确判断：<b>「上下文工程将会、也应该成为智能的核心组成部分，而不是停留在软件系统层。」</b>——换句话说，这一格的最终解法不在外壳里，<b>它迟早要回到模型内部去。</b></div></div>
+  </div>
+</section>
+
+<section class="slide" data-act="边界">
+  <div class="hd"><h2>把它放去做真研究：六种失败模式</h2></div>
+  <div class="bd">
+    <div class="p mb">上面的瓶颈是分析出来的。有一项工作是直接把它放去做真研究然后记录下发生了什么：<b>极简脚手架</b>（只有读文件、写文件、检索、列目录四个工具），<b>三个领域</b>（世界模型、多智能体强化学习、AI 安全与对齐），每个领域给 45–50 篇种子文献。</div>
+    <div class="g4 mb">
+      <div class="note b-red"><div class="t red">① 倒向训练数据里的默认答案</div>
+        <div class="cap">用已经过时的库和命令，给出的假设没有基于<b>眼前这个仓库</b>的实际情况。它写的是「一般来说该怎么做」，不是「这里该怎么做」。</div></div>
+      <div class="note b-red"><div class="t red">② 执行压力下的实现漂移</div>
+        <div class="cap">一遇阻力就<b>悄悄退回到更简单、更常见的解法</b>，而最初那个真正想验证的设计被丢掉了。<b>最后跑通的不是当初要做的实验。</b></div></div>
+      <div class="note b-red"><div class="t red">③ 记忆与上下文退化</div>
+        <div class="cap">任务一长，早期的约束、已经排除的分支、之前定下的口径，会慢慢从上下文里消失。<b>然后它开始重复做已经做过的事。</b></div></div>
+      <div class="note b-red"><div class="t red">④ 过度乐观</div>
+        <div class="cap">在<b>有噪声甚至已经失败</b>的实验上宣布成功。文献里给了两个很传神的说法：<b>「p-hacking 与 eureka-ing」</b>，以及<b>「数值胶带」</b>——把数字粘到好看为止。</div></div>
+      <div class="note b-orange"><div class="t orange">⑤ 领域直觉不足</div>
+        <div class="cap">预判一个实现要花多大力气、判断一个结果可不可信、知道<b>哪些 baseline 是必须对比的</b>——这些是隐性手艺，不写在论文里，也就学不到。</div></div>
+      <div class="note b-orange"><div class="t orange">⑥ 科学品味弱</div>
+        <div class="cap">代码能跑，实验有结果，图也画得漂亮，<b>但它回答的是一个错的问题</b>。<br>这是六条里最难自动检测的一条——因为没有任何自动判据会报错。</div></div>
+      <div class="note b-purple" style="grid-column:span 2"><div class="t purple">最终数字：一整套流程跑下来的产出</div>
+        <div class="cap">生成的大量想法里，<b>只有 4 个通过了人类专家的筛选、进入完整流程；其中只有 1 个被真正执行成了一篇论文。</b><br><b>把这个数字和第 17 页那些翻倍的基准成绩放在一起看，本章的结论就完整了</b>——在有自动判据的地方，自我改进已经是可用的工程；<b>在没有自动判据的地方，它离「能自己做研究」还很远。而这两句话之间的距离，就是第 22 页那个瓶颈。</b></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="收尾">
+  <div class="hd"><h2>拿什么衡量进展：一条最值得记的曲线</h2></div>
+  <div class="bd">
+    <div class="p mb">RE-Bench 用 7 个开放式机器学习研究工程环境，请 61 位专家做了 71 次八小时尝试，再和 Agent 对比。<b>结论不是「谁更强」，而是「在多长的时间预算下谁更强」——这条曲线比任何单个分数都更能说明今天的位置。</b></div>
+    <svg viewBox="0 0 1168 170" width="100%" style="display:block">
+      <path d="M120 146 L 1080 146" stroke="#cbd5e1" stroke-width="1.5"/>
+      <path d="M120 146 L 120 14" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="120" y="164" text-anchor="middle" font-size="12" fill="#94a3b8">2 小时</text>
+      <text x="560" y="164" text-anchor="middle" font-size="12" fill="#94a3b8">8 小时</text>
+      <text x="1000" y="164" text-anchor="middle" font-size="12" fill="#94a3b8">32 小时</text>
+      <text x="86" y="20" text-anchor="middle" font-size="12" fill="#94a3b8">得分</text>
+      <path d="M503 18 L 503 146" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="5 4"/>
+      <text x="511" y="142" font-size="12" font-weight="700" fill="#dc2626">交叉点</text>
+      <path d="M120 98 C 300 84, 400 78, 560 74 C 740 70, 900 66, 1000 64" fill="none" stroke="#2563eb" stroke-width="2.5"/>
+      <circle cx="120" cy="98" r="5" fill="#2563eb"/><circle cx="560" cy="74" r="5" fill="#2563eb"/><circle cx="1000" cy="64" r="5" fill="#2563eb"/>
+      <path d="M120 136 C 260 126, 380 94, 448 84 C 520 74, 690 44, 1000 24" fill="none" stroke="#0e9f6e" stroke-width="2.5"/>
+      <circle cx="120" cy="136" r="5" fill="#0e9f6e"/><circle cx="560" cy="66" r="5" fill="#0e9f6e"/><circle cx="1000" cy="24" r="5" fill="#0e9f6e"/>
+      <path d="M620 108 L 660 108" stroke="#2563eb" stroke-width="2.5"/>
+      <text x="668" y="113" font-size="13" font-weight="700" fill="#2563eb">AI Agent</text>
+      <path d="M620 130 L 660 130" stroke="#0e9f6e" stroke-width="2.5"/>
+      <text x="668" y="135" font-size="13" font-weight="700" fill="#0e9f6e">人类专家</text>
+      <text x="820" y="135" font-size="12" fill="#94a3b8">示意，非精确复刻</text>
+    </svg>
+    <div class="note b-purple mt2 mb"><div class="t purple">这条曲线的含义：今天缺的不是「聪明」，是「跑得久」</div>
+      <div class="cap"><b>2 小时预算下 Agent 得分是人的 4 倍；到 8 小时和 32 小时，人全部反超。</b>短预算里 Agent 大幅领先，说明<b>单步质量和吞吐都不是问题</b>。人在长预算上反超，说明差距全在<b>长程能力</b>——保持方向、记住排除过的分支、判断什么时候该放弃重来。<b>而这几样恰好就是第 21 到 24 页那些瓶颈，也恰好就是外壳这一层要解决的东西。</b></div></div>
+    <table class="tbl s">
+      <tr><th style="width:16%">基准</th><th style="width:26%">它测什么</th><th>规模与目前的成绩</th></tr>
+      <tr><td class="blue"><b>PaperBench</b></td><td>从零复现顶会论文</td><td>20 篇 ICML 2024 Spotlight / Oral；<b>8316 条评分点与论文作者共同制定</b>；当时最好的模型约 21%，<b>不及机器学习博士</b></td></tr>
+      <tr><td class="blue"><b>CORE-Bench</b></td><td>复现已发表论文的计算结果</td><td>270 个任务 / 90 篇论文，横跨计算机、社会科学、医学；最难那一档最好成绩约 21%</td></tr>
+      <tr><td class="green"><b>ScienceAgentBench</b></td><td>真实科研中的数据分析任务</td><td>102 个任务，取自 44 篇同行评议论文，覆盖数学、化学、生物、地理</td></tr>
+      <tr><td class="green"><b>MLE-bench</b></td><td>端到端打一场 Kaggle</td><td>75 场比赛；o1-preview 配合 AIDE，在 16.9% 的比赛里拿到铜牌及以上</td></tr>
+      <tr><td class="orange"><b>KernelBench</b></td><td>写出更快的 GPU kernel</td><td>250 个 PyTorch 任务；指标 <span class="kbd">fast_p</span> = 生成的 kernel 里<b>既正确、又比基线快</b>的比例</td></tr>
+    </table>
+  </div>
+</section>
+
+<section class="slide" data-act="收尾">
+  <div class="hd"><h2>人的位置：往上挪一层，而不是退出</h2></div>
+  <div class="bd">
+    <div class="p mb">这套回路每往前一步，人手工干的活就少一块。<b>但「少干一块」和「不参与」是两件完全不同的事</b>——前面所有能跑起来的系统，都有人在某个位置上定住了那些回路自己定不了的东西。</div>
+    <svg viewBox="0 0 1168 168" width="100%" style="display:block">
+      <defs><marker id="ar16" markerWidth="10" markerHeight="10" refX="9" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 z" fill="#7c3aed"/></marker></defs>
+      <rect x="0" y="4" width="474" height="158" rx="9" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="16" y="28" font-size="14" font-weight="700" fill="#94a3b8">人过去待的位置 —— 正在被回路接管</text>
+      <text x="16" y="56" font-size="12.5" fill="#5b6675">· 逐行读它写的代码</text>
+      <text x="16" y="78" font-size="12.5" fill="#5b6675">· 一条一条审它提的改动</text>
+      <text x="16" y="100" font-size="12.5" fill="#5b6675">· 手动调提示词、手动裁上下文</text>
+      <text x="16" y="122" font-size="12.5" fill="#5b6675">· 出了问题自己翻日志找原因</text>
+      <text x="16" y="150" font-size="12" fill="#94a3b8">这些事会越来越多地由第 13–15 页那套机制自己做</text>
+      <path d="M494 84 L 590 84" stroke="#7c3aed" stroke-width="2.5" marker-end="url(#ar16)"/>
+      <text x="542" y="72" text-anchor="middle" font-size="12" font-weight="700" fill="#7c3aed">往上</text>
+      <rect x="620" y="4" width="548" height="158" rx="9" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+      <text x="636" y="28" font-size="14" font-weight="700" fill="#7c3aed">人该挪去的位置 —— 回路自己定不了的四件事</text>
+      <text x="636" y="56" font-size="12.5" fill="#5b6675">· <tspan font-weight="700" fill="#7c3aed">什么算成功</tspan> —— 判据必须来自回路外面</text>
+      <text x="636" y="78" font-size="12.5" fill="#5b6675">· <tspan font-weight="700" fill="#7c3aed">哪些事不许它自己做主</tspan> —— 权限边界</text>
+      <text x="636" y="100" font-size="12.5" fill="#5b6675">· <tspan font-weight="700" fill="#7c3aed">在关键分叉上做选择</tspan> —— 而不是每一步都审</text>
+      <text x="636" y="122" font-size="12.5" fill="#5b6675">· <tspan font-weight="700" fill="#7c3aed">决定什么时候该停</tspan> —— 分数还在涨不等于该继续</text>
+      <text x="636" y="150" font-size="12" font-weight="700" fill="#7c3aed">而且这些接触点要被主动设计出来，不是出事之后临时补的</text>
+    </svg>
+    <div class="p mt2 mb">如果要把这一章变成一份可以持续核对的东西，<b>接下来几年值得盯的是这六件事</b>——每一件都有明确的观察对象，而且都会给出「是」或「否」。</div>
+    <table class="tbl s">
+      <tr><th style="width:34%">盯什么</th><th style="width:33%">看到什么算「往前走了」</th><th>看到什么算「警报」</th></tr>
+      <tr><td class="green"><b>「可验证」的边界有没有外移</b></td><td>原本必须人判的一类事，出现了可信的自动判据</td><td class="red">大家改用更容易刷的判据来换取更好看的曲线</td></tr>
+      <tr><td class="green"><b>失败有没有被系统性地留住</b></td><td>失败轨迹和「这条路不通」进了可检索的长期存储，并被后续引用</td><td class="red">日志只留最近一轮，或只留成功的那些</td></tr>
+      <tr><td class="green"><b>演化出来的外壳能不能迁移</b></td><td>冻结之后换个没见过的基准仍然有效（已有第一个正例）</td><td class="red">换基准就掉回原点 —— 说明学到的是刷分技巧</td></tr>
+      <tr><td class="blue"><b>「会改」与「用得上」两条曲线</b></td><td>用得上那条的峰值往强模型一侧移动，或整体抬高</td><td class="red">两条都平了 —— 说明外壳这一层的红利吃完了</td></tr>
+      <tr><td class="purple"><b>权重进回路的干净证据</b></td><td>出现不依赖「强模型指导弱模型」的自我改进结果</td><td class="red">继续用能力不对等的组件互相评估，涨分无法归因</td></tr>
+      <tr><td class="orange"><b>判据和权限在回路的哪一侧</b></td><td>始终只读，并配有留出测试、轨迹审计、关键点人审</td><td class="red"><b>被挪进回路内 —— 这是本章列出的所有信号里最危险的一个</b></td></tr>
+    </table>
+  </div>
+</section>
+
+<section class="slide" data-act="收尾">
+  <div class="hd"><h2>这一章的落点</h2></div>
+  <div class="bd">
+    <div class="g3 mb">
+      <div class="card t-purple"><div class="t purple">① 今天真实存在的 RSI，在外壳层</div>
+        <div class="cap">不是模型改自己的权重，是模型改包在自己外面那套系统的源码。<br><br>机制很朴素：<b>跑一批任务 → 定位根因 → 提一处改动 → 双回归验证 → 接受或回退</b>。被改的是七个部件：系统提示词、工具描述、工具实现、中间件、技能、子 Agent 配置、长期记忆。<br><br><b>DGM 那组数字（同一个模型，SWE-bench 20%→50%）是这一条最直接的证据。</b></div></div>
+      <div class="card t-red"><div class="t red">② 这条回路的上限，由评判器决定</div>
+        <div class="cap">不由模型有多聪明决定。<br><br>有自动判据的地方，它已经是可用的工程，成绩能翻倍；<br>没有自动判据的地方，一整套自动研究流程跑下来，<b>专家筛完只剩 4 个想法值得做，最后只有 1 个真的做成了</b>。<br><br><b>这两句话之间的距离，就是这一章全部的未解问题。</b></div></div>
+      <div class="card t-orange"><div class="t orange">③ 会改，和用得上，是两件事</div>
+        <div class="cap">写出一条有用的外壳改动——<b>9B 模型和顶配模型差不多</b>，因为那是个总结任务。<br><br>用得上改好的外壳——<b>需要在正确时机调用工具，还要在很长的任务里一直守着约定</b>，这一条是倒 U，中档模型收益最大。<br><br>所以合理的分工是：<b>便宜的模型批量提案，贵的预算留给执行和验证。</b></div></div>
+    </div>
+    <div class="g2 mb">
+      <div class="note b-green"><div class="t green">④ 判据和权限必须待在回路外面</div>
+        <div class="cap">这不是一条安全条款，<b>这是让「分数上涨」这件事重新有意义的前提</b>。<br>把验证器、追踪器、运行记录、模型配置设成只读之后，「关掉验证」「换个强模型」「加大预算」这三条捷径一次性消失——<b>剩下的每一分提升，才真的来自外壳被改好了。</b></div></div>
+      <div class="note b-purple"><div class="t purple">⑤ 人往上挪，不是退出</div>
+        <div class="cap">回路能自己定的东西越来越多，但它<b>永远定不了「什么算成功」和「什么不许碰」</b>。<br>人的位置从「逐条审改动」挪到「设计监督点」——<b>而监督点是要提前设计的，不是出事之后补的。</b></div></div>
+    </div>
+    <div class="note b-orange"><div class="t orange">如果你现在正在做一个 Agent 系统，这一章能直接拿走三件事</div>
+      <div class="cap">① <b>把状态赶出对话，落到文件系统上</b>——不落盘的东西没法被下一轮引用，也没法被任何人检查，更谈不上被自动改进。<br>② <b>每一次改动都配一条可证伪的预测，外加一个留出集</b>——「我改这里是因为 X，预计修好 A、可能拖坏 B」，下一轮直接判它对错。<br>③ <b>把判据和权限锁成只读</b>——不管你有没有打算做自动优化，这一条现在做，成本最低。</div></div>
+  </div>
+</section>
+
+<section class="slide" data-act="收尾">
+  <div class="hd"><h2>参考与延伸</h2></div>
+  <div class="bd">
+    <div class="note b-purple mb"><div class="t purple">本章的主要来源</div>
+      <div class="cap">Lilian Weng, <b>“Harness Engineering for Self-Improvement”</b>, Lil'Log, 2026-07-04。<br>本章的叙述骨架——<b>「被优化的对象」从提示词一路抬到优化器代码</b>——取自该文，其中引用的具体工作、数字与结论均以该文为准。图示与中文表述为本章重新组织，不代表原作者的措辞。</div></div>
+    <div class="g2">
+      <div class="card w"><div class="h3">概念与上下文层</div>
+        <ul class="ul s">
+          <li>I. J. Good, <i>Speculations Concerning the First Ultraintelligent Machine</i>, 1965</li>
+          <li>E. Yudkowsky, <i>Recursive Self-Improvement</i>, 2008</li>
+          <li>Zhang et al., <b>ACE</b>: Agentic Context Engineering, 2025 / ICLR 2026</li>
+          <li>Ye et al., <b>MCE</b>: Meta Context Engineering, 2026</li>
+          <li>Lee et al., <b>Meta-Harness</b>, 2026</li>
+        </ul>
+        <div class="h3 mt">工作流层</div>
+        <ul class="ul s">
+          <li>Lu et al., <b>The AI Scientist</b>, Nature 651:914–919, 2026</li>
+          <li>Meng et al., <b>ScientistOne</b>, 2026</li>
+          <li>Kulikov et al., <b>Autodata</b>, 2026</li>
+          <li>Hu et al., <b>ADAS</b>, ICLR 2025　·　Zhang et al., <b>AFlow</b>, ICLR 2025</li>
+          <li>Madaan et al., <b>Self-Refine</b>, 2023</li>
+        </ul>
+      </div>
+      <div class="card w"><div class="h3">外壳与优化器层</div>
+        <ul class="ul s">
+          <li>Zelikman et al., <b>STOP</b>, 2023 / COLM 2024</li>
+          <li>Zhang et al., <b>Self-Harness</b>, 2026</li>
+          <li>Lin et al., <b>AHE</b>: Agentic Harness Evolution, 2026</li>
+          <li>Lin et al., <b>Harness Updating Is Not Harness Benefit</b>, 2026</li>
+          <li>Zhang et al., <b>Darwin Gödel Machine</b>, 2025　·　Zhang et al., <b>Hyperagents</b>, 2026</li>
+          <li>Novikov et al., <b>AlphaEvolve</b>, 2025　·　Lange et al., <b>ShinkaEvolve</b>, 2025</li>
+          <li>Fernando et al., <b>Promptbreeder</b>, 2023　·　Agrawal et al., <b>GEPA</b>, 2025　·　Wang et al., <b>ThetaEvolve</b>, 2025　·　Che et al., <b>DemoEvolve</b>, 2026</li>
+          <li>Hebbar et al., <b>SIA</b>, 2026　·　Karten et al., <b>Continual Harness</b>, 2026</li>
+        </ul>
+        <div class="h3" style="margin-top:8px">评测与反面证据</div>
+        <ul class="ul s">
+          <li>Trehan &amp; Chopra, <b>Why LLMs Aren't Scientists Yet</b>, 2026　·　Bubeck et al., 2025</li>
+          <li><b>PaperBench</b>　·　<b>CORE-Bench</b>　·　<b>ScienceAgentBench</b></li>
+          <li><b>RE-Bench</b>　·　<b>MLE-bench</b>　·　<b>KernelBench</b></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+<!--SLIDES-END-->
+</main></div></div>
+
+<div id="ov"><div id="ovg"></div></div>
+
+<script>
+(function(){
+  var deck=document.getElementById('deck'), bar=document.getElementById('bar'),
+      ov=document.getElementById('ov'), ovg=document.getElementById('ovg'),
+      slides=[].slice.call(document.querySelectorAll('.slide')),
+      N=slides.length, cur=0, ovOpen=false, built=false;
+
+  // 页眉幕名 + 页脚页码（封面不加）
+  slides.forEach(function(s,i){
+    var hd=s.querySelector('.hd'), act=s.getAttribute('data-act');
+    if(hd&&act){ var b=document.createElement('b'); b.textContent=act; hd.appendChild(b); }
+    if(!s.classList.contains('cover')){
+      var ft=document.createElement('div'); ft.className='ft';
+      var p=document.createElement('span'); p.className='pg';
+      p.textContent=(i+1)+' / '+N; ft.appendChild(p); s.appendChild(ft);
+    }
+  });
+
+  function fit(){
+    var k=Math.min(window.innerWidth/1280, window.innerHeight/720)*0.96;
+    deck.style.transform='scale('+k+')';
+  }
+  window.addEventListener('resize',fit); fit();
+
+  function check(i){
+    var s=slides[i], b=s.querySelector('.bd'); if(!b) return;
+    var vo=b.scrollHeight-b.clientHeight, ho=0;
+    var els=b.querySelectorAll('*');
+    for(var k=0;k<els.length;k++){
+      if(els[k].closest('svg')) continue;
+      var d=els[k].scrollWidth-els[k].clientWidth; if(d>ho) ho=d;
+    }
+    if(vo>1||ho>1){ s.style.outline='3px solid #dc2626'; s.style.outlineOffset='-3px';
+      console.warn('[溢出] 第'+(i+1)+'页　纵向 +'+vo+'　横向 +'+ho); }
+    else { s.style.outline=''; }
+  }
+
+  function go(i){
+    i=Math.max(0,Math.min(N-1,i));
+    slides[cur].classList.remove('on'); cur=i; slides[cur].classList.add('on');
+    bar.style.width=((cur+1)/N*100)+'%';
+    history.replaceState(null,'','#'+(cur+1));
+    check(cur);
+  }
+  function next(){ if(cur<N-1) go(cur+1); }
+  function prev(){ if(cur>0) go(cur-1); }
+
+  function build(){
+    if(built) return; built=true;
+    slides.forEach(function(s,i){
+      var c=document.createElement('div'); c.className='ovc';
+      var w=document.createElement('div'); w.className='ovi';
+      var cl=s.cloneNode(true); cl.classList.add('on'); cl.style.animation='none';
+      w.appendChild(cl); c.appendChild(w);
+      var n=document.createElement('div'); n.className='ovn'; n.textContent=i+1; c.appendChild(n);
+      c.addEventListener('click',function(){ go(i); toggleOv(false); });
+      ovg.appendChild(c);
+    });
+  }
+  function toggleOv(on){ ovOpen=(on===undefined)?!ovOpen:on; if(ovOpen) build();
+    ov.classList.toggle('on',ovOpen); }
+
+  document.addEventListener('keydown',function(e){
+    var k=e.key;
+    if(k==='Escape'){ if(ovOpen) toggleOv(false);
+      else if(document.fullscreenElement) document.exitFullscreen(); return; }
+    if(k==='o'||k==='O'){ toggleOv(); e.preventDefault(); return; }
+    if(ovOpen) return;
+    if(k==='ArrowRight'||k==='PageDown'||k===' '||k==='j'||k==='J'){ next(); e.preventDefault(); }
+    else if(k==='ArrowLeft'||k==='PageUp'||k==='k'||k==='K'){ prev(); e.preventDefault(); }
+    else if(k==='Home'){ go(0); e.preventDefault(); }
+    else if(k==='End'){ go(N-1); e.preventDefault(); }
+    else if(k==='f'||k==='F'){ document.fullscreenElement?document.exitFullscreen()
+      :document.documentElement.requestFullscreen(); e.preventDefault(); }
+  });
+
+  document.getElementById('stage').addEventListener('click',function(e){
+    if(ovOpen) return;
+    if(e.target.closest('a,.code,.kbd')) return;
+    if(String(window.getSelection()).length>0) return;
+    (e.clientX/window.innerWidth < 0.28) ? prev() : next();
+  });
+
+  var tx=0;
+  document.addEventListener('touchstart',function(e){ tx=e.changedTouches[0].clientX; },{passive:true});
+  document.addEventListener('touchend',function(e){
+    if(ovOpen) return; var d=e.changedTouches[0].clientX-tx;
+    if(Math.abs(d)>50){ d<0?next():prev(); }
+  },{passive:true});
+
+  window.addEventListener('hashchange',function(){
+    var n=parseInt(location.hash.slice(1),10); if(!isNaN(n)&&n-1!==cur) go(n-1);
+  });
+
+  var h=parseInt(location.hash.slice(1),10);
+  go(isNaN(h)?0:h-1);
+})();
+</script>
+</body>
+</html>
