@@ -11,6 +11,10 @@
     "desc": "第二章 v5：倒着写的一版——终点是啃 Transformer 公式时的六个问题，往前推到深度学习、再推到机器学习的核心点；大模型段从 v4 提炼。47 页，未对外",
     "src": "C:\\Users\\think\\_stage\\agent-principles-ch2-v5"
   },
+  "agent-principles-ch2-v6": {
+    "desc": "第二章重写：从机器学习到 Transformer，倒着筛顺着讲，22 页",
+    "src": "C:\\Users\\think\\_stage\\agent-principles-ch2-v6"
+  },
   "agent-principles-ch2-versions": {
     "desc": "第二章的四个历史版本 + 每一版是怎么塌的；v0 是 2026-08-14 换下的线上原件",
     "src": "C:/Users/think/_stage/agent-principles-ch2-versions"

@@ -1,0 +1,1732 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第二章 · 从机器学习到 Transformer</title>
+<style>
+:root{
+  --bg:#e9edf3; --slide:#fff; --panel:#f4f7fb; --line:#e2e8f0;
+  --ink:#1f2937; --sub:#5b6675; --faint:#94a3b8;
+  --blue:#2563eb; --green:#0e9f6e; --orange:#c2410c; --purple:#7c3aed; --red:#dc2626;
+  --tblue:#eff6ff; --tgreen:#ecfdf5; --torange:#fff7ed; --tpurple:#f5f3ff; --tred:#fef2f2;
+  --font:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);font-family:var(--font);color:var(--ink);overflow:hidden;-webkit-font-smoothing:antialiased}
+#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;flex:none;position:relative;transform-origin:center center;
+      background:var(--slide);border-radius:6px;overflow:hidden;box-shadow:0 18px 60px rgba(15,23,42,.16)}
+#bar{position:absolute;top:0;left:0;height:2px;background:var(--blue);opacity:.55;z-index:5;width:0}
+
+/* ── 页眉 72 / 正文 608 / 页脚 40 ───────────────────────── */
+.slide{position:absolute;inset:0;display:none;flex-direction:column;padding:0 56px}
+.slide.on{display:flex;animation:fi .15s ease}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+.hd{height:72px;flex:none;display:flex;align-items:flex-end;justify-content:space-between;
+    gap:24px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.hd h2{font-size:30px;font-weight:600;line-height:1.2;letter-spacing:-.01em}
+.hd b{font-size:13px;font-weight:500;color:var(--faint);letter-spacing:.08em;white-space:nowrap;padding-bottom:5px}
+.bd{flex:1;min-height:0;overflow:hidden;padding:24px 0 0}
+.ft{height:40px;flex:none;display:flex;align-items:center;justify-content:flex-end}
+.pg{font-size:13px;color:var(--faint);letter-spacing:.04em}
+
+/* ── 文字层级：字号 + 字重 + 颜色三者一起做 ─────────────── */
+.lead{font-size:21px;font-weight:600;line-height:1.5;margin-bottom:14px}
+.p{font-size:18px;line-height:1.6}
+.p+.p{margin-top:10px}
+.sub{font-size:15px;line-height:1.6;color:var(--sub)}
+.cap{font-size:13px;line-height:1.55;color:var(--faint)}
+.h3{font-size:21px;font-weight:600;margin-bottom:8px}
+.mt{margin-top:16px}.mt2{margin-top:24px}.mb{margin-bottom:12px}
+b,strong{font-weight:600}
+em{font-style:normal;font-weight:600}
+.ul{list-style:none}
+.ul li{font-size:18px;line-height:1.55;padding-left:20px;position:relative;margin-bottom:9px}
+.ul li:before{content:"";position:absolute;left:2px;top:11px;width:6px;height:6px;border-radius:50%;background:var(--faint)}
+.ul.s li{font-size:15px;line-height:1.55;margin-bottom:6px;color:var(--sub)}
+.ul.s li:before{top:9px;width:4px;height:4px}
+.ol{counter-reset:n;list-style:none}
+.ol li{font-size:18px;line-height:1.55;padding-left:30px;position:relative;margin-bottom:10px;counter-increment:n}
+.ol li:before{content:counter(n);position:absolute;left:0;top:2px;width:21px;height:21px;border-radius:50%;
+  background:var(--panel);color:var(--sub);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center}
+
+/* ── 组件 ──────────────────────────────────────────────── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.g23{display:grid;grid-template-columns:2fr 3fr;gap:22px}
+.g32{display:grid;grid-template-columns:3fr 2fr;gap:22px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px 18px}
+.card .t{font-size:16px;font-weight:600;margin-bottom:7px}
+.card .p,.card .sub{font-size:15px;line-height:1.55}
+.card.w{background:#fff}
+.note{border-left:3px solid var(--faint);padding:2px 0 2px 16px}
+.note .t{font-size:15px;font-weight:600;margin-bottom:4px}
+.tbl{width:100%;border-collapse:collapse;font-size:15px;line-height:1.45}
+.tbl th{font-size:13px;font-weight:600;color:var(--faint);text-align:left;
+        padding:0 12px 7px;border-bottom:1.5px solid var(--line);letter-spacing:.03em}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl td:first-child{font-weight:600}
+.tbl.s{font-size:14px}.tbl.s td{padding:7px 10px}
+.code{font-family:var(--mono);font-size:13.5px;line-height:1.6;background:var(--panel);
+      border:1px solid var(--line);border-radius:6px;padding:12px 14px;white-space:pre;overflow:hidden}
+.code .c{color:var(--faint)}
+.kbd{font-family:var(--mono);font-size:13px;background:var(--panel);border:1px solid var(--line);
+     border-radius:4px;padding:1px 6px}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:11px;
+     background:var(--panel);color:var(--sub);letter-spacing:.02em}
+.num{font-size:34px;font-weight:600;line-height:1.1;letter-spacing:-.02em}
+.src{font-size:12px;color:var(--faint);line-height:1.5}
+.src a{color:var(--faint)}
+a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,.3)}
+
+.blue{color:var(--blue)}.green{color:var(--green)}.orange{color:var(--orange)}
+.purple{color:var(--purple)}.red{color:var(--red)}.dim{color:var(--sub)}
+.b-blue{border-left-color:var(--blue)}.b-green{border-left-color:var(--green)}
+.b-orange{border-left-color:var(--orange)}.b-purple{border-left-color:var(--purple)}
+.b-red{border-left-color:var(--red)}
+.t-blue{background:var(--tblue);border-color:#dbeafe}.t-green{background:var(--tgreen);border-color:#d1fae5}
+.t-orange{background:var(--torange);border-color:#fed7aa}.t-purple{background:var(--tpurple);border-color:#ede9fe}
+.t-red{background:var(--tred);border-color:#fecaca}
+
+/* ── 封面 ──────────────────────────────────────────────── */
+.slide.cover{padding:0 96px;justify-content:center}
+.cover .ser{font-size:15px;font-weight:600;color:var(--faint);letter-spacing:.22em;margin-bottom:22px}
+.cover h1{font-size:44px;font-weight:600;line-height:1.25;letter-spacing:-.02em}
+.cover .sl{font-size:21px;color:var(--sub);line-height:1.6;margin-top:18px;max-width:820px}
+.cover .rule{width:64px;height:3px;background:var(--blue);margin:26px 0;opacity:.7}
+.cover .meta{font-size:13px;color:var(--faint);letter-spacing:.04em}
+
+/* ── 概览网格 ──────────────────────────────────────────── */
+#ov{position:fixed;inset:0;background:rgba(233,237,243,.97);z-index:20;display:none;
+    overflow-y:auto;padding:28px 32px}
+#ov.on{display:block}
+#ovg{display:grid;grid-template-columns:repeat(5,218px);gap:16px;justify-content:center}
+.ovc{position:relative;width:218px;height:123px;overflow:hidden;background:#fff;cursor:pointer;
+     border:1px solid var(--line);border-radius:4px}
+.ovc:hover{border-color:var(--blue)}
+.ovi{position:absolute;top:0;left:0;width:1280px;height:720px;transform:scale(.17);transform-origin:top left}
+.ovi .slide{display:flex}
+.ovn{position:absolute;right:4px;bottom:3px;font-size:11px;color:var(--faint);background:rgba(255,255,255,.9);
+     padding:0 4px;border-radius:3px}
+</style>
+</head>
+<body>
+<div id="stage"><div id="deck"><div id="bar"></div>
+<main id="slides">
+
+
+<section class="slide cover">
+  <div class="ser">AGENT 原理与实践 · 第二章</div>
+  <h1>从机器学习到 Transformer</h1>
+  <div class="rule"></div>
+  <div class="sl">这一章只做一件事：<b>把 Transformer 拆开</b>，看它用到了哪些深度学习的东西；那些东西又用到了哪些机器学习的东西。<b>筛出这条链上的知识点，再从头顺过来讲一遍。</b><br>链条以外的，一概不讲。</div>
+  <div class="meta" style="margin-top:34px">倒着筛，顺着讲　·　22 页</div>
+  <div class="meta" style="margin-top:10px">← → 翻页　·　O 概览　·　F 全屏</div>
+</section>
+
+<section class="slide" data-act="这一章的骨架">
+  <div class="hd"><h2>把 Transformer 拆开，每个零件往前挂着什么</h2></div>
+  <div class="bd">
+    <div class="p mb">这张图是<b>从右往左</b>拆出来的：Transformer 里出现的每一样东西，往前都能找到深度学习的一条，再往前是机器学习的一条。<b>下面就按这六行，从左往右顺着讲。</b></div>
+    <svg viewBox="0 0 1168 464" width="100%" style="display:block">
+      <g font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+      <text x="2" y="14" font-size="13" font-weight="700" fill="#2563eb">第一段　机器学习</text>
+      <text x="358" y="14" font-size="13" font-weight="700" fill="#7c3aed">第二段　深度学习</text>
+      <text x="714" y="14" font-size="13" font-weight="700" fill="#0e9f6e">起点　Transformer 里的这一处</text>
+      <text x="1166" y="14" font-size="12" fill="#94a3b8" text-anchor="end">拆的方向 ←</text>
+
+      <!-- row 1 -->
+      <rect x="0" y="24" width="318" height="64" rx="7" fill="#eff6ff" stroke="#bfd4f8" stroke-width="1.5"/>
+      <text x="13" y="45" font-size="12.5" font-weight="700" fill="#1f2937">模型 = 一个带参数的函数 f(x ; W)</text>
+      <text x="13" y="64" font-size="12" fill="#5b6675">参数就是知识：训练在调它，推理不动它</text>
+      <text x="13" y="80" font-size="12" fill="#5b6675">第 3 页</text>
+      <path d="M352 56 L328 56" stroke="#94a3b8" stroke-width="1.5"/><polygon points="320,56 330,51 330,61" fill="#94a3b8"/>
+      <rect x="356" y="24" width="318" height="64" rx="7" fill="#f7f4fd" stroke="#d6cbfb" stroke-width="1.5"/>
+      <text x="369" y="45" font-size="12.5" font-weight="700" fill="#1f2937">一层网络就是一次矩阵乘：y = xW + b</text>
+      <text x="369" y="64" font-size="12" fill="#5b6675">把 x 从一个空间线性地搬到另一个空间</text>
+      <text x="369" y="80" font-size="12" fill="#5b6675">第 8 页</text>
+      <path d="M708 56 L684 56" stroke="#94a3b8" stroke-width="1.5"/><polygon points="676,56 686,51 686,61" fill="#94a3b8"/>
+      <rect x="712" y="24" width="456" height="64" rx="7" fill="#ecfdf5" stroke="#a7e3cb" stroke-width="1.5"/>
+      <text x="725" y="45" font-size="12.5" font-weight="700" fill="#0e9f6e">所有「乘一个矩阵」的地方</text>
+      <text x="725" y="64" font-size="12" fill="#5b6675">Q=XW_Q　K=XW_K　V=XW_V　拼接后的 W_O</text>
+      <text x="725" y="80" font-size="12" fill="#5b6675">FFN 的 W₁ W₂　出口的 lm_head　——参数几乎全在这里</text>
+
+      <!-- row 2 -->
+      <rect x="0" y="96" width="318" height="64" rx="7" fill="#eff6ff" stroke="#bfd4f8" stroke-width="1.5"/>
+      <text x="13" y="117" font-size="12.5" font-weight="700" fill="#1f2937">假设空间：模型能表达什么</text>
+      <text x="13" y="136" font-size="12" fill="#5b6675">表达不出来的东西，再怎么训也学不到</text>
+      <text x="13" y="152" font-size="12" fill="#5b6675">第 4 页</text>
+      <path d="M352 128 L328 128" stroke="#94a3b8" stroke-width="1.5"/><polygon points="320,128 330,123 330,133" fill="#94a3b8"/>
+      <rect x="356" y="96" width="318" height="64" rx="7" fill="#f7f4fd" stroke="#d6cbfb" stroke-width="1.5"/>
+      <text x="369" y="117" font-size="12.5" font-weight="700" fill="#1f2937">激活函数：没有它，一百层等于一层</text>
+      <text x="369" y="136" font-size="12" fill="#5b6675">线性套线性还是线性，非线性得手动插进去</text>
+      <text x="369" y="152" font-size="12" fill="#5b6675">第 9 页</text>
+      <path d="M708 128 L684 128" stroke="#94a3b8" stroke-width="1.5"/><polygon points="676,128 686,123 686,133" fill="#94a3b8"/>
+      <rect x="712" y="96" width="456" height="64" rx="7" fill="#ecfdf5" stroke="#a7e3cb" stroke-width="1.5"/>
+      <text x="725" y="117" font-size="12.5" font-weight="700" fill="#0e9f6e">FFN 中间那个 max(0, ·)</text>
+      <text x="725" y="136" font-size="12" fill="#5b6675">FFN(x) = max(0, xW₁ + b₁) W₂ + b₂　（今天多用 GELU / SwiGLU）</text>
+      <text x="725" y="152" font-size="12" fill="#5b6675">整个 Transformer 里，非线性基本只有这一处和 softmax</text>
+
+      <!-- row 3 -->
+      <rect x="0" y="168" width="318" height="64" rx="7" fill="#eff6ff" stroke="#bfd4f8" stroke-width="1.5"/>
+      <text x="13" y="189" font-size="12.5" font-weight="700" fill="#1f2937">模型吐出的是概率分布，不是答案</text>
+      <text x="13" y="208" font-size="12" fill="#5b6675">最大似然 = 最小交叉熵，损失由此而来</text>
+      <text x="13" y="224" font-size="12" fill="#5b6675">第 5 页</text>
+      <path d="M352 200 L328 200" stroke="#94a3b8" stroke-width="1.5"/><polygon points="320,200 330,195 330,205" fill="#94a3b8"/>
+      <rect x="356" y="168" width="318" height="64" rx="7" fill="#f7f4fd" stroke="#d6cbfb" stroke-width="1.5"/>
+      <text x="369" y="189" font-size="12.5" font-weight="700" fill="#1f2937">softmax：把一串实数变成一组比例</text>
+      <text x="369" y="208" font-size="12" fill="#5b6675">全正、加起来为 1；和交叉熵成对出现</text>
+      <text x="369" y="224" font-size="12" fill="#5b6675">第 10 页</text>
+      <path d="M708 200 L684 200" stroke="#94a3b8" stroke-width="1.5"/><polygon points="676,200 686,195 686,205" fill="#94a3b8"/>
+      <rect x="712" y="168" width="456" height="64" rx="7" fill="#ecfdf5" stroke="#a7e3cb" stroke-width="1.5"/>
+      <text x="725" y="189" font-size="12.5" font-weight="700" fill="#0e9f6e">softmax 在 Transformer 里出现两次</text>
+      <text x="725" y="208" font-size="12" fill="#5b6675">① 注意力内部：softmax(QKᵀ/√d_k) —— 把分数变成「听谁的比例」</text>
+      <text x="725" y="224" font-size="12" fill="#5b6675">② 模型出口：logits → softmax —— 变成整个词表上的一个分布</text>
+
+      <!-- row 4 -->
+      <rect x="0" y="240" width="318" height="64" rx="7" fill="#eff6ff" stroke="#bfd4f8" stroke-width="1.5"/>
+      <text x="13" y="261" font-size="12.5" font-weight="700" fill="#1f2937">优化：好的 W 存在，不代表找得到</text>
+      <text x="13" y="280" font-size="12" fill="#5b6675">「找不到」和「不存在」是两回事</text>
+      <text x="13" y="296" font-size="12" fill="#5b6675">第 6 页</text>
+      <path d="M352 272 L328 272" stroke="#94a3b8" stroke-width="1.5"/><polygon points="320,272 330,267 330,277" fill="#94a3b8"/>
+      <rect x="356" y="240" width="318" height="64" rx="7" fill="#f7f4fd" stroke="#d6cbfb" stroke-width="1.5"/>
+      <text x="369" y="261" font-size="12.5" font-weight="700" fill="#1f2937">深了就训不动：梯度连乘会消失</text>
+      <text x="369" y="280" font-size="12" fill="#5b6675">解法是<tspan font-weight="700">残差</tspan>和<tspan font-weight="700">归一化</tspan>，不是换模型</text>
+      <text x="369" y="296" font-size="12" fill="#5b6675">第 12、13 页</text>
+      <path d="M708 272 L684 272" stroke="#94a3b8" stroke-width="1.5"/><polygon points="676,272 686,267 686,277" fill="#94a3b8"/>
+      <rect x="712" y="240" width="456" height="64" rx="7" fill="#ecfdf5" stroke="#a7e3cb" stroke-width="1.5"/>
+      <text x="725" y="261" font-size="12.5" font-weight="700" fill="#0e9f6e">x + Sublayer(x)　和　LayerNorm(·)</text>
+      <text x="725" y="280" font-size="12" fill="#5b6675">每个子层外面都套这一圈，一层里套两次</text>
+      <text x="725" y="296" font-size="12" fill="#5b6675">它们不提升表达力，只是<tspan font-weight="700">为了能把几十层训起来</tspan></text>
+
+      <!-- row 5 -->
+      <rect x="0" y="312" width="318" height="64" rx="7" fill="#eff6ff" stroke="#bfd4f8" stroke-width="1.5"/>
+      <text x="13" y="333" font-size="12.5" font-weight="700" fill="#1f2937">特征决定上限</text>
+      <text x="13" y="352" font-size="12" fill="#5b6675">怎么把原始数据变成数，比用哪个模型更要命</text>
+      <text x="13" y="368" font-size="12" fill="#5b6675">第 7 页</text>
+      <path d="M352 344 L328 344" stroke="#94a3b8" stroke-width="1.5"/><polygon points="320,344 330,339 330,349" fill="#94a3b8"/>
+      <rect x="356" y="312" width="318" height="64" rx="7" fill="#f7f4fd" stroke="#d6cbfb" stroke-width="1.5"/>
+      <text x="369" y="333" font-size="12.5" font-weight="700" fill="#1f2937">表示学习：让向量自己被学出来</text>
+      <text x="369" y="352" font-size="12" fill="#5b6675">离散符号 → 稠密向量，和网络一起端到端训</text>
+      <text x="369" y="368" font-size="12" fill="#5b6675">第 14 页</text>
+      <path d="M708 344 L684 344" stroke="#94a3b8" stroke-width="1.5"/><polygon points="676,344 686,339 686,349" fill="#94a3b8"/>
+      <rect x="712" y="312" width="456" height="64" rx="7" fill="#ecfdf5" stroke="#a7e3cb" stroke-width="1.5"/>
+      <text x="725" y="333" font-size="12.5" font-weight="700" fill="#0e9f6e">Embedding 查表　+　位置编码 PE</text>
+      <text x="725" y="352" font-size="12" fill="#5b6675">Embedding 是一张可训练的大表，本身就是参数的一部分</text>
+      <text x="725" y="368" font-size="12" fill="#5b6675">位置编码是补丁：注意力天生看不见顺序（第 18 页）</text>
+
+      <!-- row 6 -->
+      <rect x="0" y="384" width="318" height="64" rx="7" fill="#eff6ff" stroke="#bfd4f8" stroke-width="1.5"/>
+      <text x="13" y="405" font-size="12.5" font-weight="700" fill="#1f2937">监督学习，只是标签不用人给</text>
+      <text x="13" y="424" font-size="12" fill="#5b6675">自监督：答案本来就写在数据里</text>
+      <text x="13" y="440" font-size="12" fill="#5b6675">第 7 页</text>
+      <path d="M352 416 L328 416" stroke="#94a3b8" stroke-width="1.5"/><polygon points="320,416 330,411 330,421" fill="#94a3b8"/>
+      <rect x="356" y="384" width="318" height="64" rx="7" fill="#f7f4fd" stroke="#d6cbfb" stroke-width="1.5"/>
+      <text x="369" y="405" font-size="12.5" font-weight="700" fill="#1f2937">训练循环：前向 → 损失 → 反向 → 更新</text>
+      <text x="369" y="424" font-size="12" fill="#5b6675">从取一批数据算起，五步转几十万圈就是训练</text>
+      <text x="369" y="440" font-size="12" fill="#5b6675">第 11 页</text>
+      <path d="M708 416 L684 416" stroke="#94a3b8" stroke-width="1.5"/><polygon points="676,416 686,411 686,421" fill="#94a3b8"/>
+      <rect x="712" y="384" width="456" height="64" rx="7" fill="#ecfdf5" stroke="#a7e3cb" stroke-width="1.5"/>
+      <text x="725" y="405" font-size="12.5" font-weight="700" fill="#0e9f6e">训练目标：预测下一个 token</text>
+      <text x="725" y="424" font-size="12" fill="#5b6675">配上因果掩码，一条长为 n 的句子<tspan font-weight="700">一次前向产生 n 个训练信号</tspan></text>
+      <text x="725" y="440" font-size="12" fill="#5b6675">这是它相对 RNN 真正的效率代差（第 17、21 页）</text>
+      </g>
+    </svg>
+  </div>
+</section>
+<section class="slide" data-act="① 机器学习">
+  <div class="hd"><h2>模型就是一个带参数的函数：f(x ; W)</h2></div>
+  <div class="bd">
+    <div class="p mb">机器学习换掉的不是「写程序」这件事，而是<b>规则从哪来</b>：以前规则由人写死，现在规则是一堆数，由数据定。</div>
+    <svg viewBox="0 0 1168 186" width="100%" style="display:block">
+      <g font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+      <!-- panel 1 -->
+      <rect x="0" y="0" width="366" height="186" rx="8" fill="#f4f7fb" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="16" y="24" font-size="13" font-weight="700" fill="#5b6675">以前：人来写规则</text>
+      <rect x="16" y="40" width="92" height="34" rx="6" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="62" y="61" font-size="12" text-anchor="middle" fill="#1f2937">人写的规则</text>
+      <rect x="16" y="86" width="92" height="34" rx="6" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="62" y="107" font-size="12" text-anchor="middle" fill="#1f2937">输入数据</text>
+      <path d="M114 80 L142 80" stroke="#94a3b8" stroke-width="1.5"/><polygon points="150,80 140,75 140,85" fill="#94a3b8"/>
+      <rect x="156" y="46" width="88" height="68" rx="6" fill="#fff" stroke="#94a3b8" stroke-width="1.5"/>
+      <text x="200" y="85" font-size="13" font-weight="700" text-anchor="middle" fill="#1f2937">程序</text>
+      <path d="M250 80 L278 80" stroke="#94a3b8" stroke-width="1.5"/><polygon points="286,80 276,75 276,85" fill="#94a3b8"/>
+      <rect x="292" y="63" width="60" height="34" rx="6" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="322" y="84" font-size="12" text-anchor="middle" fill="#1f2937">答案</text>
+      <text x="16" y="146" font-size="12" fill="#5b6675">规则说得清、写得完的问题，这条路更省事，</text>
+      <text x="16" y="164" font-size="12" fill="#5b6675">而且可解释、可调试——它并没有被淘汰。</text>
+
+      <!-- panel 2 -->
+      <rect x="401" y="0" width="366" height="186" rx="8" fill="#ecfdf5" stroke="#a7e3cb" stroke-width="1.5"/>
+      <text x="417" y="24" font-size="13" font-weight="700" fill="#0e9f6e">机器学习：人给例子，机器找规则</text>
+      <rect x="417" y="40" width="92" height="34" rx="6" fill="#fff" stroke="#a7e3cb" stroke-width="1.5"/>
+      <text x="463" y="61" font-size="12" text-anchor="middle" fill="#1f2937">输入数据 x</text>
+      <rect x="417" y="86" width="92" height="34" rx="6" fill="#fff" stroke="#a7e3cb" stroke-width="1.5"/>
+      <text x="463" y="107" font-size="12" text-anchor="middle" fill="#1f2937">对应的答案 y</text>
+      <path d="M515 80 L543 80" stroke="#0e9f6e" stroke-width="1.5"/><polygon points="551,80 541,75 541,85" fill="#0e9f6e"/>
+      <rect x="557" y="46" width="88" height="68" rx="6" fill="#fff" stroke="#0e9f6e" stroke-width="2"/>
+      <text x="601" y="78" font-size="13" font-weight="700" text-anchor="middle" fill="#0e9f6e">训练</text>
+      <text x="601" y="96" font-size="11" text-anchor="middle" fill="#5b6675">反复试错</text>
+      <path d="M651 80 L679 80" stroke="#0e9f6e" stroke-width="1.5"/><polygon points="687,80 677,75 677,85" fill="#0e9f6e"/>
+      <rect x="693" y="63" width="60" height="34" rx="6" fill="#fff" stroke="#0e9f6e" stroke-width="2"/>
+      <text x="723" y="84" font-size="12" font-weight="700" text-anchor="middle" fill="#0e9f6e">规则 W</text>
+      <text x="417" y="146" font-size="12" fill="#5b6675">用在<tspan font-weight="700">说不清规则</tspan>的地方：怎么算「这句话像</text>
+      <text x="417" y="164" font-size="12" fill="#5b6675">人话」？没人写得出这个 if-else。</text>
+
+      <!-- panel 3 -->
+      <rect x="802" y="0" width="366" height="186" rx="8" fill="#eff6ff" stroke="#bfd4f8" stroke-width="1.5"/>
+      <text x="818" y="24" font-size="13" font-weight="700" fill="#2563eb">找出来的「规则」，写出来就是</text>
+      <text x="984" y="66" font-size="26" font-weight="700" text-anchor="middle" fill="#1f2937">y = f ( x ; W )</text>
+      <path d="M916 78 L916 96" stroke="#94a3b8" stroke-width="1.2"/>
+      <text x="916" y="112" font-size="12" text-anchor="middle" fill="#5b6675">输入</text>
+      <text x="916" y="128" font-size="11" text-anchor="middle" fill="#94a3b8">每次都不一样</text>
+      <path d="M1010 78 L1010 96" stroke="#2563eb" stroke-width="1.2"/>
+      <text x="1010" y="112" font-size="12" font-weight="700" text-anchor="middle" fill="#2563eb">参数</text>
+      <text x="1010" y="128" font-size="11" text-anchor="middle" fill="#5b6675">训练时才变</text>
+      <text x="818" y="156" font-size="12" fill="#5b6675"><tspan font-weight="700">f 的形状由人定，W 的取值由数据定。</tspan></text>
+      <text x="818" y="174" font-size="12" fill="#5b6675">这一章之后所有的模型，都逃不出这个式子。</text>
+      </g>
+    </svg>
+    <div class="g2 mt">
+      <div class="card t-blue"><div class="t blue">「参数就是知识」不是比喻，是字面意思</div>
+        <div class="sub" style="margin-top:6px">一个模型交付出去，交的就是<b>那一堆数</b>。所谓「70 亿参数」，是说 W 里有 70 亿个浮点数——模型学到的一切，全部编码在这些数的取值里，<b>没有别的地方存东西</b>。</div>
+        <div class="cap" style="margin-top:8px">所以「模型有多大」可以直接算：参数个数 × 每个数占几个字节。70 亿参数用 FP16（2 字节）存，就是约 14 GB。</div></div>
+      <div class="card t-green"><div class="t green">训练和推理，是同一个 f 的两种用法</div>
+        <table class="tbl s" style="margin-top:4px">
+          <tr><td class="green" style="width:64px"><b>训练</b></td><td>拿 x 算出 y，和标准答案比，<b>反过来改 W</b>。慢、贵、只做一次</td></tr>
+          <tr><td>推理</td><td>拿 x 算出 y 就完了，<b>W 一个字节都不动</b>。快、便宜、每次请求都做</td></tr>
+        </table>
+        <div class="cap" style="margin-top:6px"><b>模型不会因为你跟它说了话就变聪明</b>——那只是把话塞进了 x 里。W 是死的，直到有人重新训练它。</div></div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="① 机器学习">
+  <div class="hd"><h2>任何一个学习算法，都由三件事唯一确定</h2></div>
+  <div class="bd">
+    <div class="p mb">看到一个新模型，先问这三件事，剩下的都是细节。Transformer 也不例外——它只在第一件事上做了创新。</div>
+    <div class="g3">
+      <div class="card t-blue"><div class="t blue">一、模型：先划一个范围</div>
+        <div class="sub" style="margin-top:4px">你不是在「所有函数」里找答案，而是先圈定一族候选函数，再在里面挑。这个圈叫<b>假设空间</b>。</div>
+        <svg viewBox="0 0 322 100" width="100%" style="display:block;margin-top:6px">
+          <g font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+          <ellipse cx="161" cy="50" rx="158" ry="46" fill="#fff" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5 4"/>
+          <ellipse cx="118" cy="56" rx="88" ry="32" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+          <text x="118" y="60" font-size="12" font-weight="700" text-anchor="middle" fill="#2563eb">你选的模型能表达的</text>
+          <circle cx="96" cy="76" r="4" fill="#2563eb"/>
+          <text x="106" y="80" font-size="12" fill="#5b6675">训练找到的</text>
+          <path d="M252 34 l4.5 9.5 10.5 1.5 -7.5 7.5 1.8 10.5 -9.3 -5 -9.3 5 1.8 -10.5 -7.5 -7.5 10.5 -1.5 z" fill="#c2410c"/>
+          <text x="252" y="76" font-size="12" font-weight="700" text-anchor="middle" fill="#c2410c">真正想要的</text>
+          <text x="14" y="20" font-size="12" fill="#94a3b8">所有可能的函数</text>
+          </g>
+        </svg>
+        <div class="cap" style="margin-top:6px"><b>圈外面的东西，训练多久都学不到。</b>这时候换损失、换优化器都没用，只能换模型。</div></div>
+      <div class="card t-green"><div class="t green">二、损失：什么叫「答得好」</div>
+        <div class="sub" style="margin-top:4px">一个把「这次答得多差」压成<b>一个数</b>的函数。它必须是一个数，因为只有一个数才能比大小、才能被优化。</div>
+        <div class="sub" style="margin-top:8px">损失是<b>唯一</b>被优化的东西。你写下什么，模型就去让什么变小，<b>一字不差，绝不多做</b>。</div>
+        <div class="cap" style="margin-top:8px">难点从来不是「怎么让损失变小」，是<b>「你写下的这个损失，真的等于你想要的吗」</b>。模型钻的所有空子，都是从这条缝里钻进去的。</div>
+        <div class="cap" style="margin-top:6px">Transformer 用的损失叫<b>交叉熵</b>，下一页专讲它是怎么来的。</div></div>
+      <div class="card t-purple"><div class="t purple">三、优化：怎么把 W 找出来</div>
+        <div class="sub" style="margin-top:4px">在圈定的范围里，搜出让损失最小的那组 W。深度学习里几乎只有一种做法：<b>算梯度，往反方向挪一小步，重复几十万次</b>。</div>
+        <div class="sub" style="margin-top:8px">它的前提是模型<b>处处可导</b>——这正是为什么网络里全是矩阵乘、softmax 这类光滑运算，而不是 if-else。</div>
+        <div class="cap" style="margin-top:8px"><b class="red">优化是会失败的。</b>「没找到好的 W」和「好的 W 根本不在圈里」，是两个完全不同的毛病，救法也完全不同——第 6 页。</div></div>
+    </div>
+    <table class="tbl s mt">
+      <tr><th style="width:96px">三件事</th><th>Transformer 分别是什么</th><th style="width:78px">讲在</th></tr>
+      <tr><td class="blue"><b>模型</b></td><td>N 层堆叠，每层 = <b>多头自注意力 + 前馈网络</b>，各自外面套一圈残差与归一化。<b>这是全部的创新所在</b></td><td class="dim">第 15–19 页</td></tr>
+      <tr><td class="green"><b>损失</b></td><td><b>交叉熵</b>：对真实的下一个 token，模型给的概率越低，罚得越重。<b>和几十年前的分类问题用的是同一个损失</b></td><td class="dim">第 5、10 页</td></tr>
+      <tr><td class="purple"><b>优化</b></td><td>反向传播算梯度 + <b>AdamW</b> 更新，配学习率调度。<b>也不是新东西</b></td><td class="dim">第 11 页</td></tr>
+    </table>
+  </div>
+</section>
+<section class="slide" data-act="① 机器学习">
+  <div class="hd"><h2>模型吐出来的不是答案，是一个概率分布</h2></div>
+  <div class="bd">
+    <div class="g2">
+      <div>
+        <div class="card t-blue"><div class="t blue">为什么非得是分布，不能直接给答案</div>
+          <div class="sub" style="margin-top:6px">① <b>能表达「不确定」</b>——「大概是北京，也可能是上海」这件事，一个硬答案说不出来。<br>② <b>可导</b>——「选最大的那个」这个动作是跳变的，没法求梯度；输出连续的概率才能训。<br>③ <b>能采样</b>——生成文本时要的正是这个：从分布里抽一个，而不是永远抽最大的。</div></div>
+        <div class="card w" style="margin-top:12px"><div class="t">损失是这样一步步逼出来的</div>
+          <div class="code" style="margin-top:8px">想让模型答对      →  P(真实答案) 尽量<b>大</b>
+一整批数据都要对   →  Π P 尽量大        <span class="c">← 最大似然</span>
+连乘会数值下溢     →  Σ log P 尽量大    <span class="c">← 取对数</span>
+优化器只会往小走   →  <b>− Σ log P 尽量小</b>  <span class="c">← 加负号</span></div>
+          <div class="cap" style="margin-top:8px">最后这一行就是<b>交叉熵</b>。它不是谁拍脑袋定的，是「让正确答案的概率最大」这句话被改写成了优化器能用的形式，<b>中间每一步都只是数学变形，没有引入新假设</b>。</div></div>
+        <div class="note b-orange" style="margin-top:12px"><div class="t orange">一句话记住它在干嘛</div>
+          <div class="sub"><b>L = − log P(正确答案)。</b>模型给正确答案的概率是 1，损失 0；概率是 0.5，损失 0.69；概率趋近 0，损失趋近无穷大。<b>它只盯着正确答案那一个数，其余全不看</b>——但因为分布必须加起来等于 1，压低别的等价于抬高它。</div></div>
+      </div>
+      <div>
+        <div class="card w"><div class="t">「中国的首都是 ___」</div>
+          <svg viewBox="0 0 536 196" width="100%" style="display:block;margin-top:4px">
+            <g font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+            <text x="8" y="14" font-size="12.5" font-weight="700" fill="#2563eb">模型输出的分布</text>
+            <line x1="8" y1="152" x2="236" y2="152" stroke="#cbd5e1" stroke-width="1.5"/>
+            <rect x="16" y="84" width="34" height="68" fill="#2563eb"/><text x="33" y="78" font-size="12" text-anchor="middle" fill="#2563eb">.62</text>
+            <rect x="62" y="129" width="34" height="23" fill="#93b4f5"/><text x="79" y="123" font-size="12" text-anchor="middle" fill="#5b6675">.21</text>
+            <rect x="108" y="143" width="34" height="9" fill="#93b4f5"/><text x="125" y="137" font-size="12" text-anchor="middle" fill="#5b6675">.08</text>
+            <rect x="154" y="146" width="34" height="6" fill="#93b4f5"/><text x="171" y="140" font-size="12" text-anchor="middle" fill="#5b6675">.05</text>
+            <rect x="200" y="148" width="34" height="4" fill="#93b4f5"/><text x="217" y="142" font-size="12" text-anchor="middle" fill="#5b6675">.04</text>
+            <text x="33" y="168" font-size="12" text-anchor="middle" fill="#1f2937">北京</text>
+            <text x="79" y="168" font-size="12" text-anchor="middle" fill="#5b6675">上海</text>
+            <text x="125" y="168" font-size="12" text-anchor="middle" fill="#5b6675">广州</text>
+            <text x="171" y="168" font-size="12" text-anchor="middle" fill="#5b6675">南京</text>
+            <text x="217" y="168" font-size="12" text-anchor="middle" fill="#5b6675">其他</text>
+            <text x="122" y="190" font-size="12" text-anchor="middle" fill="#94a3b8">加起来正好等于 1</text>
+
+            <text x="300" y="14" font-size="12.5" font-weight="700" fill="#0e9f6e">真实答案</text>
+            <line x1="300" y1="152" x2="528" y2="152" stroke="#cbd5e1" stroke-width="1.5"/>
+            <rect x="308" y="42" width="34" height="110" fill="#0e9f6e"/><text x="325" y="36" font-size="12" text-anchor="middle" fill="#0e9f6e">1</text>
+            <rect x="354" y="150" width="34" height="2" fill="#cbd5e1"/>
+            <rect x="400" y="150" width="34" height="2" fill="#cbd5e1"/>
+            <rect x="446" y="150" width="34" height="2" fill="#cbd5e1"/>
+            <rect x="492" y="150" width="34" height="2" fill="#cbd5e1"/>
+            <text x="325" y="168" font-size="12" text-anchor="middle" fill="#1f2937">北京</text>
+            <text x="371" y="168" font-size="12" text-anchor="middle" fill="#94a3b8">0</text>
+            <text x="417" y="168" font-size="12" text-anchor="middle" fill="#94a3b8">0</text>
+            <text x="463" y="168" font-size="12" text-anchor="middle" fill="#94a3b8">0</text>
+            <text x="509" y="168" font-size="12" text-anchor="middle" fill="#94a3b8">0</text>
+            <text x="414" y="190" font-size="12" text-anchor="middle" fill="#94a3b8">只有一个 1，其余全 0（one-hot）</text>
+
+            <path d="M248 100 L286 100" stroke="#c2410c" stroke-width="1.5" stroke-dasharray="4 3"/>
+            <text x="267" y="92" font-size="12" font-weight="700" text-anchor="middle" fill="#c2410c">比一比</text>
+            </g>
+          </svg>
+          <div class="cap" style="margin-top:2px">这一批的损失 = <b>− log 0.62 = 0.48</b>。如果模型只给了 0.05，损失就是 3.0——<b>差六倍多的惩罚</b>。训练就是把左边那根蓝柱子往上顶。</div></div>
+        <div class="note b-purple" style="margin-top:12px"><div class="t purple">Transformer 的出口，一模一样</div>
+          <div class="sub">只是把「五个候选」换成<b>整个词表的五万个候选</b>：模型算完最后一层，用一个矩阵把向量映成 5 万个分数（logits），softmax 成 5 万个概率，<b>取真实的下一个 token 那一格，−log 一下就是损失</b>。<br>训练时拿它<b>比对</b>，推理时拿它<b>采样</b>——同一个分布，两种用法。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="① 机器学习">
+  <div class="hd"><h2>优化：把 W 找出来的唯一办法，以及它会怎么失败</h2></div>
+  <div class="bd">
+    <div class="p mb">损失 L 是<b>参数 W 的函数</b>。训练就是在这个函数上找最低点——只不过 W 有几十亿维，没法画，也没法穷举。</div>
+    <div class="g32">
+      <div>
+        <svg viewBox="0 0 690 244" width="100%" style="display:block">
+          <g font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+          <line x1="30" y1="228" x2="676" y2="228" stroke="#cbd5e1" stroke-width="1.5"/>
+          <line x1="30" y1="14" x2="30" y2="228" stroke="#cbd5e1" stroke-width="1.5"/>
+          <text x="36" y="24" font-size="12" fill="#94a3b8">损失 L</text>
+          <text x="674" y="244" font-size="12" text-anchor="end" fill="#94a3b8">W（把几十亿个参数想象成一根轴）</text>
+          <path d="M40,40 C90,130 150,168 195,163 C245,157 255,112 285,114 C340,118 390,182 450,199 C520,218 600,142 676,48"
+                fill="none" stroke="#7c3aed" stroke-width="2.5"/>
+          <circle cx="195" cy="163" r="7" fill="#c2410c"/>
+          <text x="195" y="192" font-size="12" font-weight="700" text-anchor="middle" fill="#c2410c">局部最低点</text>
+          <text x="195" y="209" font-size="12" text-anchor="middle" fill="#5b6675">四周都在上坡，就停了</text>
+          <circle cx="450" cy="199" r="7" fill="#0e9f6e"/>
+          <text x="450" y="220" font-size="12" font-weight="700" text-anchor="middle" fill="#0e9f6e">真正的最低点</text>
+          <circle cx="88" cy="128" r="7" fill="#2563eb"/>
+          <text x="88" y="112" font-size="12" font-weight="700" text-anchor="middle" fill="#2563eb">起点</text>
+          <path d="M100,140 L136,158" stroke="#2563eb" stroke-width="2"/><polygon points="144,162 132,161 137,151" fill="#2563eb"/>
+          <text x="126" y="134" font-size="12" fill="#2563eb">走一步 η</text>
+          <path d="M285,92 L285,72" stroke="#94a3b8" stroke-width="1.2"/>
+          <text x="285" y="64" font-size="12" text-anchor="middle" fill="#5b6675">这一段是上坡，梯度告诉你别往右</text>
+          <path d="M528,118 L498,172" stroke="#94a3b8" stroke-width="1.2" stroke-dasharray="4 3"/>
+          <text x="600" y="92" font-size="12" text-anchor="end" fill="#94a3b8">谷底附近梯度 ≈ 0</text>
+          <text x="600" y="108" font-size="12" text-anchor="end" fill="#94a3b8">越走越慢，最后停住</text>
+          </g>
+        </svg>
+        <div class="code" style="margin-top:6px">W  ←  W  −  η · ∂L/∂W        <span class="c">η 是学习率，∂L/∂W 是梯度</span></div>
+        <div class="cap" style="margin-top:8px"><b>梯度</b>的意思是：每个参数分别往哪个方向拧、拧多少，能让损失涨得最快。取个负号往反方向挪一小步，就是<b>梯度下降</b>。深度学习几十年就靠这一个式子，<b>Transformer 也是用它训出来的</b>。</div>
+      </div>
+      <div>
+        <div class="card t-orange"><div class="t orange">学习率 η：最难调的一个数</div>
+          <div class="sub" style="margin-top:4px"><b>太大</b>：一步跨过最低点，损失来回震荡，严重时直接变成 NaN。<b>太小</b>：能走对方向，但走不完——训练预算是有限的。</div>
+          <div class="cap" style="margin-top:8px">实践上不用固定值：开头几百步<b>从 0 慢慢升上去</b>（warmup），之后按余弦曲线<b>慢慢降下来</b>。大模型训练里这条曲线几乎是标配。</div></div>
+        <div class="card w" style="margin-top:12px"><div class="t">训练不动，通常是这三种之一</div>
+          <table class="tbl s" style="margin-top:4px">
+            <tr><td class="red" style="width:74px"><b>步子炸了</b></td><td>损失震荡或变 NaN。调小学习率、加梯度裁剪</td></tr>
+            <tr><td class="red"><b>走不动</b></td><td>梯度趋近 0，损失卡住。<b>深层网络的头号病</b>，第 12、13 页专治</td></tr>
+            <tr><td class="dim">停错地方</td><td>局部最低点或鞍点。<b>参数一多反而不太是问题</b>——几十亿维里，四面八方同时上坡的概率极低</td></tr>
+          </table></div>
+        <div class="note b-red" style="margin-top:12px"><div class="t red">要能分清的一件事</div>
+          <div class="sub"><b>「没找到好的 W」和「好的 W 根本不在假设空间里」，是两个病。</b>前者是优化问题，调学习率、改结构、加算力还有救；后者是模型选错了，训到天荒地老也没用。<b>看训练损失就能分</b>：训练损失自己都降不下去，是前者。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="① 机器学习">
+  <div class="hd"><h2>数据这一侧：怎么把东西变成数，答案又从哪来</h2></div>
+  <div class="bd">
+    <div class="g2">
+      <div>
+        <div class="card w"><div class="t">「猫」这个词，怎么变成模型能吃的数？</div>
+          <svg viewBox="0 0 536 178" width="100%" style="display:block;margin-top:2px">
+            <g font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+            <text x="0" y="14" font-size="12.5" font-weight="700" fill="#c2410c">① 直接编号（one-hot）：给每个词一个格子</text>
+            <rect x="0" y="24" width="24" height="24" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/><text x="12" y="41" font-size="12" text-anchor="middle" fill="#94a3b8">0</text>
+            <rect x="28" y="24" width="24" height="24" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/><text x="40" y="41" font-size="12" text-anchor="middle" fill="#94a3b8">0</text>
+            <rect x="56" y="24" width="24" height="24" rx="3" fill="#c2410c" stroke="#c2410c" stroke-width="1.5"/><text x="68" y="41" font-size="12" font-weight="700" text-anchor="middle" fill="#fff">1</text>
+            <rect x="84" y="24" width="24" height="24" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/><text x="96" y="41" font-size="12" text-anchor="middle" fill="#94a3b8">0</text>
+            <rect x="112" y="24" width="24" height="24" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/><text x="124" y="41" font-size="12" text-anchor="middle" fill="#94a3b8">0</text>
+            <rect x="140" y="24" width="24" height="24" rx="3" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/><text x="152" y="41" font-size="12" text-anchor="middle" fill="#94a3b8">0</text>
+            <text x="176" y="41" font-size="12" fill="#94a3b8">… 一共五万格，只有一格是 1</text>
+            <text x="0" y="66" font-size="12" fill="#5b6675">任意两个词之间的距离<tspan font-weight="700">完全相等</tspan>——「猫」离「狗」和离「螺丝刀」一样远。</text>
+            <text x="0" y="82" font-size="12" fill="#5b6675">词与词的关系，<tspan font-weight="700" fill="#c2410c">一个字都表达不出来</tspan>。</text>
+
+            <text x="0" y="110" font-size="12.5" font-weight="700" fill="#0e9f6e">② 稠密向量：几百个数，由训练自己定</text>
+            <rect x="0" y="120" width="46" height="24" rx="3" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/><text x="23" y="137" font-size="12" text-anchor="middle" fill="#0e9f6e">0.31</text>
+            <rect x="50" y="120" width="46" height="24" rx="3" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/><text x="73" y="137" font-size="12" text-anchor="middle" fill="#0e9f6e">−1.2</text>
+            <rect x="100" y="120" width="46" height="24" rx="3" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/><text x="123" y="137" font-size="12" text-anchor="middle" fill="#0e9f6e">0.80</text>
+            <rect x="150" y="120" width="46" height="24" rx="3" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/><text x="173" y="137" font-size="12" text-anchor="middle" fill="#0e9f6e">0.05</text>
+            <text x="204" y="137" font-size="12" fill="#94a3b8">… 共 4096 个</text>
+            <text x="0" y="164" font-size="12" fill="#5b6675">这些数<tspan font-weight="700">没人手写</tspan>，是训练时和网络一起被梯度调出来的。</text>
+
+            <line x1="352" y1="164" x2="530" y2="164" stroke="#cbd5e1" stroke-width="1.2"/>
+            <line x1="352" y1="164" x2="352" y2="96" stroke="#cbd5e1" stroke-width="1.2"/>
+            <circle cx="392" cy="140" r="4.5" fill="#0e9f6e"/><text x="402" y="144" font-size="12" fill="#0e9f6e">猫</text>
+            <circle cx="410" cy="128" r="4.5" fill="#0e9f6e"/><text x="420" y="132" font-size="12" fill="#0e9f6e">狗</text>
+            <circle cx="502" cy="112" r="4.5" fill="#94a3b8"/><text x="493" y="108" font-size="12" text-anchor="end" fill="#94a3b8">螺丝刀</text>
+            <text x="352" y="88" font-size="12" fill="#5b6675">意思相近的，位置自然就近</text>
+            </g>
+          </svg>
+          <div class="cap" style="margin-top:2px"><b>特征决定上限。</b>深度学习之前，「怎么把原始数据变成一组数」靠人手工设计，是项目里最花时间的一环；深度学习最大的改变，就是<b>把这一步也交给训练</b>——这叫<b>表示学习</b>。</div></div>
+        <div class="note b-purple" style="margin-top:10px"><div class="t purple">Transformer 的第一层就是它</div>
+          <div class="sub">那张「每个词一行向量」的大表叫 <b>Embedding</b>，它本身就是参数的一部分，和其余所有 W 一起被训练。第 14 页展开。</div></div>
+        <div class="note b-orange" style="margin-top:12px"><div class="t orange">还有一件事：数据是「一批一批」喂进去的</div>
+        <div class="sub">不是一条一条算，也不是全部堆在一起算。<b>每次抓一小撮，算一次平均损失，更新一次 W</b>——这就是第 11 页那个循环的第一步。</div>
+        <table class="tbl s" style="margin-top:6px">
+          <tr><td style="width:80px">一条一条</td><td>梯度方向抖得厉害，而且完全用不上并行，慢</td></tr>
+          <tr><td>全部一起</td><td>方向最准，但显存根本装不下，转一圈也太慢</td></tr>
+          <tr><td class="green"><b>一批</b></td><td>拿一小撮<b>估一下</b>整体的方向。够准，又装得下。多大由人定（第 20 页）</td></tr>
+        </table></div>
+      </div>
+      <div>
+        <div class="card t-green"><div class="t green">答案从哪来：监督 → 自监督</div>
+          <table class="tbl s" style="margin-top:4px">
+            <tr><td class="dim" style="width:76px">监督学习</td><td>x 和 y <b>都得人给</b>。ImageNet 那 120 万张图，是几万人标了两年多标出来的。<b class="red">标注量，就是数据量的天花板</b></td></tr>
+            <tr><td class="green"><b>自监督</b></td><td>y <b>本来就藏在 x 里</b>。把一句话切开，前面当输入、下一个词当答案——<b>答案是原文自己</b>，一个人都不用请</td></tr>
+          </table>
+          <div class="cap" style="margin-top:8px">于是互联网上所有的文本，一夜之间全部变成了带标注的训练数据，数据规模直接放大四五个数量级。<b class="red">标注这个瓶颈不是被扩产解决的，是被绕过去了。</b></div>
+          <div class="cap" style="margin-top:6px">但要注意：<b>形式上它仍然是监督学习</b>——有 x、有 y，用同一个交叉熵、同一套梯度下降。<b>没有引入任何新数学</b>，换的只是 y 从哪来。</div></div>
+        <div class="note b-blue" style="margin-top:12px"><div class="t blue">还有一条底线：训练集上的分数不算分</div>
+          <div class="sub">把训练数据全背下来，就能在训练集上拿满分，但那没有任何意义——我们要的是<b>在没见过的数据上也对</b>，这叫<b>泛化</b>。所以评价模型永远要用留出来没参与训练的数据。</div>
+          <div class="cap" style="margin-top:6px">这条在大模型上有个反直觉的走向：预训练的数据量太大了，<b>每条数据基本只被看一次</b>，「死记硬背」这件事反而不太发生。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="② 深度学习">
+  <div class="hd"><h2>一层神经网络，展开就是一次矩阵乘法</h2></div>
+  <div class="bd">
+    <div class="p mb">「神经网络」这个名字容易让人想歪。<b>它里面没有神经，只有乘法和加法。</b></div>
+    <svg viewBox="0 0 1168 224" width="100%" style="display:block">
+      <g font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+      <!-- A 一个神经元 -->
+      <text x="0" y="14" font-size="13" font-weight="700" fill="#7c3aed">① 一个神经元：加权求和，再加个偏置</text>
+      <line x1="39" y1="54" x2="158" y2="94" stroke="#94a3b8" stroke-width="1.5"/>
+      <line x1="39" y1="100" x2="158" y2="100" stroke="#94a3b8" stroke-width="1.5"/>
+      <line x1="39" y1="146" x2="158" y2="106" stroke="#94a3b8" stroke-width="1.5"/>
+      <text x="92" y="62" font-size="12" fill="#7c3aed">w₁</text>
+      <text x="92" y="94" font-size="12" fill="#7c3aed">w₂</text>
+      <text x="92" y="140" font-size="12" fill="#7c3aed">w₃</text>
+      <circle cx="26" cy="54" r="13" fill="#fff" stroke="#94a3b8" stroke-width="1.5"/><text x="26" y="59" font-size="12" text-anchor="middle" fill="#1f2937">x₁</text>
+      <circle cx="26" cy="100" r="13" fill="#fff" stroke="#94a3b8" stroke-width="1.5"/><text x="26" y="105" font-size="12" text-anchor="middle" fill="#1f2937">x₂</text>
+      <circle cx="26" cy="146" r="13" fill="#fff" stroke="#94a3b8" stroke-width="1.5"/><text x="26" y="151" font-size="12" text-anchor="middle" fill="#1f2937">x₃</text>
+      <circle cx="182" cy="100" r="24" fill="#f7f4fd" stroke="#7c3aed" stroke-width="2"/><text x="182" y="106" font-size="15" font-weight="700" text-anchor="middle" fill="#7c3aed">Σ</text>
+      <text x="182" y="142" font-size="12" text-anchor="middle" fill="#5b6675">再 + b</text>
+      <path d="M210 100 L246 100" stroke="#7c3aed" stroke-width="1.5"/><polygon points="254,100 244,95 244,105" fill="#7c3aed"/>
+      <circle cx="272" cy="100" r="15" fill="#f7f4fd" stroke="#7c3aed" stroke-width="2"/><text x="272" y="105" font-size="12" font-weight="700" text-anchor="middle" fill="#7c3aed">z</text>
+      <text x="0" y="188" font-size="12.5" fill="#1f2937">z = w₁x₁ + w₂x₂ + w₃x₃ + b</text>
+      <text x="0" y="208" font-size="12" fill="#5b6675">要学的就是这几个 w 和 b，别的什么都没有。</text>
+
+      <!-- B 一层 -->
+      <text x="396" y="14" font-size="13" font-weight="700" fill="#7c3aed">② 一层 = 很多个神经元并排，各算各的</text>
+      <line x1="435" y1="54" x2="689" y2="40" stroke="#cbd5e1" stroke-width="1.2"/>
+      <line x1="435" y1="54" x2="689" y2="80" stroke="#cbd5e1" stroke-width="1.2"/>
+      <line x1="435" y1="54" x2="689" y2="120" stroke="#cbd5e1" stroke-width="1.2"/>
+      <line x1="435" y1="54" x2="689" y2="160" stroke="#cbd5e1" stroke-width="1.2"/>
+      <line x1="435" y1="100" x2="689" y2="40" stroke="#cbd5e1" stroke-width="1.2"/>
+      <line x1="435" y1="100" x2="689" y2="80" stroke="#cbd5e1" stroke-width="1.2"/>
+      <line x1="435" y1="100" x2="689" y2="120" stroke="#cbd5e1" stroke-width="1.2"/>
+      <line x1="435" y1="100" x2="689" y2="160" stroke="#cbd5e1" stroke-width="1.2"/>
+      <line x1="435" y1="146" x2="689" y2="40" stroke="#cbd5e1" stroke-width="1.2"/>
+      <line x1="435" y1="146" x2="689" y2="80" stroke="#cbd5e1" stroke-width="1.2"/>
+      <line x1="435" y1="146" x2="689" y2="120" stroke="#cbd5e1" stroke-width="1.2"/>
+      <line x1="435" y1="146" x2="689" y2="160" stroke="#cbd5e1" stroke-width="1.2"/>
+      <circle cx="424" cy="54" r="11" fill="#fff" stroke="#94a3b8" stroke-width="1.5"/>
+      <circle cx="424" cy="100" r="11" fill="#fff" stroke="#94a3b8" stroke-width="1.5"/>
+      <circle cx="424" cy="146" r="11" fill="#fff" stroke="#94a3b8" stroke-width="1.5"/>
+      <circle cx="700" cy="40" r="11" fill="#f7f4fd" stroke="#7c3aed" stroke-width="1.8"/>
+      <circle cx="700" cy="80" r="11" fill="#f7f4fd" stroke="#7c3aed" stroke-width="1.8"/>
+      <circle cx="700" cy="120" r="11" fill="#f7f4fd" stroke="#7c3aed" stroke-width="1.8"/>
+      <circle cx="700" cy="160" r="11" fill="#f7f4fd" stroke="#7c3aed" stroke-width="1.8"/>
+      <text x="396" y="188" font-size="12.5" fill="#1f2937">3 个输入 → 4 个输出，一共 3×4 = 12 个 w，加 4 个 b</text>
+      <text x="396" y="208" font-size="12" fill="#5b6675">每根线上挂一个权重。这种「人人都连」的层叫<tspan font-weight="700">全连接层</tspan>。</text>
+
+      <!-- C 矩阵 -->
+      <text x="792" y="14" font-size="13" font-weight="700" fill="#0e9f6e">③ 把 12 个乘法收进一个记号</text>
+      <rect x="800" y="46" width="56" height="52" rx="5" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.8"/><text x="828" y="78" font-size="14" font-weight="700" text-anchor="middle" fill="#0e9f6e">X</text>
+      <text x="868" y="78" font-size="14" text-anchor="middle" fill="#5b6675">·</text>
+      <rect x="880" y="46" width="56" height="52" rx="5" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.8"/><text x="908" y="78" font-size="14" font-weight="700" text-anchor="middle" fill="#0e9f6e">W</text>
+      <text x="948" y="78" font-size="14" text-anchor="middle" fill="#5b6675">+</text>
+      <rect x="960" y="46" width="34" height="52" rx="5" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.8"/><text x="977" y="78" font-size="14" font-weight="700" text-anchor="middle" fill="#0e9f6e">b</text>
+      <text x="1008" y="78" font-size="14" text-anchor="middle" fill="#5b6675">=</text>
+      <rect x="1022" y="46" width="56" height="52" rx="5" fill="#fff" stroke="#0e9f6e" stroke-width="1.8"/><text x="1050" y="78" font-size="14" font-weight="700" text-anchor="middle" fill="#0e9f6e">Y</text>
+      <text x="828" y="118" font-size="12" text-anchor="middle" fill="#5b6675">n × d</text>
+      <text x="908" y="118" font-size="12" text-anchor="middle" fill="#5b6675">d × k</text>
+      <text x="1050" y="118" font-size="12" text-anchor="middle" fill="#5b6675">n × k</text>
+      <text x="792" y="152" font-size="12" fill="#5b6675">n 个样本<tspan font-weight="700">一起算</tspan>，只是把 X 从一行变成 n 行，</text>
+      <text x="792" y="170" font-size="12" fill="#5b6675">式子一个字都不用改。</text>
+      <text x="792" y="196" font-size="12.5" font-weight="700" fill="#0e9f6e">GPU 擅长的就是这一种形状的运算，</text>
+      <text x="792" y="214" font-size="12.5" font-weight="700" fill="#0e9f6e">深度学习能跑起来，一半靠这件事。</text>
+      </g>
+    </svg>
+    <div class="g2 mt">
+      <div class="card t-purple"><div class="t purple">这就是「参数」的物理形态</div>
+        <div class="sub" style="margin-top:4px">一层的全部参数 = 一个 <b>d × k 的矩阵 W</b> 加一个 <b>长度 k 的向量 b</b>，共 d×k + k 个数。整个模型的参数量，就是把每一层的这个数加起来。</div>
+        <div class="cap" style="margin-top:8px">注意区分：<b>W 是训练时才变的</b>，<b>X 和 Y 是每次输入重新算的</b>。它们都是一堆数，但一个要存进模型文件，一个用完就扔——这条区分到第 20 页会变得很重要。</div></div>
+      <div class="card t-green"><div class="t green">Transformer 里，这个式子出现在哪</div>
+        <table class="tbl s" style="margin-top:4px">
+          <tr><td class="green" style="width:104px"><b>QKV 投影</b></td><td>Q = X W_Q，K = X W_K，V = X W_V<br><b>同一个式子做三次，用三组不同的 W</b></td></tr>
+          <tr><td class="green"><b>多头出口</b></td><td>拼接完再乘一次 W_O</td></tr>
+          <tr><td class="green"><b>FFN</b></td><td>连着做两次：W₁ 把维度撑到 4 倍，W₂ 再降回来</td></tr>
+          <tr><td class="green"><b>模型出口</b></td><td>lm_head 把向量映成词表上的 5 万个分数</td></tr>
+        </table></div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="② 深度学习">
+  <div class="hd"><h2>激活函数：没有它，一百层等于一层</h2></div>
+  <div class="bd">
+    <div class="g2">
+      <div>
+        <div class="card t-red"><div class="t red">先看不加会怎样：两行就崩了</div>
+          <div class="code" style="margin-top:8px">第一层：h  = x W₁
+第二层：y  = h W₂ = ( x W₁ ) W₂
+矩阵乘满足结合律：  = x ( W₁ W₂ )
+令 W′ = W₁W₂：      <b>= x W′</b>   <span class="c">← 又变回一层了</span></div>
+          <div class="cap" style="margin-top:8px">堆一百层线性层，等价于<b>一个</b>线性层。深度白加了：参数变多了，能表达的东西<b>一点没变多</b>。</div>
+          <div class="cap" style="margin-top:6px">所以每一层后面必须插一个<b>非线性</b>函数，把这条结合律打断。这个函数就叫<b>激活函数</b>，它是深度学习里「深度」二字能成立的<b>唯一前提</b>。</div></div>
+        <div class="note b-purple" style="margin-top:12px"><div class="t purple">整个 Transformer 里，非线性只有两处</div>
+          <div class="sub">① <b>FFN 中间那个 max(0, ·)</b>（今天多换成 GELU 或 SwiGLU）；② <b>注意力里的 softmax</b>。<br>除此之外全是矩阵乘、加法和归一化。<b>说 Transformer「结构简单」，指的就是这件事。</b></div></div>
+        <div class="note b-orange" style="margin-top:12px"><div class="t orange">顺带解释一个常见困惑</div>
+          <div class="sub">ReLU 在 0 处不可导，但它照样能用梯度下降训——工程上直接规定该点导数取 0 就行。<b>「处处可导」在实践中是「几乎处处可导」</b>，一个点不影响优化。</div></div>
+      </div>
+      <div>
+        <svg viewBox="0 0 536 206" width="100%" style="display:block">
+          <g font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+          <!-- Sigmoid -->
+          <text x="0" y="12" font-size="12.5" font-weight="700" fill="#dc2626">Sigmoid（老一代）</text>
+          <line x1="6" y1="140" x2="156" y2="140" stroke="#e2e8f0" stroke-width="1.5"/>
+          <line x1="81" y1="24" x2="81" y2="148" stroke="#e2e8f0" stroke-width="1.5"/>
+          <path d="M8,136 C48,135 62,45 154,42" fill="none" stroke="#dc2626" stroke-width="2.5"/>
+          <path d="M8,136 L44,135" stroke="#c2410c" stroke-width="4" opacity=".35"/>
+          <path d="M120,42.5 L154,42" stroke="#c2410c" stroke-width="4" opacity=".35"/>
+          <text x="81" y="168" font-size="12" text-anchor="middle" fill="#c2410c">两端几乎是平的</text>
+          <text x="81" y="186" font-size="12" text-anchor="middle" fill="#5b6675">梯度 ≈ 0，往回传就没了</text>
+          <text x="81" y="204" font-size="12" text-anchor="middle" fill="#94a3b8">深层网络训不动的元凶</text>
+
+          <!-- ReLU -->
+          <text x="190" y="12" font-size="12.5" font-weight="700" fill="#0e9f6e">ReLU：max(0, x)</text>
+          <line x1="196" y1="140" x2="346" y2="140" stroke="#e2e8f0" stroke-width="1.5"/>
+          <line x1="271" y1="24" x2="271" y2="148" stroke="#e2e8f0" stroke-width="1.5"/>
+          <path d="M198,140 L271,140 L344,32" fill="none" stroke="#0e9f6e" stroke-width="2.5"/>
+          <text x="271" y="168" font-size="12" text-anchor="middle" fill="#0e9f6e">正半边斜率恒为 1</text>
+          <text x="271" y="186" font-size="12" text-anchor="middle" fill="#5b6675">梯度原样传回去，不衰减</text>
+          <text x="271" y="204" font-size="12" text-anchor="middle" fill="#94a3b8">而且只是一次比大小，极快</text>
+
+          <!-- GELU -->
+          <text x="380" y="12" font-size="12.5" font-weight="700" fill="#7c3aed">GELU / SwiGLU（现在）</text>
+          <line x1="386" y1="140" x2="536" y2="140" stroke="#e2e8f0" stroke-width="1.5"/>
+          <line x1="461" y1="24" x2="461" y2="148" stroke="#e2e8f0" stroke-width="1.5"/>
+          <path d="M388,140 C424,140 444,150 461,140 C480,128 506,74 534,32" fill="none" stroke="#7c3aed" stroke-width="2.5"/>
+          <text x="461" y="168" font-size="12" text-anchor="middle" fill="#7c3aed">形状像 ReLU，但是光滑的</text>
+          <text x="461" y="186" font-size="12" text-anchor="middle" fill="#5b6675">0 附近有个小小的负值区</text>
+          <text x="461" y="204" font-size="12" text-anchor="middle" fill="#94a3b8">大模型里的实际默认选择</text>
+          </g>
+        </svg>
+        <div class="note b-blue" style="margin-top:14px"><div class="t blue">从 Sigmoid 换到 ReLU，是深度学习的转折点之一</div>
+          <div class="sub">Sigmoid 的问题不在「不够非线性」，在于<b>它两端的导数趋近 0</b>：反向传播是把每层导数<b>连乘</b>起来的，一串小于 1 的数乘几十次，梯度就没了。<br>ReLU 把正半边的导数钉死在 1，连乘也不衰减——<b>换一个函数，网络就能堆到几十上百层</b>。这条线索到第 12 页会接上残差。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="② 深度学习">
+  <div class="hd"><h2>输出层与损失，必须成对出现</h2></div>
+  <div class="bd">
+    <div class="p mb">第 5 页说「模型输出的是概率分布」。可网络最后一层算出来的是<b>任意实数</b>，有正有负，加起来也不是 1。中间差的这一步，就是 <b>softmax</b>。</div>
+    <div class="g2">
+      <div>
+        <svg viewBox="0 0 536 178" width="100%" style="display:block">
+          <g font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+          <text x="8" y="12" font-size="12.5" font-weight="700" fill="#5b6675">最后一层的输出</text>
+          <text x="8" y="28" font-size="12" fill="#94a3b8">logits，可正可负</text>
+          <rect x="8" y="38" width="104" height="28" rx="4" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/><text x="60" y="57" font-size="12.5" text-anchor="middle" fill="#1f2937">2.0</text>
+          <rect x="8" y="72" width="104" height="28" rx="4" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/><text x="60" y="91" font-size="12.5" text-anchor="middle" fill="#1f2937">1.0</text>
+          <rect x="8" y="106" width="104" height="28" rx="4" fill="#fff" stroke="#cbd5e1" stroke-width="1.5"/><text x="60" y="125" font-size="12.5" text-anchor="middle" fill="#1f2937">0.1</text>
+
+          <path d="M124 86 L156 86" stroke="#94a3b8" stroke-width="1.5"/><polygon points="164,86 154,81 154,91" fill="#94a3b8"/>
+          <text x="144" y="76" font-size="12" text-anchor="middle" fill="#5b6675">取 exp</text>
+
+          <text x="176" y="12" font-size="12.5" font-weight="700" fill="#c2410c">全变成正数</text>
+          <text x="176" y="28" font-size="12" fill="#94a3b8">而且差距被放大</text>
+          <rect x="176" y="38" width="104" height="28" rx="4" fill="#fff7ed" stroke="#fdba74" stroke-width="1.5"/><text x="228" y="57" font-size="12.5" text-anchor="middle" fill="#c2410c">7.39</text>
+          <rect x="176" y="72" width="104" height="28" rx="4" fill="#fff7ed" stroke="#fdba74" stroke-width="1.5"/><text x="228" y="91" font-size="12.5" text-anchor="middle" fill="#c2410c">2.72</text>
+          <rect x="176" y="106" width="104" height="28" rx="4" fill="#fff7ed" stroke="#fdba74" stroke-width="1.5"/><text x="228" y="125" font-size="12.5" text-anchor="middle" fill="#c2410c">1.11</text>
+          <text x="228" y="152" font-size="12" text-anchor="middle" fill="#5b6675">加起来 = 11.22</text>
+
+          <path d="M292 86 L324 86" stroke="#94a3b8" stroke-width="1.5"/><polygon points="332,86 322,81 322,91" fill="#94a3b8"/>
+          <text x="312" y="76" font-size="12" text-anchor="middle" fill="#5b6675">各自除以总和</text>
+
+          <text x="344" y="12" font-size="12.5" font-weight="700" fill="#0e9f6e">一个合法的概率分布</text>
+          <text x="344" y="28" font-size="12" fill="#94a3b8">全正，加起来正好 1</text>
+          <rect x="344" y="38" width="104" height="28" rx="4" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.8"/><text x="396" y="57" font-size="12.5" font-weight="700" text-anchor="middle" fill="#0e9f6e">0.66</text>
+          <rect x="344" y="72" width="104" height="28" rx="4" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/><text x="396" y="91" font-size="12.5" text-anchor="middle" fill="#0e9f6e">0.24</text>
+          <rect x="344" y="106" width="104" height="28" rx="4" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/><text x="396" y="125" font-size="12.5" text-anchor="middle" fill="#0e9f6e">0.10</text>
+          <path d="M460 52 L484 52" stroke="#0e9f6e" stroke-width="1.5" stroke-dasharray="3 3"/>
+          <text x="490" y="46" font-size="12" fill="#0e9f6e">损失只看</text>
+          <text x="490" y="62" font-size="12" fill="#0e9f6e">这一格</text>
+          <text x="344" y="152" font-size="12" fill="#5b6675">L = − log 0.66 = 0.42</text>
+          <text x="8" y="174" font-size="12" fill="#5b6675">2.0 和 0.1 只差 1.9，概率却差了六倍多——<tspan font-weight="700">exp 天生放大差距</tspan>，是特性不是副作用。</text>
+          </g>
+        </svg>
+        <div class="card t-orange" style="margin-top:10px"><div class="t orange">为什么偏偏是 exp</div>
+          <div class="sub" style="margin-top:4px">① <b>把负数变成正数</b>，而且保持大小顺序不变；② <b>处处可导</b>，导数还是它自己，反向传播算起来最省事；③ <b>拉开差距</b>，让模型的「偏好」体现得出来。</div>
+          <div class="cap" style="margin-top:6px">顺带一提：先把 logits 除以一个数 T 再做 softmax，T 越大分布越平、越随机，T 越小越尖、越确定。这就是<b>温度</b>，生成文本时那个调「创造性」的旋钮。</div></div>
+        <div class="note b-purple" style="margin-top:12px"><div class="t purple">Transformer 里 softmax 出现两次，用途完全不同</div>
+          <div class="sub">① <b>注意力内部</b>：把分数变成「听谁的比例」，<b>后面不接损失</b>；② <b>模型出口</b>：把 logits 变成词表分布，<b>后面接交叉熵</b>。</div>
+          <div class="cap" style="margin-top:6px">同一个算子，一个在<b>层里面</b>当权重用，一个在<b>模型出口</b>当概率用。看见 softmax 先分清是哪一个。</div></div>
+      </div>
+      <div>
+        <div class="card w"><div class="t">输出层怎么配、损失怎么配，是定死的</div>
+          <table class="tbl s" style="margin-top:4px">
+            <tr><th style="width:102px">任务</th><th style="width:150px">最后一层</th><th>损失</th></tr>
+            <tr><td>预测一个数</td><td>不加激活，直出</td><td>均方误差 MSE</td></tr>
+            <tr><td>是 / 否</td><td>Sigmoid，1 个输出</td><td>二元交叉熵</td></tr>
+            <tr><td class="green"><b>选一个类别</b><br><span class="dim">预测下一个 token</span></td><td class="green"><b>Softmax</b><br>输出 V 个数</td><td class="green"><b>交叉熵</b></td></tr>
+          </table>
+          <div class="cap" style="margin-top:6px">乱配是会出事的：分类问题用 MSE，梯度会变得又小又难走。<b>这一对不是习惯，是有理由的。</b></div></div>
+        <div class="note b-green" style="margin-top:8px"><div class="t green">成对的理由：导数干净得不像话</div>
+          <div class="sub">softmax 和交叉熵接在一起，损失对 logits 的导数正好是</div>
+          <div class="code" style="margin-top:6px">∂L / ∂logits  =  p  −  y      <span class="c">预测的分布 − 真实的分布</span></div>
+          <div class="cap" style="margin-top:4px">「你猜的减去正确答案」，就是要往回传的东西。中间那些 exp、log 全部约掉了。所以框架里 softmax 和交叉熵通常<b>合成一个算子</b>——既为数值稳定，也为了直接用这个结果。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="② 深度学习">
+  <div class="hd"><h2>训练循环：这五步重复几十万次，就是全部的训练</h2></div>
+  <div class="bd">
+    <div class="p mb">从最小的网络到最大的模型，训练流程<b>一个字都没变过</b>。变的只是这个循环转多少次、每次吃多少数据。</div>
+    <svg viewBox="0 0 1168 196" width="100%" style="display:block">
+      <g font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+      <rect x="0" y="6" width="200" height="98" rx="8" fill="#eff6ff" stroke="#93b4f5" stroke-width="1.5"/>
+      <rect x="12" y="16" width="22" height="18" rx="4" fill="#2563eb"/><text x="23" y="29.5" font-size="12" font-weight="700" text-anchor="middle" fill="#fff">1</text>
+      <text x="42" y="30" font-size="13" font-weight="700" fill="#1f2937">取一批数据</text>
+      <text x="14" y="56" font-size="12" fill="#5b6675">一批叫 batch，几十到</text>
+      <text x="14" y="74" font-size="12" fill="#5b6675">几百万条不等</text>
+      <text x="14" y="94" font-size="12" fill="#5b6675">一起算，摊薄开销</text>
+      <path d="M204 55 L232 55" stroke="#94a3b8" stroke-width="1.5"/><polygon points="240,55 230,50 230,60" fill="#94a3b8"/>
+
+      <rect x="242" y="6" width="200" height="98" rx="8" fill="#eff6ff" stroke="#93b4f5" stroke-width="1.5"/>
+      <rect x="254" y="16" width="22" height="18" rx="4" fill="#2563eb"/><text x="265" y="29.5" font-size="12" font-weight="700" text-anchor="middle" fill="#fff">2</text>
+      <text x="284" y="30" font-size="13" font-weight="700" fill="#1f2937">前向：算到底</text>
+      <text x="256" y="56" font-size="12" fill="#5b6675">从第一层一路算到最</text>
+      <text x="256" y="74" font-size="12" fill="#5b6675">后一层，拿到预测</text>
+      <text x="256" y="94" font-size="12" font-weight="700" fill="#2563eb">中间每层的输出都留着</text>
+      <path d="M446 55 L474 55" stroke="#94a3b8" stroke-width="1.5"/><polygon points="482,55 472,50 472,60" fill="#94a3b8"/>
+
+      <rect x="484" y="6" width="200" height="98" rx="8" fill="#eff6ff" stroke="#93b4f5" stroke-width="1.5"/>
+      <rect x="496" y="16" width="22" height="18" rx="4" fill="#2563eb"/><text x="507" y="29.5" font-size="12" font-weight="700" text-anchor="middle" fill="#fff">3</text>
+      <text x="526" y="30" font-size="13" font-weight="700" fill="#1f2937">算损失</text>
+      <text x="498" y="56" font-size="12" fill="#5b6675">预测和答案比一比，</text>
+      <text x="498" y="74" font-size="12" fill="#5b6675">压成<tspan font-weight="700">一个数</tspan></text>
+      <text x="498" y="94" font-size="12" fill="#5b6675">L = − log P(正确答案)</text>
+      <path d="M688 55 L716 55" stroke="#c2410c" stroke-width="1.5"/><polygon points="724,55 714,50 714,60" fill="#c2410c"/>
+
+      <rect x="726" y="6" width="200" height="98" rx="8" fill="#fff7ed" stroke="#fdba74" stroke-width="1.5"/>
+      <rect x="738" y="16" width="22" height="18" rx="4" fill="#c2410c"/><text x="749" y="29.5" font-size="12" font-weight="700" text-anchor="middle" fill="#fff">4</text>
+      <text x="768" y="30" font-size="13" font-weight="700" fill="#1f2937">反向：求梯度</text>
+      <text x="740" y="56" font-size="12" fill="#5b6675">从损失倒着走回去，</text>
+      <text x="740" y="74" font-size="12" fill="#5b6675">用链式法则逐层求导</text>
+      <text x="740" y="94" font-size="12" font-weight="700" fill="#c2410c">得到每个 W 的 ∂L/∂W</text>
+      <path d="M930 55 L958 55" stroke="#0e9f6e" stroke-width="1.5"/><polygon points="966,55 956,50 956,60" fill="#0e9f6e"/>
+
+      <rect x="968" y="6" width="200" height="98" rx="8" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="2"/>
+      <rect x="980" y="16" width="22" height="18" rx="4" fill="#0e9f6e"/><text x="991" y="29.5" font-size="12" font-weight="700" text-anchor="middle" fill="#fff">5</text>
+      <text x="1010" y="30" font-size="13" font-weight="700" fill="#1f2937">更新参数</text>
+      <text x="982" y="56" font-size="12" fill="#5b6675">W ← W − η · 梯度</text>
+      <text x="982" y="74" font-size="12" fill="#5b6675">交给优化器执行</text>
+      <text x="982" y="94" font-size="12" font-weight="700" fill="#0e9f6e">这是 W 唯一会变的时刻</text>
+
+      <path d="M1068 108 L1068 148 L100 148 L100 112" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="6 4"/>
+      <polygon points="100,104 95,116 105,116" fill="#94a3b8"/>
+      <text x="584" y="142" font-size="12.5" font-weight="700" text-anchor="middle" fill="#5b6675">回到 ①，换下一批数据 —— 大模型预训练里，这个圈要转几十万圈</text>
+      <text x="584" y="184" font-size="12" text-anchor="middle" fill="#94a3b8">推理时只做 ① 和 ②：不算损失、不求梯度、不更新。所以推理便宜得多，也不需要留中间结果。</text>
+      </g>
+    </svg>
+    <div class="g2 mt">
+      <div class="card t-orange"><div class="t orange">反向传播不是新算法，是链式法则加一本账</div>
+        <div class="sub" style="margin-top:4px">要知道「某个 w 动一点，损失会变多少」，只要把从 w 到损失这条路上每一步的导数<b>乘起来</b>——这就是高中的链式法则，没有别的。</div>
+        <div class="cap" style="margin-top:8px"><b>「一本账」指的是</b>：前向时每层的中间结果都记在账上，反向时按相反顺序取出来用。所以框架里网络不是代码，是一张<b>计算图</b>，每个算子都配一个「求导版本」。</div>
+        <div class="cap" style="margin-top:6px"><b class="red">这也是训练比推理吃显存的原因</b>：不光要放参数，还得把整个前向的中间激活全部留到反向用完为止。</div></div>
+      <div class="card t-green"><div class="t green">第 ⑤ 步为什么不用最朴素的减法</div>
+        <table class="tbl s" style="margin-top:4px">
+          <tr><td style="width:88px">SGD</td><td>W ← W − η·g。最直接，但所有参数<b>共用一个步长</b>，对学习率极其敏感</td></tr>
+          <tr><td class="green"><b>Adam<br>AdamW</b></td><td>给<b>每个参数各记两个滑动平均</b>（梯度的一阶、二阶矩），自动给它算一个合适的步长。<b>今天的实际默认</b></td></tr>
+        </table>
+        <div class="cap" style="margin-top:6px">代价是显存：每个参数除了自己，还要额外存<b>梯度 + 两份优化器状态</b>。这就是为什么「训一个 80 亿参数的模型」远不止 16 GB——训练的显存开销是参数本身的好几倍。</div></div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="② 深度学习">
+  <div class="hd"><h2>深了就训不动：梯度消失，和残差这个解</h2></div>
+  <div class="bd">
+    <div class="p mb">既然深度能带来表达力，为什么不一口气堆一千层？<b>因为 2015 年之前，超过二十几层就训不动了</b>——不是过拟合，是<b>压根降不下去</b>。</div>
+    <svg viewBox="0 0 1168 208" width="100%" style="display:block">
+      <g font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+      <!-- A -->
+      <rect x="0" y="0" width="560" height="208" rx="8" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.5"/>
+      <text x="16" y="24" font-size="13" font-weight="700" fill="#dc2626">病因：反向传播是一长串<tspan font-size="13">连乘</tspan></text>
+      <text x="16" y="46" font-size="12.5" fill="#1f2937">∂L/∂W₁ = ∂L/∂y · ∂y/∂h₄ · ∂h₄/∂h₃ · … · ∂h₁/∂W₁</text>
+      <line x1="16" y1="164" x2="300" y2="164" stroke="#cbd5e1" stroke-width="1.5"/>
+      <rect x="20" y="74" width="22" height="90" fill="#dc2626"/>
+      <rect x="48" y="101" width="22" height="63" fill="#dc2626" opacity=".85"/>
+      <rect x="76" y="120" width="22" height="44" fill="#dc2626" opacity=".7"/>
+      <rect x="104" y="133" width="22" height="31" fill="#dc2626" opacity=".6"/>
+      <rect x="132" y="143" width="22" height="21" fill="#dc2626" opacity=".5"/>
+      <rect x="160" y="149" width="22" height="15" fill="#dc2626" opacity=".4"/>
+      <rect x="188" y="154" width="22" height="10" fill="#dc2626" opacity=".34"/>
+      <rect x="216" y="157" width="22" height="7" fill="#dc2626" opacity=".28"/>
+      <rect x="244" y="159" width="22" height="5" fill="#dc2626" opacity=".22"/>
+      <rect x="272" y="161" width="22" height="3" fill="#dc2626" opacity=".18"/>
+      <text x="16" y="182" font-size="12" fill="#5b6675">输出侧</text>
+      <text x="294" y="182" font-size="12" text-anchor="end" fill="#5b6675">输入侧</text>
+      <text x="16" y="200" font-size="12" fill="#94a3b8">往回传的梯度大小，一层比一层小</text>
+      <text x="322" y="80" font-size="12" fill="#5b6675">每层导数只要是 <tspan font-weight="700">0.9</tspan>，</text>
+      <text x="322" y="98" font-size="12" fill="#5b6675">50 层后是 0.9⁵⁰ ≈ <tspan font-weight="700" fill="#dc2626">0.005</tspan></text>
+      <text x="322" y="122" font-size="12" fill="#5b6675">每层导数是 <tspan font-weight="700">1.1</tspan>，</text>
+      <text x="322" y="140" font-size="12" fill="#5b6675">50 层后是 1.1⁵⁰ ≈ <tspan font-weight="700" fill="#dc2626">117</tspan></text>
+      <text x="322" y="168" font-size="12" fill="#5b6675">一个叫<tspan font-weight="700">梯度消失</tspan>，一个叫</text>
+      <text x="322" y="186" font-size="12" fill="#5b6675"><tspan font-weight="700">梯度爆炸</tspan>。都是同一个根源。</text>
+
+      <!-- B -->
+      <rect x="608" y="0" width="560" height="208" rx="8" fill="#ecfdf5" stroke="#a7e3cb" stroke-width="1.5"/>
+      <text x="624" y="24" font-size="13" font-weight="700" fill="#0e9f6e">解法：给梯度另开一条直通车</text>
+      <circle cx="656" cy="94" r="16" fill="#fff" stroke="#0e9f6e" stroke-width="1.8"/><text x="656" y="99" font-size="13" font-weight="700" text-anchor="middle" fill="#0e9f6e">x</text>
+      <path d="M674 94 L706 94" stroke="#94a3b8" stroke-width="1.5"/><polygon points="714,94 704,89 704,99" fill="#94a3b8"/>
+      <rect x="720" y="68" width="132" height="52" rx="6" fill="#fff" stroke="#94a3b8" stroke-width="1.5"/>
+      <text x="786" y="92" font-size="13" font-weight="700" text-anchor="middle" fill="#1f2937">子层 F</text>
+      <text x="786" y="110" font-size="12" text-anchor="middle" fill="#5b6675">注意力 或 FFN</text>
+      <path d="M856 94 L888 94" stroke="#94a3b8" stroke-width="1.5"/><polygon points="896,94 886,89 886,99" fill="#94a3b8"/>
+      <circle cx="916" cy="94" r="17" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="2"/><text x="916" y="100" font-size="16" font-weight="700" text-anchor="middle" fill="#0e9f6e">+</text>
+      <path d="M936 94 L968 94" stroke="#0e9f6e" stroke-width="1.5"/><polygon points="976,94 966,89 966,99" fill="#0e9f6e"/>
+      <circle cx="996" cy="94" r="16" fill="#fff" stroke="#0e9f6e" stroke-width="1.8"/><text x="996" y="99" font-size="13" font-weight="700" text-anchor="middle" fill="#0e9f6e">y</text>
+      <path d="M656 76 C700 34, 872 34, 916 74" fill="none" stroke="#0e9f6e" stroke-width="2.5"/>
+      <polygon points="916,78 908,68 921,66" fill="#0e9f6e"/>
+      <text x="786" y="42" font-size="12" font-weight="700" text-anchor="middle" fill="#0e9f6e">原样抄过来，一个字不改</text>
+      <text x="624" y="148" font-size="12.5" fill="#1f2937">y = x + F(x)　　　求导：　∂y/∂x = <tspan font-weight="700" fill="#0e9f6e">1</tspan> + ∂F/∂x</text>
+      <text x="624" y="174" font-size="12" fill="#5b6675">那个 <tspan font-weight="700" fill="#0e9f6e">1</tspan> 就是直通车：<tspan font-weight="700">哪怕 ∂F/∂x 小到没有，梯度也能原样传回去。</tspan></text>
+      <text x="624" y="194" font-size="12" fill="#5b6675">于是网络终于能堆到几十、上百层——2015 年 ResNet 就是靠这一笔。</text>
+      </g>
+    </svg>
+    <div class="g2 mt">
+      <div class="card t-green"><div class="t green">残差还有第二个好处，同样重要</div>
+        <div class="sub" style="margin-top:4px">它把每一层要学的东西，从「输出应该是什么」<b>换成了「在输入的基础上该改动多少」</b>。</div>
+        <div class="cap" style="margin-top:8px">如果某一层最好的选择是「什么都别做」，没有残差时它得费劲学出一个恒等映射；有了残差，<b>只要把 F 压成 0 就行</b>——这件事容易太多。<b>层数加上去，性能至少不会变差</b>，这个保证是残差给的。</div></div>
+      <div class="card t-blue"><div class="t blue">Transformer 里，这一圈套在哪</div>
+        <div class="sub" style="margin-top:4px">每个子层外面都套一次，所以<b>一层套两次</b>：注意力算完套一次，FFN 算完再套一次。96 层的模型，就是 192 个这样的加号。</div>
+        <div class="cap" style="margin-top:8px"><b class="red">常见误解：残差是「加回去」，不是「替换掉」。</b>子层的输出没有覆盖输入，而是叠在输入上。<br>另外，因为要做加法，<b>x 和 F(x) 的形状必须完全一样</b>——这正是为什么整个 Transformer 从头到尾，每个 token 的向量都保持 d 维不变。</div></div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="② 深度学习">
+  <div class="hd"><h2>归一化：把数值拉回一个能算的尺度</h2></div>
+  <div class="bd">
+    <div class="p mb">残差解决了「梯度传不回去」，还剩一个问题：<b>每层输出的数值会越漂越野</b>。上一层输出跑到几百，下一层的权重就得配几百分之一；训练途中分布还一直在变，学习率根本没法定。</div>
+    <div class="g2">
+      <div>
+        <svg viewBox="0 0 536 194" width="100%" style="display:block">
+          <g font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+          <text x="0" y="14" font-size="12.5" font-weight="700" fill="#c2410c">BatchNorm：竖着切</text>
+          <text x="0" y="32" font-size="12" fill="#5b6675">同一个特征，跨整批样本一起算</text>
+          <rect x="76" y="46" width="40" height="120" fill="#fff7ed" stroke="#c2410c" stroke-width="2"/>
+          <g stroke="#cbd5e1" stroke-width="1.2" fill="none">
+          <rect x="36" y="46" width="40" height="30"/><rect x="76" y="46" width="40" height="30"/><rect x="116" y="46" width="40" height="30"/><rect x="156" y="46" width="40" height="30"/><rect x="196" y="46" width="40" height="30"/>
+          <rect x="36" y="76" width="40" height="30"/><rect x="76" y="76" width="40" height="30"/><rect x="116" y="76" width="40" height="30"/><rect x="156" y="76" width="40" height="30"/><rect x="196" y="76" width="40" height="30"/>
+          <rect x="36" y="106" width="40" height="30"/><rect x="76" y="106" width="40" height="30"/><rect x="116" y="106" width="40" height="30"/><rect x="156" y="106" width="40" height="30"/><rect x="196" y="106" width="40" height="30"/>
+          <rect x="36" y="136" width="40" height="30"/><rect x="76" y="136" width="40" height="30"/><rect x="116" y="136" width="40" height="30"/><rect x="156" y="136" width="40" height="30"/><rect x="196" y="136" width="40" height="30"/>
+          </g>
+          <rect x="76" y="46" width="40" height="120" fill="none" stroke="#c2410c" stroke-width="2.5"/>
+          <text x="30" y="66" font-size="12" text-anchor="end" fill="#5b6675">词 1</text>
+          <text x="30" y="96" font-size="12" text-anchor="end" fill="#5b6675">词 2</text>
+          <text x="30" y="126" font-size="12" text-anchor="end" fill="#5b6675">词 3</text>
+          <text x="30" y="156" font-size="12" text-anchor="end" fill="#5b6675">词 4</text>
+          <text x="136" y="186" font-size="12" text-anchor="middle" fill="#94a3b8">特征维 →</text>
+
+          <text x="296" y="14" font-size="12.5" font-weight="700" fill="#0e9f6e">LayerNorm：横着切</text>
+          <text x="296" y="32" font-size="12" fill="#5b6675">同一个词，只看它自己的所有特征</text>
+          <rect x="332" y="76" width="200" height="30" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="2"/>
+          <g stroke="#cbd5e1" stroke-width="1.2" fill="none">
+          <rect x="332" y="46" width="40" height="30"/><rect x="372" y="46" width="40" height="30"/><rect x="412" y="46" width="40" height="30"/><rect x="452" y="46" width="40" height="30"/><rect x="492" y="46" width="40" height="30"/>
+          <rect x="332" y="76" width="40" height="30"/><rect x="372" y="76" width="40" height="30"/><rect x="412" y="76" width="40" height="30"/><rect x="452" y="76" width="40" height="30"/><rect x="492" y="76" width="40" height="30"/>
+          <rect x="332" y="106" width="40" height="30"/><rect x="372" y="106" width="40" height="30"/><rect x="412" y="106" width="40" height="30"/><rect x="452" y="106" width="40" height="30"/><rect x="492" y="106" width="40" height="30"/>
+          <rect x="332" y="136" width="40" height="30"/><rect x="372" y="136" width="40" height="30"/><rect x="412" y="136" width="40" height="30"/><rect x="452" y="136" width="40" height="30"/><rect x="492" y="136" width="40" height="30"/>
+          </g>
+          <rect x="332" y="76" width="200" height="30" fill="none" stroke="#0e9f6e" stroke-width="2.5"/>
+          <text x="432" y="186" font-size="12" text-anchor="middle" fill="#94a3b8">特征维 →</text>
+          </g>
+        </svg>
+        <div class="card t-green" style="margin-top:6px"><div class="t green">文本这一侧，只能用横着切的那个</div>
+          <div class="sub" style="margin-top:4px">句子有长有短，一批里竖着那一列<b>根本对不齐</b>；而且 BatchNorm 依赖 batch 大小，推理时一次只来一条请求，它得另存一份训练时的平均值凑合用。</div>
+          <div class="cap" style="margin-top:6px">LayerNorm 只看自己这一行，<b>和 batch 多大无关、和句子多长无关</b>。这就是 Transformer 一律用它的全部理由。</div></div>
+      </div>
+      <div>
+        <div class="card w"><div class="t">公式，以及它的四步</div>
+          <div class="code" style="margin-top:8px">LN(x) = γ ⊙ ( x − μ ) / √( σ² + ε ) + β</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><td style="width:96px">① 算均值 μ</td><td>把这一行的 d 个数加起来除以 d</td></tr>
+            <tr><td>② 算方差</td><td>看这一行数值散得有多开，记作 σ²</td></tr>
+            <tr><td>③ 标准化</td><td>减均值、除标准差，<b>拉成均值 0、方差 1</b>。ε 是防止除以 0 的小数</td></tr>
+            <tr><td class="green"><b>④ 放缩</b></td><td>再乘 γ、加 β。<b>这两个是要学的</b>——硬钉在标准正态上会削表达力，得给模型留个「拉回去」的余地</td></tr>
+          </table></div>
+        <div class="note b-blue" style="margin-top:12px"><div class="t blue">同一行里，有两类完全不同的符号</div>
+          <div class="sub"><b>γ 和 β 是参数</b>，训练时被梯度调，要存进模型文件；<b>μ 和 σ² 不是参数</b>，是每次拿到输入现算的，用完就扔。<br>这个区分到第 20 页数参数量时会直接用上。</div></div>
+        <div class="note b-orange" style="margin-top:12px"><div class="t orange">摆在子层前面还是后面，是两件事</div>
+          <div class="sub">原论文放在子层<b>后面</b>（Post-LN），不配 warmup 容易训崩；现代大模型普遍改到子层<b>前面</b>（Pre-LN），残差通路一路干净，稳得多。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="② 深度学习">
+  <div class="hd"><h2>Embedding：把词变成向量，而这张表本身也是学出来的</h2></div>
+  <div class="bd">
+    <div class="p mb">第 7 页说「要用稠密向量，不要 one-hot」。落到文字上，具体的做法就是<b>准备一张大表：词表里每一个 token，配一个 d 维向量</b>。</div>
+    <svg viewBox="0 0 1168 218" width="100%" style="display:block">
+      <g font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+      <text x="0" y="14" font-size="12.5" font-weight="700" fill="#5b6675">① 分词器切出 token，每个有个编号</text>
+      <rect x="0" y="44" width="150" height="34" rx="6" fill="#fff" stroke="#93b4f5" stroke-width="1.5"/>
+      <text x="16" y="66" font-size="13" fill="#1f2937">今天</text><text x="134" y="66" font-size="12" text-anchor="end" fill="#2563eb">#5182</text>
+      <rect x="0" y="96" width="150" height="34" rx="6" fill="#fff" stroke="#93b4f5" stroke-width="1.5"/>
+      <text x="16" y="118" font-size="13" fill="#1f2937">天气</text><text x="134" y="118" font-size="12" text-anchor="end" fill="#2563eb">#9043</text>
+      <rect x="0" y="148" width="150" height="34" rx="6" fill="#fff" stroke="#93b4f5" stroke-width="1.5"/>
+      <text x="16" y="170" font-size="13" fill="#1f2937">不错</text><text x="134" y="170" font-size="12" text-anchor="end" fill="#2563eb">#2617</text>
+
+      <path d="M154 61 C210 61, 224 57, 276 57" fill="none" stroke="#2563eb" stroke-width="1.5"/>
+      <path d="M154 113 C210 113, 224 123, 276 123" fill="none" stroke="#2563eb" stroke-width="1.5"/>
+      <path d="M154 165 C210 165, 224 167, 276 167" fill="none" stroke="#2563eb" stroke-width="1.5"/>
+
+      <text x="280" y="14" font-size="12.5" font-weight="700" fill="#7c3aed">② 嵌入表 E：V 行 × d 列</text>
+      <rect x="280" y="46" width="420" height="22" fill="#f5f3ff"/>
+      <rect x="280" y="112" width="420" height="22" fill="#f5f3ff"/>
+      <rect x="280" y="156" width="420" height="22" fill="#f5f3ff"/>
+      <g stroke="#e2e8f0" stroke-width="1.5" fill="none">
+      <rect x="280" y="24" width="420" height="22"/><rect x="280" y="46" width="420" height="22"/><rect x="280" y="68" width="420" height="22"/><rect x="280" y="90" width="420" height="22"/>
+      <rect x="280" y="112" width="420" height="22"/><rect x="280" y="134" width="420" height="22"/><rect x="280" y="156" width="420" height="22"/><rect x="280" y="178" width="420" height="22"/>
+      <line x1="315" y1="24" x2="315" y2="200"/><line x1="350" y1="24" x2="350" y2="200"/><line x1="385" y1="24" x2="385" y2="200"/><line x1="420" y1="24" x2="420" y2="200"/><line x1="455" y1="24" x2="455" y2="200"/><line x1="490" y1="24" x2="490" y2="200"/><line x1="525" y1="24" x2="525" y2="200"/><line x1="560" y1="24" x2="560" y2="200"/><line x1="595" y1="24" x2="595" y2="200"/><line x1="630" y1="24" x2="630" y2="200"/><line x1="665" y1="24" x2="665" y2="200"/>
+      </g>
+      <g stroke="#7c3aed" stroke-width="2" fill="none">
+      <rect x="280" y="46" width="420" height="22"/><rect x="280" y="112" width="420" height="22"/><rect x="280" y="156" width="420" height="22"/>
+      </g>
+      <rect x="280" y="24" width="420" height="176" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+      <text x="490" y="216" font-size="12" text-anchor="middle" fill="#94a3b8">V 一般三万到三十万，d 一般 2048 到 8192</text>
+
+      <path d="M706 112 L748 112" stroke="#7c3aed" stroke-width="1.5"/><polygon points="756,112 746,107 746,117" fill="#7c3aed"/>
+      <text x="727" y="100" font-size="12" text-anchor="middle" fill="#7c3aed">取行</text>
+
+      <text x="790" y="14" font-size="12.5" font-weight="700" fill="#0e9f6e">③ 拼成 3 × d 的矩阵，正式进网络</text>
+      <g fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.8">
+      <rect x="790" y="46" width="336" height="22"/><rect x="790" y="112" width="336" height="22"/><rect x="790" y="156" width="336" height="22"/>
+      </g>
+      <g stroke="#a7e3cb" stroke-width="1.2">
+      <line x1="818" y1="46" x2="818" y2="68"/><line x1="846" y1="46" x2="846" y2="68"/><line x1="874" y1="46" x2="874" y2="68"/><line x1="902" y1="46" x2="902" y2="68"/><line x1="930" y1="46" x2="930" y2="68"/><line x1="958" y1="46" x2="958" y2="68"/><line x1="986" y1="46" x2="986" y2="68"/><line x1="1014" y1="46" x2="1014" y2="68"/><line x1="1042" y1="46" x2="1042" y2="68"/><line x1="1070" y1="46" x2="1070" y2="68"/><line x1="1098" y1="46" x2="1098" y2="68"/>
+      <line x1="818" y1="112" x2="818" y2="134"/><line x1="846" y1="112" x2="846" y2="134"/><line x1="874" y1="112" x2="874" y2="134"/><line x1="902" y1="112" x2="902" y2="134"/><line x1="930" y1="112" x2="930" y2="134"/><line x1="958" y1="112" x2="958" y2="134"/><line x1="986" y1="112" x2="986" y2="134"/><line x1="1014" y1="112" x2="1014" y2="134"/><line x1="1042" y1="112" x2="1042" y2="134"/><line x1="1070" y1="112" x2="1070" y2="134"/><line x1="1098" y1="112" x2="1098" y2="134"/>
+      <line x1="818" y1="156" x2="818" y2="178"/><line x1="846" y1="156" x2="846" y2="178"/><line x1="874" y1="156" x2="874" y2="178"/><line x1="902" y1="156" x2="902" y2="178"/><line x1="930" y1="156" x2="930" y2="178"/><line x1="958" y1="156" x2="958" y2="178"/><line x1="986" y1="156" x2="986" y2="178"/><line x1="1014" y1="156" x2="1014" y2="178"/><line x1="1042" y1="156" x2="1042" y2="178"/><line x1="1070" y1="156" x2="1070" y2="178"/><line x1="1098" y1="156" x2="1098" y2="178"/>
+      </g>
+      <text x="1166" y="216" font-size="12" text-anchor="end" fill="#5b6675">往后一路到最后一层，<tspan font-weight="700">每个 token 始终是 d 维向量</tspan>，形状不再变。</text>
+      </g>
+    </svg>
+    <div class="g2 mt">
+      <div class="card t-purple"><div class="t purple">这张表不是查字典，是训出来的</div>
+        <div class="sub" style="margin-top:4px">E 一开始是<b>随机数</b>。它和网络里其他所有权重一样，被同一个损失、同一次反向传播往回调——<b>没有单独的「训 embedding」阶段</b>。</div>
+        <div class="cap" style="margin-top:8px">训完之后，语义相近的词自然就靠在一起了。没有人标注过「猫和狗像」，模型只是发现<b>它俩总出现在相似的上下文里</b>，于是把它们的向量放到了一块儿。这就是第 7 页说的表示学习，落在语言上的样子。</div>
+        <div class="cap" style="margin-top:6px">查表在数学上等价于 <b>one-hot 向量 × E</b>，但实现上没人真去乘——按行号取一行就完了。这也是它叫 lookup 的原因。</div></div>
+      <div class="card t-orange"><div class="t orange">三个必须知道的工程事实</div>
+        <div class="sub" style="margin-top:4px"><b>① 它很大。</b>V = 128k、d = 4096，光这一张表就是 <b>5.2 亿</b>参数。在小模型里，embedding 能占到总参数的一半以上。</div>
+        <div class="cap" style="margin-top:8px"><b>② 出口还有一张。</b>最后要把 d 维向量投回 V 个词的分数，需要一张 d × V 的表（lm_head）。有的模型让它和输入表<b>共用同一份权重</b>（weight tying），省下一半。</div>
+        <div class="cap" style="margin-top:6px"><b>③ token 既不是字也不是词，是子词。</b>常见词一个 token，罕见词被拆成几段。<b class="red">模型数不清 strawberry 里有几个 r，根源就在这</b>——它看到的从来不是字母，是几个已经打包好的编号。</div></div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="③ Transformer">
+  <div class="hd"><h2>轮到序列了：老办法卡在哪，新要求是什么</h2></div>
+  <div class="bd">
+    <div class="p mb">前面搭起来的东西，处理的都是「一组固定长度的数进去，一个答案出来」。可语言不是这样：<b>长度不定，而且顺序有意义</b>。2017 年之前有两套办法，各有各的死结。</div>
+    <svg viewBox="0 0 1168 216" width="100%" style="display:block">
+      <g font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+      <!-- RNN -->
+      <text x="0" y="14" font-size="13" font-weight="700" fill="#dc2626">RNN：一个词一个词地读</text>
+      <g fill="#fef2f2" stroke="#dc2626" stroke-width="1.8">
+      <circle cx="36" cy="110" r="14"/><circle cx="100" cy="110" r="14"/><circle cx="164" cy="110" r="14"/><circle cx="228" cy="110" r="14"/><circle cx="292" cy="110" r="14"/><circle cx="356" cy="110" r="14"/>
+      </g>
+      <g stroke="#dc2626" stroke-width="1.8" fill="none">
+      <path d="M50 110 L78 110"/><path d="M114 110 L142 110"/><path d="M178 110 L206 110"/><path d="M242 110 L270 110"/><path d="M306 110 L334 110"/>
+      </g>
+      <g fill="#dc2626"><polygon points="86,110 76,105 76,115"/><polygon points="150,110 140,105 140,115"/><polygon points="214,110 204,105 204,115"/><polygon points="278,110 268,105 268,115"/><polygon points="342,110 332,105 332,115"/></g>
+      <path d="M36 88 C120 44, 272 44, 356 88" fill="none" stroke="#dc2626" stroke-width="2" stroke-dasharray="5 4"/>
+      <text x="196" y="42" font-size="12" font-weight="700" text-anchor="middle" fill="#dc2626">第 1 个词要影响第 6 个词，得走 5 步</text>
+      <text x="0" y="172" font-size="12" fill="#5b6675"><tspan font-weight="700">死结一：串行。</tspan>第 t 步必须等第 t−1 步算完，</text>
+      <text x="0" y="190" font-size="12" fill="#5b6675">显卡上万个核心闲着，训练根本堆不大。</text>
+      <text x="0" y="210" font-size="12" fill="#5b6675"><tspan font-weight="700">死结二：</tspan>远处的信息要连乘 n 次才传得到 —— 和第 12 页同一个病。</text>
+
+      <!-- CNN -->
+      <text x="398" y="14" font-size="13" font-weight="700" fill="#c2410c">CNN：一次只看一个小窗口</text>
+      <g stroke="#fdba74" stroke-width="1.5" fill="none">
+      <path d="M434 134 L470 100"/><path d="M482 134 L470 100"/><path d="M530 134 L470 100"/>
+      <path d="M482 134 L518 100"/><path d="M530 134 L518 100"/><path d="M578 134 L518 100"/>
+      <path d="M530 134 L566 100"/><path d="M578 134 L566 100"/><path d="M626 134 L566 100"/>
+      <path d="M578 134 L614 100"/><path d="M626 134 L614 100"/><path d="M674 134 L614 100"/>
+      <path d="M470 100 L518 66"/><path d="M518 100 L518 66"/><path d="M566 100 L518 66"/>
+      <path d="M518 100 L566 66"/><path d="M566 100 L566 66"/><path d="M614 100 L566 66"/>
+      <path d="M518 66 L542 38"/><path d="M566 66 L542 38"/>
+      </g>
+      <g fill="#fff7ed" stroke="#c2410c" stroke-width="1.6">
+      <circle cx="434" cy="140" r="11"/><circle cx="482" cy="140" r="11"/><circle cx="530" cy="140" r="11"/><circle cx="578" cy="140" r="11"/><circle cx="626" cy="140" r="11"/><circle cx="674" cy="140" r="11"/>
+      <circle cx="470" cy="98" r="10"/><circle cx="518" cy="98" r="10"/><circle cx="566" cy="98" r="10"/><circle cx="614" cy="98" r="10"/>
+      <circle cx="518" cy="64" r="10"/><circle cx="566" cy="64" r="10"/>
+      <circle cx="542" cy="34" r="10"/>
+      </g>
+      <text x="398" y="172" font-size="12" fill="#5b6675"><tspan font-weight="700">并行没问题</tspan>，但视野是靠<tspan font-weight="700">堆层数</tspan>换来的：</text>
+      <text x="398" y="190" font-size="12" fill="#5b6675">两个隔得远的词，要爬好几层才见得上面。</text>
+      <text x="398" y="210" font-size="12" fill="#5b6675">而且<tspan font-weight="700">看谁是由位置定死的</tspan>，跟内容没关系。</text>
+
+      <!-- Attention -->
+      <text x="796" y="14" font-size="13" font-weight="700" fill="#0e9f6e">想要的：任意两个位置，一步直达</text>
+      <g stroke="#0e9f6e" stroke-width="1.5" fill="none" opacity=".55">
+      <path d="M828 94 C858 58, 858 58, 888 94"/>
+      <path d="M828 94 C888 42, 888 42, 948 94"/>
+      <path d="M828 94 C918 30, 918 30, 1008 94"/>
+      <path d="M828 94 C948 24, 948 24, 1068 94"/>
+      </g>
+      <path d="M828 94 C978 18, 978 18, 1128 94" fill="none" stroke="#0e9f6e" stroke-width="2.6"/>
+      <g fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.8">
+      <circle cx="828" cy="110" r="14"/><circle cx="888" cy="110" r="14"/><circle cx="948" cy="110" r="14"/><circle cx="1008" cy="110" r="14"/><circle cx="1068" cy="110" r="14"/><circle cx="1128" cy="110" r="14"/>
+      </g>
+      <text x="978" y="142" font-size="12" text-anchor="middle" fill="#0e9f6e">每个位置都这样连一遍</text>
+      <text x="796" y="172" font-size="12" fill="#5b6675"><tspan font-weight="700">路径长度恒为 1</tspan>，不管隔多远。</text>
+      <text x="796" y="190" font-size="12" fill="#5b6675">六个位置<tspan font-weight="700">可以同时算</tspan>，一个矩阵乘就完事。</text>
+      <text x="796" y="210" font-size="12" fill="#5b6675">至于该重点看谁 —— <tspan font-weight="700">由内容自己决定。</tspan></text>
+      </g>
+    </svg>
+    <div class="card w mt"><div class="t">把要求并排列出来，答案几乎是被逼出来的</div>
+      <table class="tbl s" style="margin-top:6px">
+        <tr><th style="width:180px">这一维上的表现</th><th style="width:250px" class="red">RNN</th><th style="width:250px" class="orange">CNN</th><th class="green">想要的</th></tr>
+        <tr><td>能不能同时算</td><td>不能，天生串行</td><td>能</td><td class="green"><b>能</b></td></tr>
+        <tr><td>任意两个位置的距离</td><td>n 步</td><td>层数的对数</td><td class="green"><b>1 步</b></td></tr>
+        <tr><td>「该看谁」由什么决定</td><td>位置先后</td><td>窗口大小，写死的</td><td class="green"><b>内容，当场算</b></td></tr>
+      </table>
+      <div class="cap" style="margin-top:6px">三条同时满足，剩下的可能性其实不多了：<b>让每个位置直接对所有位置打一个分，再按分数加权取信息</b>。这个东西就叫注意力，下一页拆开它。</div></div>
+  </div>
+</section>
+<section class="slide" data-act="③ Transformer">
+  <div class="hd"><h2>注意力：五步走完，就是那一个公式</h2></div>
+  <div class="bd">
+    <div class="p mb">拿一句话看：<b>「那只 猫 追 它」</b>。要让「它」知道自己指的是谁，它得<b>主动去问别的位置</b>——这就是注意力干的事。</div>
+    <svg viewBox="0 0 1168 256" width="100%" style="display:block">
+      <g font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+      <rect x="0" y="6" width="150" height="46" rx="6" fill="#fff" stroke="#94a3b8" stroke-width="1.5"/>
+      <text x="75" y="28" font-size="13" font-weight="700" text-anchor="middle" fill="#1f2937">每个位置的 x</text>
+      <text x="75" y="44" font-size="12" text-anchor="middle" fill="#94a3b8">上一页拿到的 d 维向量</text>
+      <path d="M154 29 L172 29" stroke="#2563eb" stroke-width="1.5"/><polygon points="180,29 170,24 170,34" fill="#2563eb"/>
+      <g fill="#eff6ff" stroke="#93b4f5" stroke-width="1.5">
+      <rect x="188" y="6" width="310" height="46" rx="6"/><rect x="516" y="6" width="310" height="46" rx="6"/><rect x="844" y="6" width="310" height="46" rx="6"/>
+      </g>
+      <text x="202" y="28" font-size="13" font-weight="700" fill="#2563eb">Q = x · W_Q</text><text x="484" y="28" font-size="12" text-anchor="end" fill="#5b6675">我在找什么样的信息</text>
+      <text x="530" y="28" font-size="13" font-weight="700" fill="#2563eb">K = x · W_K</text><text x="812" y="28" font-size="12" text-anchor="end" fill="#5b6675">我这儿有什么可以被找到</text>
+      <text x="858" y="28" font-size="13" font-weight="700" fill="#2563eb">V = x · W_V</text><text x="1140" y="28" font-size="12" text-anchor="end" fill="#5b6675">被选中时我真正交出去的内容</text>
+      <text x="0" y="72" font-size="12" fill="#94a3b8">① 同一个 x，分别乘三个不同的权重矩阵，就分出了三个身份。W_Q、W_K、W_V 都是要学的参数 —— 也是注意力里绝大部分的参数。</text>
+
+      <text x="0" y="96" font-size="12.5" font-weight="700" fill="#5b6675">现在站在「它」这个位置上，看它要从四个位置各拿多少 ——</text>
+      <text x="96" y="118" font-size="12" text-anchor="end" fill="#94a3b8">位置 j</text>
+      <text x="256" y="118" font-size="12" text-anchor="end" fill="#94a3b8">② q<tspan font-size="10">它</tspan> · k<tspan font-size="10">j</tspan></text>
+      <text x="404" y="118" font-size="12" text-anchor="end" fill="#c2410c">③ ÷ √d_k</text>
+      <text x="440" y="118" font-size="12" fill="#0e9f6e">④ softmax → 权重</text>
+      <text x="800" y="118" font-size="12" fill="#94a3b8">⑤ 各自乘上自己的 v，加起来</text>
+      <line x1="0" y1="126" x2="1168" y2="126" stroke="#e2e8f0" stroke-width="1.5"/>
+
+      <text x="96" y="152" font-size="13" text-anchor="end" fill="#1f2937">那只</text>
+      <text x="256" y="152" font-size="12.5" text-anchor="end" fill="#5b6675">9.6</text>
+      <text x="404" y="152" font-size="12.5" text-anchor="end" fill="#c2410c">1.2</text>
+      <rect x="440" y="140" width="14" height="18" fill="#0e9f6e" opacity=".45"/>
+      <text x="700" y="152" font-size="12.5" text-anchor="end" fill="#0e9f6e">0.06</text>
+      <text x="800" y="152" font-size="12.5" fill="#5b6675">× v<tspan font-size="10">那只</tspan></text>
+
+      <text x="96" y="182" font-size="13" text-anchor="end" font-weight="700" fill="#1f2937">猫</text>
+      <text x="256" y="182" font-size="12.5" text-anchor="end" fill="#5b6675">27.2</text>
+      <text x="404" y="182" font-size="12.5" text-anchor="end" fill="#c2410c">3.4</text>
+      <rect x="440" y="170" width="134" height="18" fill="#0e9f6e"/>
+      <text x="700" y="182" font-size="12.5" text-anchor="end" font-weight="700" fill="#0e9f6e">0.56</text>
+      <text x="800" y="182" font-size="12.5" font-weight="700" fill="#1f2937">× v<tspan font-size="10">猫</tspan></text>
+
+      <text x="96" y="212" font-size="13" text-anchor="end" fill="#1f2937">追</text>
+      <text x="256" y="212" font-size="12.5" text-anchor="end" fill="#5b6675">15.2</text>
+      <text x="404" y="212" font-size="12.5" text-anchor="end" fill="#c2410c">1.9</text>
+      <rect x="440" y="200" width="31" height="18" fill="#0e9f6e" opacity=".45"/>
+      <text x="700" y="212" font-size="12.5" text-anchor="end" fill="#0e9f6e">0.13</text>
+      <text x="800" y="212" font-size="12.5" fill="#5b6675">× v<tspan font-size="10">追</tspan></text>
+
+      <text x="96" y="242" font-size="13" text-anchor="end" fill="#1f2937">它</text>
+      <text x="256" y="242" font-size="12.5" text-anchor="end" fill="#5b6675">20.8</text>
+      <text x="404" y="242" font-size="12.5" text-anchor="end" fill="#c2410c">2.6</text>
+      <rect x="440" y="230" width="60" height="18" fill="#0e9f6e" opacity=".45"/>
+      <text x="700" y="242" font-size="12.5" text-anchor="end" fill="#0e9f6e">0.25</text>
+      <text x="800" y="242" font-size="12.5" fill="#5b6675">× v<tspan font-size="10">它</tspan></text>
+
+      <path d="M880 140 L900 140 L900 236 L880 236" fill="none" stroke="#0e9f6e" stroke-width="1.5"/>
+      <path d="M900 188 L926 188" stroke="#0e9f6e" stroke-width="1.5"/><polygon points="934,188 924,183 924,193" fill="#0e9f6e"/>
+      <rect x="940" y="162" width="228" height="52" rx="6" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="2"/>
+      <text x="1054" y="184" font-size="13" font-weight="700" text-anchor="middle" fill="#0e9f6e">「它」的新向量</text>
+      <text x="1054" y="204" font-size="12" text-anchor="middle" fill="#5b6675">大半是「猫」的内容</text>
+      <text x="940" y="242" font-size="12" fill="#94a3b8">权重加起来正好 = 1</text>
+      </g>
+    </svg>
+    <div class="g2 mt">
+      <div class="card t-blue"><div class="t blue">这五步写成一行，就是那个公式</div>
+        <div class="code" style="margin-top:8px">Attention(Q, K, V) = softmax( <b>Q Kᵀ</b> / √d_k ) <b>V</b>
+                             <span class="c">└ ② 打分  ③ 缩放  ④ 归一   ⑤ 取值</span></div>
+        <div class="cap" style="margin-top:8px"><b>Q Kᵀ 一次就算出所有位置对所有位置的分数</b>，是一个 n × n 的方阵；softmax <b>按行</b>做，每一行加起来是 1；再乘 V，就是加权求和。</div>
+        <div class="cap" style="margin-top:6px">整条路上只有<b>两次矩阵乘加一个 softmax</b>，全部位置一起算完。第 15 页要的三条，到这里全满足了。</div></div>
+      <div class="note b-orange"><div class="t orange">那个 √d_k 是干嘛的：唯一一处纯工程的补丁</div>
+        <div class="sub">q 和 k 都是 d_k 维，点积是 d_k 个乘积相加，<b>维度越高，分数的波动越大</b>（标准差大约按 √d_k 涨）。</div>
+        <div class="cap" style="margin-top:8px">分数一大，softmax 就被推进饱和区：某一格权重接近 1，其余全接近 0，<b>梯度几乎没了</b>——正是第 9 页 Sigmoid 两端那个毛病。除以 √d_k，把波动拉回 1 附近。</div>
+        <div class="cap" style="margin-top:6px">公式里别的每一项都对应一个「要做什么」，<b>只有这个根号对应「不这么做会训崩」</b>。</div></div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="③ Transformer">
+  <div class="hd"><h2>多头，和那块挡板</h2></div>
+  <div class="bd">
+    <div class="p mb">上一页那套东西，实际用的时候要改两个地方：<b>并排跑好几套</b>，以及<b>不许往后看</b>。</div>
+    <div class="g2">
+      <div>
+        <div class="h3 blue">多头：一种「相关」不够用</div>
+        <svg viewBox="0 0 536 192" width="100%" style="display:block;margin-top:6px">
+          <g font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+          <text x="0" y="12" font-size="12" fill="#5b6675">① 把 d = 512 横着切成 8 份</text>
+          <text x="536" y="12" font-size="12" text-anchor="end" fill="#94a3b8">每份 64 维</text>
+          <g fill="#eff6ff" stroke="#93b4f5" stroke-width="1.5">
+          <rect x="0" y="20" width="67" height="24"/><rect x="67" y="20" width="67" height="24"/><rect x="134" y="20" width="67" height="24"/><rect x="201" y="20" width="67" height="24"/><rect x="268" y="20" width="67" height="24"/><rect x="335" y="20" width="67" height="24"/><rect x="402" y="20" width="67" height="24"/><rect x="469" y="20" width="67" height="24"/>
+          </g>
+          <g stroke="#93b4f5" stroke-width="1.2">
+          <line x1="33" y1="44" x2="33" y2="56"/><line x1="100" y1="44" x2="100" y2="56"/><line x1="167" y1="44" x2="167" y2="56"/><line x1="234" y1="44" x2="234" y2="56"/><line x1="301" y1="44" x2="301" y2="56"/><line x1="368" y1="44" x2="368" y2="56"/><line x1="435" y1="44" x2="435" y2="56"/><line x1="502" y1="44" x2="502" y2="56"/>
+          </g>
+          <g fill="#fff" stroke="#2563eb" stroke-width="1.5">
+          <rect x="4" y="56" width="59" height="30" rx="4"/><rect x="71" y="56" width="59" height="30" rx="4"/><rect x="138" y="56" width="59" height="30" rx="4"/><rect x="205" y="56" width="59" height="30" rx="4"/><rect x="272" y="56" width="59" height="30" rx="4"/><rect x="339" y="56" width="59" height="30" rx="4"/><rect x="406" y="56" width="59" height="30" rx="4"/><rect x="473" y="56" width="59" height="30" rx="4"/>
+          </g>
+          <g font-size="12" text-anchor="middle" fill="#2563eb">
+          <text x="33" y="75">头 1</text><text x="100" y="75">头 2</text><text x="167" y="75">头 3</text><text x="234" y="75">头 4</text><text x="301" y="75">头 5</text><text x="368" y="75">头 6</text><text x="435" y="75">头 7</text><text x="502" y="75">头 8</text>
+          </g>
+          <text x="268" y="104" font-size="12" text-anchor="middle" fill="#5b6675">每一份，各自完整跑一遍第 16 页那五步</text>
+          <g stroke="#0e9f6e" stroke-width="1.2">
+          <line x1="33" y1="110" x2="33" y2="120"/><line x1="100" y1="110" x2="100" y2="120"/><line x1="167" y1="110" x2="167" y2="120"/><line x1="234" y1="110" x2="234" y2="120"/><line x1="301" y1="110" x2="301" y2="120"/><line x1="368" y1="110" x2="368" y2="120"/><line x1="435" y1="110" x2="435" y2="120"/><line x1="502" y1="110" x2="502" y2="120"/>
+          </g>
+          <g fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5">
+          <rect x="0" y="120" width="67" height="24"/><rect x="67" y="120" width="67" height="24"/><rect x="134" y="120" width="67" height="24"/><rect x="201" y="120" width="67" height="24"/><rect x="268" y="120" width="67" height="24"/><rect x="335" y="120" width="67" height="24"/><rect x="402" y="120" width="67" height="24"/><rect x="469" y="120" width="67" height="24"/>
+          </g>
+          <text x="536" y="160" font-size="12" text-anchor="end" fill="#94a3b8">② 结果拼回 d 维</text>
+          <path d="M100 144 L100 158" stroke="#0e9f6e" stroke-width="1.5"/><polygon points="100,166 95,156 105,156" fill="#0e9f6e"/>
+          <rect x="0" y="166" width="300" height="26" rx="4" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.8"/>
+          <text x="150" y="184" font-size="12.5" font-weight="700" text-anchor="middle" fill="#0e9f6e">③ 再乘 W_O，把八个头混一混</text>
+          </g>
+        </svg>
+        <div class="note b-blue" style="margin-top:10px"><div class="t blue">重点：这几乎是白送的</div>
+          <div class="sub">总维度没变，只是<b>切开分头算</b>，算完拼回去——计算量和单头基本一样。换来的是<b>八种不同的「相关」可以同时存在</b>：有的头盯着紧邻的上一个词，有的头专门找主谓搭配，有的头负责追指代。</div></div>
+        <div class="note b-purple" style="margin-top:12px"><div class="t purple">今天实际在用的变体：GQA</div>
+          <div class="sub">推理时 K 和 V 要缓存下来反复用，头越多缓存越大。于是现在普遍改成<b>多个 Q 头共用一组 K、V</b>（分组查询注意力）：缓存直接小几倍，质量几乎不掉。</div>
+          <div class="cap" style="margin-top:6px">公式一个字没改，改的只是「几个头共享一份 K/V」。<b>这类改动是最近几年优化的主流</b>——不动骨架，动配比。</div></div>
+      </div>
+      <div>
+        <div class="h3 red">掩码：不许看后面</div>
+        <svg viewBox="0 0 536 214" width="100%" style="display:block;margin-top:6px">
+          <g font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+          <text x="0" y="12" font-size="12" fill="#5b6675">softmax 之前，把这些格子的分数设成 −∞</text>
+          <text x="146" y="34" font-size="12" text-anchor="middle" fill="#94a3b8">它想看的位置 j →</text>
+          <g stroke="#fff" stroke-width="1.5">
+          <rect x="62" y="38" width="28" height="28" fill="#dcfce7"/><rect x="90" y="38" width="28" height="28" fill="#f1f5f9"/><rect x="118" y="38" width="28" height="28" fill="#f1f5f9"/><rect x="146" y="38" width="28" height="28" fill="#f1f5f9"/><rect x="174" y="38" width="28" height="28" fill="#f1f5f9"/><rect x="202" y="38" width="28" height="28" fill="#f1f5f9"/>
+          <rect x="62" y="66" width="28" height="28" fill="#dcfce7"/><rect x="90" y="66" width="28" height="28" fill="#dcfce7"/><rect x="118" y="66" width="28" height="28" fill="#f1f5f9"/><rect x="146" y="66" width="28" height="28" fill="#f1f5f9"/><rect x="174" y="66" width="28" height="28" fill="#f1f5f9"/><rect x="202" y="66" width="28" height="28" fill="#f1f5f9"/>
+          <rect x="62" y="94" width="28" height="28" fill="#dcfce7"/><rect x="90" y="94" width="28" height="28" fill="#dcfce7"/><rect x="118" y="94" width="28" height="28" fill="#dcfce7"/><rect x="146" y="94" width="28" height="28" fill="#f1f5f9"/><rect x="174" y="94" width="28" height="28" fill="#f1f5f9"/><rect x="202" y="94" width="28" height="28" fill="#f1f5f9"/>
+          <rect x="62" y="122" width="28" height="28" fill="#dcfce7"/><rect x="90" y="122" width="28" height="28" fill="#dcfce7"/><rect x="118" y="122" width="28" height="28" fill="#dcfce7"/><rect x="146" y="122" width="28" height="28" fill="#dcfce7"/><rect x="174" y="122" width="28" height="28" fill="#f1f5f9"/><rect x="202" y="122" width="28" height="28" fill="#f1f5f9"/>
+          <rect x="62" y="150" width="28" height="28" fill="#dcfce7"/><rect x="90" y="150" width="28" height="28" fill="#dcfce7"/><rect x="118" y="150" width="28" height="28" fill="#dcfce7"/><rect x="146" y="150" width="28" height="28" fill="#dcfce7"/><rect x="174" y="150" width="28" height="28" fill="#dcfce7"/><rect x="202" y="150" width="28" height="28" fill="#f1f5f9"/>
+          <rect x="62" y="178" width="28" height="28" fill="#dcfce7"/><rect x="90" y="178" width="28" height="28" fill="#dcfce7"/><rect x="118" y="178" width="28" height="28" fill="#dcfce7"/><rect x="146" y="178" width="28" height="28" fill="#dcfce7"/><rect x="174" y="178" width="28" height="28" fill="#dcfce7"/><rect x="202" y="178" width="28" height="28" fill="#dcfce7"/>
+          </g>
+          <g font-size="13" fill="#dc2626" text-anchor="middle">
+          <text x="104" y="57">×</text><text x="132" y="57">×</text><text x="160" y="57">×</text><text x="188" y="57">×</text><text x="216" y="57">×</text>
+          <text x="132" y="85">×</text><text x="160" y="85">×</text><text x="188" y="85">×</text><text x="216" y="85">×</text>
+          <text x="160" y="113">×</text><text x="188" y="113">×</text><text x="216" y="113">×</text>
+          <text x="188" y="141">×</text><text x="216" y="141">×</text>
+          <text x="216" y="169">×</text>
+          </g>
+          <rect x="62" y="38" width="168" height="168" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+          <text x="54" y="57" font-size="12" text-anchor="end" fill="#5b6675">第 1 个</text>
+          <text x="54" y="113" font-size="12" text-anchor="end" fill="#5b6675">第 3 个</text>
+          <text x="54" y="197" font-size="12" text-anchor="end" fill="#5b6675">第 6 个</text>
+          <text x="252" y="60" font-size="12" fill="#0e9f6e">绿色 = 允许看</text>
+          <text x="252" y="80" font-size="12" fill="#dc2626">× = 分数改成 −∞</text>
+          <text x="252" y="104" font-size="12" fill="#5b6675">exp(−∞) = 0，</text>
+          <text x="252" y="122" font-size="12" fill="#5b6675">于是 softmax 之后</text>
+          <text x="252" y="140" font-size="12" fill="#5b6675">这些格子的权重<tspan font-weight="700">正好是 0</tspan>，</text>
+          <text x="252" y="158" font-size="12" fill="#5b6675">一点信息都漏不过去。</text>
+          <text x="252" y="182" font-size="12" fill="#94a3b8">整句话仍然是<tspan font-weight="700">一次性并行</tspan>算完的，</text>
+          <text x="252" y="200" font-size="12" fill="#94a3b8">挡板只挡视线，不挡速度。</text>
+          </g>
+        </svg>
+        <div class="note b-red" style="margin-top:8px"><div class="t red">为什么非挡不可</div>
+          <div class="sub">训练时整句话是<b>一次性全喂进去</b>的，第 i 个位置的任务是猜第 i+1 个词。不挡，它一眼就能看见答案——损失当场降到 0，模型什么也没学会。<b class="dim">这就是 decoder-only 和 BERT 那类双向模型最根本的一处不同。</b></div></div>
+        <div class="note b-orange" style="margin-top:12px"><div class="t orange">顺带两件事</div>
+          <div class="sub"><b>① 还有一块挡板</b>：一批句子长短不齐，短的要补空位凑齐，这些空位也得屏蔽掉，叫 padding mask。</div>
+          <div class="cap" style="margin-top:6px"><b>② 这个方阵是 n × n 的</b>，长度翻倍，它就涨四倍。<b class="red">整个 Transformer 里唯一按长度平方增长的地方就在这</b>——「上下文越长越贵」的账，全记在这张表上。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="③ Transformer">
+  <div class="hd"><h2>位置编码：注意力自己分不清词序</h2></div>
+  <div class="bd">
+    <div class="p mb">注意力有一个必须补的漏洞：<b>它是对「一袋词」操作的</b>。第 16 页整套算下来，下标 i、j 只用来<b>取东西</b>，从没进过公式本身。</div>
+    <div class="g2">
+      <div>
+        <svg viewBox="0 0 536 190" width="100%" style="display:block">
+          <g font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+          <g stroke="#93b4f5" stroke-width="1.3" fill="none">
+          <path d="M58 40 L102 40"/><path d="M138 40 L182 40"/><path d="M40 22 C90 -8, 150 -8, 200 22"/>
+          <path d="M58 110 L102 110"/><path d="M138 110 L182 110"/><path d="M40 92 C90 62, 150 62, 200 92"/>
+          </g>
+          <g fill="#eff6ff" stroke="#2563eb" stroke-width="1.8">
+          <circle cx="40" cy="40" r="18"/><circle cx="120" cy="40" r="18"/><circle cx="200" cy="40" r="18"/>
+          <circle cx="40" cy="110" r="18"/><circle cx="120" cy="110" r="18"/><circle cx="200" cy="110" r="18"/>
+          </g>
+          <g font-size="13" text-anchor="middle" fill="#1f2937">
+          <text x="40" y="45">猫</text><text x="120" y="45">追</text><text x="200" y="45">狗</text>
+          <text x="40" y="115">狗</text><text x="120" y="115">追</text><text x="200" y="115">猫</text>
+          </g>
+          <path d="M232 75 L262 75" stroke="#dc2626" stroke-width="1.5"/><polygon points="270,75 260,70 260,80" fill="#dc2626"/>
+          <text x="284" y="46" font-size="12.5" font-weight="700" fill="#dc2626">这两句，注意力算出来</text>
+          <text x="284" y="66" font-size="12.5" font-weight="700" fill="#dc2626">的东西完全一样</text>
+          <text x="284" y="92" font-size="12" fill="#5b6675">—— 只是跟着换了个摆放顺序。</text>
+          <text x="284" y="114" font-size="12" fill="#5b6675">q · k 只看两个向量的内容，</text>
+          <text x="284" y="132" font-size="12" fill="#5b6675">「谁在前谁在后」根本没参与运算。</text>
+          <text x="0" y="158" font-size="12" font-weight="700" fill="#7c3aed">补法：把位置也做成向量，混进去</text>
+          <rect x="0" y="166" width="140" height="24" rx="4" fill="#eff6ff" stroke="#93b4f5" stroke-width="1.5"/>
+          <text x="70" y="183" font-size="12" text-anchor="middle" fill="#2563eb">词向量（第 14 页）</text>
+          <text x="152" y="183" font-size="14" text-anchor="middle" fill="#5b6675">+</text>
+          <rect x="164" y="166" width="140" height="24" rx="4" fill="#f5f3ff" stroke="#c4b5fd" stroke-width="1.5"/>
+          <text x="234" y="183" font-size="12" text-anchor="middle" fill="#7c3aed">位置向量</text>
+          <text x="316" y="183" font-size="14" text-anchor="middle" fill="#5b6675">=</text>
+          <rect x="330" y="166" width="140" height="24" rx="4" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
+          <text x="400" y="183" font-size="12" text-anchor="middle" fill="#1f2937">真正进网络的 x</text>
+          </g>
+        </svg>
+        <div class="note b-red" style="margin-top:12px"><div class="t red">这不是小毛病</div>
+          <div class="sub">「猫追狗」和「狗追猫」在它眼里是同一件事。<b>不补位置，模型连语序都学不到</b>——第 15 页拿掉的那条链式结构，顺带把词序信息也一起拿掉了，得再还回来。</div></div>
+        <div class="note b-blue" style="margin-top:12px"><div class="t blue">一个常见疑问：直接加上去，不会把词义冲掉吗</div>
+          <div class="sub">基本不会。d 有几千维，<b>空间大到位置信息和语义信息可以各占各的方向</b>，互相踩不着。而且这两部分都是训练时一起调出来的，模型自己会把它们安排开。</div></div>
+      </div>
+      <div>
+        <div class="card w"><div class="t">三代做法，一代比一代往后挪</div>
+          <table class="tbl s" style="margin-top:4px">
+            <tr><td style="width:112px">正弦编码<br><span class="dim">原论文</span></td><td>用不同频率的 sin / cos 直接算出一个向量，<b>加到词向量上</b>。不用学，任意长度都有值</td></tr>
+            <tr><td>可学习的<br>绝对位置</td><td>准备一张「最大长度 × d」的表，和第 14 页一样查。<b class="red">超出训练时的长度就查不到了</b></td></tr>
+            <tr><td class="purple"><b>RoPE</b><br><span class="dim">今天主流</span></td><td class="purple">不加在输入上，而是<b>在算注意力的时候</b>，把 q 和 k 各自旋转一个与位置成正比的角度</td></tr>
+          </table></div>
+        <div class="h3 purple" style="margin-top:12px">RoPE 为什么赢：转一下，差值就出来了</div>
+        <svg viewBox="0 0 536 134" width="100%" style="display:block;margin-top:4px">
+          <g font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+          <circle cx="76" cy="72" r="46" fill="#faf9ff" stroke="#e2e8f0" stroke-width="1.5"/>
+          <line x1="30" y1="72" x2="122" y2="72" stroke="#e2e8f0" stroke-width="1.5"/>
+          <path d="M76 72 L118 72" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="3 3"/>
+          <path d="M76 72 L112 49" stroke="#7c3aed" stroke-width="2.5"/><polygon points="118,45 106,46 110,54" fill="#7c3aed"/>
+          <path d="M104 72 A28 28 0 0 0 99 58" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+          <text x="108" y="70" font-size="11" fill="#7c3aed">m·θ</text>
+          <text x="76" y="132" font-size="12" text-anchor="middle" fill="#5b6675">位置 m 的 q，转 m·θ</text>
+
+          <circle cx="236" cy="72" r="46" fill="#faf9ff" stroke="#e2e8f0" stroke-width="1.5"/>
+          <line x1="190" y1="72" x2="282" y2="72" stroke="#e2e8f0" stroke-width="1.5"/>
+          <path d="M236 72 L278 72" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="3 3"/>
+          <path d="M236 72 L256 33" stroke="#2563eb" stroke-width="2.5"/><polygon points="260,27 250,34 258,38" fill="#2563eb"/>
+          <path d="M264 72 A28 28 0 0 0 250 47" fill="none" stroke="#2563eb" stroke-width="1.5"/>
+          <text x="266" y="66" font-size="11" fill="#2563eb">n·θ</text>
+          <text x="236" y="132" font-size="12" text-anchor="middle" fill="#5b6675">位置 n 的 k，转 n·θ</text>
+
+          <text x="308" y="40" font-size="12.5" font-weight="700" fill="#7c3aed">两者的夹角 = (m − n) · θ</text>
+          <text x="308" y="64" font-size="12" fill="#5b6675">点积只看夹角，于是 q·k <tspan font-weight="700">只取决</tspan></text>
+          <text x="308" y="82" font-size="12" fill="#5b6675"><tspan font-weight="700">于两个位置隔了多远</tspan>，和它俩各自</text>
+          <text x="308" y="100" font-size="12" fill="#5b6675">排第几无关。</text>
+          <text x="308" y="126" font-size="12" fill="#94a3b8">这正是语言真正在意的东西。</text>
+          </g>
+        </svg>
+        <div class="note b-orange" style="margin-top:10px"><div class="t orange">它还顺手解决了「上下文能开多长」</div>
+          <div class="sub">θ 是个可以调的旋钮。把它整体缩小，等于<b>把位置刻度拉稀</b>，训练时只见过 4k 长度的模型，就能撑到几十上百 k——今天长上下文的主要手段之一，就是在这个角度上做文章。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="③ Transformer">
+  <div class="hd"><h2>装配图：一层 Transformer，全是前面讲过的零件</h2></div>
+  <div class="bd">
+    <div class="p mb">现在把零件拼起来。<b>这张图里没有一个新东西</b>——每个框下面标着它是从哪一页来的。</div>
+    <svg viewBox="0 0 1168 194" width="100%" style="display:block">
+      <g font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+      <text x="1168" y="14" font-size="12.5" font-weight="700" text-anchor="end" fill="#7c3aed">这一整块，原样重复 N 次（N = 12 / 32 / 96 …）</text>
+
+      <path d="M128 100 C 200 36, 440 36, 501 94" fill="none" stroke="#0e9f6e" stroke-width="2.2"/>
+      <polygon points="503,100 495,89 507,86" fill="#0e9f6e"/>
+      <text x="314" y="42" font-size="12" font-weight="700" text-anchor="middle" fill="#0e9f6e">残差：把输入原样加回来</text>
+      <path d="M536 100 C 640 36, 890 36, 974 94" fill="none" stroke="#0e9f6e" stroke-width="2.2"/>
+      <polygon points="976,100 968,89 980,86" fill="#0e9f6e"/>
+      <text x="755" y="42" font-size="12" font-weight="700" text-anchor="middle" fill="#0e9f6e">残差：把输入原样加回来</text>
+
+      <g stroke="#94a3b8" stroke-width="1.5" fill="none">
+      <path d="M118 132 L130 132"/><path d="M218 132 L230 132"/><path d="M472 132 L473 132"/><path d="M525 132 L538 132"/><path d="M626 132 L638 132"/><path d="M956 132 L946 132"/><path d="M998 132 L1010 132"/>
+      </g>
+      <g fill="#94a3b8">
+      <polygon points="138,132 128,127 128,137"/><polygon points="238,132 228,127 228,137"/><polygon points="481,132 471,127 471,137"/><polygon points="546,132 536,127 536,137"/><polygon points="646,132 636,127 636,137"/><polygon points="954,132 944,127 944,137"/><polygon points="1018,132 1008,127 1008,137"/>
+      </g>
+
+      <rect x="0" y="100" width="118" height="64" rx="6" fill="#fff" stroke="#94a3b8" stroke-width="1.5"/>
+      <text x="59" y="127" font-size="13" font-weight="700" text-anchor="middle" fill="#1f2937">进来的 x</text>
+      <text x="59" y="147" font-size="12" text-anchor="middle" fill="#94a3b8">n × d</text>
+
+      <rect x="138" y="100" width="80" height="64" rx="6" fill="#fff7ed" stroke="#fdba74" stroke-width="1.5"/>
+      <text x="178" y="127" font-size="12.5" font-weight="700" text-anchor="middle" fill="#c2410c">LayerNorm</text>
+      <text x="178" y="147" font-size="11" text-anchor="middle" fill="#c2410c">按特征维切</text>
+
+      <rect x="238" y="100" width="234" height="64" rx="6" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+      <text x="355" y="125" font-size="13.5" font-weight="700" text-anchor="middle" fill="#7c3aed">多头自注意力</text>
+      <text x="355" y="147" font-size="11" text-anchor="middle" fill="#5b6675">Q·K → ÷√d → 掩码 → softmax → 加权 V</text>
+
+      <circle cx="503" cy="132" r="22" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="2"/>
+      <text x="503" y="139" font-size="19" font-weight="700" text-anchor="middle" fill="#0e9f6e">+</text>
+
+      <rect x="546" y="100" width="80" height="64" rx="6" fill="#fff7ed" stroke="#fdba74" stroke-width="1.5"/>
+      <text x="586" y="127" font-size="12.5" font-weight="700" text-anchor="middle" fill="#c2410c">LayerNorm</text>
+      <text x="586" y="147" font-size="11" text-anchor="middle" fill="#c2410c">又来一次</text>
+
+      <rect x="646" y="100" width="298" height="64" rx="6" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+      <text x="795" y="125" font-size="13.5" font-weight="700" text-anchor="middle" fill="#7c3aed">前馈网络 FFN</text>
+      <text x="795" y="147" font-size="11" text-anchor="middle" fill="#5b6675">x W₁ → 激活 → W₂，中间那层放大到 4d 再收回来</text>
+
+      <circle cx="976" cy="132" r="22" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="2"/>
+      <text x="976" y="139" font-size="19" font-weight="700" text-anchor="middle" fill="#0e9f6e">+</text>
+
+      <rect x="1018" y="100" width="150" height="64" rx="6" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="2"/>
+      <text x="1093" y="127" font-size="13" font-weight="700" text-anchor="middle" fill="#0e9f6e">出去的 x</text>
+      <text x="1093" y="147" font-size="11" text-anchor="middle" fill="#5b6675">n × d，形状一模一样</text>
+
+      <g font-size="11.5" text-anchor="middle" fill="#94a3b8">
+      <text x="178" y="184">第 13 页</text>
+      <text x="355" y="184">第 16 · 17 · 18 页</text>
+      <text x="503" y="184">第 12 页</text>
+      <text x="586" y="184">第 13 页</text>
+      <text x="795" y="184">第 8 · 9 页</text>
+      <text x="976" y="184">第 12 页</text>
+      <text x="1093" y="184">所以才能一层接一层</text>
+      </g>
+      </g>
+    </svg>
+    <div class="h3 mt">把这一块放回整条链上</div>
+      <svg viewBox="0 0 1160 80" width="100%" style="display:block;margin-top:4px">
+        <g font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+        <g stroke="#94a3b8" stroke-width="1.5" fill="none">
+        <path d="M167 38 L181 38"/><path d="M360 38 L374 38"/><path d="M553 38 L567 38"/><path d="M746 38 L760 38"/><path d="M939 38 L953 38"/>
+        </g>
+        <g fill="#94a3b8">
+        <polygon points="193,38 183,33 183,43"/><polygon points="386,38 376,33 376,43"/><polygon points="579,38 569,33 569,43"/><polygon points="772,38 762,33 762,43"/><polygon points="965,38 955,33 955,43"/>
+        </g>
+        <g fill="#fff" stroke="#94a3b8" stroke-width="1.5">
+        <rect x="0" y="18" width="167" height="40" rx="6"/><rect x="579" y="18" width="167" height="40" rx="6"/>
+        </g>
+        <g fill="#eff6ff" stroke="#93b4f5" stroke-width="1.5">
+        <rect x="193" y="18" width="167" height="40" rx="6"/><rect x="772" y="18" width="167" height="40" rx="6"/>
+        </g>
+        <rect x="386" y="18" width="167" height="40" rx="6" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+        <rect x="965" y="18" width="167" height="40" rx="6" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="2"/>
+        <g font-size="12.5" text-anchor="middle">
+        <text x="83" y="43" fill="#1f2937">一段文本</text>
+        <text x="276" y="43" fill="#2563eb">词向量 + 位置</text>
+        <text x="469" y="43" font-weight="700" fill="#7c3aed">× N 层</text>
+        <text x="662" y="43" fill="#1f2937">每个位置一个向量</text>
+        <text x="855" y="43" fill="#2563eb">lm_head + softmax</text>
+        <text x="1048" y="43" font-weight="700" fill="#0e9f6e">下一个词的概率</text>
+        </g>
+        <g font-size="11" text-anchor="middle" fill="#94a3b8">
+        <text x="276" y="72">第 14 · 18 页</text>
+        <text x="469" y="72">就是上面那张图</text>
+        <text x="855" y="72">第 10 · 14 页</text>
+        <text x="1048" y="72">训练时后面接交叉熵 · 第 5 页</text>
+        </g>
+        </g>
+      </svg>
+    <div class="g2 mt">
+      <div class="card t-purple"><div class="t purple">为什么偏偏是「注意力 + FFN」交替</div>
+        <div class="sub" style="margin-top:4px">这两块干的活正好互补：<b>注意力横着混</b>——在不同位置之间搬运信息；<b>FFN 竖着混</b>——在每个位置内部，对那一个向量做加工。</div>
+        <div class="cap" style="margin-top:8px">缺哪个都不行。<b>只有注意力</b>，每个位置的新向量不过是别人向量的加权平均，凑不出新东西；<b>只有 FFN</b>，位置之间永远不通气，读不成一句话。<b>「搬一次，加工一次」，重复 N 次</b>——整个结构最本质的一句话就是它。</div></div>
+      <div class="card t-orange"><div class="t orange">参数都堆在哪：算一下就知道</div>
+        <table class="tbl s" style="margin-top:4px">
+          <tr><td style="width:126px">注意力</td><td>W_Q、W_K、W_V、W_O 各 d × d</td><td class="orange" style="width:64px"><b>4d²</b></td></tr>
+          <tr><td>FFN</td><td>W₁ 是 d × 4d，W₂ 是 4d × d</td><td class="orange"><b>8d²</b></td></tr>
+        </table>
+        <div class="cap" style="margin-top:6px">（LayerNorm 的 γ、β 各只有 d 个，小到可以忽略。）<b>FFN 占了每层参数的三分之二</b>——常听到的那句「模型的知识存在 FFN 里」，出处就是这个比例。</div></div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="③ Transformer">
+  <div class="hd"><h2>当程序看：形状怎么变，哪些东西是要学的</h2></div>
+  <div class="bd">
+    <div class="p mb">公式讲完了，换个角度再看一遍。<b>写成代码，Transformer 就是一串矩阵在换形状</b>——盯住形状，很多事会突然变清楚。</div>
+    <svg viewBox="0 0 1168 142" width="100%" style="display:block">
+      <g font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+      <g stroke="#94a3b8" stroke-width="1.5" fill="none">
+      <path d="M148 68 L158 68"/><path d="M318 68 L328 68"/><path d="M488 68 L498 68"/><path d="M658 68 L668 68"/><path d="M828 68 L838 68"/><path d="M998 68 L1008 68"/>
+      </g>
+      <g fill="#94a3b8">
+      <polygon points="170,68 160,63 160,73"/><polygon points="340,68 330,63 330,73"/><polygon points="510,68 500,63 500,73"/><polygon points="680,68 670,63 670,73"/><polygon points="850,68 840,63 840,73"/><polygon points="1020,68 1010,63 1010,73"/>
+      </g>
+      <g fill="#fff" stroke="#94a3b8" stroke-width="1.5">
+      <rect x="0" y="36" width="148" height="64" rx="6"/>
+      </g>
+      <g fill="#eff6ff" stroke="#93b4f5" stroke-width="1.5">
+      <rect x="170" y="36" width="148" height="64" rx="6"/><rect x="510" y="36" width="148" height="64" rx="6"/><rect x="850" y="36" width="148" height="64" rx="6"/>
+      </g>
+      <g fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.8">
+      <rect x="340" y="36" width="148" height="64" rx="6"/><rect x="680" y="36" width="148" height="64" rx="6"/>
+      </g>
+      <rect x="1020" y="36" width="148" height="64" rx="6" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="2"/>
+      <g font-size="15" font-weight="700" text-anchor="middle">
+      <text x="74" y="66" fill="#1f2937">n</text>
+      <text x="244" y="66" fill="#2563eb">n × d</text>
+      <text x="414" y="66" fill="#7c3aed">n × n</text>
+      <text x="584" y="66" fill="#2563eb">n × d</text>
+      <text x="754" y="66" fill="#7c3aed">n × 4d</text>
+      <text x="924" y="66" fill="#2563eb">n × d</text>
+      <text x="1094" y="66" fill="#0e9f6e">n × V</text>
+      </g>
+      <g font-size="11.5" text-anchor="middle" fill="#5b6675">
+      <text x="74" y="88">一串 token 编号</text>
+      <text x="244" y="88">查完嵌入表 + 位置</text>
+      <text x="414" y="88">注意力分数，每层每头一张</text>
+      <text x="584" y="88">加权取完 V，回到 d 维</text>
+      <text x="754" y="88">FFN 中间胀大的那层</text>
+      <text x="924" y="88">一层的输出</text>
+      <text x="1094" y="88">每个词一个分数</text>
+      </g>
+      <path d="M924 104 L924 126 L414 126 L414 106" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="6 4"/>
+      <polygon points="414,100 409,111 419,111" fill="#7c3aed"/>
+      <text x="669" y="122" font-size="12" font-weight="700" text-anchor="middle" fill="#7c3aed">中间这一段，原样重复 N 次，形状进出一致</text>
+      <text x="0" y="14" font-size="12" fill="#94a3b8">n = 这次输入有几个 token（每次都不一样）　·　d = 模型定死的宽度　·　V = 词表大小</text>
+      <text x="1168" y="140" font-size="12" text-anchor="end" fill="#94a3b8">最后一行接 softmax，就是第 10 页那个分布</text>
+      </g>
+    </svg>
+    <div class="g2 mt">
+      <div class="card w"><div class="t">代码里的符号，只有三种</div>
+        <table class="tbl s" style="margin-top:4px">
+          <tr><td class="green" style="width:104px"><b>要学的</b><br><span class="dim">参数</span></td><td>嵌入表 E、W_Q W_K W_V W_O、W₁ W₂、γ β、lm_head。<b>被梯度调，存进模型文件</b>——所谓「权重」「模型多大」，说的就是这一堆</td></tr>
+          <tr><td style="width:104px">当场算的<br><span class="dim">激活</span></td><td>Q、K、V、注意力分数、每层的输出。<b>算完就扔</b>，换个输入全都不一样。训练时得留着等反向用完（第 11 页）</td></tr>
+          <tr><td style="width:104px">人定的<br><span class="dim">超参数</span></td><td>d、层数 N、头数、词表大小、学习率、batch 大小。<b>训练前定死，梯度碰不到它们</b></td></tr>
+        </table>
+        <div class="cap" style="margin-top:6px">分不清这三种，读代码时最容易犯的错就是<b>把激活当成参数</b>——注意力权重那张 n×n 的表看着很重要，但它一个参数都不是。</div></div>
+      <div>
+        <div class="card t-orange"><div class="t orange">顺手把参数量数一遍</div>
+          <div class="code" style="margin-top:8px">每层 = 4d²<span class="c">（注意力）</span> + 8d²<span class="c">（FFN）</span> = 12d²
+全部 = N × 12d²  +  2 × V × d   <span class="c">← 进出两张词表</span>
+
+代入 d = 4096，N = 32，V = 128000：
+  32 × 12 × 4096²  =  64.4 亿
+  2 × 128000 × 4096 =  10.5 亿
+  <b>合计 ≈ 75 亿</b>   <span class="c">← 平时说的「7B 模型」</span></div></div>
+        <div class="note b-blue" style="margin-top:12px"><div class="t blue">n 和 d 的地位完全不同</div>
+          <div class="sub"><b>d 是模型的一部分</b>，训完就定死了；<b>n 只是这次输入有多长</b>，一个参数都不占。同一个模型能吃任意长度的输入，原因就在这——没有任何一个权重的形状里带着 n。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="③ Transformer">
+  <div class="hd"><h2>同一个模型，两种用法：训练一次算完，生成一个个蹦</h2></div>
+  <div class="bd">
+    <div class="p mb">第 3 页说过，训练和推理是<b>同一个 f 的两种用法</b>。到这里可以把这句话兑现了——中间那一大堆零件，两边完全一样，不一样的只有怎么用。</div>
+    <div class="g2">
+      <div>
+        <div class="h3 blue">训练：一次前向，n 个位置同时做题</div>
+        <svg viewBox="0 0 536 152" width="100%" style="display:block;margin-top:4px">
+          <g font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+          <g fill="#eff6ff" stroke="#93b4f5" stroke-width="1.5">
+          <rect x="0" y="18" width="110" height="32" rx="6"/><rect x="124" y="18" width="110" height="32" rx="6"/><rect x="248" y="18" width="110" height="32" rx="6"/><rect x="372" y="18" width="110" height="32" rx="6"/>
+          </g>
+          <g font-size="13" text-anchor="middle" fill="#1f2937">
+          <text x="55" y="39">今天</text><text x="179" y="39">天气</text><text x="303" y="39">不错</text><text x="427" y="39">啊</text>
+          </g>
+          <g stroke="#0e9f6e" stroke-width="1.5" fill="none">
+          <path d="M55 50 L55 66"/><path d="M179 50 L179 66"/><path d="M303 50 L303 66"/><path d="M427 50 L427 66"/>
+          </g>
+          <g fill="#0e9f6e">
+          <polygon points="55,74 50,64 60,64"/><polygon points="179,74 174,64 184,64"/><polygon points="303,74 298,64 308,64"/><polygon points="427,74 422,64 432,64"/>
+          </g>
+          <g fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.8">
+          <rect x="0" y="76" width="110" height="32" rx="6"/><rect x="124" y="76" width="110" height="32" rx="6"/><rect x="248" y="76" width="110" height="32" rx="6"/><rect x="372" y="76" width="110" height="32" rx="6"/>
+          </g>
+          <g font-size="13" font-weight="700" text-anchor="middle" fill="#0e9f6e">
+          <text x="55" y="97">天气</text><text x="179" y="97">不错</text><text x="303" y="97">啊</text><text x="427" y="97">。</text>
+          </g>
+          <text x="496" y="39" font-size="12" fill="#94a3b8">输入</text>
+          <text x="496" y="97" font-size="12" fill="#94a3b8">答案</text>
+          <text x="0" y="132" font-size="12.5" font-weight="700" fill="#1f2937">每个位置的任务都一样：猜自己后面那一个词。</text>
+          <text x="0" y="150" font-size="12" fill="#5b6675">损失 = 这四道题的交叉熵，取个平均。</text>
+          </g>
+        </svg>
+        <div class="note b-green" style="margin-top:10px"><div class="t green">答案是白送的，这就是第 7 页那个问题的最终答案</div>
+          <div class="sub">一句 n 个词的话，<b>自动就是 n 道带标准答案的题</b>——答案是句子里下一个词，没有任何人标注过。</div>
+          <div class="cap" style="margin-top:6px">整个互联网的文本，因此可以<b>原封不动</b>拿来当训练集。「大模型为什么能吃下这么多数据」，答案就这一句。</div></div>
+        <div class="note b-orange" style="margin-top:10px"><div class="t orange">这里，第 17 页那块挡板在兜底</div>
+          <div class="sub">四道题是<b>一次前向同时算完</b>的。第 3 个位置做题时，掩码保证它看不见第 4 个词。<b>并行做题，又不许抄答案</b>——两件事同时成立，全靠那个上三角。</div></div>
+      </div>
+      <div>
+        <div class="h3 purple">生成：一次只产一个词，接回去再来</div>
+        <svg viewBox="0 0 536 172" width="100%" style="display:block;margin-top:4px">
+          <g font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+          <g fill="#eff6ff" stroke="#93b4f5" stroke-width="1.5">
+          <rect x="0" y="16" width="56" height="28" rx="5"/>
+          <rect x="0" y="72" width="56" height="28" rx="5"/><rect x="62" y="72" width="56" height="28" rx="5"/>
+          <rect x="0" y="128" width="56" height="28" rx="5"/><rect x="62" y="128" width="56" height="28" rx="5"/><rect x="124" y="128" width="56" height="28" rx="5"/>
+          </g>
+          <g font-size="12" text-anchor="middle" fill="#2563eb">
+          <text x="28" y="35">今天</text>
+          <text x="28" y="91">今天</text><text x="90" y="91">天气</text>
+          <text x="28" y="147">今天</text><text x="90" y="147">天气</text><text x="152" y="147">不错</text>
+          </g>
+          <g stroke="#94a3b8" stroke-width="1.5" fill="none">
+          <path d="M62 30 L206 30"/><path d="M124 86 L206 86"/><path d="M186 142 L206 142"/>
+          <path d="M280 30 L300 30"/><path d="M280 86 L300 86"/><path d="M280 142 L300 142"/>
+          </g>
+          <g fill="#94a3b8">
+          <polygon points="214,30 204,25 204,35"/><polygon points="214,86 204,81 204,91"/><polygon points="214,142 204,137 204,147"/>
+          <polygon points="308,30 298,25 298,35"/><polygon points="308,86 298,81 298,91"/><polygon points="308,142 298,137 298,147"/>
+          </g>
+          <g fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.8">
+          <rect x="214" y="16" width="66" height="28" rx="5"/><rect x="214" y="72" width="66" height="28" rx="5"/><rect x="214" y="128" width="66" height="28" rx="5"/>
+          </g>
+          <g font-size="12" font-weight="700" text-anchor="middle" fill="#7c3aed">
+          <text x="247" y="35">模型</text><text x="247" y="91">模型</text><text x="247" y="147">模型</text>
+          </g>
+          <g fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.8">
+          <rect x="308" y="16" width="66" height="28" rx="5"/><rect x="308" y="72" width="66" height="28" rx="5"/><rect x="308" y="128" width="66" height="28" rx="5"/>
+          </g>
+          <g font-size="12" font-weight="700" text-anchor="middle" fill="#0e9f6e">
+          <text x="341" y="35">天气</text><text x="341" y="91">不错</text><text x="341" y="147">啊</text>
+          </g>
+          <path d="M341 44 C341 60, 120 52, 92 68" fill="none" stroke="#0e9f6e" stroke-width="1.5" stroke-dasharray="5 3"/>
+          <polygon points="90,72 96,62 100,72" fill="#0e9f6e"/>
+          <path d="M341 100 C341 116, 182 108, 154 124" fill="none" stroke="#0e9f6e" stroke-width="1.5" stroke-dasharray="5 3"/>
+          <polygon points="152,128 158,118 162,128" fill="#0e9f6e"/>
+          <text x="388" y="26" font-size="12" fill="#5b6675">只取<tspan font-weight="700">最后一个位置</tspan>的</text>
+          <text x="388" y="44" font-size="12" fill="#5b6675">那个概率分布，抽一个词</text>
+          <text x="388" y="88" font-size="12" fill="#0e9f6e">抽到的词接到句子末尾，</text>
+          <text x="388" y="106" font-size="12" fill="#0e9f6e">整句重新走一遍</text>
+          <text x="388" y="150" font-size="12" fill="#94a3b8">直到抽到结束符</text>
+          </g>
+        </svg>
+        <div class="card w" style="margin-top:8px"><div class="t">「抽一个词」怎么抽，全在第 10 页那个 softmax 上</div>
+          <table class="tbl s" style="margin-top:4px">
+            <tr><td style="width:88px">贪心</td><td>永远取概率最大的那个。稳，但容易车轱辘话</td></tr>
+            <tr><td>温度 T</td><td>logits 先除以 T 再 softmax。<b>T 大分布变平，更敢说；T 小更保守</b></td></tr>
+            <tr><td>top-p</td><td>只在累计概率前 p 的那几个词里抽，把长尾的怪词直接切掉</td></tr>
+          </table>
+          <div class="cap" style="margin-top:6px"><b>这三个旋钮都在模型外面。</b>调它们不改一个参数，改的只是「怎么从分布里取样」。</div></div>
+        <div class="note b-purple" style="margin-top:10px"><div class="t purple">为什么第一个词慢、后面快：KV cache</div>
+          <div class="sub">每多一个词就整句重算一遍，太亏。而前面那些位置的 K 和 V <b>算过就不会再变</b>——存下来，下一轮只算新来的那一个位置。<b class="dim">代价是显存：上下文越长，这份缓存越大。第 17 页说的 GQA，省的正是它。</b></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="收尾">
+  <div class="hd"><h2>回头看：那条链，走完了</h2></div>
+  <div class="bd">
+    <div class="p mb">第 2 页是<b>倒着筛</b>出来的——从 Transformer 的零件往回挂。这一路是<b>顺着讲</b>的。两张图对得上，这一章就完了。</div>
+    <svg viewBox="0 0 1168 200" width="100%" style="display:block">
+      <g font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+      <rect x="0" y="0" width="372" height="200" rx="8" fill="#f7faff" stroke="#93b4f5" stroke-width="1.5"/>
+      <text x="16" y="26" font-size="14" font-weight="700" fill="#2563eb">① 机器学习</text>
+      <text x="356" y="26" font-size="12" text-anchor="end" fill="#94a3b8">第 3 – 7 页</text>
+      <line x1="16" y1="38" x2="356" y2="38" stroke="#dbe6fb" stroke-width="1.5"/>
+      <g font-size="12" fill="#1f2937">
+      <text x="46" y="64">模型就是一个带参数的函数</text>
+      <text x="46" y="90">模型、损失、优化，三件事定死一切</text>
+      <text x="46" y="116">吐出来的是概率分布，损失是 −log P</text>
+      <text x="46" y="142">梯度下降，以及它会怎么失败</text>
+      <text x="46" y="168">怎么把东西变成数，答案从哪来</text>
+      </g>
+      <g font-size="11.5" font-weight="700" fill="#2563eb">
+      <text x="18" y="64">3</text><text x="18" y="90">4</text><text x="18" y="116">5</text><text x="18" y="142">6</text><text x="18" y="168">7</text>
+      </g>
+
+      <path d="M376 100 L388 100" stroke="#94a3b8" stroke-width="1.5"/><polygon points="396,100 386,95 386,105" fill="#94a3b8"/>
+
+      <rect x="398" y="0" width="372" height="200" rx="8" fill="#faf9ff" stroke="#c4b5fd" stroke-width="1.5"/>
+      <text x="414" y="26" font-size="14" font-weight="700" fill="#7c3aed">② 深度学习</text>
+      <text x="754" y="26" font-size="12" text-anchor="end" fill="#94a3b8">第 8 – 14 页</text>
+      <line x1="414" y1="38" x2="754" y2="38" stroke="#e9e4fb" stroke-width="1.5"/>
+      <g font-size="12" fill="#1f2937">
+      <text x="446" y="60">一层网络，展开就是一次矩阵乘</text>
+      <text x="446" y="82">激活函数：没它，一百层等于一层</text>
+      <text x="446" y="104">输出层与损失，必须成对</text>
+      <text x="446" y="126">训练循环那五步</text>
+      <text x="446" y="148">梯度消失，和残差这个解</text>
+      <text x="446" y="170">归一化：为什么按特征维切</text>
+      <text x="446" y="192">Embedding：一张学出来的大表</text>
+      </g>
+      <g font-size="11.5" font-weight="700" fill="#7c3aed">
+      <text x="416" y="60">8</text><text x="416" y="82">9</text><text x="416" y="104">10</text><text x="416" y="126">11</text><text x="416" y="148">12</text><text x="416" y="170">13</text><text x="416" y="192">14</text>
+      </g>
+
+      <path d="M774 100 L786 100" stroke="#94a3b8" stroke-width="1.5"/><polygon points="794,100 784,95 784,105" fill="#94a3b8"/>
+
+      <rect x="796" y="0" width="372" height="200" rx="8" fill="#f6fdfa" stroke="#0e9f6e" stroke-width="2"/>
+      <text x="812" y="26" font-size="14" font-weight="700" fill="#0e9f6e">③ Transformer</text>
+      <text x="1152" y="26" font-size="12" text-anchor="end" fill="#94a3b8">第 15 – 21 页</text>
+      <line x1="812" y1="38" x2="1152" y2="38" stroke="#c8ede0" stroke-width="1.5"/>
+      <g font-size="12" fill="#1f2937">
+      <text x="844" y="60">序列这件事，老办法卡在哪</text>
+      <text x="844" y="82">注意力：五步，一个公式</text>
+      <text x="844" y="104">多头，和那块挡板</text>
+      <text x="844" y="126">位置编码</text>
+      <text x="844" y="148">一层的完整装配图</text>
+      <text x="844" y="170">形状怎么变，参数有多少</text>
+      <text x="844" y="192">训练与生成，同一个模型</text>
+      </g>
+      <g font-size="11.5" font-weight="700" fill="#0e9f6e">
+      <text x="814" y="60">15</text><text x="814" y="82">16</text><text x="814" y="104">17</text><text x="814" y="126">18</text><text x="814" y="148">19</text><text x="814" y="170">20</text><text x="814" y="192">21</text>
+      </g>
+      </g>
+    </svg>
+    <div class="g2 mt">
+      <div class="card w"><div class="t">这一章刻意没讲的东西</div>
+        <div class="sub" style="margin-top:4px">不是因为它们不重要，是因为<b>这条链上用不到</b>。这几块各自都能撑起一章：</div>
+        <table class="tbl s" style="margin-top:6px">
+          <tr><td style="width:116px">CNN、RNN</td><td>第 15 页只借它们当对照，两边的结构都没展开</td></tr>
+          <tr><td>经典机器学习</td><td>偏差方差、正则化、决策树、集成学习</td></tr>
+          <tr><td>训练流程</td><td>预训练怎么定规模、后训练怎么做、RLHF 与对齐</td></tr>
+          <tr><td>用起来之后</td><td>评测体系、推理部署优化、Agent 怎么搭</td></tr>
+        </table>
+        <div class="cap" style="margin-top:8px">这一章只回答一个问题：<b>Transformer 每一步在算什么，为什么非得这么算</b>。链条以外的一概不讲——这是从第一页就定死的。</div></div>
+      <div class="card t-green"><div class="t green">再往上，还差三段</div>
+        <div class="sub" style="margin-top:4px">你现在手里有的，是<b>「一层怎么算」和「参数怎么被调」</b>。从这里到一个能对话的模型，还隔着：</div>
+        <table class="tbl s" style="margin-top:6px">
+          <tr><td style="width:64px"><b>规模</b></td><td>同样的五步循环，转几十万圈，喂进几万亿 token</td></tr>
+          <tr><td><b>对齐</b></td><td>让它从「会接话」变成「会答话」，并且不乱说</td></tr>
+          <tr><td><b>工程</b></td><td>缓存、量化、批调度，把它跑得起、跑得便宜</td></tr>
+        </table>
+        <div class="cap" style="margin-top:6px"><b>这三段一个字都不改上面那张装配图。</b>它们改的是转多少圈、拿什么喂、怎么跑得快——骨架就是你刚看完的这些。</div></div>
+    </div>
+  </div>
+</section>
+<!--SLIDES-END-->
+</main></div></div>
+
+<div id="ov"><div id="ovg"></div></div>
+
+<script>
+(function(){
+  var deck=document.getElementById('deck'), bar=document.getElementById('bar'),
+      ov=document.getElementById('ov'), ovg=document.getElementById('ovg'),
+      slides=[].slice.call(document.querySelectorAll('.slide')),
+      N=slides.length, cur=0, ovOpen=false, built=false;
+
+  // 页眉幕名 + 页脚页码（封面不加）
+  slides.forEach(function(s,i){
+    var hd=s.querySelector('.hd'), act=s.getAttribute('data-act');
+    if(hd&&act){ var b=document.createElement('b'); b.textContent=act; hd.appendChild(b); }
+    if(!s.classList.contains('cover')){
+      var ft=document.createElement('div'); ft.className='ft';
+      var p=document.createElement('span'); p.className='pg';
+      p.textContent=(i+1)+' / '+N; ft.appendChild(p); s.appendChild(ft);
+    }
+  });
+
+  function fit(){
+    var k=Math.min(window.innerWidth/1280, window.innerHeight/720)*0.96;
+    deck.style.transform='scale('+k+')';
+  }
+  window.addEventListener('resize',fit); fit();
+
+  function check(i){
+    var s=slides[i], b=s.querySelector('.bd'); if(!b) return;
+    var vo=b.scrollHeight-b.clientHeight, ho=0;
+    var els=b.querySelectorAll('*');
+    for(var k=0;k<els.length;k++){
+      if(els[k].closest('svg')) continue;
+      var d=els[k].scrollWidth-els[k].clientWidth; if(d>ho) ho=d;
+    }
+    if(vo>1||ho>1){ s.style.outline='3px solid #dc2626'; s.style.outlineOffset='-3px';
+      console.warn('[溢出] 第'+(i+1)+'页　纵向 +'+vo+'　横向 +'+ho); }
+    else { s.style.outline=''; }
+  }
+
+  function go(i){
+    i=Math.max(0,Math.min(N-1,i));
+    slides[cur].classList.remove('on'); cur=i; slides[cur].classList.add('on');
+    bar.style.width=((cur+1)/N*100)+'%';
+    history.replaceState(null,'','#'+(cur+1));
+    check(cur);
+  }
+  function next(){ if(cur<N-1) go(cur+1); }
+  function prev(){ if(cur>0) go(cur-1); }
+
+  function build(){
+    if(built) return; built=true;
+    slides.forEach(function(s,i){
+      var c=document.createElement('div'); c.className='ovc';
+      var w=document.createElement('div'); w.className='ovi';
+      var cl=s.cloneNode(true); cl.classList.add('on'); cl.style.animation='none';
+      w.appendChild(cl); c.appendChild(w);
+      var n=document.createElement('div'); n.className='ovn'; n.textContent=i+1; c.appendChild(n);
+      c.addEventListener('click',function(){ go(i); toggleOv(false); });
+      ovg.appendChild(c);
+    });
+  }
+  function toggleOv(on){ ovOpen=(on===undefined)?!ovOpen:on; if(ovOpen) build();
+    ov.classList.toggle('on',ovOpen); }
+
+  document.addEventListener('keydown',function(e){
+    var k=e.key;
+    if(k==='Escape'){ if(ovOpen) toggleOv(false);
+      else if(document.fullscreenElement) document.exitFullscreen(); return; }
+    if(k==='o'||k==='O'){ toggleOv(); e.preventDefault(); return; }
+    if(ovOpen) return;
+    if(k==='ArrowRight'||k==='PageDown'||k===' '||k==='j'||k==='J'){ next(); e.preventDefault(); }
+    else if(k==='ArrowLeft'||k==='PageUp'||k==='k'||k==='K'){ prev(); e.preventDefault(); }
+    else if(k==='Home'){ go(0); e.preventDefault(); }
+    else if(k==='End'){ go(N-1); e.preventDefault(); }
+    else if(k==='f'||k==='F'){ document.fullscreenElement?document.exitFullscreen()
+      :document.documentElement.requestFullscreen(); e.preventDefault(); }
+  });
+
+  document.getElementById('stage').addEventListener('click',function(e){
+    if(ovOpen) return;
+    if(e.target.closest('a,.code,.kbd')) return;
+    if(String(window.getSelection()).length>0) return;
+    (e.clientX/window.innerWidth < 0.28) ? prev() : next();
+  });
+
+  var tx=0;
+  document.addEventListener('touchstart',function(e){ tx=e.changedTouches[0].clientX; },{passive:true});
+  document.addEventListener('touchend',function(e){
+    if(ovOpen) return; var d=e.changedTouches[0].clientX-tx;
+    if(Math.abs(d)>50){ d<0?next():prev(); }
+  },{passive:true});
+
+  window.addEventListener('hashchange',function(){
+    var n=parseInt(location.hash.slice(1),10); if(!isNaN(n)&&n-1!==cur) go(n-1);
+  });
+
+  var h=parseInt(location.hash.slice(1),10);
+  go(isNaN(h)?0:h-1);
+})();
+</script>
+</body>
+</html>
