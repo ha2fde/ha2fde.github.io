@@ -1,0 +1,1969 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第二章 · 从机器学习到大模型</title>
+<style>
+:root{
+  --bg:#e9edf3; --slide:#fff; --panel:#f4f7fb; --line:#e2e8f0;
+  --ink:#1f2937; --sub:#5b6675; --faint:#94a3b8;
+  --blue:#2563eb; --green:#0e9f6e; --orange:#c2410c; --purple:#7c3aed; --red:#dc2626;
+  --tblue:#eff6ff; --tgreen:#ecfdf5; --torange:#fff7ed; --tpurple:#f5f3ff; --tred:#fef2f2;
+  --font:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC",-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);font-family:var(--font);color:var(--ink);overflow:hidden;-webkit-font-smoothing:antialiased}
+#stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#deck{width:1280px;height:720px;flex:none;position:relative;transform-origin:center center;
+      background:var(--slide);border-radius:6px;overflow:hidden;box-shadow:0 18px 60px rgba(15,23,42,.16)}
+#bar{position:absolute;top:0;left:0;height:2px;background:var(--blue);opacity:.55;z-index:5;width:0}
+
+/* ── 页眉 72 / 正文 608 / 页脚 40 ───────────────────────── */
+.slide{position:absolute;inset:0;display:none;flex-direction:column;padding:0 56px}
+.slide.on{display:flex;animation:fi .15s ease}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+.hd{height:72px;flex:none;display:flex;align-items:flex-end;justify-content:space-between;
+    gap:24px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.hd h2{font-size:30px;font-weight:600;line-height:1.2;letter-spacing:-.01em}
+.hd b{font-size:13px;font-weight:500;color:var(--faint);letter-spacing:.08em;white-space:nowrap;padding-bottom:5px}
+.bd{flex:1;min-height:0;overflow:hidden;padding:24px 0 0}
+.ft{height:40px;flex:none;display:flex;align-items:center;justify-content:flex-end}
+.pg{font-size:13px;color:var(--faint);letter-spacing:.04em}
+
+/* ── 文字层级：字号 + 字重 + 颜色三者一起做 ─────────────── */
+.lead{font-size:21px;font-weight:600;line-height:1.5;margin-bottom:14px}
+.p{font-size:18px;line-height:1.6}
+.p+.p{margin-top:10px}
+.sub{font-size:15px;line-height:1.6;color:var(--sub)}
+.cap{font-size:13px;line-height:1.55;color:var(--faint)}
+.h3{font-size:21px;font-weight:600;margin-bottom:8px}
+.mt{margin-top:16px}.mt2{margin-top:24px}.mb{margin-bottom:12px}
+b,strong{font-weight:600}
+em{font-style:normal;font-weight:600}
+.ul{list-style:none}
+.ul li{font-size:18px;line-height:1.55;padding-left:20px;position:relative;margin-bottom:9px}
+.ul li:before{content:"";position:absolute;left:2px;top:11px;width:6px;height:6px;border-radius:50%;background:var(--faint)}
+.ul.s li{font-size:15px;line-height:1.55;margin-bottom:6px;color:var(--sub)}
+.ul.s li:before{top:9px;width:4px;height:4px}
+.ol{counter-reset:n;list-style:none}
+.ol li{font-size:18px;line-height:1.55;padding-left:30px;position:relative;margin-bottom:10px;counter-increment:n}
+.ol li:before{content:counter(n);position:absolute;left:0;top:2px;width:21px;height:21px;border-radius:50%;
+  background:var(--panel);color:var(--sub);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center}
+
+/* ── 组件 ──────────────────────────────────────────────── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.g23{display:grid;grid-template-columns:2fr 3fr;gap:22px}
+.g32{display:grid;grid-template-columns:3fr 2fr;gap:22px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px 18px}
+.card .t{font-size:16px;font-weight:600;margin-bottom:7px}
+.card .p,.card .sub{font-size:15px;line-height:1.55}
+.card.w{background:#fff}
+.note{border-left:3px solid var(--faint);padding:2px 0 2px 16px}
+.note .t{font-size:15px;font-weight:600;margin-bottom:4px}
+.tbl{width:100%;border-collapse:collapse;font-size:15px;line-height:1.45}
+.tbl th{font-size:13px;font-weight:600;color:var(--faint);text-align:left;
+        padding:0 12px 7px;border-bottom:1.5px solid var(--line);letter-spacing:.03em}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl td:first-child{font-weight:600}
+.tbl.s{font-size:14px}.tbl.s td{padding:7px 10px}
+.code{font-family:var(--mono);font-size:13.5px;line-height:1.6;background:var(--panel);
+      border:1px solid var(--line);border-radius:6px;padding:12px 14px;white-space:pre;overflow:hidden}
+.code .c{color:var(--faint)}
+.kbd{font-family:var(--mono);font-size:13px;background:var(--panel);border:1px solid var(--line);
+     border-radius:4px;padding:1px 6px}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:11px;
+     background:var(--panel);color:var(--sub);letter-spacing:.02em}
+.num{font-size:34px;font-weight:600;line-height:1.1;letter-spacing:-.02em}
+.src{font-size:12px;color:var(--faint);line-height:1.5}
+.src a{color:var(--faint)}
+a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,.3)}
+
+.blue{color:var(--blue)}.green{color:var(--green)}.orange{color:var(--orange)}
+.purple{color:var(--purple)}.red{color:var(--red)}.dim{color:var(--sub)}
+.b-blue{border-left-color:var(--blue)}.b-green{border-left-color:var(--green)}
+.b-orange{border-left-color:var(--orange)}.b-purple{border-left-color:var(--purple)}
+.b-red{border-left-color:var(--red)}
+.t-blue{background:var(--tblue);border-color:#dbeafe}.t-green{background:var(--tgreen);border-color:#d1fae5}
+.t-orange{background:var(--torange);border-color:#fed7aa}.t-purple{background:var(--tpurple);border-color:#ede9fe}
+.t-red{background:var(--tred);border-color:#fecaca}
+
+/* ── 封面 ──────────────────────────────────────────────── */
+.slide.cover{padding:0 96px;justify-content:center}
+.cover .ser{font-size:15px;font-weight:600;color:var(--faint);letter-spacing:.22em;margin-bottom:22px}
+.cover h1{font-size:44px;font-weight:600;line-height:1.25;letter-spacing:-.02em}
+.cover .sl{font-size:21px;color:var(--sub);line-height:1.6;margin-top:18px;max-width:820px}
+.cover .rule{width:64px;height:3px;background:var(--blue);margin:26px 0;opacity:.7}
+.cover .meta{font-size:13px;color:var(--faint);letter-spacing:.04em}
+
+/* ── 概览网格 ──────────────────────────────────────────── */
+#ov{position:fixed;inset:0;background:rgba(233,237,243,.97);z-index:20;display:none;
+    overflow-y:auto;padding:28px 32px}
+#ov.on{display:block}
+#ovg{display:grid;grid-template-columns:repeat(5,218px);gap:16px;justify-content:center}
+.ovc{position:relative;width:218px;height:123px;overflow:hidden;background:#fff;cursor:pointer;
+     border:1px solid var(--line);border-radius:4px}
+.ovc:hover{border-color:var(--blue)}
+.ovi{position:absolute;top:0;left:0;width:1280px;height:720px;transform:scale(.17);transform-origin:top left}
+.ovi .slide{display:flex}
+.ovn{position:absolute;right:4px;bottom:3px;font-size:11px;color:var(--faint);background:rgba(255,255,255,.9);
+     padding:0 4px;border-radius:3px}
+</style>
+</head>
+<body>
+<div id="stage"><div id="deck"><div id="bar"></div>
+<main id="slides">
+
+
+<section class="slide cover">
+  <div class="ser">AGENT 原理与实践 · 第二章</div>
+  <h1>从机器学习到大模型</h1>
+  <div class="rule"></div>
+  <div class="sl">一个 Agent 底下压着的那套<b>知识底座</b>。这一版是倒着写的：终点是<b>真正坐下来啃 Transformer 公式时，会问出来的那六个问题</b>；往前推一层，是深度学习的核心点；再往前推一层，是机器学习的核心点。<br><b>不要求顺读，哪块不清楚翻哪块。</b></div>
+  <div class="meta" style="margin-top:34px">参考章 · 47 页 · 每页自成完整知识块</div>
+  <div class="meta" style="margin-top:10px">← → 翻页　·　O 概览　·　F 全屏</div>
+</section>
+
+
+<section class="slide" data-act="开场">
+  <div class="hd"><h2>这一章的地图</h2></div>
+  <div class="bd">
+    <div class="lead">五个模块，从「什么是学习」一路铺到「一个大模型怎么从零练出来、怎么送到用户面前」。<b>这一版多了一条主线：第 3 页那六个问题是整章的终点，前面每一块知识都在为其中某一问兜底。</b></div>
+    <table class="tbl mt">
+      <tr><th style="width:190px">模块</th><th style="width:62px">页</th><th>里面有什么</th><th style="width:214px">它为终点的哪一问兜底</th></tr>
+      <tr><td>A　机器学习基础</td><td>5–14</td><td>任务分类 · 术语与数据形态 · 三要素 · <b>参数就是知识</b> · 泛化与数据划分 · 归纳偏置与 NFL · 性能度量 · 偏差方差 · 经典模型与集成 · 聚类降维与学习理论</td><td>⑤ 为什么参数才是被学的<br>④ 为什么输出偏偏是概率</td></tr>
+      <tr><td>B　神经网络与深度学习</td><td>15–23</td><td>神经元与前向传播 · 激活函数 · <b>损失与输出层</b> · <b>反向传播</b> · 归一化与残差 · 优化器与正则化 · CNN 与 RNN/LSTM · 词向量 · 反常识的经验事实</td><td>①②③ 里那些零件<b>都不是 Transformer 发明的</b></td></tr>
+      <tr><td>C　Transformer</td><td>24–35</td><td>注意力的动机 · 自注意力 QKV · 多头与掩码 · 位置编码 · 完整 block · 三种架构与复杂度 · <b>公式速查 · 人话版 · 计算流水线 · 输出是什么 · 符号分三类 · 数字实例</b></td><td><b>六问全部在这一段落地</b>，30–35 页一问一页</td></tr>
+      <tr><td>D　大模型怎么练出来</td><td>36–44</td><td>参数量账单 · 全流程总览 · 分词 · 数据流水线 · 预训练与 Scaling Law · 并行显存与训练实况 · SFT 与偏好对齐 · 推理与部署 · 评测与失效</td><td>把④那个「一个词一个词往外蹦」做到 GPT 规模，还差多少道工序</td></tr>
+      <tr><td>E　附录与收尾</td><td>45–47</td><td>术语中英对照速查 · 一页知识清单 · 六问回填与边界</td><td>看到 GQA、KV cache、logits 不再卡住</td></tr>
+    </table>
+    <div class="note mt"><div class="t">三条阅读约定</div>
+      <div class="sub">① <b>每页自足</b> —— 一页只讲一块知识，该有的定义、公式、数字、对照表都在这一页里，不需要翻回去。<br>② <b>颜色有固定含义</b> —— <b class="blue">蓝＝数据/计算流</b>、<b class="green">绿＝产出与正确的做法</b>、<b class="orange">橙＝工程要点</b>、<b class="purple">紫＝模型与结构</b>、<b class="red">红＝坑与失效</b>。<br>③ <b>数字都标了口径</b> —— 凡是给了具体数值的，都注明了出处与年份；这个领域的数字过期很快。</div></div>
+  </div>
+</section>
+
+<section class="slide" data-act="开场">
+  <div class="hd"><h2>这一章的终点：六个问题</h2></div>
+  <div class="bd">
+    <div class="p mb">一个人真的坐下来啃 Transformer 的公式，问出来的通常不是「Q、K、V 的定义是什么」。<b>是下面这六个。</b>它们不按教科书顺序出现，而是按「哪儿还没通」的顺序出现——所以它们比任何目录都更能说明：一份讲解到底该讲什么。</div>
+    <table class="tbl s">
+      <tr><th style="width:30px"></th><th style="width:330px">问题</th><th>它实际在问的是</th><th style="width:88px">答在</th></tr>
+      <tr><td class="blue"><b>①</b></td><td>能不能把 Transformer 的数学公式讲清楚</td><td>一层里到底有哪几个式子，它们按什么顺序接上——<b>先要一份完整清单</b></td><td class="green"><b>30</b> 页</td></tr>
+      <tr><td class="blue"><b>②</b></td><td>先用语言讲清楚这都是在干嘛，把数学尽量转成能听懂的</td><td>每个式子在完成一个什么<b>动作</b>——符号背后的意图，而不是符号的读法</td><td class="green"><b>31</b> 页</td></tr>
+      <tr><td class="blue"><b>③</b></td><td>有没有一种展示，能告诉我一步一步在算什么。看不懂的公式点一下更好</td><td>把它当<b>程序</b>看：每一步拿到什么、产出什么、数据的形状怎么变</td><td class="green"><b>32</b> 页</td></tr>
+      <tr><td class="orange"><b>④</b></td><td>算来算去，算出来的是啥</td><td>这台机器的<b>输出对象</b>到底是什么类型的东西——这一问一旦通了，训练和推理同时通</td><td class="green"><b>33</b> 页</td></tr>
+      <tr><td class="orange"><b>⑤</b></td><td>公式里那些参数是要算的，我理解就是权重吧</td><td>哪些符号是<b>被学出来的</b>，哪些是写死的，哪些是每次输入重算的</td><td class="green"><b>34</b> 页</td></tr>
+      <tr><td class="orange"><b>⑥</b></td><td>能不能用具体的数走一遍，这样不是更清楚吗</td><td>要一个<b>端到端的数值实例</b>——小到能手算，但每一步都不跳</td><td class="green"><b>35</b> 页</td></tr>
+    </table>
+    <div class="g2 mt2">
+      <div class="note b-purple"><div class="t purple">这六问为什么值得当骨架</div>
+        <div class="sub">它们恰好覆盖了理解一个模型的四个层次：<b>形式</b>（有哪些式子）→ <b>语义</b>（式子在干嘛）→ <b>执行</b>（一步步怎么算）→ <b>本体</b>（算出来的是什么、什么是被学的）。<br>缺任何一层，剩下的就只是背公式。</div></div>
+      <div class="note b-orange"><div class="t orange">往前推两层，就是这一章前半本</div>
+        <div class="sub">④⑤ 两问的答案里会出现 softmax、交叉熵、梯度下降、参数与中间结果的区分——<b>这些全部是深度学习的概念，不是 Transformer 的</b>。<br>再往前推，它们又都落在机器学习的三要素上。<b>下一页把这条倒推链摊开。</b></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-act="开场">
+  <div class="hd"><h2>倒着推一遍：Transformer 里的每一处，往前都挂着什么</h2></div>
+  <div class="bd">
+    <div class="p mb">这张表是本章前 23 页的存在理由：<b>左列是公式里会亲眼看到的东西，中列右列是它在深度学习、机器学习里的出处。</b></div>
+    <table class="tbl s">
+      <tr><th style="width:31%">Transformer 里的这一处</th><th style="width:35%">往前推一层 · 深度学习的核心点</th><th>再往前推一层 · 机器学习的核心点</th></tr>
+      <tr><td class="purple"><b>最后那个 softmax，出来的是概率</b></td><td>输出层与损失<b>必须成对</b>：softmax 配交叉熵<span class="dim">（17 页）</span></td><td>损失函数不是评分标准，是你对数据分布的假设<span class="dim">（7 页）</span></td></tr>
+      <tr><td class="purple"><b>W_Q / W_K / W_V / W_O / W₁ / W₂ 是学出来的</b></td><td>反向传播：链式法则加一本账，<b>只调参数，不调数据</b><span class="dim">（18 页）</span></td><td>模型 = 假设空间，一组参数 = 空间里的一个点<span class="dim">（7 页）</span></td></tr>
+      <tr><td class="purple"><b>「训练几亿次把 W 调好」</b></td><td>梯度下降与优化器：有了梯度，往哪走、走多远<span class="dim">（20 页）</span></td><td>经验风险最小化，以及它和期望风险之间那道缝<span class="dim">（7 页）</span></td></tr>
+      <tr><td class="purple"><b>调好之后固定不动，拿去用</b></td><td>—</td><td><b>训练与推理是两个阶段</b>，参数是唯一被带走的东西<span class="dim">（8 页）</span></td></tr>
+      <tr><td class="blue"><b>Embedding 表：字 → 向量</b></td><td>表示学习：特征不再由人手工设计，而是被学出来<span class="dim">（22 页）</span></td><td>特征决定上限，模型只是逼近这个上限<span class="dim">（6 页）</span></td></tr>
+      <tr><td class="blue"><b>FFN 里的 max(0, ·)</b></td><td><b>没有非线性，一百层等于一层</b><span class="dim">（16 页）</span></td><td>假设空间的表达力：能表达什么，决定能学到什么<span class="dim">（7 页）</span></td></tr>
+      <tr><td class="orange"><b>x + Sublayer(x) 的那个加号</b>、<b>LayerNorm</b>、<b>÷√d_k</b></td><td>训练不动的三大病与四味解药：梯度消失、数值爆炸、尺度失配<span class="dim">（19 页）</span></td><td>—</td></tr>
+      <tr><td class="green"><b>它「学会了语言」，不是背下了语料</b></td><td>四个反直觉的经验事实：随机标签、双下降、彩票假设<span class="dim">（23 页）</span></td><td>泛化：训练集上的正确率毫无价值<span class="dim">（9 页）</span></td></tr>
+      <tr><td class="green"><b>为什么偏偏是这个架构</b></td><td>架构就是归纳偏置：CNN 押空间局部性，RNN 押时间顺序<span class="dim">（21 页）</span></td><td>归纳偏置与「没有免费的午餐」<span class="dim">（10 页）</span></td></tr>
+    </table>
+    <div class="note b-green mt2"><div class="t green">这张表反过来读，是这一章最该带走的一句话</div>
+      <div class="sub">Transformer 里<b>真正属于 Transformer 自己的东西只有三样</b>：注意力这个算子、多头这种拆法、位置编码这个补丁。<br>其余全部——概率输出、交叉熵、梯度下降、残差、归一化、非线性、嵌入表——都是它<b>从深度学习那里继承来的通用零件</b>，而那些零件又各自落在机器学习的三要素上。<b>看懂那个公式，八成的功夫花在前面这两层。</b></div></div>
+  </div>
+</section>
+<section class="slide" data-act="机器学习">
+  <div class="hd"><h2>机器学习是什么：一个定义，四类任务</h2></div>
+  <div class="bd">
+    <div class="g32">
+      <div>
+        <div class="card t-blue"><div class="t blue">定义（Tom Mitchell, 1997）</div>
+          <div class="sub" style="margin-top:6px">一个程序在任务 <b>T</b> 上，以度量 <b>P</b> 衡量的表现，随着经验 <b>E</b> 的积累而提高，就说它<b>从 E 中学到了关于 T 的东西</b>。</div>
+          <div class="cap mt" style="margin-top:8px">这个定义的价值在于：它把「学习」变成了三个必须先说清楚的量。任何一个真实项目卡住，多半是 T、P、E 里有一个没定义好 —— 尤其是 P。</div></div>
+        <div class="card mt"><div class="t">和传统编程的分工</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><th style="width:96px">　</th><th>人提供</th><th>机器产出</th></tr>
+            <tr><td>传统编程</td><td>规则 + 输入</td><td>输出</td></tr>
+            <tr><td>机器学习</td><td>输入 + 期望输出</td><td><b>规则</b>（模型参数）</td></tr>
+          </table>
+          <div class="cap" style="margin-top:8px">所以机器学习适用的场景是：<b>你知道对错，但写不出规则</b>。能写出规则的（税率计算、排序、编译）不要用机器学习。</div></div>
+        <div class="card t-purple mt"><div class="t purple">这些名词的包含关系</div>
+          <div class="cap" style="margin-top:8px"><b>人工智能 ⊃ 机器学习 ⊃ 表示学习 ⊃ 深度学习 ⊃ 大模型</b>。机器学习是人工智能里「靠数据获得能力」的那一支；深度学习是机器学习里「用多层神经网络<b>自动学出特征</b>」的那一支；大模型则是深度学习里以 <b>Transformer 为骨架、以自监督预训练为方法</b>的那一支。</div>
+          <div class="cap mt" style="margin-top:8px">另外两个常一起出现的词：<b>统计学习</b>基本是机器学习的同义词，只是更强调数学基础；<b>数据挖掘</b>侧重从大数据里找有价值的模式，方法上大量借用机器学习，但目标是<b>发现知识</b>，不是造一个能预测的模型。</div></div>
+      </div>
+      <div>
+        <div class="card w"><div class="t">四类任务：按「监督信号从哪儿来」分</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><th style="width:92px">类型</th><th style="width:150px">给机器的数据</th><th>要它学出什么</th></tr>
+            <tr><td>监督学习</td><td>(x, y) 成对，y 由人标</td><td>映射 x→y。<b>分类</b>（y 离散）与<b>回归</b>（y 连续）</td></tr>
+            <tr><td>无监督学习</td><td>只有 x</td><td>数据自身的结构：<b>聚类</b>、<b>降维</b>、密度估计</td></tr>
+            <tr><td class="blue">自监督学习</td><td>只有 x，但从 x 里<b>造出</b> y</td><td>遮住一部分去预测它。<b>今天所有大模型都出自这一类</b></td></tr>
+            <tr><td>强化学习</td><td>环境 + 奖励信号</td><td>策略：什么状态下做什么动作，使长期回报最大</td></tr>
+          </table></div>
+        <div class="note b-blue mt"><div class="t blue">自监督为什么单列</div>
+          <div class="sub">形式上它是监督学习（有 x 有 y，用同一套损失和优化器），但 <b>y 不花人力</b> —— 「预测下一个词」的答案就写在原文里。标注量不再是瓶颈，数据规模因此可以放大四五个数量级。这一条是大模型能出现的直接前提，第 40 页会完整展开。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="机器学习">
+  <div class="hd"><h2>数据长什么样，以及必须记住的九个词</h2></div>
+  <div class="bd">
+    <div class="g23">
+      <div>
+        <svg viewBox="0 0 440 250" width="100%" style="display:block" font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+          <text x="0" y="14" font-size="12" font-weight="600" fill="#5b6675">一个数据集 D，m 个样本 × d 个特征</text>
+          <text x="60" y="42" font-size="12" fill="#94a3b8">色泽</text><text x="130" y="42" font-size="12" fill="#94a3b8">根蒂</text>
+          <text x="200" y="42" font-size="12" fill="#94a3b8">敲声</text><text x="272" y="42" font-size="12" fill="#94a3b8">密度</text>
+          <text x="356" y="42" font-size="12" font-weight="600" fill="#0e9f6e">好瓜?</text>
+          <rect x="46" y="50" width="272" height="130" rx="4" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+          <rect x="330" y="50" width="70" height="130" rx="4" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+          <text x="0" y="76" font-size="12" fill="#5b6675">x₁</text><text x="0" y="106" font-size="12" fill="#5b6675">x₂</text>
+          <text x="0" y="136" font-size="12" fill="#5b6675">⋮</text><text x="0" y="168" font-size="12" fill="#5b6675">xₘ</text>
+          <text x="60" y="76" font-size="12" fill="#1f2937">青绿</text><text x="130" y="76" font-size="12" fill="#1f2937">蜷缩</text><text x="200" y="76" font-size="12" fill="#1f2937">浊响</text><text x="272" y="76" font-size="12" fill="#1f2937">.697</text><text x="356" y="76" font-size="12" font-weight="600" fill="#0e9f6e">是</text>
+          <text x="60" y="106" font-size="12" fill="#1f2937">乌黑</text><text x="130" y="106" font-size="12" fill="#1f2937">稍蜷</text><text x="200" y="106" font-size="12" fill="#1f2937">沉闷</text><text x="272" y="106" font-size="12" fill="#1f2937">.774</text><text x="356" y="106" font-size="12" font-weight="600" fill="#0e9f6e">是</text>
+          <text x="60" y="136" font-size="12" fill="#94a3b8">⋮</text><text x="130" y="136" font-size="12" fill="#94a3b8">⋮</text><text x="200" y="136" font-size="12" fill="#94a3b8">⋮</text><text x="272" y="136" font-size="12" fill="#94a3b8">⋮</text><text x="356" y="136" font-size="12" fill="#94a3b8">⋮</text>
+          <text x="60" y="168" font-size="12" fill="#1f2937">浅白</text><text x="130" y="168" font-size="12" fill="#1f2937">硬挺</text><text x="200" y="168" font-size="12" fill="#1f2937">清脆</text><text x="272" y="168" font-size="12" fill="#1f2937">.245</text><text x="356" y="168" font-size="12" font-weight="600" fill="#dc2626">否</text>
+          <path d="M46 196 v8 h272 v-8" fill="none" stroke="#2563eb" stroke-width="1.5"/>
+          <text x="182" y="220" text-anchor="middle" font-size="12" fill="#2563eb">特征 / 属性　feature</text>
+          <text x="182" y="238" text-anchor="middle" font-size="12" fill="#94a3b8">一行 = 一个样本 = 特征空间里的一个点</text>
+          <path d="M330 196 v8 h70 v-8" fill="none" stroke="#0e9f6e" stroke-width="1.5"/>
+          <text x="365" y="220" text-anchor="middle" font-size="12" fill="#0e9f6e">标记 label</text>
+        </svg>
+        <div class="note b-orange"><div class="t orange">一句要紧的话</div>
+          <div class="sub">上面这张表的<b>列</b>是人定的。这一步叫<b>特征工程</b>，在深度学习之前，它决定了项目成败的一大半（第 22 页看它是怎么被拿掉的）。</div></div>
+      </div>
+      <div>
+        <table class="tbl s">
+          <tr><th style="width:112px">术语</th><th style="width:118px">英文</th><th>意思</th></tr>
+          <tr><td>样本 / 示例</td><td>sample, instance</td><td>一条记录，记作 <b>x</b>；是特征空间里的一个向量</td></tr>
+          <tr><td>特征 / 属性</td><td>feature, attribute</td><td>描述样本的一个维度；d 个特征 = d 维</td></tr>
+          <tr><td>标记</td><td>label</td><td>该样本的期望输出 <b>y</b>；有标记的样本叫<b>样例</b></td></tr>
+          <tr><td>数据集</td><td>dataset</td><td>D = {(x₁,y₁), …, (xₘ,yₘ)}，m 叫<b>样本量</b></td></tr>
+          <tr><td>假设空间</td><td>hypothesis space</td><td>你允许的所有候选模型构成的集合 <b>H</b></td></tr>
+          <tr><td>参数</td><td>parameter</td><td>模型内部由<b>数据训练</b>得到的数（如权重 w）</td></tr>
+          <tr><td>超参数</td><td>hyperparameter</td><td>训练前由<b>人设定</b>的数（学习率、层数、树深）</td></tr>
+          <tr><td>分布</td><td>distribution</td><td>数据背后那个看不见的真实规律 <b>𝒟</b>；样本是从它里独立同分布抽出来的</td></tr>
+          <tr><td>泛化</td><td>generalization</td><td>在<b>没见过的</b>新样本上还能做对</td></tr>
+        </table>
+        <div class="note b-red mt"><div class="t red">最容易混的一对：参数 vs 超参数</div>
+          <div class="sub">参数是<b>学出来的</b>（GPT 的「1750 亿参数」指的是这个）；超参数是<b>试出来的</b>，靠验证集选。二者的调整发生在两个完全不同的循环里。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="机器学习">
+  <div class="hd"><h2>任何一个学习算法，都由三件东西唯一确定</h2></div>
+  <div class="bd">
+    <div class="lead">这是李航《统计学习方法》给出的拆法，通用性极强：<b>模型 + 策略 + 算法</b>。看到任何一个陌生方法，先把它这三格填出来，就不会晕。</div>
+    <div class="g3 mt">
+      <div class="card t-purple"><div class="t purple">① 模型 — 假设空间 H</div>
+        <div class="sub" style="margin-top:6px">候选答案的集合。你先规定「答案长什么样」：<br>· 一条直线 y = wᵀx + b<br>· 一棵深度 ≤ 5 的决策树<br>· 一个 32 层的 Transformer</div>
+        <div class="cap mt" style="margin-top:8px">H 越大，能表达的规律越多，但也越容易把噪声当规律。这个大小有个正式的度量，见第 14 页。</div></div>
+      <div class="card t-orange"><div class="t orange">② 策略 — 拿什么衡量好坏</div>
+        <div class="sub" style="margin-top:6px"><b>损失函数</b> L(y, f(x))：单个样本错了多少。<br><b>经验风险</b>：训练集上损失的平均。<br><b>结构风险</b> = 经验风险 + λ·Ω(f)，后一项是<b>正则化</b>，惩罚复杂模型。</div>
+        <div class="cap mt" style="margin-top:8px">真正想最小化的是<b>期望风险</b>（全分布上的期望损失），但它算不出来 —— 整门学科的技术含量都在这道缝里。</div></div>
+      <div class="card t-blue"><div class="t blue">③ 算法 — 怎么找到那个最优解</div>
+        <div class="sub" style="margin-top:6px">在 H 里搜使风险最小的那个 f：<br>· <b>解析解</b>：直接求导置零（线性回归）<br>· <b>凸优化</b>：有全局最优保证（SVM、逻辑回归）<br>· <b>梯度下降</b>：只能找到局部最优（神经网络，第 20 页）<br>· <b>贪心搜索</b>：每步选最优切分（决策树）</div></div>
+    </div>
+    <div class="g2">
+      <div class="card w"><div class="t">常见损失函数速查</div>
+        <table class="tbl s" style="margin-top:8px">
+          <tr><th style="width:120px">损失</th><th style="width:180px">形式</th><th>用在哪</th></tr>
+          <tr><td>平方损失</td><td>(y − ŷ)²</td><td>回归；对应高斯噪声假设，怕离群点</td></tr>
+          <tr><td>绝对值 / Huber</td><td>|y − ŷ| / 分段</td><td>回归；对离群点稳健</td></tr>
+          <tr><td>交叉熵</td><td>−Σ y log ŷ</td><td><b>分类的默认选择</b>，含所有语言模型</td></tr>
+          <tr><td>合页损失</td><td>max(0, 1 − y·ŷ)</td><td>SVM；只惩罚「不够有把握」的那些点</td></tr>
+        </table></div>
+      <div class="note b-green"><div class="t green">损失函数不是评分标准，是你的分布假设</div>
+        <div class="sub">从最大似然的角度看：假设噪声是高斯的，最大化似然就<b>等价于</b>最小化平方损失；假设输出服从多项分布，最大化似然就等价于最小化交叉熵。<br>所以「选哪个损失」实质是<b>「你认为数据是怎么生成的」</b>。选错损失比选错模型更致命 —— 它悄悄改掉了你在优化的目标。</div></div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="机器学习">
+  <div class="hd"><h2>参数就是知识：训练在调它，推理不动它</h2></div>
+  <div class="bd">
+    <div class="lead">上一页的「模型」是一个<b>假设空间</b>，一组具体的参数值就是空间里的<b>一个点</b>。学习从头到尾只做一件事：<b>把这个点挪到该在的位置</b>。</div>
+    <svg viewBox="0 0 1168 152" width="100%" style="display:block;margin-top:14px">
+      <defs><marker id="a2" markerWidth="9" markerHeight="9" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#2563eb"/></marker>
+            <marker id="a2g" markerWidth="9" markerHeight="9" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#0e9f6e"/></marker></defs>
+      <rect x="0" y="2" width="700" height="148" rx="9" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="16" y="21" font-size="14" font-weight="700" fill="#2563eb">训练阶段 —— 参数每一步都在变</text>
+      <rect x="16" y="32" width="94" height="32" rx="6" fill="#fff" stroke="#93b4f5"/><text x="63" y="52" text-anchor="middle" font-size="12.5" fill="#1f2937">一批数据</text>
+      <path d="M114 48 L 142 48" stroke="#2563eb" stroke-width="1.8" marker-end="url(#a2)"/>
+      <rect x="146" y="32" width="94" height="32" rx="6" fill="#fff" stroke="#93b4f5"/><text x="193" y="52" text-anchor="middle" font-size="12.5" fill="#1f2937">前向：出预测</text>
+      <path d="M244 48 L 272 48" stroke="#2563eb" stroke-width="1.8" marker-end="url(#a2)"/>
+      <rect x="276" y="32" width="112" height="32" rx="6" fill="#fff" stroke="#93b4f5"/><text x="332" y="52" text-anchor="middle" font-size="12.5" fill="#1f2937">跟真答案比 → 损失</text>
+      <path d="M392 48 L 420 48" stroke="#2563eb" stroke-width="1.8" marker-end="url(#a2)"/>
+      <rect x="424" y="32" width="94" height="32" rx="6" fill="#fff" stroke="#93b4f5"/><text x="471" y="52" text-anchor="middle" font-size="12.5" fill="#1f2937">反向：出梯度</text>
+      <path d="M522 48 L 550 48" stroke="#2563eb" stroke-width="1.8" marker-end="url(#a2)"/>
+      <rect x="554" y="32" width="130" height="32" rx="6" fill="#fff" stroke="#2563eb" stroke-width="2"/><text x="619" y="52" text-anchor="middle" font-size="12.5" font-weight="700" fill="#2563eb">按梯度更新参数</text>
+      <path d="M619 66 L 619 80 L 63 80 L 63 68" stroke="#2563eb" stroke-width="1.8" fill="none" marker-end="url(#a2)"/>
+      <text x="341" y="96" text-anchor="middle" font-size="12" fill="#5b6675">这个圈跑几亿次。<tspan font-weight="700">每一圈里，数据是新的，被改的只有参数。</tspan></text>
+      <rect x="16" y="104" width="668" height="42" rx="6" fill="#fff" stroke="#cbd5e1"/>
+      <text x="30" y="122" font-size="12.5" fill="#5b6675">跑完之后，把所有参数的当前值原样写进一个文件 ——</text>
+      <text x="30" y="139" font-size="12.5" font-weight="700" fill="#2563eb">这个文件就是「模型」。它是这几亿圈里唯一被留下来的东西。</text>
+      <path d="M700 80 L 748 80" stroke="#0e9f6e" stroke-width="2.5" marker-end="url(#a2g)"/>
+      <rect x="756" y="2" width="412" height="148" rx="9" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="772" y="21" font-size="14" font-weight="700" fill="#0e9f6e">推理阶段 —— 参数一个都不变</text>
+      <rect x="772" y="32" width="88" height="32" rx="6" fill="#fff" stroke="#86e0bd"/><text x="816" y="52" text-anchor="middle" font-size="12.5" fill="#1f2937">你的输入</text>
+      <path d="M864 48 L 892 48" stroke="#0e9f6e" stroke-width="1.8" marker-end="url(#a2g)"/>
+      <rect x="896" y="32" width="112" height="32" rx="6" fill="#fff" stroke="#0e9f6e" stroke-width="2"/><text x="952" y="52" text-anchor="middle" font-size="12.5" font-weight="700" fill="#0e9f6e">前向一遍</text>
+      <path d="M1012 48 L 1040 48" stroke="#0e9f6e" stroke-width="1.8" marker-end="url(#a2g)"/>
+      <rect x="1044" y="32" width="108" height="32" rx="6" fill="#fff" stroke="#86e0bd"/><text x="1098" y="52" text-anchor="middle" font-size="12.5" fill="#1f2937">输出</text>
+      <text x="772" y="87" font-size="12.5" fill="#5b6675">没有比对，没有梯度，没有更新。</text>
+      <rect x="772" y="96" width="380" height="50" rx="6" fill="#fff" stroke="#dc2626" stroke-width="1.5"/>
+      <text x="786" y="114" font-size="12.5" font-weight="700" fill="#dc2626">最常见的误解：以为模型在使用中「学到」了什么</text>
+      <text x="786" y="134" font-size="12.5" fill="#5b6675">它没有。你这次说的话不改动任何一个参数。</text>
+    </svg>
+    <div class="g23 mt2">
+      <table class="tbl s">
+        <tr><th style="width:106px">公式里的符号</th><th style="width:110px">谁定的</th><th style="width:132px">什么时候变</th><th>例子</th></tr>
+        <tr><td class="orange"><b>参数</b>（权重）</td><td>训练过程自己定</td><td><b>每步都变，练完固定</b></td><td>w、b；后面会看到的 W_Q、W_K、W_V、γ、β、Embedding 表</td></tr>
+        <tr><td class="purple"><b>超参数</b></td><td><b>人定的</b></td><td>训练开始前定好</td><td>学习率、层数、隐藏维度、批量大小</td></tr>
+        <tr><td class="blue"><b>中间结果</b></td><td>算出来的</td><td><b>每次输入重算一遍</b></td><td>每层的激活值、注意力权重、logits</td></tr>
+      </table>
+      <div class="note b-orange"><div class="t orange">「模型有多大」说的是第一行</div>
+        <div class="sub">一个模型标称多少参数，数的就是<b>第一行那些数字一共有多少个</b>。超参数只有几十个，中间结果根本不存盘，两者都不计入。<br>所以「70 亿参数」= 训练结束时被冻住、写进文件里的 70 亿个浮点数。<b>模型文件大小 ≈ 参数个数 × 每个数占的字节数</b>；第 36 页会把一个 8B 模型逐项拆开数一遍。</div></div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="机器学习">
+  <div class="hd"><h2>泛化：训练集上的正确率毫无价值</h2></div>
+  <div class="bd">
+    <div class="g23">
+      <div>
+        <div class="card t-red"><div class="t red">一行就能给出的反例</div>
+          <div class="sub" style="margin-top:6px">「把所有训练样本背下来，来了新输入就返回最像的那个样本的答案。」<br>这个模型训练集错误率<b>恒为零</b>，但它什么也没学到。</div></div>
+        <div class="card mt"><div class="t">两种失败，方向相反</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><th style="width:78px">　</th><th style="width:88px">训练误差</th><th style="width:88px">测试误差</th><th>病根</th></tr>
+            <tr><td>欠拟合</td><td>高</td><td>高</td><td>H 太小 / 训练不足</td></tr>
+            <tr><td>刚好</td><td>低</td><td class="green">低</td><td>—</td></tr>
+            <tr><td>过拟合</td><td class="green">很低</td><td class="red">高</td><td>把噪声当成了规律</td></tr>
+          </table>
+          <div class="cap" style="margin-top:8px">欠拟合好治（换更大的模型、训久一点）。<b>过拟合治不好，只能缓解</b> —— 它是机器学习的核心矛盾，无法彻底避免。</div></div>
+        <div class="note b-red mt"><div class="t red">一条纪律：测试集只能用一次</div>
+          <div class="sub">用它选过一次模型，它就变成了验证集：你的选择已经泄漏进去，它给出的数字从此偏乐观。今天大模型评测里的<b>刷榜</b>和<b>数据污染</b>，本质上就是这一条被反复违反。</div></div>
+      </div>
+      <div>
+        <div class="card w"><div class="t">数据怎么切：三份，各有各的用途</div>
+          <svg viewBox="0 0 560 96" width="100%" style="display:block;margin-top:10px" font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+            <rect x="0" y="8" width="336" height="30" rx="4" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+            <text x="168" y="28" text-anchor="middle" font-size="13" fill="#2563eb">训练集 60%</text>
+            <rect x="344" y="8" width="104" height="30" rx="4" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/>
+            <text x="396" y="28" text-anchor="middle" font-size="13" fill="#c2410c">验证集 20%</text>
+            <rect x="456" y="8" width="104" height="30" rx="4" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+            <text x="508" y="28" text-anchor="middle" font-size="13" fill="#0e9f6e">测试集 20%</text>
+            <text x="168" y="60" text-anchor="middle" font-size="12" fill="#5b6675">调<tspan font-weight="700">参数</tspan>：梯度下降在这上面跑</text>
+            <text x="396" y="60" text-anchor="middle" font-size="12" fill="#5b6675">选<tspan font-weight="700">超参数</tspan>和模型</text>
+            <text x="508" y="60" text-anchor="middle" font-size="12" fill="#5b6675">最后估一次</text>
+            <text x="396" y="82" text-anchor="middle" font-size="12" fill="#94a3b8">可反复用</text>
+            <text x="508" y="82" text-anchor="middle" font-size="12" fill="#dc2626">只能用一次</text>
+          </svg></div>
+        <div class="card mt"><div class="t">数据不够时的三种切法</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><th style="width:120px">方法</th><th>做法</th><th style="width:170px">注意</th></tr>
+            <tr><td>留出法</td><td>直接按比例切一刀</td><td>必须<b>分层采样</b>，保持类别比例；多切几次取平均</td></tr>
+            <tr><td>k 折交叉验证</td><td>切成 k 份，轮流拿一份当验证，跑 k 次取平均</td><td>k 常取 5 或 10；结果稳，代价是训练 k 次</td></tr>
+            <tr><td>自助法</td><td>有放回抽 m 次作训练集，没抽到的当验证</td><td>约 <b>36.8%</b> 的样本永远不会被抽到（1/e）；改变了数据分布，只在样本极少时用</td></tr>
+          </table>
+          <div class="cap mt" style="margin-top:8px"><b>时间序列例外</b>：绝不能随机切，必须按时间切（用过去预测未来）。随机切会让模型看到「未来」，这是工业界最常见的数据泄漏。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="机器学习">
+  <div class="hd"><h2>归纳偏置与「没有免费的午餐」</h2></div>
+  <div class="bd">
+    <div class="lead">追问一句：在训练集上全对的候选函数有几个？—— 不是一个，是<b>无穷多个</b>。数据只约束了见过的那些点，点与点之间怎么走，样本一个字也没说。那么凭什么挑？</div>
+    <div class="g2 mt">
+      <div>
+        <div class="card t-purple"><div class="t purple">归纳偏置 inductive bias</div>
+          <div class="sub" style="margin-top:6px">学习算法在「同样能解释数据的多个假设」之间做取舍时，所依据的那些<b>不来自数据的假定</b>。<br><br>它不是缺陷，是<b>学习成为可能的前提</b> —— 没有它，「学习」这个动作在数学上无法定义。</div></div>
+        <div class="card mt"><div class="t">没有免费的午餐定理（Wolpert, 1996）</div>
+          <div class="sub" style="margin-top:6px">在<b>所有可能的目标函数上取平均</b>，任意两个学习算法的期望表现<b>完全相同</b> —— 包括「瞎猜」。</div>
+          <div class="cap mt" style="margin-top:8px"><b>口径要看清：</b>前提是「所有目标函数等可能」。真实世界显然不是这样（世界是平滑的、有局部性的、有层次结构的）。所以这条定理的正确用法不是「算法都一样」，而是：<b class="purple">你的算法之所以有效，一定是因为它内建的偏好恰好和这个世界的规律对上了。</b></div></div>
+      </div>
+      <div>
+        <div class="card w"><div class="t">偏好长什么样：把它从每个方法里揪出来</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><th style="width:104px">方法</th><th>它内建的假定</th><th style="width:146px">什么时候会输</th></tr>
+            <tr><td>线性回归</td><td>输出随输入平滑、按比例变化</td><td>规律是阶跃或周期的</td></tr>
+            <tr><td>决策树</td><td>少数几个属性上的阈值切分就够</td><td>规律是多属性的加权和</td></tr>
+            <tr><td>k 近邻</td><td>输入相近，输出就相近</td><td>高维空间里「相近」失去意义</td></tr>
+            <tr><td>正则化</td><td>参数小的模型更可能对（奥卡姆剃刀）</td><td>真实规律本来就需要大参数</td></tr>
+            <tr><td>CNN</td><td>局部相关、平移不变</td><td>数据没有空间局部性</td></tr>
+            <tr><td>Transformer</td><td>几乎不假定结构，全靠数据</td><td><b>数据量小的时候明显更差</b></td></tr>
+          </table>
+          <div class="cap mt" style="margin-top:10px">所谓「<b>调参</b>」，每一次都是在调这个偏好的强度；所谓「<b>特征工程</b>」，是把人对该领域的先验翻译成机器能用的形式。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="机器学习">
+  <div class="hd"><h2>性能度量：光看「对了几个」是不够的</h2></div>
+  <div class="bd">
+    <div class="g23">
+      <div>
+        <svg viewBox="0 0 420 200" width="100%" style="display:block" font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+          <text x="0" y="12" font-size="12" font-weight="600" fill="#5b6675">混淆矩阵</text>
+          <text x="150" y="34" text-anchor="middle" font-size="12" fill="#94a3b8">预测为正</text>
+          <text x="290" y="34" text-anchor="middle" font-size="12" fill="#94a3b8">预测为负</text>
+          <text x="70" y="70" text-anchor="end" font-size="12" fill="#94a3b8">真实为正</text>
+          <text x="70" y="130" text-anchor="end" font-size="12" fill="#94a3b8">真实为负</text>
+          <rect x="80" y="44" width="140" height="48" rx="4" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+          <text x="150" y="66" text-anchor="middle" font-size="13" font-weight="600" fill="#0e9f6e">TP</text>
+          <text x="150" y="84" text-anchor="middle" font-size="11" fill="#5b6675">真正例</text>
+          <rect x="228" y="44" width="140" height="48" rx="4" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
+          <text x="298" y="66" text-anchor="middle" font-size="13" font-weight="600" fill="#dc2626">FN</text>
+          <text x="298" y="84" text-anchor="middle" font-size="11" fill="#5b6675">漏报</text>
+          <rect x="80" y="100" width="140" height="48" rx="4" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
+          <text x="150" y="122" text-anchor="middle" font-size="13" font-weight="600" fill="#dc2626">FP</text>
+          <text x="150" y="140" text-anchor="middle" font-size="11" fill="#5b6675">误报</text>
+          <rect x="228" y="100" width="140" height="48" rx="4" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+          <text x="298" y="122" text-anchor="middle" font-size="13" font-weight="600" fill="#0e9f6e">TN</text>
+          <text x="298" y="140" text-anchor="middle" font-size="11" fill="#5b6675">真负例</text>
+          <text x="80" y="172" font-size="12" fill="#2563eb">查准率 P = TP/(TP+FP)　——「报出来的里有多少是真的」</text>
+          <text x="80" y="192" font-size="12" fill="#c2410c">查全率 R = TP/(TP+FN)　——「真的里被抓出来多少」</text>
+        </svg>
+        <div class="note b-red"><div class="t red">为什么不能只看精度</div>
+          <div class="sub">1000 个人里有 1 个病人。「全判为健康」这个模型精度 <b>99.9%</b>，但查全率 <b>0</b>，毫无用处。<br><b>类别越不平衡，精度这个指标越没信息量。</b></div></div>
+      </div>
+      <div>
+        <div class="card w"><div class="t">指标速查</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><th style="width:104px">指标</th><th style="width:150px">定义</th><th>什么时候看它</th></tr>
+            <tr><td>精度 Accuracy</td><td>(TP+TN)/全部</td><td>只在类别<b>大致平衡</b>时有意义</td></tr>
+            <tr><td>查准率 Precision</td><td>TP/(TP+FP)</td><td>误报代价高：垃圾邮件、推荐、抓捕</td></tr>
+            <tr><td>查全率 Recall</td><td>TP/(TP+FN)</td><td>漏报代价高：癌症筛查、风控、安检</td></tr>
+            <tr><td>F1</td><td>2PR/(P+R)</td><td>P 和 R 的调和平均；两者都要时的默认综合指标</td></tr>
+            <tr><td>P-R 曲线</td><td>阈值扫一遍</td><td>看模型在不同取舍下的整体能力</td></tr>
+            <tr><td>ROC / AUC</td><td>TPR 对 FPR</td><td>AUC = 随机取一正一负，正例得分更高的概率。<b>对类别不平衡不敏感</b>，适合比模型</td></tr>
+            <tr><td>回归：MSE / MAE / R²</td><td>—</td><td>MSE 罚大错更狠；MAE 稳健；R² 看解释了多少方差</td></tr>
+          </table></div>
+        <div class="g2 mt">
+          <div class="note b-orange"><div class="t orange">P 和 R 天生互斥</div>
+            <div class="sub">调低判正阈值 → 报得多 → R 升 P 降。<b>没有同时提高两者的免费方法</b>，只能换更好的模型把整条曲线往外推。</div></div>
+          <div class="note b-blue"><div class="t blue">先定 P，再定指标</div>
+            <div class="sub">回到第 5 页那个 P：<b>指标选错，后面全白做</b>。业务上真正在乎什么，必须在训练开始前写死。</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="机器学习">
+  <div class="hd"><h2>误差从哪儿来：偏差-方差分解</h2></div>
+  <div class="bd">
+    <div class="g23">
+      <div>
+        <div class="card t-blue"><div class="t blue">泛化误差可以拆成三块</div>
+          <div class="code" style="margin-top:8px">E(f;D) = bias²(x) + var(x) + ε²</div>
+          <div class="sub mt" style="margin-top:10px"><b>偏差 bias</b>　模型的<b>期望</b>预测与真实值的差 —— 学习算法本身的拟合能力不够。<br><b>方差 var</b>　换一批同样大小的训练数据，预测结果的抖动 —— 对数据扰动太敏感。<br><b>噪声 ε</b>　任何模型都到不了的下限，由问题本身决定。</div></div>
+        <svg viewBox="0 0 460 126" width="100%" style="display:block;margin-top:10px" font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+          <g stroke="#cbd5e1" stroke-width="1.5" fill="none">
+            <circle cx="90" cy="48" r="34"/><circle cx="90" cy="48" r="20"/>
+            <circle cx="230" cy="48" r="34"/><circle cx="230" cy="48" r="20"/>
+            <circle cx="370" cy="48" r="34"/><circle cx="370" cy="48" r="20"/>
+          </g>
+          <g fill="#2563eb">
+            <circle cx="86" cy="44" r="3"/><circle cx="93" cy="50" r="3"/><circle cx="89" cy="53" r="3"/><circle cx="94" cy="43" r="3"/>
+            <circle cx="210" cy="28" r="3"/><circle cx="250" cy="66" r="3"/><circle cx="246" cy="30" r="3"/><circle cx="212" cy="68" r="3"/>
+            <circle cx="374" cy="22" r="3"/><circle cx="382" cy="28" r="3"/><circle cx="376" cy="30" r="3"/><circle cx="384" cy="20" r="3"/>
+          </g>
+          <text x="90" y="104" text-anchor="middle" font-size="12" fill="#0e9f6e">低偏差 低方差</text>
+          <text x="90" y="120" text-anchor="middle" font-size="12" fill="#94a3b8">理想</text>
+          <text x="230" y="104" text-anchor="middle" font-size="12" fill="#c2410c">低偏差 高方差</text>
+          <text x="230" y="120" text-anchor="middle" font-size="12" fill="#94a3b8">过拟合</text>
+          <text x="370" y="104" text-anchor="middle" font-size="12" fill="#c2410c">高偏差 低方差</text>
+          <text x="370" y="120" text-anchor="middle" font-size="12" fill="#94a3b8">欠拟合</text>
+        </svg>
+        <div class="card t-orange mt"><div class="t orange">实践中怎么看出来</div>
+          <div class="cap" style="margin-top:8px"><b>学习曲线</b>　一张图上画训练误差与验证误差两条线。都高且紧贴 → <b>偏差主导</b>；训练低、验证高、中间一道大缝 → <b>方差主导</b>，缝会随数据量增加收窄。</div>
+          <div class="cap mt" style="margin-top:8px"><b>k 折交叉验证</b>　训练集切 k 份（常取 5 或 10），轮流留一份验证取平均，数据不多时比单次留出稳得多，也是选超参数的标准做法。<b class="red">代价是训 k 遍</b>。</div></div>
+      </div>
+      <div>
+        <div class="card w"><div class="t">这套框架的实用价值：诊断和对症下药</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><th style="width:120px">症状</th><th style="width:96px">诊断</th><th>该做什么</th></tr>
+            <tr><td>训练误差就很高</td><td>偏差主导</td><td>换更大的模型、加特征、训久一点、降低正则强度</td></tr>
+            <tr><td>训练很低、验证很高</td><td>方差主导</td><td><b>加数据</b>（最有效）、加正则、Dropout、早停、集成</td></tr>
+            <tr><td>两者都低但线上崩</td><td>分布偏移</td><td>不是偏差方差问题 —— 是训练分布 ≠ 线上分布</td></tr>
+          </table>
+          <div class="cap mt" style="margin-top:10px">模型容量增大 → 偏差降、方差升。传统的做法是在两者之间找平衡点，这就是那条经典的 <b>U 型曲线</b>。</div></div>
+        <div class="note b-red mt"><div class="t red">重要：这条 U 型曲线在深度学习区间不成立</div>
+          <div class="sub">当模型大到足以<b>完全插值</b>训练集（训练误差压到 0）之后再继续变大，测试误差会<b>先升后降</b>，出现第二个下降段 —— 这叫<b>双下降</b>（Belkin et al., 2019）。<br>今天所有的大模型都工作在这条曲线的<b>第二段</b>。也就是说：<b>「参数多于样本 = 必然过拟合」这个直觉，在这里是错的。</b>细节见第 23 页。</div></div>
+        <div class="card t-purple" style="margin-top:4px"><div class="t purple">三个容易混用的词</div>
+          <div class="cap" style="margin-top:6px"><b>损失 vs 误差</b>　损失是在一批样本上算出来、用来求梯度的那个数；误差指在整个数据集上的整体表现。<b>优化的是损失，关心的是误差。</b></div>
+          <div class="cap" style="margin-top:6px"><b>泛化误差 vs 测试误差</b>　前者是理论量（对真实分布的期望，算不出来），后者是它的一个<b>估计值</b> —— 测试集越小越不可信。</div>
+          <div class="cap" style="margin-top:6px"><b>分解的适用范围</b>　上面那个等式严格成立于<b>平方损失</b>；分类任务下有多个推广版本，形式不唯一，但方向一致。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="机器学习">
+  <div class="hd"><h2>经典模型与集成：六个零件，两种拼法</h2></div>
+  <div class="bd">
+    <div class="p mb">别背算法细节，记<b>第三列</b>——一个方法在什么情况下会输，比它怎么算更值得记：前者决定你选不选它，后者有现成的库。</div>
+    <table class="tbl s">
+      <tr><th style="width:118px">模型</th><th style="width:286px">在做什么</th><th>内建偏好 / 关键点</th><th style="width:238px">今天还用它吗</th></tr>
+      <tr><td><b>线性回归</b></td><td>拟合 y = wᵀx + b，最小化平方误差；有<b>解析解</b></td><td>线性、平滑；加 L2 叫岭回归，加 L1 叫 Lasso（能把系数压到 0，自动选特征）</td><td>用。理解一切的起点，可解释性最好的基线</td></tr>
+      <tr><td><b>逻辑回归</b></td><td>线性打分后过 sigmoid 变概率，用交叉熵训练</td><td>名字叫回归，做的是<b>分类</b>；决策边界是一条直线</td><td>大量在用。风控、点击率预估的默认基线</td></tr>
+      <tr><td><b>决策树</b></td><td>每次挑一个属性切一刀，递归下去，直到子集足够纯</td><td>切分准则：<b>信息增益</b>(ID3)、<b>增益率</b>(C4.5)、<b>基尼指数</b>(CART)。必须剪枝，否则必过拟合</td><td>很少单用，但它是<b>集成学习的基本零件</b></td></tr>
+      <tr><td><b>支持向量机</b></td><td>找一个把两类分开、且<b>间隔最大</b>的超平面</td><td>只由少数「支持向量」决定；<b>核技巧</b>不显式升维也能处理非线性</td><td>中小数据上仍很强；深度学习之前的统治方法</td></tr>
+      <tr><td><b>朴素贝叶斯</b></td><td>用贝叶斯公式算 P(类别|特征)，假设特征<b>相互独立</b></td><td>独立假设几乎总是错的，但<b>出奇好用</b>；训练只需数一遍频次</td><td>文本分类、垃圾邮件的经典基线，极快</td></tr>
+      <tr><td><b>k 近邻</b></td><td>不训练。来一个新样本，找最近的 k 个邻居投票</td><td>典型的<b>懒惰学习</b>；k 小受噪声影响，k 大边界过平滑</td><td>思想还在用 —— <b>向量检索 / RAG 本质上就是 kNN</b></td></tr>
+    </table>
+    <div class="g3 mt2">
+      <div class="card t-blue"><div class="t blue">Bagging —— 并行，降<b>方差</b></div>
+        <div class="cap" style="margin-top:6px">有放回抽 T 个子集各训一个模型，最后投票/平均，互不影响可并行。<b>随机森林 = Bagging + 决策树 + 属性也随机采样</b>：多一层随机让树与树更不像，方差降得更狠，几乎不用调参。</div></div>
+      <div class="card t-orange"><div class="t orange">Boosting —— 串行，降<b>偏差</b></div>
+        <div class="cap" style="margin-top:6px">一个接一个训，<b>新模型专修前面犯的错</b>：AdaBoost 提高错分样本权重，梯度提升让新树拟合<b>残差</b>。基学习器要够弱（浅树 3–8 层），需控轮数与学习率。代表：<b>XGBoost / LightGBM</b>。</div></div>
+      <div class="note b-green"><div class="t green">一条今天仍然成立的事实</div>
+        <div class="sub">在<b>结构化表格数据</b>上，<b>梯度提升树至今常常仍强于神经网络</b>，还快得多。这类特征本就是人挑好的、语义明确、维度不高，深度学习「自动学表示」的优势用不上，代价一样不少。<b>先跑一个 XGBoost 当基线。</b></div></div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="机器学习">
+  <div class="hd"><h2>没有标记时能做什么，以及「能学会」为什么需要证明</h2></div>
+  <div class="bd">
+    <div class="g2">
+      <div>
+        <div class="card t-blue"><div class="t blue">聚类 —— 把相似的样本归到一起</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><th style="width:88px">方法</th><th>怎么做 / 局限</th></tr>
+            <tr><td>k-means</td><td>反复「分配点 → 更新中心」；要<b>预先指定 k</b>，只能找球形簇</td></tr>
+            <tr><td>层次聚类</td><td>自底向上合并最近两簇，产出一棵树；不用定 k，但慢</td></tr>
+            <tr><td>DBSCAN</td><td>按密度扩展；能找任意形状、自动识别<b>离群点</b>，但对参数敏感</td></tr>
+            <tr><td>高斯混合</td><td>假设由 k 个高斯混合生成，EM 求解；给出<b>软分配</b></td></tr>
+          </table>
+          <div class="cap" style="margin-top:8px">聚类最难的不是算法，是<b>评估</b>——没有标准答案。内部指标只能说簇「紧不紧」，说不了「对不对」。</div></div>
+        <div class="card t-purple mt"><div class="t purple">降维 —— 把高维数据压到低维</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><th style="width:88px">方法</th><th>目标 / 用途</th></tr>
+            <tr><td>PCA</td><td>取方差最大的几个正交方向；线性、可逆、快，去噪压缩的默认选择</td></tr>
+            <tr><td>t-SNE / UMAP</td><td>保持局部邻居关系；<b>只用于可视化</b>，别拿输出去训练。UMAP 更快</td></tr>
+            <tr><td>自编码器</td><td>神经网络压缩再还原，中间那层就是低维表示；<b>表示学习的雏形</b></td></tr>
+          </table></div>
+      </div>
+      <div>
+        <div class="card w"><div class="t">PAC 学习框架（Valiant, 1984）与 VC 维</div>
+          <div class="cap" style="margin-top:6px"><b>P</b>robably <b>A</b>pproximately <b>C</b>orrect：以至少 1−δ 的<b>概率</b>，学到一个误差不超过 ε 的模型。两个「不完美」都是必须的——样本是随机抽的，只能<b>大概率</b>对；样本是有限的，只能<b>近似</b>对。<br><b>VC 维</b>＝假设空间能<b>打散</b>的最大样本数（无论标记怎么排列都能全分对）。二维平面上的直线 VC 维 = <b>3</b>。VC 维越大越有表达力，也越容易过拟合。</div>
+          <div class="code" style="margin-top:10px">泛化误差 ≤ 训练误差 + O( √( (VC维 + log(1/δ)) / m ) )</div>
+          <div class="cap" style="margin-top:8px">右边第二项是<b>你为模型复杂度付的税</b>：样本量 m 越大税越低（<b>加数据永远有用</b>），模型容量越大税越高。这就是「模型复杂度和样本量要匹配」的严格版本。</div></div>
+        <div class="note b-red mt"><div class="t red">诚实的边界：这套理论解释不了深度学习</div>
+          <div class="sub">上千亿参数的网络，VC 维大到让这个界完全<b>空洞</b>（右边远大于 1，等于什么都没说），但它实际泛化得很好。<br>Zhang et al. (2017)：把标签<b>完全打乱成随机</b>，同一个网络照样训到训练集 100% 正确——容量确实足以记住一切；换成真标签又能正常泛化。<br><b>泛化不能只由「模型有多大」解释</b>，还取决于数据结构、优化算法的隐式偏好。<b class="red">这仍是开放问题</b>——第 23 页会把这条线接下去。</div></div>
+        <div class="note b-orange mt"><div class="t orange">维度灾难：为什么非降维不可</div>
+          <div class="sub">维度一高，样本变得<b>极端稀疏</b>（保持同样采样密度，样本量需随维度指数增长），且<b>距离失去区分度</b>（最近点与最远点趋于等距，kNN、k-means 一起失效）。「特征越多越好」是错的。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="深度学习">
+  <div class="hd"><h2>从一个神经元到一张网络</h2></div>
+  <div class="bd">
+    <div class="g23">
+      <div>
+        <svg viewBox="0 0 430 262" width="100%" style="display:block" font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+          <text x="0" y="12" font-size="12" font-weight="600" fill="#5b6675">一个神经元：加权求和 → 过一个非线性</text>
+          <circle cx="34" cy="48" r="14" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/><text x="34" y="53" text-anchor="middle" font-size="12" fill="#2563eb">x₁</text>
+          <circle cx="34" cy="90" r="14" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/><text x="34" y="95" text-anchor="middle" font-size="12" fill="#2563eb">x₂</text>
+          <circle cx="34" cy="132" r="14" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/><text x="34" y="137" text-anchor="middle" font-size="12" fill="#2563eb">x₃</text>
+          <line x1="48" y1="48" x2="150" y2="88" stroke="#94a3b8" stroke-width="1.5"/><text x="92" y="58" font-size="11" fill="#94a3b8">w₁</text>
+          <line x1="48" y1="90" x2="150" y2="90" stroke="#94a3b8" stroke-width="1.5"/><text x="92" y="84" font-size="11" fill="#94a3b8">w₂</text>
+          <line x1="48" y1="132" x2="150" y2="92" stroke="#94a3b8" stroke-width="1.5"/><text x="92" y="126" font-size="11" fill="#94a3b8">w₃</text>
+          <rect x="152" y="66" width="104" height="48" rx="6" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+          <text x="204" y="86" text-anchor="middle" font-size="12" fill="#7c3aed">Σ wᵢxᵢ + b</text>
+          <text x="204" y="105" text-anchor="middle" font-size="12" fill="#7c3aed">→ σ( · )</text>
+          <line x1="256" y1="90" x2="300" y2="90" stroke="#94a3b8" stroke-width="1.5"/><path d="M300 90 l-8 -4 v8 z" fill="#94a3b8"/>
+          <circle cx="322" cy="90" r="16" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/><text x="322" y="95" text-anchor="middle" font-size="12" fill="#0e9f6e">a</text>
+          <text x="0" y="176" font-size="12" font-weight="600" fill="#5b6675">写成矩阵，一整层就是一行（上标 (l) 表示第 l 层）：</text>
+          <rect x="0" y="188" width="430" height="34" rx="6" fill="#f4f7fb" stroke="#e2e8f0" stroke-width="1.5"/>
+          <text x="215" y="210" text-anchor="middle" font-size="15" font-family="Consolas,monospace" fill="#1f2937">a^(l) = σ( W^(l) · a^(l-1) + b^(l) )</text>
+          <text x="0" y="242" font-size="12" fill="#94a3b8">W 是权重矩阵（形状 = 本层宽 × 上层宽），b 是偏置向量，</text>
+          <text x="0" y="258" font-size="12" fill="#94a3b8">σ 是激活函数。整个网络就是这一行<tspan font-weight="700">套 L 次</tspan>。</text>
+        </svg>
+      </div>
+      <div>
+        <div class="card w"><div class="t">三个必须分清的概念</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><th style="width:104px">概念</th><th>是什么</th></tr>
+            <tr><td>前向传播</td><td>把输入按上面那行公式一层层算到输出，得到预测值 ŷ。<b>推理时只做这一步。</b></td></tr>
+            <tr><td>深度 / 宽度</td><td>深度 = 层数 L；宽度 = 每层神经元个数。同样的参数量，<b>深比宽更有效</b>（见下）</td></tr>
+            <tr><td>参数量</td><td>Σ (本层宽 × 上层宽 + 本层宽)。这是「多少亿参数」这个数字的来源</td></tr>
+          </table></div>
+        <div class="card t-purple mt"><div class="t purple">万能逼近定理（Cybenko 1989 / Hornik 1991）</div>
+          <div class="sub" style="margin-top:6px">只要有<b>一个</b>隐藏层，神经元足够多，前馈网络就能以任意精度逼近任何连续函数。</div>
+          <div class="cap mt" style="margin-top:8px"><b>但这个定理几乎没有实用价值</b>，因为它三件事都没说：需要多少个神经元（可能指数多）、怎么找到那组权重、找到之后泛化好不好。<br>它只保证了「表达力不是瓶颈」。<b>真正的瓶颈从来是优化和泛化。</b></div></div>
+        <div class="note b-green mt"><div class="t green">那为什么要「深」</div>
+          <div class="sub">因为世界本身是<b>组合式</b>的：像素 → 边缘 → 纹理 → 部件 → 物体。深度让网络<b>复用</b>中间结果 —— 浅而宽要把每种组合单独记一遍，深而窄可以搭积木。同样的表达力，深度网络所需的神经元数可以少<b>指数级</b>。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="深度学习">
+  <div class="hd"><h2>激活函数：没有它，一百层等于一层</h2></div>
+  <div class="bd">
+    <div class="lead">去掉 σ，每层就只是一次线性变换。而<b>线性套线性还是线性</b> —— W₃(W₂(W₁x)) = (W₃W₂W₁)x，一百层能被一个矩阵完全替代。<b class="red">非线性是「深度」这件事存在的唯一理由。</b></div>
+    <table class="tbl s mt">
+      <tr><th style="width:112px">函数</th><th style="width:164px">形式</th><th style="width:300px">性质</th><th>今天用在哪</th></tr>
+      <tr><td>Sigmoid</td><td>1/(1+e⁻ˣ)</td><td>输出压到 (0,1)；两端梯度趋近 0 → <b class="red">梯度消失</b>；输出非零中心</td><td>只用在<b>二分类输出层</b>和门控里，不再做隐藏层激活</td></tr>
+      <tr><td>Tanh</td><td>(eˣ−e⁻ˣ)/(eˣ+e⁻ˣ)</td><td>输出 (−1,1)，零中心；仍有梯度消失</td><td>LSTM 内部；RNN 时代的主力</td></tr>
+      <tr><td>ReLU</td><td>max(0, x)</td><td>正半轴梯度恒为 1 → <b class="green">彻底缓解梯度消失</b>；算得极快；带来稀疏性。缺点：负半轴梯度为 0，神经元可能<b class="red">永久死亡</b></td><td>CNN 与绝大多数网络的默认选择。AlexNet 靠它把训练加速约 <b>6 倍</b></td></tr>
+      <tr><td>Leaky ReLU / PReLU</td><td>max(αx, x)</td><td>给负半轴留一点斜率，治「死亡 ReLU」</td><td>需要时替换 ReLU，代价为零</td></tr>
+      <tr><td>GELU</td><td>x·Φ(x)</td><td>ReLU 的平滑版，负值区不硬截断，梯度更稳</td><td><b>BERT / GPT 系列的默认激活</b></td></tr>
+      <tr><td>SwiGLU</td><td>(xW₁ ⊗ swish(xW₂))W₃</td><td><b>门控</b>结构：一路当内容，一路当开关。多一个矩阵，通常把中间维度调小以保住算量</td><td><b>2026 年主流大模型 FFN 的标准选择</b>（Llama、Qwen、DeepSeek）</td></tr>
+      <tr><td>Softmax</td><td>eˣⁱ/Σeˣʲ</td><td>把一组实数变成和为 1 的概率分布。<b>不是隐藏层激活</b></td><td>多分类<b>输出层</b>；注意力里的权重归一化</td></tr>
+    </table>
+    <div class="note b-orange mt"><div class="t orange">怎么选</div>
+      <div class="sub">隐藏层：<b>不知道选什么就用 ReLU</b>，训 Transformer 用 GELU 或 SwiGLU。输出层由任务决定：回归不加激活、二分类 Sigmoid、多分类 Softmax，且<b>必须和损失函数配对</b>（下一页）。</div></div>
+  </div>
+</section>
+<section class="slide" data-act="深度学习">
+  <div class="hd"><h2>输出层与损失，必须成对出现</h2></div>
+  <div class="bd">
+    <div class="g2">
+      <div>
+        <div class="card w"><div class="t">三种任务的标准配法</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><th style="width:88px">任务</th><th style="width:118px">输出层</th><th>损失</th></tr>
+            <tr><td>回归</td><td>不加激活，直接输出实数</td><td>MSE（或 Huber）</td></tr>
+            <tr><td>二分类</td><td>1 个单元 + Sigmoid</td><td>二元交叉熵 BCE</td></tr>
+            <tr><td>多分类</td><td>K 个单元 + Softmax</td><td>交叉熵 CE</td></tr>
+          </table>
+          <div class="cap mt" style="margin-top:10px">配错会怎样：Sigmoid + MSE 时，输出饱和区的梯度里会多出一个趋近 0 的 σ′ 因子，<b>错得越离谱梯度反而越小</b>，训练卡死。换成交叉熵，这个因子刚好被约掉，梯度正比于 <b>(ŷ − y)</b> —— 错多少，就推多大力。</div></div>
+        <div class="card t-blue mt"><div class="t blue">语言模型是一次巨大的多分类</div>
+          <div class="sub" style="margin-top:6px">「预测下一个词」= 在整个词表（约 10 万个 token）上做<b>一次 10 万类分类</b>。<br>输出层给出 10 万个分数（<b>logits</b>）→ Softmax 变成概率 → 与真实的下一个 token 算交叉熵。</div>
+          <div class="cap mt" style="margin-top:8px">所以整个大模型的训练目标，写出来就是一行交叉熵。<b>没有第二个损失函数。</b></div></div>
+      </div>
+      <div>
+        <div class="card t-purple"><div class="t purple">交叉熵到底在算什么</div>
+          <div class="code" style="margin-top:8px">L = − Σ  y_i · log(ŷ_i)</div>
+          <div class="sub mt" style="margin-top:10px">y 是<b>one-hot</b> 的（正确类别为 1，其余为 0），所以这个求和实际上只剩一项：<br><b>L = − log(模型给正确答案的概率)</b>。<br><br>模型给正确答案 0.9 → 损失 0.105；给 0.1 → 损失 2.30；给 0.001 → 损失 6.91。<b>越自信地答错，罚得越狠</b>，而且是无上界的。</div></div>
+        <div class="card mt"><div class="t">顺带记住两个由此而来的量</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><td style="width:104px">困惑度 PPL</td><td>= e^(平均交叉熵)。直观含义：<b>模型在每一步平均在多少个候选之间犹豫</b>。PPL=1 表示完全确定，PPL=100 表示相当于在 100 个词里瞎猜。语言模型的经典指标</td></tr>
+            <tr><td>logits</td><td>Softmax <b>之前</b>的原始分数。采样温度、top-k、top-p 都作用在这一层上（第 43 页）</td></tr>
+          </table></div>
+        <div class="note b-green mt"><div class="t green">一句话串起来</div>
+          <div class="sub">你在新闻里看到的 <b>loss 曲线往下掉</b>，掉的就是这个「−log 正确答案的概率」的平均值。它从 ln(100000)≈11.5（完全随机）一路降到 1.5–2 左右。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="深度学习">
+  <div class="hd"><h2>反向传播：名字唬人，其实是链式法则加一本账</h2></div>
+  <div class="bd">
+    <div class="g23">
+      <div>
+        <div class="card t-blue"><div class="t blue">要解决的问题</div>
+          <div class="sub" style="margin-top:6px">损失 L 是一个数。网络里有 N 个参数。想知道<b>每个参数该往哪个方向调、调多少</b>，就要求出 N 个偏导 ∂L/∂wᵢ。</div>
+          <div class="cap mt" style="margin-top:8px">笨办法：把每个参数动一点点，各跑一次前向看 L 变多少 —— 要跑 <b>N 次</b>前向。N = 80 亿时这条路完全不通。</div></div>
+        <div class="card t-green mt"><div class="t green">反向传播的做法</div>
+          <div class="sub" style="margin-top:6px">利用链式法则，<b>从输出往回走一遍</b>，就把全部 N 个偏导一次算齐。</div>
+          <div class="cap mt" style="margin-top:8px">代价：约等于<b>一次前向的两倍</b>。与参数量 N 无关 —— 这是深度学习在计算上可行的根本原因。<br>1986 年 Rumelhart、Hinton、Williams 的论文让它进入主流。</div></div>
+        <div class="note b-orange mt"><div class="t orange">「账」指的是什么</div>
+          <div class="sub">反向要用到前向的中间结果，所以必须把每一层的激活值<b>存下来</b>。这就是训练时显存被吃掉的大头（第 41 页会算这笔账），也是「梯度检查点」这类技术要省的东西。</div></div>
+      </div>
+      <div>
+        <div class="card w"><div class="t">拆开看：一条链上发生了什么</div>
+          <div class="code" style="margin-top:8px">前向：  x ──W₁──▸ z₁ ──σ──▸ a₁ ──W₂──▸ z₂ ──σ──▸ ŷ ──▸ L
+
+反向：  ∂L/∂ŷ
+        ∂L/∂z₂ = ∂L/∂ŷ · σ′(z₂)
+        ∂L/∂W₂ = ∂L/∂z₂ · a₁ᵀ        <span class="c">← 要用到前向存的 a₁</span>
+        ∂L/∂a₁ = W₂ᵀ · ∂L/∂z₂         <span class="c">← 误差继续往回传</span>
+        ∂L/∂z₁ = ∂L/∂a₁ · σ′(z₁)
+        ∂L/∂W₁ = ∂L/∂z₁ · xᵀ</div>
+          <div class="sub mt" style="margin-top:10px">看这个结构：每往回一层，就<b>乘一次 Wᵀ、再乘一次 σ′</b>。全部规律都藏在这句话里 ——<br>· σ′ 长期小于 1（Sigmoid 最大只有 0.25）→ 连乘 L 次后趋近 0 → <b class="red">梯度消失</b><br>· 权重初始化偏大 → 连乘放大 → <b class="red">梯度爆炸</b></div>
+          <div class="cap mt" style="margin-top:10px">0.9<sup>50</sup> ≈ 0.005（消失）　　1.1<sup>50</sup> ≈ 117（爆炸）<br>这就是为什么 1986 年就有的算法，要等到 2012 年前后才真正训得动几十层的网络。解药在下一页。</div></div>
+        <div class="note b-blue mt"><div class="t blue">今天你不需要手写它</div>
+          <div class="sub">PyTorch / JAX 的<b>自动微分</b>会把前向过程记成一张计算图，<code class="kbd">loss.backward()</code> 一句就把上面所有偏导算完。但知道它在乘什么，你才看得懂后面那些「奇怪」的设计。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="深度学习">
+  <div class="hd"><h2>训练不动的三大病，和四味解药</h2></div>
+  <div class="bd">
+    <div class="g2">
+      <div>
+        <div class="card t-red"><div class="t red">病</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><th style="width:104px">症状</th><th>成因</th></tr>
+            <tr><td>梯度消失</td><td>反向连乘的因子长期 &lt; 1，浅层几乎收不到梯度，只有靠近输出的几层在学</td></tr>
+            <tr><td>梯度爆炸</td><td>连乘因子 &gt; 1，梯度指数放大，参数一步跳飞，loss 变 NaN</td></tr>
+            <tr><td>退化</td><td>层数加深后，<b>训练误差反而上升</b> —— 不是过拟合，是优化本身找不到解</td></tr>
+          </table></div>
+        <div class="card t-green mt"><div class="t green">解药 ① 初始化：让每层输出的方差保持一致</div>
+          <div class="sub" style="margin-top:6px"><b>Xavier / Glorot</b>（配 tanh、sigmoid）与 <b>He / Kaiming</b>（配 ReLU，因为 ReLU 砍掉一半信号，方差要乘 2 补回来）。<br>这两个初始化把「连乘因子」尽量摆到 1 附近。<b>全零初始化是错的</b> —— 所有神经元会完全对称，永远学到同一个东西。</div></div>
+        <div class="card t-green mt"><div class="t green">解药 ② 梯度裁剪</div>
+          <div class="sub" style="margin-top:6px">梯度范数超过阈值就等比缩回去。治爆炸最直接，几乎零成本。<b>大模型训练里是标配</b>，常设 1.0。</div></div>
+      </div>
+      <div>
+        <div class="card t-green"><div class="t green">解药 ③ 归一化：把每层的输入重新拉回稳定区间</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><th style="width:96px">方法</th><th>沿哪个方向统计</th><th style="width:150px">用在哪</th></tr>
+            <tr><td>BatchNorm</td><td>同一批样本里，对<b>每个特征</b>做归一</td><td>CNN。依赖 batch 大小，训练/推理行为不同</td></tr>
+            <tr><td>LayerNorm</td><td>单个样本内，对<b>该层所有维度</b>做归一</td><td>Transformer。与 batch 无关，适合变长序列</td></tr>
+            <tr><td>RMSNorm</td><td>同 LayerNorm，但<b>省掉减均值</b>，只除以均方根</td><td><b>2026 主流大模型的默认</b>，更快且相当</td></tr>
+          </table>
+          <div class="cap mt" style="margin-top:8px">归一化不止让训练稳，还让网络<b>对学习率不那么敏感</b> —— 可以开更大的学习率。</div></div>
+        <div class="card t-green mt"><div class="t green">解药 ④ 残差连接：一行加法解决退化</div>
+          <div class="code" style="margin-top:8px">y = x + F(x)</div>
+          <div class="sub mt" style="margin-top:10px">让每一层去学「<b>要在输入上改动什么</b>」，而不是「输出应该是什么」。<br>· 不需要改时把 F 压到 0 即可 —— 深网络<b>至少不会比浅网络差</b>，退化消失。<br>· 反向时多了一条<b>恒等的梯度高速通道</b>（∂y/∂x = 1 + ∂F/∂x），不受连乘衰减。</div>
+          <div class="cap mt" style="margin-top:8px">ResNet（2015）用它把网络从 20 层解锁到 1000 层以上。<b>今天几乎没有一个深网络不用残差</b>，包括每一个 Transformer block。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="深度学习">
+  <div class="hd"><h2>有了梯度往哪走，以及怎么不让它跑偏</h2></div>
+  <div class="bd">
+    <div class="g2">
+      <div>
+        <div class="card w"><div class="t blue">优化器：有了梯度，往哪走、走多远</div>
+          <div class="code" style="margin-top:8px">w ← w − η · ∂L/∂w</div>
+          <div class="sub" style="margin-top:10px">η 是<b>学习率</b>。梯度是「上升最快的方向」，取负号就是下降最快的方向。<b>像浓雾里下山：摸脚下的坡度，朝最陡的方向迈一步，再重新摸。</b></div>
+          <table class="tbl s" style="margin-top:10px">
+            <tr><th style="width:104px">优化器</th><th>加了什么</th><th style="width:140px">解决什么</th></tr>
+            <tr><td>SGD</td><td>—</td><td>基线，收敛慢</td></tr>
+            <tr><td>Momentum</td><td>累积历史梯度的<b>惯性</b></td><td>抑制震荡</td></tr>
+            <tr><td>RMSProp</td><td>按梯度平方的滑动平均缩放 η</td><td>自适应步长</td></tr>
+            <tr><td class="green">Adam</td><td>上面两个<b>合体</b></td><td>又快又稳</td></tr>
+            <tr><td class="green">AdamW</td><td>权重衰减从梯度里<b>拆出来</b>单独做</td><td><b>训大模型的默认</b></td></tr>
+          </table>
+          <div class="cap" style="margin-top:10px"><b>代价</b>：Adam / AdamW 要为每个参数多存一阶矩、二阶矩两个状态，<b>占的显存是参数本身的两倍</b>，是训练显存账里最大的一项。</div></div>
+        <div class="note b-orange mt"><div class="t orange">η 是最重要的一个超参数，而且它不是常数</div>
+          <div class="sub"><b>太大</b>：来回弹跳甚至发散（loss 震荡或变 NaN → 调小）。<b>太小</b>：慢到训不完。<br><b>warmup + cosine 是大模型训练的标准配方</b>：开头几百到几千步让 η 从 0 升上去（此时参数还是随机的，梯度方向极不可靠），后期再衰减下来精修。</div></div>
+      </div>
+      <div>
+        <div class="card w"><div class="t orange">正则化：五种手段，同一件事——用一点训练误差换泛化误差</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><th style="width:100px">手段</th><th>具体做法</th><th style="width:172px">为什么有用</th></tr>
+            <tr><td>L2 / 权重衰减</td><td>损失里加 λ‖w‖²，逼参数变小</td><td>参数小 → 函数更平滑 → 对扰动不敏感</td></tr>
+            <tr><td>L1</td><td>损失里加 λ‖w‖₁</td><td>把部分权重<b>压到恰好 0</b>，自动选特征</td></tr>
+            <tr><td>Dropout</td><td>训练时随机让部分神经元<b>临时失效</b>（p=0.1–0.5），<b>推理时必须关掉</b></td><td>逼网络不依赖任何单个神经元，近似免费集成了一堆子网络</td></tr>
+            <tr><td>数据增广</td><td>做保持标签不变的变换：图像翻转裁剪、文本回译同义替换</td><td>把「什么变化不该影响结果」这条先验直接教给模型</td></tr>
+            <tr><td>早停</td><td>验证误差连续 n 轮不再下降就停</td><td>在模型开始记噪声之前叫停，零成本</td></tr>
+          </table></div>
+        <div class="note b-green mt"><div class="t green">最强的「正则化」其实不在这张表里</div>
+          <div class="sub">是<b>加数据</b>。所有正则化手段都是数据不够时的补救，数据够多时收益迅速变小——这也是为什么大模型预训练几乎不用 Dropout。<br>另外：<b>BatchNorm / LayerNorm 不是正则化</b>，它们是为了让训练稳定和加速（上一页那四味解药之一）。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="深度学习">
+  <div class="hd"><h2>CNN 与 RNN：两套写进结构里的先验，和它们的极限</h2></div>
+  <div class="bd">
+    <div class="p mb">这两类最该记的不是细节，是<b>把领域先验写进网络结构</b>这个做法——Transformer 继承了它，只换了一套先验。</div>
+    <div class="g2">
+      <div>
+        <div class="card w"><div class="t purple">CNN：三条内建假设，就是它的归纳偏置</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><th style="width:88px">假设</th><th>机制</th><th style="width:150px">带来的好处</th></tr>
+            <tr><td>局部性</td><td>每个神经元只连接输入的一小块（3×3、5×5）</td><td>参数量大幅下降</td></tr>
+            <tr><td>平移不变</td><td><b>权重共享</b>：同一个卷积核扫过全图</td><td>猫在左上还是右下，用同一套检测器</td></tr>
+            <tr><td>层次组合</td><td>层层堆叠，<b>感受野</b>递增</td><td>边缘 → 纹理 → 部件 → 物体</td></tr>
+          </table>
+          <div class="cap" style="margin-top:10px">对比全连接：224×224×3 的图接 1000 维全连接要 <b>1.5 亿</b>参数，一个 3×3×3×64 的卷积核只要 <b>1728</b> 个。<b>更少参数＝更强约束＝更好的泛化。</b></div>
+          <div class="cap" style="margin-top:10px"><b>几个零件</b>：<b>卷积核</b>＝检测某种局部图案的小窗口，一层几十到几百个，输出<b>通道数</b>＝核的个数；<b>池化</b>＝窗口内取最大或平均，降尺寸、增大感受野；<b>1×1 卷积</b>＝只在通道维做线性组合，用来升降维。</div></div>
+        <div class="note b-orange mt"><div class="t orange">一个必须记住的年份</div>
+          <div class="sub"><b>AlexNet，2012</b>：ImageNet top-5 错误率 <b>15.3%</b>，次名 26.2%，<b>深度学习时代的起点</b>。2015 年 ResNet 用残差连接把 152 层解锁——那个「加号」在 Transformer 里还会再见。</div></div>
+      </div>
+      <div>
+        <div class="card t-blue"><div class="t blue">RNN：维护一个隐状态，读一个更新一次</div>
+          <div class="code" style="margin-top:8px">hₜ = tanh( W·hₜ₋₁ + U·xₜ + b )　　yₜ = V·hₜ</div>
+          <div class="sub" style="margin-top:10px">h 是「到目前为止读到的东西的摘要」。<b>每一步用同一组权重</b> W、U、V——这就是 RNN 的归纳偏置（时间上的平移不变）。<br><b>LSTM（1997）</b>装了遗忘/输入/输出三道门，核心是那条<b>细胞状态</b>：信息能近乎无损地一路传下去（本质上又是一条残差通道）。它把可用依赖长度推到几百步，<b>但没有从根上解决问题</b>。</div></div>
+        <div class="card t-red mt"><div class="t red">两个死穴</div>
+          <div class="sub" style="margin-top:6px"><b>① 长程依赖仍然压不住。</b>信息从第 1 个词传到第 500 个词要穿过 500 次矩阵乘法和非线性，反传回去同样连乘 500 次。句子一长，早期信息就被稀释掉。<br><b>② 天生串行，吃不下并行算力。</b>hₜ 依赖 hₜ₋₁，第 t 步必须等第 t−1 步算完；而 GPU 的全部优势在于同时算几万个数。<b class="red">第二条更致命</b>——第一条是效果问题，第二条是「有钱也买不到更快」。</div></div>
+        <div class="note b-green mt"><div class="t green">这两条直接定义了继任者的设计目标</div>
+          <div class="sub">需要一个机制：① 任意两个位置之间<b>一步可达</b>；② 全序列<b>可以一次并行算完</b>。<br>Transformer 就是对这两条的直接回应——见第 24 页。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="深度学习">
+  <div class="hd"><h2>表示学习：文字怎么变成有意义的向量</h2></div>
+  <div class="bd">
+    <div class="g23">
+      <div>
+        <div class="card t-red"><div class="t red">起点：one-hot 的两个致命缺陷</div>
+          <div class="sub" style="margin-top:6px">词表 10 万，每个词表示成一个 10 万维、只有一位是 1 的向量。<br>① <b>维度爆炸且极端稀疏</b>。<br>② <b>任意两个词都正交</b> —— 「猫」和「狗」的相似度，与「猫」和「螺丝刀」完全一样，都是 0。语义信息一点没有。</div></div>
+        <div class="card t-green mt"><div class="t green">word2vec（2013）：用上下文定义词义</div>
+          <div class="sub" style="margin-top:6px">出发点是语言学里那句老话：<b>「一个词的意思，由它周围经常出现哪些词决定。」</b><br>训练方式极简单 —— <b>CBOW</b> 用周围词预测中心词，<b>Skip-gram</b> 用中心词预测周围词。训完之后要的不是这个预测任务，而是<b>中间那张权重表</b>：每个词一行，几百维的稠密向量。</div>
+          <div class="cap mt" style="margin-top:8px">这是<b>自监督学习</b>的早期范例：标签是从文本自己身上造出来的。</div></div>
+      </div>
+      <div>
+        <div class="card w"><div class="t">学出来的向量空间有几何结构</div>
+          <div class="code" style="margin-top:8px">vec(国王) − vec(男) + vec(女) ≈ vec(女王)
+vec(巴黎) − vec(法国) + vec(意大利) ≈ vec(罗马)</div>
+          <div class="sub mt" style="margin-top:10px">「性别」「首都关系」这些概念，变成了空间里一个<b>可加减的方向</b>。没有人教过它这些 —— 全是从「谁和谁常一起出现」里长出来的。<br>相似度用<b>余弦相似度</b>（两向量夹角）度量。今天的向量检索、RAG，用的就是同一套东西。</div></div>
+        <div class="card t-orange mt"><div class="t orange">它的局限，以及下一步</div>
+          <div class="sub" style="margin-top:6px">word2vec 给每个词<b>一个固定向量</b>。可是「苹果」在「吃苹果」和「苹果发布会」里根本不是一个意思，<b>一个向量装不下</b>。</div>
+          <div class="cap mt" style="margin-top:8px">于是有了<b>上下文相关的表示</b>：同一个词在不同句子里拿到不同的向量。ELMo（2018，双向 LSTM）先做到，BERT / GPT 用 Transformer 做得更好。<br><b>今天大模型里的 embedding 层，就是这套东西的直系后代</b> —— 只不过它不再是训练的产物，而是整个模型的第一层，和其余部分一起端到端训练（第 38 页）。</div></div>
+        <div class="note b-blue mt"><div class="t blue">「表示学习」这个词的意思</div>
+          <div class="sub">让模型自己学出「数据该用什么形式表达」，而不是由人设计。这是深度学习区别于传统机器学习最实质的一点。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="深度学习">
+  <div class="hd"><h2>四个反直觉的经验事实</h2></div>
+  <div class="bd">
+    <div class="lead">深度学习里有一批被反复验证、但和经典理论直觉相冲突的现象。<b>知道它们存在，比会推导它们更重要</b> —— 它们解释了今天大模型的很多做法为什么合理。</div>
+    <div class="g2 mt">
+      <div>
+        <div class="card t-orange"><div class="t orange">① 双下降 double descent</div>
+          <svg viewBox="0 0 400 150" width="100%" style="display:block;margin-top:8px" font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+            <line x1="36" y1="12" x2="36" y2="118" stroke="#cbd5e1" stroke-width="1.5"/>
+            <line x1="36" y1="118" x2="392" y2="118" stroke="#cbd5e1" stroke-width="1.5"/>
+            <text x="4" y="22" font-size="11" fill="#94a3b8">测试</text><text x="4" y="36" font-size="11" fill="#94a3b8">误差</text>
+            <path d="M46 40 C 90 96, 130 96, 172 30 C 200 12, 230 62, 290 82 C 330 94, 360 100, 388 104" fill="none" stroke="#dc2626" stroke-width="2"/>
+            <line x1="176" y1="12" x2="176" y2="118" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 4"/>
+            <text x="176" y="134" text-anchor="middle" font-size="11" fill="#5b6675">插值点</text>
+            <text x="100" y="134" text-anchor="middle" font-size="11" fill="#94a3b8">教科书那半段</text>
+            <text x="300" y="134" text-anchor="middle" font-size="11" fill="#2563eb">大模型工作在这半段</text>
+            <text x="392" y="134" text-anchor="end" font-size="11" fill="#94a3b8">模型容量 →</text>
+          </svg>
+          <div class="cap" style="margin-top:6px">模型大到刚好能记住全部训练数据时，测试误差冲到最高；<b>再继续变大，它又开始下降</b>。所以「参数比样本多 = 必然过拟合」在这里不成立。</div></div>
+        <div class="card t-orange mt"><div class="t orange">② 随机标签也能背下来</div>
+          <div class="cap" style="margin-top:6px">Zhang et al. (2017)：把 ImageNet 标签完全打乱，同一个网络照样训到训练集 100% 正确。<b>说明容量根本不是限制因素</b> —— 泛化必然还有别的来源（数据结构、SGD 的隐式偏好等）。这至今没有完整解释。</div></div>
+      </div>
+      <div>
+        <div class="card t-orange"><div class="t orange">③ 彩票假说 lottery ticket</div>
+          <div class="cap" style="margin-top:6px">Frankle & Carbin (2019)：一个随机初始化的大网络里，存在一个<b>很小的子网络</b>，单独把它拿出来、用原来的初始值训练，能达到和整个大网络相当的效果。<br>解读：训练大网络，某种程度上是在<b>并行地买很多张彩票</b>，然后让优化过程挑出中奖的那张。这是模型剪枝和蒸馏的理论依据。</div></div>
+        <div class="card t-orange mt"><div class="t orange">④ 规模本身会带来质变</div>
+          <div class="cap" style="margin-top:6px">在小模型上完全做不了、准确率等于随机的任务（多步算术、复杂推理），在模型规模跨过某个点之后<b>突然可用</b>。<br><b>但这里有个重要修正</b>：后续研究指出，很多所谓「涌现」是<b>评测指标不连续</b>造成的错觉 —— 用「完全正确才算分」这类阈值指标去看，曲线自然是突变的；换成连续指标（如逐 token 的对数似然）后，提升其实是平滑的。<br><b class="red">下次看到「涌现能力」，先问一句用的是什么指标。</b></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="Transformer">
+  <div class="hd"><h2>注意力：让任意两个位置一步直达</h2></div>
+  <div class="bd">
+    <div class="lead">2017 年论文《Attention Is All You Need》。标题里的 <b>all</b> 是关键 —— 它不是给 RNN 加一个注意力模块，而是<b class="red">把循环结构整个删掉</b>，只留注意力。</div>
+    <div class="g2 mt">
+      <div>
+        <div class="card w"><div class="t">它一次解决了 RNN 的两个死穴</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><th style="width:120px">RNN 的问题</th><th>注意力的做法</th></tr>
+            <tr><td>信息要走 n 步才能从头传到尾</td><td>任意两个位置<b>直接连一条边</b>，路径长度恒为 <b>1</b>，与距离无关</td></tr>
+            <tr><td>第 t 步必须等第 t−1 步</td><td>整个序列<b>一次矩阵乘法算完</b>，天然并行，吃满 GPU</td></tr>
+          </table>
+          <div class="cap mt" style="margin-top:10px">代价也很直接：n 个位置两两相连是 <b>n²</b> 条边。算量和显存都随序列长度平方增长 —— 这个窟窿至今没有被真正填上，只是被工程手段压住了（第 29 页）。</div></div>
+        <div class="card t-orange mt"><div class="t orange">还必须补两样东西</div>
+          <div class="sub" style="margin-top:6px">删掉循环，也就删掉了「顺序」这个信息。注意力本身是<b>置换不变</b>的 —— 把句子的词打乱，它算出来完全一样。<br>所以必须外挂 <b>位置编码</b>（第 27 页）。<br><br>另外，注意力只做「加权求和」，是线性的，所以每层后面还要接一个 <b>FFN</b> 提供非线性和存储容量。</div></div>
+      </div>
+      <div>
+        <div class="card t-blue"><div class="t blue">直觉：一次「带着问题去查资料」</div>
+          <div class="sub" style="margin-top:6px">句子：<b>「那只猫没跳上桌子，因为<span class="red">它</span>太胖了」</b><br>要理解「它」，模型得知道「它」指的是猫还是桌子。</div>
+          <table class="tbl s" style="margin-top:10px">
+            <tr><td style="width:76px" class="purple"><b>Query</b></td><td>「它」这个位置发出的<b>提问</b>：我在找一个会「胖」的东西</td></tr>
+            <tr><td class="purple"><b>Key</b></td><td>每个位置挂出的<b>标签</b>：我是一个动物 / 我是一件家具</td></tr>
+            <tr><td class="purple"><b>Value</b></td><td>每个位置真正<b>携带的内容</b>，被选中后要交出去的东西</td></tr>
+          </table>
+          <div class="sub mt" style="margin-top:10px">拿 Query 去和所有 Key 做匹配 → 得到一组匹配分数 → 归一化成权重 → 按权重把所有 Value 加权求和。<br><b class="green">「猫」的 Key 与这个 Query 匹配度高，于是「它」这个位置的新表示里，绝大部分内容来自「猫」。</b></div>
+          <div class="cap mt" style="margin-top:8px">注意：<b>Q、K、V 都是从同一份输入用三个不同的权重矩阵变换出来的</b>。「自注意力」的「自」就是这个意思 —— 提问的和被查的是同一个序列。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="Transformer">
+  <div class="hd"><h2>自注意力：五步，一个公式</h2></div>
+  <div class="bd">
+    <div class="g23">
+      <div>
+        <div class="card t-purple"><div class="t purple">公式</div>
+          <div class="code" style="margin-top:8px">Attention(Q,K,V)
+  = softmax( <b>QKᵀ / √d_k</b> ) V</div>
+          <div class="cap mt" style="margin-top:10px"><b>为什么要除以 √d_k：</b>d_k 越大，QKᵀ 这个点积的方差越大，数值被推到 Softmax 的饱和区，梯度趋近 0 训不动。除以 √d_k 把方差拉回 1 附近。<br>所以这一步叫「<b>缩放</b>点积注意力」，缩放两个字不是修辞。</div></div>
+        <div class="card w mt"><div class="t">形状对照（单头）</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><td style="width:96px">输入 X</td><td>n × d</td></tr>
+            <tr><td>W_Q,W_K,W_V</td><td>d × d_k</td></tr>
+            <tr><td>Q, K, V</td><td>n × d_k</td></tr>
+            <tr><td class="orange">QKᵀ（分数矩阵）</td><td class="orange"><b>n × n</b> ← 平方项在这</td></tr>
+            <tr><td>输出</td><td>n × d_k</td></tr>
+          </table>
+          <div class="cap mt" style="margin-top:8px">n = 序列长度，d = 模型维度。<b>参数量与 n 无关</b>，所以同一个模型能吃任意长度 —— 只是显存吃不消。</div></div>
+      </div>
+      <div>
+        <div class="card w"><div class="t">五步，一步不多</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><th style="width:32px">#</th><th style="width:190px">做什么</th><th>细节</th></tr>
+            <tr><td style="width:22px" class="dim">1</td><td>算 Q、K、V</td><td>Q = XW_Q，K = XW_K，V = XW_V。三个矩阵是<b>要学的参数</b>，训练前随机初始化</td></tr>
+            <tr><td class="dim">2</td><td>算相关性分数</td><td>score(i,j) = qᵢ · kⱼ。点积越大表示越相关。<b>得到一张 n×n 的表</b>：第 i 行第 j 列 = 位置 i 有多想看位置 j</td></tr>
+            <tr><td class="dim">3</td><td>缩放 + 掩码</td><td>除以 √d_k；需要遮住的位置把分数设成 −∞（下一页）</td></tr>
+            <tr><td class="dim">4</td><td>Softmax 逐行归一</td><td>每一行变成一个和为 1 的<b>权重分布</b>。这就是常见热力图里那些亮点</td></tr>
+            <tr><td class="dim">5</td><td>加权求和 Value</td><td>outᵢ = Σⱼ 权重(i,j)·vⱼ。<b>每个位置的新表示 = 它认为该看的那些位置的内容的混合</b></td></tr>
+          </table></div>
+        <div class="g2 mt">
+          <div class="note b-green"><div class="t green">关键性质</div>
+            <div class="sub">权重是<b>按输入现场算出来的</b>，不是训练时固定下来的。同一个模型，遇到不同句子会连出完全不同的连接图。<b>「该看哪里」这件事本身成了模型的输出，而不是人写死的结构。</b></div></div>
+          <div class="note b-red"><div class="t red">别过度解读注意力图</div>
+            <div class="sub">注意力权重<b>不等于</b>模型的解释。多项研究显示，同样的预测可以由差别很大的注意力分布得到，权重高的位置未必是因果上重要的位置。当示意可以，当证据不行。</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="Transformer">
+  <div class="hd"><h2>多头与掩码：两个必要的补丁</h2></div>
+  <div class="bd">
+    <div class="g2">
+      <div>
+        <div class="card t-purple"><div class="t purple">补丁一：多头注意力 Multi-Head</div>
+          <div class="sub" style="margin-top:6px"><b>问题</b>：一次 Softmax 只能给出一种权重分布。可是「它」这个词，既需要看指代关系，也需要看语法角色、看情感、看主题 —— <b>一张表装不下这么多种关系</b>。</div>
+          <div class="sub mt" style="margin-top:10px"><b>做法</b>：把 d 维切成 h 份，每份独立做一次上一页的完整流程，最后把 h 个输出拼起来再过一个 W_O 融合。</div>
+          <div class="code" style="margin-top:10px">d = 4096, h = 32  →  每头 d_k = 128</div>
+          <div class="cap mt" style="margin-top:10px"><b>算量几乎不变</b>（切开算 h 次小的 ≈ 算一次大的），但表达力大幅上升。可以粗略理解成「同时用 h 种视角看同一句话」。<br>可解释性研究确实发现有些头专管句法、有些管指代 —— 但<b>不是每个头都有清晰分工</b>，且很多头可以被剪掉而几乎不掉点。</div></div>
+      </div>
+      <div>
+        <div class="card t-orange"><div class="t orange">补丁二：掩码 Mask</div>
+          <div class="sub" style="margin-top:6px">掩码的实现只有一句：<b>在 Softmax 之前，把不该看的位置的分数设成 −∞</b>。过完 Softmax 它的权重就精确等于 0。</div>
+          <table class="tbl s" style="margin-top:10px">
+            <tr><th style="width:110px">种类</th><th>遮什么 / 为什么</th></tr>
+            <tr><td class="red">因果掩码<br>causal</td><td>遮住<b>所有未来位置</b>。训练时整句话都在眼前，不遮的话模型直接抄下一个词，学不到任何东西。<b>这是 GPT 类模型能并行训练又不作弊的关键</b></td></tr>
+            <tr><td>填充掩码<br>padding</td><td>一个 batch 里句子长短不一，短的补 0 凑齐。遮住这些补位，别让它们参与计算</td></tr>
+            <tr><td>无掩码</td><td>BERT 类模型双向可见，每个位置都能看到全句</td></tr>
+          </table>
+          <div class="cap mt" style="margin-top:10px"><b>因果掩码是「自回归」这件事在实现层面的全部内容。</b>有它，一次前向就能同时算出 n 个位置各自的「下一个词」预测，n 个训练信号一次拿到手 —— 训练效率相比 RNN 提升了一个数量级。</div></div>
+      </div>
+    </div>
+    <div class="note b-blue mt"><div class="t blue">顺带记住三个词</div>
+      <div class="sub"><b>自注意力</b>：Q、K、V 来自同一个序列。<b>交叉注意力</b>：Q 来自解码器，K/V 来自编码器 —— 翻译模型靠它把译文对齐到原文，今天多模态模型也用它把文本对齐到图像。<b>因果 / 双向</b>：指的就是有没有加因果掩码。</div></div>
+  </div>
+</section>
+<section class="slide" data-act="Transformer">
+  <div class="hd"><h2>位置编码：把「顺序」重新装回去</h2></div>
+  <div class="bd">
+    <div class="lead">注意力是加权求和，<b>加法不分先后</b>。「猫追狗」和「狗追猫」在纯注意力眼里完全一样。位置信息必须单独注入 —— 这是 Transformer 唯一一处需要人工设计先验的地方，也是过去八年被改得最多的地方。</div>
+    <table class="tbl mt">
+      <tr><th style="width:130px">方案</th><th style="width:300px">做法</th><th style="width:250px">优点</th><th>问题 / 现状</th></tr>
+      <tr><td>正弦位置编码<br><span class="dim">原版 2017</span></td><td>用不同频率的 sin/cos 生成一个固定向量，<b>加</b>到 token embedding 上</td><td>不需要训练；理论上可外推到训练时没见过的长度</td><td>实测外推效果差；已被淘汰</td></tr>
+      <tr><td>可学习位置编码<br><span class="dim">BERT / GPT-2</span></td><td>每个位置一个可训练向量，同样是加上去</td><td>简单，效果好</td><td><b>最大长度写死</b>，超过训练长度直接没有对应向量</td></tr>
+      <tr><td class="green">RoPE 旋转位置编码<br><span class="dim">2021 → 今天的标准</span></td><td>不加到输入上，而是在算注意力时<b>把 Q 和 K 按位置旋转一个角度</b>。点积后自然只剩相对位置 m−n 的依赖</td><td>把<b>相对位置</b>直接写进注意力；可以通过调整旋转基频（NTK / YaRN 等）扩展上下文</td><td><b>Llama、Qwen、DeepSeek、Mistral 等主流模型全部在用</b></td></tr>
+      <tr><td>ALiBi</td><td>不加编码，直接在注意力分数上按距离<b>减去一个线性惩罚</b>：越远扣分越多</td><td>实现极简；长度外推能力强</td><td>本质是硬编码「近的更重要」这条先验，部分任务上受限</td></tr>
+    </table>
+    <div class="g2 mt">
+      <div class="note b-orange"><div class="t orange">为什么「相对」比「绝对」好</div>
+        <div class="sub">语言里真正重要的是<b>词与词的距离和顺序</b>，不是它在文档里的绝对下标。同一个短语出现在第 5 个词还是第 5000 个词，内部结构应该一样。RoPE 把这条先验直接编进了注意力的计算方式里，而不是指望模型自己从数据里学出来。</div></div>
+      <div class="note b-red"><div class="t red">长上下文不是免费的</div>
+        <div class="sub">把 RoPE 的基频调大，模型确实能吃下 128K 甚至 1M token，但<b>「能读进去」不等于「读得懂」</b>。大海捞针式测试上表现好，不代表跨长距离的多步推理也好；实测普遍存在「中间部分被忽略」的现象。标称上下文长度要和实际有效长度分开看。</div></div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="Transformer">
+  <div class="hd"><h2>一个 Transformer 层的完整装配</h2></div>
+  <div class="bd">
+    <div class="g23">
+      <div>
+        <svg viewBox="0 0 430 498" width="100%" style="display:block" font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+          <text x="0" y="12" font-size="12" font-weight="600" fill="#5b6675">现代写法（Pre-Norm），一层内部：</text>
+          <rect x="60" y="26" width="230" height="30" rx="6" fill="#f4f7fb" stroke="#cbd5e1" stroke-width="1.5"/>
+          <text x="175" y="46" text-anchor="middle" font-size="13" fill="#5b6675">输入 x（n × d）</text>
+          <line x1="175" y1="56" x2="175" y2="80" stroke="#94a3b8" stroke-width="1.5"/>
+          <rect x="60" y="80" width="230" height="28" rx="6" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+          <text x="175" y="99" text-anchor="middle" font-size="13" fill="#7c3aed">RMSNorm</text>
+          <line x1="175" y1="108" x2="175" y2="132" stroke="#94a3b8" stroke-width="1.5"/>
+          <rect x="60" y="132" width="230" height="46" rx="6" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+          <text x="175" y="151" text-anchor="middle" font-size="13" fill="#7c3aed">多头自注意力（+ RoPE）</text>
+          <text x="175" y="169" text-anchor="middle" font-size="12" fill="#94a3b8">因果掩码 · GQA</text>
+          <line x1="175" y1="178" x2="175" y2="202" stroke="#94a3b8" stroke-width="1.5"/>
+          <circle cx="175" cy="214" r="12" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+          <text x="175" y="219" text-anchor="middle" font-size="14" fill="#0e9f6e">+</text>
+          <path d="M60 41 L26 41 L26 214 L163 214" fill="none" stroke="#0e9f6e" stroke-width="1.5" stroke-dasharray="5 4"/>
+          <text x="0" y="130" font-size="12" fill="#0e9f6e">残差</text>
+          <line x1="175" y1="226" x2="175" y2="250" stroke="#94a3b8" stroke-width="1.5"/>
+          <rect x="60" y="250" width="230" height="28" rx="6" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+          <text x="175" y="269" text-anchor="middle" font-size="13" fill="#7c3aed">RMSNorm</text>
+          <line x1="175" y1="278" x2="175" y2="302" stroke="#94a3b8" stroke-width="1.5"/>
+          <rect x="60" y="302" width="230" height="46" rx="6" fill="#fff7ed" stroke="#c2410c" stroke-width="2"/>
+          <text x="175" y="321" text-anchor="middle" font-size="13" fill="#c2410c">前馈网络 FFN（SwiGLU）</text>
+          <text x="175" y="339" text-anchor="middle" font-size="12" fill="#94a3b8">d → 4d 左右 → d，逐位置独立</text>
+          <line x1="175" y1="348" x2="175" y2="372" stroke="#94a3b8" stroke-width="1.5"/>
+          <circle cx="175" cy="384" r="12" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+          <text x="175" y="389" text-anchor="middle" font-size="14" fill="#0e9f6e">+</text>
+          <path d="M60 214 L26 236 L26 384 L163 384" fill="none" stroke="#0e9f6e" stroke-width="1.5" stroke-dasharray="5 4"/>
+          <line x1="175" y1="396" x2="175" y2="420" stroke="#94a3b8" stroke-width="1.5"/>
+          <rect x="60" y="420" width="230" height="30" rx="6" fill="#f4f7fb" stroke="#cbd5e1" stroke-width="1.5"/>
+          <text x="175" y="440" text-anchor="middle" font-size="13" fill="#5b6675">输出（n × d，形状不变）</text>
+          <text x="0" y="470" font-size="12" fill="#5b6675">形状进出一致 → 可以无限堆叠。8B 模型约 32 层，405B 约 126 层。</text>
+          <text x="0" y="490" font-size="12" fill="#5b6675">一句话：<tspan font-weight="600" fill="#7c3aed">注意力负责「看哪儿」</tspan>，<tspan font-weight="600" fill="#c2410c">FFN 负责「想什么」</tspan>，交替几十次。</text>
+        </svg>
+      </div>
+      <div>
+        <div class="card w"><div class="t">四个零件各自负责什么</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><td style="width:88px" class="purple"><b>注意力</b></td><td><b>跨位置搬运信息</b>。「这个位置该参考哪些位置」</td></tr>
+            <tr><td class="orange"><b>FFN</b></td><td><b>逐位置加工与存储</b>。对每个位置独立做一次「升维 → 非线性 → 降维」，不看邻居。占全模型约 <b>2/3</b> 参数；可解释性研究认为<b>事实性知识主要存这里</b></td></tr>
+            <tr><td class="green"><b>残差</b></td><td>给梯度一条恒等高速路，让几十上百层能训得动</td></tr>
+            <tr><td class="purple"><b>归一化</b></td><td>控制每层输入的数值尺度，防止越堆越飘</td></tr>
+          </table>
+          </div>
+        <div class="card t-orange mt"><div class="t orange">2017 原版 → 2026 标准的六处改动</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><th style="width:104px">原版</th><th style="width:118px">现在</th><th>为什么</th></tr>
+            <tr><td>Post-Norm</td><td class="green">Pre-Norm</td><td>归一化放到子层<b>之前</b>，残差通路彻底干净。原版深了必须靠 warmup 才训得起来，改完稳定性大幅改善</td></tr>
+            <tr><td>LayerNorm</td><td class="green">RMSNorm</td><td>省掉减均值，更快，效果相当</td></tr>
+            <tr><td>ReLU FFN</td><td class="green">SwiGLU</td><td>门控结构，同算量下效果更好</td></tr>
+            <tr><td>正弦编码</td><td class="green">RoPE</td><td>相对位置，可扩展上下文</td></tr>
+            <tr><td>多头 MHA</td><td class="green">GQA</td><td>多个 Q 头共享一组 K/V，<b>推理时 KV cache 小几倍</b></td></tr>
+            <tr><td>带 bias</td><td class="green">去掉 bias</td><td>大模型上没收益，去掉更稳更省</td></tr>
+          </table></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="Transformer">
+  <div class="hd"><h2>同一套积木的三种搭法，和那个 n² 的窟窿</h2></div>
+  <div class="bd">
+    <div class="p mb">三者唯一的实质差别是<b>看不看得见未来</b>，剩下的零件三家完全一样。下半页那四类补法要分清：<b>FlashAttention 是精确的工程优化，换了它结果一模一样；稀疏注意力和 MoE 改了模型本身，是用效果换成本。</b></div>
+    <div class="g3">
+      <div class="card t-blue"><div class="t blue">Encoder-only ｜ BERT, 2018</div>
+        <div class="cap" style="margin-top:6px">不加掩码，每个位置都看得到左右两边。<br><b>目标</b>：遮住约 15% 的词让它猜回来（MLM）。<br><b>擅长</b>：分类、情感、实体识别、相似度。<br><b class="red">不会生成</b>——它没有「下一个词」的概念。<br>今天仍是<b>检索/排序编码器</b>的主力（RAG 的 embedding 模型多是这一支）。1–3 亿参数。</div></div>
+      <div class="card t-green"><div class="t green">Decoder-only ｜ 今天几乎所有大模型</div>
+        <div class="cap" style="margin-top:6px">加因果掩码，每个位置只看得到自己和左边。<br><b>目标</b>：预测下一个 token，就这一个。<br><b>为什么它赢了</b>：任何无标注文本都是训练数据；训练与推理形式一致；扩规模收益最持续；<b>任何任务都能写成文字接龙</b>。<br>几十亿到上万亿参数，上下文 12.8 万起步。</div></div>
+      <div class="card t-purple"><div class="t purple">Encoder-Decoder ｜ 原版、T5</div>
+        <div class="cap" style="margin-top:6px">编码器读完整输入，解码器边生成边用<b>交叉注意力</b>回看。<br><b>擅长</b>：翻译、摘要这类输入输出边界清晰的任务。<br><b>为什么让位</b>：参数近乎翻倍，而 decoder-only 把输入放进上下文就能干同样的事。<br>但交叉注意力活了下来——<b>多模态模型接图像/音频用的就是它</b>。</div></div>
+    </div>
+    <div class="g23 mt">
+      <div class="card t-red"><div class="t red">窟窿：注意力的算量是 O(n²·d)</div>
+        <div class="cap" style="margin-top:6px">序列 1,024 → n×n 分数矩阵约 <b>100 万</b>个数；32,768 → <b>10.7 亿</b>；1,000,000 → 约 <b>1 万亿</b>。朴素实现还要把整张表<b>写进显存再读回来</b>——长上下文的瓶颈往往不是算力，是<b>显存带宽</b>。<br><b>三个真正的约束</b>：① KV cache 随长度<b>线性增长</b>，长对话常是显存先撑不住；② <b>长上下文贵在「读」不在「写」</b>；③ <b>能装下 ≠ 用得上</b>，信息放中间时召回率明显下降。</div></div>
+      <div class="card w"><div class="t">四类补法，各补一处</div>
+        <table class="tbl s" style="margin-top:8px">
+          <tr><th style="width:118px">方法</th><th style="width:56px">补哪</th><th>做法与效果</th></tr>
+          <tr><td class="green"><b>FlashAttention</b></td><td>显存<br>带宽</td><td>分块放进片上缓存里算，中间那张 n×n 表<b>根本不落显存</b>；显存从 O(n²) 降到 O(n)，速度还更快——<b>今天所有主流框架的默认实现</b></td></tr>
+          <tr><td>稀疏 / 滑窗</td><td>算量</td><td>只看邻近若干个 + 少数全局位置，近似 O(n)。代价是<b>确实会漏信息</b></td></tr>
+          <tr><td class="green"><b>GQA / MQA / MLA</b></td><td>KV<br>缓存</td><td>每生成一个 token 都要缓存全部历史的 K、V。MQA 全部 Q 头共用一组；<b>GQA</b> 分组共享（默认）；MLA 压成低秩潜向量（DeepSeek）</td></tr>
+          <tr><td>MoE 混合专家</td><td>参数<br>算量</td><td>FFN 换成 N 个专家 + 路由器，<b>每个 token 只激活 2–8 个</b>：总参数极大而单次算量只按激活部分算，<b>2026 年前沿模型的普遍选择</b>。代价是训练不稳、显存仍要装全部专家</td></tr>
+        </table></div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="Transformer">
+  <div class="hd"><h2>① 一层里到底有哪几个式子：全套公式速查</h2></div>
+  <div class="bd">
+    <div class="p mb">第一问要的不是解释，是<b>一份完整清单</b>——先知道总共有几个式子、按什么顺序接上，再谈每个式子在干嘛。</div>
+    <table class="tbl s">
+      <tr><th style="width:118px">步骤</th><th style="width:456px">公式</th><th>这一步在做什么</th></tr>
+      <tr><td class="blue">位置编码</td><td>PE(pos,2i)=sin(pos/10000^(2i/d))　PE(pos,2i+1)=cos(同上)</td><td>给每个位置算一串固定的数，用来编码「这是第几个词」</td></tr>
+      <tr><td class="blue">输入</td><td>H = Embedding(x) + PE</td><td>词的含义向量 + 位置向量，直接相加</td></tr>
+      <tr><td class="purple">QKV 投影</td><td>Q = XW_Q　　K = XW_K　　V = XW_V</td><td>同一份输入乘三组不同权重，得到三种角色</td></tr>
+      <tr><td class="purple"><b>缩放点积注意力</b></td><td><b>Attention(Q,K,V) = softmax( QKᵀ / √d_k ) V</b></td><td><b>整个 Transformer 的核心，就这一行</b></td></tr>
+      <tr><td class="purple">多头</td><td>head_i = Attention(QW_Qⁱ, KW_Kⁱ, VW_Vⁱ)<br>MHA = Concat(head₁, …, head_h) W_O</td><td>拆成 h 组各算一遍，再拼起来过一次线性变换</td></tr>
+      <tr><td class="orange">残差 + 归一化</td><td>out = LayerNorm( x + Sublayer(x) )</td><td>每个子层外面都套这一圈</td></tr>
+      <tr><td class="orange">LayerNorm</td><td>LN(x) = γ ⊙ (x − μ) / √(σ² + ε) + β</td><td>按特征维把这一行数值拉回标准尺度</td></tr>
+      <tr><td class="purple">前馈网络</td><td>FFN(x) = max(0, xW₁ + b₁) W₂ + b₂</td><td>每个位置独立过一个两层小网络：先升维再降回</td></tr>
+      <tr><td class="red">因果掩码</td><td>softmax( QKᵀ/√d_k + M ) V　　M 的上三角 = −∞</td><td>生成时不许看后面的词</td></tr>
+      <tr><td class="blue">交叉注意力</td><td>softmax( Q_d K_eᵀ / √d_k ) V_e</td><td>Q 来自解码器，K/V 来自编码器</td></tr>
+      <tr><td class="green">输出</td><td>logits = h · W_out　→　softmax</td><td>变成整个词表上的一个概率分布（第 33 页）</td></tr>
+    </table>
+    <div class="g2" style="margin-top:8px">
+      <div class="note b-green"><div class="t green">一句话把它们串起来</div>
+        <div class="sub"><b>嵌入 + 位置 →〔多头注意力 → Add&amp;Norm → FFN → Add&amp;Norm〕× N 层 → 输出</b><br>方括号里那四步就是一个 block，其余全是把它重复 N 遍。</div></div>
+      <div class="note b-red"><div class="t red">四个最容易记错的点</div>
+        <div class="sub">① <b>√d_k 不是可选项</b>，是数值稳定性必需；② LayerNorm 按<b>特征维</b>算，不是按 batch；③ 掩码加的是 <b>−∞</b> 不是 0；④ 原论文是 Post-LN，<b>现代大模型普遍改成 Pre-LN</b>（更稳，表达力略弱）。</div></div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="Transformer">
+  <div class="hd"><h2>② 换成人话：把一层 Transformer 当成一间会议室</h2></div>
+  <div class="bd">
+    <div class="p mb">第二问问的不是符号怎么读，是<b>每个式子在完成一个什么动作</b>。下面这套对应关系不精确，但它能让人先站住脚。</div>
+    <div class="g2">
+      <div class="card w"><div class="t blue">开会前：谁是谁，各自想干嘛</div>
+        <table class="tbl s" style="margin-top:8px">
+          <tr><th style="width:132px">公式里的东西</th><th>会议室里的什么</th></tr>
+          <tr><td>Embedding</td><td>给每个人<b>发一张身份卡</b>，上面写着他大致是个什么样的人</td></tr>
+          <tr><td>位置编码 PE</td><td>再<b>贴一个座位号</b>——不然所有人站成一团，谁先谁后分不出来</td></tr>
+          <tr><td><b class="purple">Q</b>（Query）</td><td>「<b>我想找什么样的人说话</b>」</td></tr>
+          <tr><td><b class="purple">K</b>（Key）</td><td>「<b>我能被什么样的人匹配上</b>」——挂在胸前的标签</td></tr>
+          <tr><td><b class="purple">V</b>（Value）</td><td>「<b>真要交流，我能提供什么内容</b>」</td></tr>
+          <tr><td>QKᵀ → softmax</td><td>拿自己的需求去对每个人的标签，算出<b>「我这一轮听谁、各听多少比例」</b></td></tr>
+        </table></div>
+      <div class="card w"><div class="t orange">开会中与开完：怎么不吵、怎么消化</div>
+        <table class="tbl s" style="margin-top:8px">
+          <tr><th style="width:132px">公式里的东西</th><th>会议室里的什么</th></tr>
+          <tr><td>÷ √d_k</td><td>音量调节器：<b>别让某个人的声音尖到把别人全盖住</b></td></tr>
+          <tr><td>多头</td><td>拆成 8 个小组同时开：<b>有的盯语法，有的盯指代，有的盯情绪</b>，最后汇总</td></tr>
+          <tr><td>x + Sublayer(x)</td><td>「<b>我原来的样子 + 刚听来的新东西</b>」——开 96 轮会，不能每轮都把自己覆盖掉</td></tr>
+          <tr><td>LayerNorm</td><td>会后统一调音量，别让某个人越说越大声、滚成雪球</td></tr>
+          <tr><td>FFN</td><td><b>关起门自己消化</b>：512 维摊开成 2048 维想一遍，再收回 512 维。每个人各想各的，互不打扰</td></tr>
+          <tr><td>× N 层</td><td>同一批人<b>连开 N 轮会</b>，越聊越深</td></tr>
+        </table></div>
+    </div>
+    <div class="note b-purple mt"><div class="t purple">另外两个补丁，和这套比喻的边界</div>
+      <div class="sub"><b>因果掩码</b>＝考试时不许看后面的题：生成第 5 个词时，第 6 个词还不存在。　<b>交叉注意力</b>＝翻译时回头查原文：需求来自「我正在写的这句译文」，内容来自「原文那一段」。<br><b class="red">边界</b>：会议室里的「人」其实是<b>词在这一层的向量表示</b>，它每过一层就变一次；「听谁多少」也不是意图，只是<b>两个向量点积出来的一个数</b>。比喻负责让人进门，公式负责说清到底在算什么——所以下一页把它当程序再走一遍。</div></div>
+  </div>
+</section>
+<section class="slide" data-act="Transformer">
+  <div class="hd"><h2>③ 当成程序看：一层 Transformer 的 12 格计算流水线</h2></div>
+  <div class="bd">
+    <div class="p mb">第三问要的是<b>执行顺序</b>：不求看懂每个符号，但要知道这一步拿到什么、产出什么、数据的形状怎么变。<span class="dim">记号：n = 序列长度，d = 隐藏维度，h = 头数，V = 词表大小。</span></div>
+    <svg viewBox="0 0 1168 344" width="100%" style="display:block">
+      <g font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+      <!-- row 1 -->
+      <rect x="0" y="2" width="278" height="100" rx="8" fill="#eff6ff" stroke="#93b4f5" stroke-width="1.5"/>
+      <rect x="12" y="12" width="22" height="18" rx="4" fill="#2563eb"/><text x="23" y="25.5" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">1</text>
+      <text x="42" y="26" font-size="13" font-weight="700" fill="#1f2937">Embedding 查表</text>
+      <text x="14" y="50" font-size="12.5" fill="#2563eb">X = Embedding(token id)</text>
+      <text x="14" y="70" font-size="12" fill="#5b6675">拿到：一串整数 id</text>
+      <text x="14" y="88" font-size="12" fill="#5b6675">产出：<tspan font-weight="700">X，形状 n × d</tspan></text>
+
+      <rect x="296" y="2" width="278" height="100" rx="8" fill="#eff6ff" stroke="#93b4f5" stroke-width="1.5"/>
+      <rect x="308" y="12" width="22" height="18" rx="4" fill="#2563eb"/><text x="319" y="25.5" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">2</text>
+      <text x="338" y="26" font-size="13" font-weight="700" fill="#1f2937">加上位置编码</text>
+      <text x="310" y="50" font-size="12.5" fill="#2563eb">H = X + PE</text>
+      <text x="310" y="70" font-size="12" fill="#5b6675">拿到：X 和一张固定的位置表</text>
+      <text x="310" y="88" font-size="12" fill="#5b6675">产出：<tspan font-weight="700">H，n × d</tspan>（含位置信息）</text>
+
+      <rect x="592" y="2" width="278" height="100" rx="8" fill="#f7f4fd" stroke="#c4b5fd" stroke-width="1.5"/>
+      <rect x="604" y="12" width="22" height="18" rx="4" fill="#7c3aed"/><text x="615" y="25.5" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">3</text>
+      <text x="634" y="26" font-size="13" font-weight="700" fill="#1f2937">QKV 三次投影</text>
+      <text x="606" y="50" font-size="12.5" fill="#7c3aed">Q=HW_Q　K=HW_K　V=HW_V</text>
+      <text x="606" y="70" font-size="12" fill="#5b6675">同一份 H，乘三组<tspan font-weight="700">不同的权重</tspan></text>
+      <text x="606" y="88" font-size="12" fill="#5b6675">产出：<tspan font-weight="700">Q、K、V，各 n × d_k</tspan></text>
+
+      <rect x="888" y="2" width="278" height="100" rx="8" fill="#f7f4fd" stroke="#7c3aed" stroke-width="2"/>
+      <rect x="900" y="12" width="22" height="18" rx="4" fill="#7c3aed"/><text x="911" y="25.5" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">4</text>
+      <text x="930" y="26" font-size="13" font-weight="700" fill="#1f2937">打分：谁跟谁有关</text>
+      <text x="902" y="50" font-size="12.5" fill="#7c3aed">S = Q Kᵀ / √d_k</text>
+      <text x="902" y="70" font-size="12" fill="#5b6675">每个词的 Q 去点乘所有词的 K</text>
+      <text x="902" y="88" font-size="12" fill="#5b6675">产出：<tspan font-weight="700">S，n × n</tspan> 的一张分数表</text>
+
+      <!-- row 2 -->
+      <rect x="0" y="122" width="278" height="100" rx="8" fill="#f7f4fd" stroke="#7c3aed" stroke-width="2"/>
+      <rect x="12" y="132" width="22" height="18" rx="4" fill="#7c3aed"/><text x="23" y="145.5" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">5</text>
+      <text x="42" y="146" font-size="13" font-weight="700" fill="#1f2937">归一：变成比例</text>
+      <text x="14" y="170" font-size="12.5" fill="#7c3aed">A = softmax(S)　按行做</text>
+      <text x="14" y="190" font-size="12" fill="#5b6675">每一行加起来正好等于 1</text>
+      <text x="14" y="208" font-size="12" fill="#5b6675">产出：<tspan font-weight="700">A，n × n</tspan> 的权重表</text>
+
+      <rect x="296" y="122" width="278" height="100" rx="8" fill="#f7f4fd" stroke="#7c3aed" stroke-width="2"/>
+      <rect x="308" y="132" width="22" height="18" rx="4" fill="#7c3aed"/><text x="319" y="145.5" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">6</text>
+      <text x="338" y="146" font-size="13" font-weight="700" fill="#1f2937">按比例把内容加起来</text>
+      <text x="310" y="170" font-size="12.5" fill="#7c3aed">out = A · V</text>
+      <text x="310" y="190" font-size="12" fill="#5b6675"><tspan font-weight="700">4、5、6 合起来</tspan>就是那一个总公式</text>
+      <text x="310" y="208" font-size="12" fill="#5b6675">产出：<tspan font-weight="700">out，n × d_k</tspan></text>
+
+      <rect x="592" y="122" width="278" height="100" rx="8" fill="#f7f4fd" stroke="#c4b5fd" stroke-width="1.5"/>
+      <rect x="604" y="132" width="22" height="18" rx="4" fill="#7c3aed"/><text x="615" y="145.5" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">7</text>
+      <text x="634" y="146" font-size="13" font-weight="700" fill="#1f2937">多头拼接</text>
+      <text x="606" y="170" font-size="12.5" fill="#7c3aed">Concat(head₁…head_h) · W_O</text>
+      <text x="606" y="190" font-size="12" fill="#5b6675">3–6 步<tspan font-weight="700">同时做 h 遍</tspan>，各看各的角度</text>
+      <text x="606" y="208" font-size="12" fill="#5b6675">产出：<tspan font-weight="700">回到 n × d</tspan></text>
+
+      <rect x="888" y="122" width="278" height="100" rx="8" fill="#fff7ed" stroke="#fdba74" stroke-width="1.5"/>
+      <rect x="900" y="132" width="22" height="18" rx="4" fill="#c2410c"/><text x="911" y="145.5" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">8</text>
+      <text x="930" y="146" font-size="13" font-weight="700" fill="#1f2937">残差：加回原样子</text>
+      <text x="902" y="170" font-size="12.5" fill="#c2410c">x + Sublayer(x)</text>
+      <text x="902" y="190" font-size="12" fill="#5b6675">是加回去，不是替换掉</text>
+      <text x="902" y="208" font-size="12" fill="#5b6675">产出：<tspan font-weight="700">形状不变</tspan></text>
+
+      <!-- row 3 -->
+      <rect x="0" y="242" width="278" height="100" rx="8" fill="#fff7ed" stroke="#fdba74" stroke-width="1.5"/>
+      <rect x="12" y="252" width="22" height="18" rx="4" fill="#c2410c"/><text x="23" y="265.5" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">9</text>
+      <text x="42" y="266" font-size="13" font-weight="700" fill="#1f2937">LayerNorm</text>
+      <text x="14" y="290" font-size="12.5" fill="#c2410c">γ⊙(x−μ)/√(σ²+ε)+β</text>
+      <text x="14" y="310" font-size="12" fill="#5b6675">按<tspan font-weight="700">特征维</tspan>把这一行拉回标准尺度</text>
+      <text x="14" y="328" font-size="12" fill="#5b6675">产出：<tspan font-weight="700">形状不变</tspan></text>
+
+      <rect x="296" y="242" width="278" height="100" rx="8" fill="#f7f4fd" stroke="#c4b5fd" stroke-width="1.5"/>
+      <rect x="308" y="252" width="22" height="18" rx="4" fill="#7c3aed"/><text x="319" y="265.5" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">10</text>
+      <text x="338" y="266" font-size="13" font-weight="700" fill="#1f2937">FFN 关起门消化</text>
+      <text x="310" y="290" font-size="12.5" fill="#7c3aed">max(0, xW₁+b₁) W₂ + b₂</text>
+      <text x="310" y="310" font-size="12" fill="#5b6675">d → 4d → d，<tspan font-weight="700">每个位置各算各的</tspan></text>
+      <text x="310" y="328" font-size="12" fill="#5b6675">产出：<tspan font-weight="700">形状不变</tspan>　（7–10 重复 N 次）</text>
+
+      <rect x="592" y="242" width="278" height="100" rx="8" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.5"/>
+      <rect x="604" y="252" width="22" height="18" rx="4" fill="#dc2626"/><text x="615" y="265.5" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">11</text>
+      <text x="634" y="266" font-size="13" font-weight="700" fill="#1f2937">因果掩码（生成时）</text>
+      <text x="606" y="290" font-size="12.5" fill="#dc2626">S + M，M 的上三角 = −∞</text>
+      <text x="606" y="310" font-size="12" fill="#5b6675">插在第 4 步和第 5 步<tspan font-weight="700">之间</tspan></text>
+      <text x="606" y="328" font-size="12" fill="#5b6675">效果：softmax 后那些位置权重为 0</text>
+
+      <rect x="888" y="242" width="278" height="100" rx="8" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="2"/>
+      <rect x="900" y="252" width="22" height="18" rx="4" fill="#0e9f6e"/><text x="911" y="265.5" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">12</text>
+      <text x="930" y="266" font-size="13" font-weight="700" fill="#1f2937">出口：变成分数</text>
+      <text x="902" y="290" font-size="12.5" fill="#0e9f6e">logits = h · W_out　→ softmax</text>
+      <text x="902" y="310" font-size="12" fill="#5b6675">在最后一层之后做一次</text>
+      <text x="902" y="328" font-size="12" fill="#5b6675">产出：<tspan font-weight="700">n × V</tspan>，V ≈ 5 万（下一页）</text>
+      </g>
+    </svg>
+    <div class="note b-orange" style="margin-top:12px"><div class="t orange">这张图最该带走的两件事</div>
+      <div class="sub">① <b>形状从头到尾都是 n × d</b>，每个 token 进来是一个向量，出去还是一个向量——中间那张 n × n 的表只是临时的中转，用完就扔（这也正是 <b>n² 那个窟窿</b>的来源）。<br>② <b>只有第 3、7、10 步里有要学的权重</b>，其余步骤（softmax、加法、归一化里的除法、掩码）全是固定的算术——<b>第 34 页会把所有符号按这个标准分成三类</b>。</div></div>
+  </div>
+</section>
+<section class="slide" data-act="Transformer">
+  <div class="hd"><h2>④ 算来算去，算出来的到底是什么</h2></div>
+  <div class="bd">
+    <div class="p mb">这一问是六问里的枢纽：<b>一旦知道出口处那个东西是什么类型，训练和推理会同时通。</b>答案很短——是<b class="green">整个词表上的一个概率分布</b>。</div>
+    <svg viewBox="0 0 1168 236" width="100%" style="display:block">
+      <g font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+      <defs><marker id="a3" markerWidth="9" markerHeight="9" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#5b6675"/></marker>
+            <marker id="a3g" markerWidth="9" markerHeight="9" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#0e9f6e"/></marker></defs>
+      <rect x="0" y="24" width="152" height="50" rx="7" fill="#f7f4fd" stroke="#c4b5fd" stroke-width="1.5"/>
+      <text x="76" y="44" text-anchor="middle" font-size="12.5" font-weight="700" fill="#7c3aed">h：最后一层的输出</text>
+      <text x="76" y="63" text-anchor="middle" font-size="12" fill="#5b6675">d = 512 个数</text>
+      <path d="M156 49 L 184 49" stroke="#5b6675" stroke-width="1.6" marker-end="url(#a3)"/>
+      <rect x="190" y="24" width="152" height="50" rx="7" fill="#fff7ed" stroke="#fdba74" stroke-width="1.5"/>
+      <text x="266" y="44" text-anchor="middle" font-size="12.5" font-weight="700" fill="#c2410c">× W_out</text>
+      <text x="266" y="63" text-anchor="middle" font-size="12" fill="#5b6675">512 × 50000 的大矩阵</text>
+      <path d="M346 49 L 374 49" stroke="#5b6675" stroke-width="1.6" marker-end="url(#a3)"/>
+      <rect x="380" y="24" width="152" height="50" rx="7" fill="#f4f7fb" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="456" y="44" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1f2937">logits</text>
+      <text x="456" y="63" text-anchor="middle" font-size="12" fill="#5b6675">5 万个原始分数</text>
+      <path d="M536 49 L 574 49" stroke="#5b6675" stroke-width="1.6" marker-end="url(#a3)"/>
+      <text x="555" y="38" text-anchor="middle" font-size="11.5" fill="#5b6675">softmax</text>
+      <rect x="580" y="24" width="172" height="50" rx="7" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="2"/>
+      <text x="666" y="44" text-anchor="middle" font-size="12.5" font-weight="700" fill="#0e9f6e">一个概率分布</text>
+      <text x="666" y="63" text-anchor="middle" font-size="12" fill="#5b6675">5 万个数，加起来 = 1</text>
+      <path d="M756 49 L 794 49" stroke="#5b6675" stroke-width="1.6" marker-end="url(#a3)"/>
+      <text x="775" y="38" text-anchor="middle" font-size="11.5" fill="#5b6675">采样</text>
+      <rect x="800" y="24" width="140" height="50" rx="7" fill="#eff6ff" stroke="#93b4f5" stroke-width="1.5"/>
+      <text x="870" y="44" text-anchor="middle" font-size="12.5" font-weight="700" fill="#2563eb">选出一个词</text>
+      <text x="870" y="63" text-anchor="middle" font-size="12" fill="#5b6675">这才是「动作」</text>
+      <path d="M944 49 L 972 49" stroke="#0e9f6e" stroke-width="1.6" marker-end="url(#a3g)"/>
+      <rect x="978" y="24" width="190" height="50" rx="7" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="1073" y="44" text-anchor="middle" font-size="12.5" font-weight="700" fill="#0e9f6e">把它接到输入末尾</text>
+      <text x="1073" y="63" text-anchor="middle" font-size="12" fill="#5b6675">整套流程再走一遍</text>
+      <path d="M1073 78 L 1073 96 L 76 96 L 76 80" stroke="#0e9f6e" stroke-width="1.6" fill="none" stroke-dasharray="5 4" marker-end="url(#a3g)"/>
+      <text x="574" y="92" text-anchor="middle" font-size="12" fill="#0e9f6e"><tspan font-weight="700">这个循环就是「自回归生成」</tspan>——所谓一个字一个字往外蹦，蹦的是这一圈</text>
+      <line x1="0" y1="112" x2="1168" y2="112" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="0" y="134" font-size="12.5" font-weight="700" fill="#1f2937">举个例：输入「I ___ you」，模型在空位上给出的分布长这样</text>
+      <text x="130" y="163" text-anchor="end" font-size="12.5" fill="#1f2937">love</text>
+      <rect x="140" y="150" width="497" height="17" rx="3" fill="#0e9f6e"/><text x="649" y="163" font-size="12.5" font-weight="700" fill="#0e9f6e">71%</text>
+      <text x="130" y="189" text-anchor="end" font-size="12.5" fill="#1f2937">like</text>
+      <rect x="140" y="176" width="105" height="17" rx="3" fill="#2563eb"/><text x="257" y="189" font-size="12.5" fill="#2563eb">15%</text>
+      <text x="130" y="215" text-anchor="end" font-size="12.5" fill="#1f2937">hate</text>
+      <rect x="140" y="202" width="21" height="17" rx="3" fill="#94a3b8"/><text x="173" y="215" font-size="12.5" fill="#5b6675">3%</text>
+      <text x="710" y="163" font-size="12" fill="#5b6675">剩下 49,997 个词分掉 11%，每个都是一个大于 0 的小数。</text>
+      <text x="710" y="187" font-size="12" fill="#5b6675"><tspan font-weight="700" fill="#c2410c">模型从不「选」词——它只输出这张表。</tspan></text>
+      <text x="710" y="211" font-size="12" fill="#5b6675">选哪一个是外面那层解码策略的事（温度、top-k、top-p，第 43 页）。</text>
+      </g>
+    </svg>
+    <div class="g3" style="margin-top:10px">
+      <div class="note b-blue"><div class="t blue">训练时，这张表接着做什么</div>
+        <div class="sub">拿它<b>跟真答案比</b>：真答案是「正确的那个词概率应该是 1」。差距用<b>交叉熵</b>算成一个数，再反向传播回去把所有 W 调一点点。<span class="dim">（这正是第 17 页「输出层与损失必须成对」的那一对）</span></div></div>
+      <div class="note b-orange"><div class="t orange">推理时，这张表接着做什么</div>
+        <div class="sub">不比对、不算损失、<b>不动任何一个参数</b>。只按解码策略从表里挑一个词，接到输入末尾，再算下一轮。<span class="dim">（第 8 页那两个阶段的区别，在这里第一次变得具体）</span></div></div>
+      <div class="note b-purple"><div class="t purple">如果是理解类模型呢</div>
+        <div class="sub">BERT 这类不接 W_out 出口，它要的是<b>中间产物</b>：每个词被改写成一个<b>融合了上下文的新向量</b>。同一个「苹果」，在「吃苹果」和「苹果发布会」里出来的向量不一样——这就是「读懂了」在数字上的样子。</div></div>
+    </div>
+    <div class="note b-green mt"><div class="t green">把这一问的答案压成一句话</div>
+      <div class="sub"><b>公式是流程，W 是知识，概率是产出，选词是动作，循环是生成。</b>——这五个词各归各位之后，「大模型在干什么」就没有剩下的神秘部分了。</div></div>
+  </div>
+</section>
+<section class="slide" data-act="Transformer">
+  <div class="hd"><h2>⑤ 公式里哪些是要学的：所有符号分成三堆</h2></div>
+  <div class="bd">
+    <div class="p mb">「那些参数是要算的，我理解就是权重吧」——方向是对的，但公式里的符号<b>其实有三种</b>，混在一起才是看不懂的主因。</div>
+    <div class="g3">
+      <div class="card t-orange"><div class="t orange">一、要学的参数 —— 训练调的就是这些</div>
+        <table class="tbl s" style="margin-top:8px">
+          <tr><th style="width:104px">符号</th><th>形状与个数</th></tr>
+          <tr><td><b>W_Q, W_K, W_V</b></td><td>各 d × d_k，<b>每层每头都有一组</b>；总数 = 层数 × 头数 × 3</td></tr>
+          <tr><td><b>W_O</b></td><td>d × d，每层一个（多头拼接之后的那次线性）</td></tr>
+          <tr><td><b>W₁, b₁, W₂, b₂</b></td><td>d×4d 与 4d×d，每层一组。<b class="orange">参数量的大头，约占全模型 2/3</b></td></tr>
+          <tr><td><b>γ, β</b></td><td>各 d 维，每个 LayerNorm 一对</td></tr>
+          <tr><td><b>Embedding 表</b></td><td>V × d，全模型一张（V ≈ 5 万）</td></tr>
+          <tr><td><b>W_out</b></td><td>d × V，很大；常与 Embedding <b>共享同一份权重</b></td></tr>
+        </table></div>
+      <div class="card t-green"><div class="t green">二、写死不学 —— 训多久都不变</div>
+        <table class="tbl s" style="margin-top:8px">
+          <tr><th style="width:104px">符号</th><th>它是什么</th></tr>
+          <tr><td><b>PE</b></td><td>原论文用 sin/cos <b>算出来</b>的固定表。<span class="dim">注意：现代大模型多改用 RoPE 或可学习位置编码，那时它就挪进第一堆</span></td></tr>
+          <tr><td><b>√d_k</b></td><td>一个常数。d_k = 64 时它就是 8</td></tr>
+          <tr><td><b>ε</b></td><td>防止除以 0 的小数，一般 1e-5</td></tr>
+          <tr><td><b>softmax</b></td><td>一个固定的函数，没有任何参数</td></tr>
+          <tr><td><b>max(0,·)</b></td><td>ReLU，也是固定函数</td></tr>
+          <tr><td><b>Concat</b></td><td>把几段向量接起来，纯搬运</td></tr>
+        </table></div>
+      <div class="card t-purple"><div class="t purple">三、每次输入重算 —— 算完就扔</div>
+        <table class="tbl s" style="margin-top:8px">
+          <tr><th style="width:104px">符号</th><th>它是什么</th></tr>
+          <tr><td><b>X, H</b></td><td>这一次输入的词向量、加过位置的输入</td></tr>
+          <tr><td><b>Q, K, V</b></td><td>由 H 乘权重<b>算出来</b>的，不是存着的</td></tr>
+          <tr><td><b>S, A</b></td><td>分数表与权重表，n × n，用完即弃</td></tr>
+          <tr><td><b>out, head_i</b></td><td>各头的输出与合并结果</td></tr>
+          <tr><td><b>μ, σ²</b></td><td>LayerNorm 里<b>当场统计</b>出来的均值方差</td></tr>
+          <tr><td><b>logits, p</b></td><td>出口的原始分数与概率分布</td></tr>
+        </table></div>
+    </div>
+    <div class="g2 mt">
+      <div class="note b-red"><div class="t red">最容易混的一处，就在 LayerNorm 这一个式子里</div>
+        <div class="sub">LN(x) = <b class="orange">γ</b> ⊙ (x − <b class="purple">μ</b>) / √(<b class="purple">σ²</b> + ε) + <b class="orange">β</b><br><b class="orange">γ、β 是学出来的参数</b>，<b class="purple">μ、σ² 是这一次输入当场算出来的统计量</b>——同一行公式里两种都有，看错就会以为归一化「也在学」。</div></div>
+      <div class="note b-green"><div class="t green">「GPT-3 有 1750 亿参数」数的是哪一堆</div>
+        <div class="sub">只数<b>第一堆</b>。第二堆是常数和函数，第三堆每次输入都重算、根本不存盘，两者<b>一个都不计入</b>。<br>这也解释了模型文件为什么大、跑起来显存为什么还要更大：文件装第一堆，运行还得给第三堆腾地方。<span class="dim">第 36 页会拆一个 8B 模型。</span></div></div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="Transformer">
+  <div class="hd"><h2>⑥ 用具体的数走一遍：小到能手算，但一步不跳</h2></div>
+  <div class="bd">
+    <div class="p mb">设定：<b>d = 4，单头，词表只有「我 爱 你 吃」四个词，位置编码取 0，W_Q = W_K = W_V = 单位阵</b>（这样投影不改变数值，能把注意力本身看清楚）。输入两个字：<b>「我 爱」</b>。</div>
+    <div class="g2">
+      <div class="card w"><div class="t blue">前半程：从词到注意力权重</div>
+        <table class="tbl s" style="margin-top:8px">
+          <tr><th style="width:118px">步骤</th><th>算式与结果</th></tr>
+          <tr><td><b>① 查表</b></td><td>我 → [1, 0, 0, 1]　　爱 → [0, 1, 1, 0]<br><span class="dim">PE = 0，所以 H = X；单位阵投影，所以 Q = K = V = H</span></td></tr>
+          <tr><td><b>② 打分</b><br><span class="dim">S = QKᵀ/√d_k</span></td><td>「我·我」= 1+0+0+1 = <b>2</b>　「我·爱」= <b>0</b><br>QKᵀ = [[2, 0], [0, 2]]，除以 √4 = 2<br><b>S = [[1, 0], [0, 1]]</b></td></tr>
+          <tr><td><b>③ 归一</b><br><span class="dim">A = softmax(S)</span></td><td>第一行 softmax([1, 0])：e¹ = 2.72，e⁰ = 1，和 = 3.72<br>→ [2.72/3.72, 1/3.72] = <b>[0.73, 0.27]</b><br><b>A = [[0.73, 0.27], [0.27, 0.73]]</b></td></tr>
+          <tr><td><b>④ 加权求和</b><br><span class="dim">out = A · V</span></td><td>「我」这一行 = 0.73×[1,0,0,1] + 0.27×[0,1,1,0]<br>= <b class="green">[0.73, 0.27, 0.27, 0.73]</b></td></tr>
+        </table>
+        <div class="note b-green" style="margin-top:10px"><div class="t green">第 ④ 步就是「理解了上下文」在数字上的全部含义</div>
+          <div class="sub">「我」原本是 [1,0,0,1]，现在里面<b>掺进了 27% 的「爱」</b>。所谓「这个词的表示融合了上下文」，落到数上就是这么一次加权平均——没有别的。</div></div></div>
+      <div class="card w"><div class="t orange">后半程：从注意力输出到吐出一个字</div>
+        <table class="tbl s" style="margin-top:8px">
+          <tr><th style="width:118px">步骤</th><th>算式与结果</th></tr>
+          <tr><td><b>⑤ 残差</b><br><span class="dim">x + Sublayer(x)</span></td><td>[1, 0, 0, 1] + [0.73, 0.27, 0.27, 0.73]<br>= <b>[1.73, 0.27, 0.27, 1.73]</b></td></tr>
+          <tr><td><b>⑥ LayerNorm</b></td><td>μ = 1.0，σ = 0.73<br>(x − μ)/σ = <b>[1, −1, −1, 1]</b>　<span class="dim">（γ=1、β=0 时）</span></td></tr>
+          <tr><td><b>⑦ 略过</b></td><td>FFN 和其余 N−1 层照上面的套路重复。设最终一层输出<br><b>h = [0.5, 1.0, 2.0, −0.5]</b></td></tr>
+          <tr><td><b>⑧ 出口</b><br><span class="dim">logits = h · W_out</span></td><td>这里 W_out 也取单位阵，于是 <b>logits = [0.5, 1.0, 2.0, −0.5]</b><br><span class="dim">真实模型里这是一个 512 × 50000 的矩阵乘法</span></td></tr>
+          <tr><td><b>⑨ softmax</b></td><td>e 的各次方：1.65、2.72、7.39、0.61，和 = 12.36<br><b class="green">我 0.13　爱 0.22　你 0.60　吃 0.05</b></td></tr>
+        </table>
+        <div class="note b-orange" style="margin-top:8px"><div class="t orange">输出「你」</div>
+          <div class="sub">四个数加起来正好是 1，最大的那个是「你」。<b>模型做的全部工作到这里为止</b>——挑走 0.60 那一个、把「你」接到「我 爱」后面、再算一轮，是外面那层解码逻辑干的事。</div></div></div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="Transformer">
+  <div class="hd"><h2>参数量是怎么算出来的：拆开一个 8B 模型</h2></div>
+  <div class="bd">
+    <div class="lead">「8B 参数」不是玄学，是一道加法题。取一组典型配置：<b>d = 4096，层数 L = 32，头数 32，FFN 中间维 14336，词表 128,256</b>。</div>
+    <div class="g2">
+      <div>
+        <div class="card w"><div class="t">逐块算</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><th style="width:130px">部件</th><th style="width:190px">算式</th><th>参数量</th></tr>
+            <tr><td>词嵌入</td><td>128,256 × 4096</td><td>约 5.25 亿</td></tr>
+            <tr><td>注意力（每层）</td><td>W_Q,W_K,W_V,W_O<br>本例用 GQA（8 组 K/V）</td><td>约 4200 万<br><span class="dim">不用 GQA 则 6700 万</span></td></tr>
+            <tr><td>FFN（每层）</td><td>SwiGLU 三个矩阵<br>3 × 4096 × 14336</td><td><b>约 1.76 亿</b></td></tr>
+            <tr><td>每层小计</td><td>注意力 + FFN</td><td>约 2.2 亿</td></tr>
+            <tr><td>32 层合计</td><td>32 × 2.2 亿</td><td><b>约 70 亿</b></td></tr>
+            <tr><td>输出投影</td><td>4096 × 128,256</td><td>约 5.25 亿<span class="dim">（常与词嵌入共享）</span></td></tr>
+            <tr class="t-green"><td><b>总计</b></td><td>—</td><td><b>约 80 亿 = 8B</b></td></tr>
+          </table></div>
+      </div>
+      <div>
+        <div class="card t-orange"><div class="t orange">三个能直接用的结论</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><td style="width:22px" class="dim">1</td><td><b>FFN 占大头。</b>每层 FFN 约 1.76 亿、注意力约 0.42 亿 —— <b>FFN 吃掉约 3/4 参数</b>。「知识存在哪」这个问题，答案首先指向 FFN</td></tr>
+            <tr><td class="dim">2</td><td><b>参数量与上下文长度无关。</b>整张表里没有一项含 n。上下文变长，涨的是<b>激活值和 KV cache</b>，不是参数</td></tr>
+            <tr><td class="dim">3</td><td><b>参数量 ≈ 12 × L × d²</b>（词表另算）。快速估一个模型多大，这个式子就够了</td></tr>
+          </table></div>
+        <div class="card t-blue mt"><div class="t blue">从参数量到显存</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><th style="width:120px">场景</th><th>每个参数占多少</th></tr>
+            <tr><td>FP16 推理</td><td>2 字节 → 8B 模型约 <b>16 GB</b></td></tr>
+            <tr><td>4-bit 量化推理</td><td>约 0.5 字节 → 约 <b>5 GB</b>，消费级卡可跑</td></tr>
+            <tr><td class="red">训练<br>（AdamW 混合精度）</td><td>参数 2 + 梯度 2 + FP32 主权重 4 + 优化器两个状态 8 ≈ <b>16 字节</b> → 8B 模型光这一项就要 <b>128 GB</b>，还没算激活值</td></tr>
+          </table>
+          <div class="cap mt" style="margin-top:10px"><b>训练比推理贵一个数量级</b>，这一行就是全部原因，也是为什么训练必须多卡并行。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="大模型训练">
+  <div class="hd"><h2>大模型训练全流程：一张总览图</h2></div>
+  <div class="bd">
+    <svg viewBox="0 0 1168 430" width="100%" style="display:block" font-family="'PingFang SC','Microsoft YaHei',sans-serif">
+      <rect x="0" y="18" width="268" height="128" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="12" y="40" font-size="14" font-weight="700" fill="#2563eb">① 预训练 Pre-training</text>
+      <text x="12" y="62" font-size="12" fill="#334155">目标：预测下一个 token</text>
+      <text x="12" y="80" font-size="12" fill="#334155">数据：10–30T token 无标注网页/代码/书</text>
+      <text x="12" y="98" font-size="12" fill="#334155">算力：几千到几万张卡 · 数十天</text>
+      <text x="12" y="116" font-size="12" fill="#334155">成本：占全流程 <tspan font-weight="700">99%</tspan> 以上</text>
+      <text x="12" y="138" font-size="12" font-weight="700" fill="#0e9f6e">产出：Base Model（只会续写）</text>
+
+      <rect x="300" y="18" width="268" height="128" rx="8" fill="#fff7ed" stroke="#c2410c" stroke-width="2"/>
+      <text x="312" y="40" font-size="14" font-weight="700" fill="#c2410c">② 监督微调 SFT</text>
+      <text x="312" y="62" font-size="12" fill="#334155">目标：同样是预测下一个 token</text>
+      <text x="312" y="80" font-size="12" fill="#334155">数据：几万到几百万条<tspan font-weight="700">人写的问答对</tspan></text>
+      <text x="312" y="98" font-size="12" fill="#334155">算力：几十到几百卡时</text>
+      <text x="312" y="116" font-size="12" fill="#334155">教会的是<tspan font-weight="700">格式与行为</tspan>，不是新知识</text>
+      <text x="312" y="138" font-size="12" font-weight="700" fill="#0e9f6e">产出：会听指令、会对话的模型</text>
+
+      <rect x="600" y="18" width="268" height="128" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+      <text x="612" y="40" font-size="14" font-weight="700" fill="#7c3aed">③ 偏好对齐 RLHF / DPO</text>
+      <text x="612" y="62" font-size="12" fill="#334155">目标：在多个都「对」的答案里</text>
+      <text x="612" y="80" font-size="12" fill="#334155">　　　挑人更喜欢的那个</text>
+      <text x="612" y="98" font-size="12" fill="#334155">数据：人类<tspan font-weight="700">排序</tspan>（A 比 B 好）</text>
+      <text x="612" y="116" font-size="12" fill="#334155">管的是有用 / 无害 / 诚实</text>
+      <text x="612" y="138" font-size="12" font-weight="700" fill="#0e9f6e">产出：可以交付给用户的 Chat 模型</text>
+
+      <rect x="900" y="18" width="268" height="128" rx="8" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="2"/>
+      <text x="912" y="40" font-size="14" font-weight="700" fill="#0e9f6e">④ 推理部署 Inference</text>
+      <text x="912" y="62" font-size="12" fill="#334155">量化 · 蒸馏 · KV cache 管理</text>
+      <text x="912" y="80" font-size="12" fill="#334155">批处理 · 投机解码 · 服务化</text>
+      <text x="912" y="98" font-size="12" fill="#334155">这一段决定<tspan font-weight="700">单位成本与延迟</tspan></text>
+      <text x="912" y="116" font-size="12" fill="#334155">也是唯一持续花钱的一段</text>
+      <text x="912" y="138" font-size="12" font-weight="700" fill="#0e9f6e">产出：一个能接住流量的服务</text>
+
+      <g stroke="#94a3b8" stroke-width="2">
+        <line x1="268" y1="82" x2="292" y2="82"/><path d="M300 82 l-10 -5 v10 z" fill="#94a3b8" stroke="none"/>
+        <line x1="568" y1="82" x2="592" y2="82"/><path d="M600 82 l-10 -5 v10 z" fill="#94a3b8" stroke="none"/>
+        <line x1="868" y1="82" x2="892" y2="82"/><path d="M900 82 l-10 -5 v10 z" fill="#94a3b8" stroke="none"/>
+      </g>
+
+      <text x="0" y="186" font-size="13" font-weight="700" fill="#5b6675">每一步内部又是一条自己的流水线：</text>
+      <rect x="0" y="198" width="268" height="220" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="12" y="220" font-size="12" fill="#5b6675">数据采集 → 清洗 → 去重 → 质量筛</text>
+      <text x="12" y="240" font-size="12" fill="#5b6675">→ 配比 → <tspan font-weight="700" fill="#2563eb">分词</tspan> → 打包成定长序列</text>
+      <text x="12" y="260" font-size="12" fill="#5b6675">→ 初始化 → 分布式训练循环</text>
+      <text x="12" y="280" font-size="12" fill="#5b6675">→ 监控 loss / 故障续跑 → 检查点</text>
+      <text x="12" y="300" font-size="12" fill="#5b6675">规模：10–30T token，约 1 个 epoch</text>
+      <text x="12" y="320" font-size="12" fill="#5b6675">难点：数据质量比数据数量更要命</text>
+      <text x="12" y="340" font-size="12" fill="#5b6675">万卡规模上硬件故障是常态，</text>
+      <text x="12" y="360" font-size="12" fill="#5b6675">靠检查点续跑；<tspan font-weight="700">知识截止日期在这步</tspan></text>
+      <text x="12" y="378" font-size="12" fill="#c2410c">产出 base model（见第 40–41 页）</text>
+      <rect x="300" y="198" width="268" height="220" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="312" y="220" font-size="12" fill="#5b6675">收集 / 合成指令-回答对 → 去污染</text>
+      <text x="312" y="240" font-size="12" fill="#5b6675">→ 套上对话模板（system / user /</text>
+      <text x="312" y="260" font-size="12" fill="#5b6675">　assistant 三种角色标记）</text>
+      <text x="312" y="280" font-size="12" fill="#5b6675">→ <tspan font-weight="700">只对 assistant 部分算损失</tspan></text>
+      <text x="312" y="300" font-size="12" fill="#5b6675">规模：几千到几百万条，几十卡时</text>
+      <text x="312" y="320" font-size="12" fill="#5b6675">全量微调 或 LoRA（省显存十倍以上）</text>
+      <text x="312" y="340" font-size="12" fill="#5b6675">几千条高质量数据即可见效，</text>
+      <text x="312" y="360" font-size="12" fill="#5b6675">常见坑：风格被少数标注员带偏</text>
+      <text x="312" y="378" font-size="12" fill="#c2410c">产出 chat model（见第 42 页）</text>
+      <rect x="600" y="198" width="268" height="220" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="612" y="220" font-size="12" fill="#5b6675">同一问题采样多个回答</text>
+      <text x="612" y="240" font-size="12" fill="#5b6675">→ 人类或模型给出 <tspan font-weight="700">排序 / 打分</tspan></text>
+      <text x="612" y="260" font-size="12" fill="#5b6675">→ 训奖励模型 → PPO 更新策略</text>
+      <text x="612" y="280" font-size="12" fill="#5b6675">→ 或 DPO 跳过奖励模型直接优化</text>
+      <text x="612" y="300" font-size="12" fill="#5b6675">→ 数学/代码改用可验证奖励 RLVR</text>
+      <text x="612" y="320" font-size="12" fill="#5b6675">风险：奖励攻陷、对齐税</text>
+      <text x="612" y="340" font-size="12" fill="#5b6675">打分也可以交给模型（RLAIF），</text>
+      <text x="612" y="360" font-size="12" fill="#5b6675">同一批数据通常要迭代多轮</text>
+      <text x="612" y="378" font-size="12" fill="#c2410c">产出可交付模型（见第 42 页）</text>
+      <rect x="900" y="198" width="268" height="220" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="912" y="220" font-size="12" fill="#5b6675">评测（基准 + 人评 + 红队）</text>
+      <text x="912" y="240" font-size="12" fill="#5b6675">→ 量化 / 蒸馏压缩 → 算子优化</text>
+      <text x="912" y="260" font-size="12" fill="#5b6675">→ 连续批处理 + 分页 KV cache</text>
+      <text x="912" y="280" font-size="12" fill="#5b6675">→ 投机解码压低延迟</text>
+      <text x="912" y="300" font-size="12" fill="#5b6675">→ 灰度上线 → 收集真实反馈</text>
+      <text x="912" y="320" font-size="12" fill="#5b6675">成本：prefill 吃算力，decode 吃带宽</text>
+      <text x="912" y="340" font-size="12" fill="#5b6675">同一个模型换套部署方案，</text>
+      <text x="912" y="360" font-size="12" fill="#5b6675">吞吐可以差好几倍</text>
+      <text x="912" y="378" font-size="12" fill="#c2410c">产出稳定服务（见第 43 页）</text>
+    </svg>
+    <div class="note b-red mt"><div class="t red">这张图里最容易被误解的一点</div>
+      <div class="sub"><b>模型的知识几乎全部来自 ①。</b>②和③只占总算力的百分之一量级，它们改变的是模型<b>怎么表现</b>，不是它<b>知道什么</b>。所以「微调一下让它学会我们公司的业务知识」这个说法，在多数情况下是不成立的 —— 该用检索增强（RAG）或继续预训练，而不是 SFT。</div></div>
+  </div>
+</section>
+<section class="slide" data-act="大模型训练">
+  <div class="hd"><h2>分词：模型眼里的世界不是字，是 token</h2></div>
+  <div class="bd">
+    <div class="g23">
+      <div>
+        <div class="card t-blue"><div class="t blue">为什么不能直接按字或按词</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><td style="width:76px">按词</td><td>词表爆炸，且永远会遇到没见过的词（OOV）。中文还得先分词</td></tr>
+            <tr><td>按字符</td><td>没有 OOV，但序列变得极长，n² 的代价吃不消，语义单位也太碎</td></tr>
+            <tr><td class="green">按子词</td><td><b>折中方案，今天的标准</b>。常见词整块保留，罕见词拆成有意义的片段</td></tr>
+          </table></div>
+        <div class="card w mt"><div class="t">BPE：字节对编码</div>
+          <div class="sub" style="margin-top:6px">训练时反复做一件事：<b>统计当前语料里最常一起出现的相邻两个单元，把它们合并成一个新单元</b>。重复几万次，就得到一张词表。</div>
+          <div class="code" style="margin-top:10px">l o w e r  ·  l o w e s t  ·  n e w e s t
+  → 合并最频繁的 (e,s) → es
+  → 再合并 (es,t) → est
+  → 词表里出现了「est」这个后缀</div>
+          <div class="cap mt" style="margin-top:8px">变体：GPT 系用<b>字节级 BPE</b>（在 UTF-8 字节上跑，任何字符都不会 OOV）；也有 WordPiece（BERT）、SentencePiece / Unigram（多语言常用）。</div></div>
+      </div>
+      <div>
+        <div class="card w"><div class="t">几个必须知道的数</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><th style="width:180px">项</th><th>典型值</th></tr>
+            <tr><td>词表大小</td><td>GPT-4 系 cl100k 约 <b>10 万</b>；Llama 3 为 <b>128,256</b>；多语言模型常到 25 万</td></tr>
+            <tr><td>英文</td><td>约 <b>1 token ≈ 0.75 个单词</b>，即 4 个字符左右</td></tr>
+            <tr><td>中文</td><td>约 <b>1 个汉字 ≈ 1–2 token</b>，取决于分词器。<b class="red">同样一句话，中文往往比英文更费 token</b> —— 上下文窗口和 API 计价都受影响</td></tr>
+            <tr><td>代码</td><td>缩进、括号会吃掉不少 token，所以新一代分词器专门优化了连续空格</td></tr>
+          </table></div>
+        <div class="card t-red mt"><div class="t red">分词直接造成的几个「模型好蠢」现象</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><td style="width:140px">数不清字母</td><td>问「strawberry 里有几个 r」常出错 —— 这个词被切成几个 token，模型<b>根本看不见单个字母</b></td></tr>
+            <tr><td>算术不稳</td><td>数字切法不一致（「1234」可能是一个 token，也可能是「12」「34」），位值难对齐。新模型多改成<b>逐位数字单独成 token</b></td></tr>
+            <tr><td>罕见词失灵</td><td>被切成一堆碎片后，语义信息在拼接中损失</td></tr>
+            <tr><td>多语言不公平</td><td>低资源语言被切得更碎 → 同样内容更费 token → 成本更高、有效上下文更短</td></tr>
+          </table>
+          <div class="cap mt" style="margin-top:10px"><b>这些不是「模型不够聪明」，是输入表示层面的信息损失。</b>知道这一点，就知道哪些任务不该指望它硬算，而该交给工具。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="大模型训练">
+  <div class="hd"><h2>数据：全流程里最重的一道工序</h2></div>
+  <div class="bd">
+    <div class="lead">在架构基本收敛、算力可以买到的今天，<b>拉开模型差距的主要变量是数据</b>。这一道工序的产出物是一串 token 流，但做法上更像工业提纯。</div>
+    <div class="g23 mt">
+      <div>
+        <div class="card w"><div class="t">流水线的六道</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><td style="width:22px" class="dim">1</td><td><b>采集</b>：Common Crawl 网页快照、代码仓库、书籍、论文、百科、许可数据</td></tr>
+            <tr><td class="dim">2</td><td><b>抽正文</b>：从 HTML 里剥掉导航、广告、样板文字</td></tr>
+            <tr><td class="dim">3</td><td><b>语种识别与过滤</b></td></tr>
+            <tr><td class="dim">4</td><td><b>质量筛</b>：启发式规则（长度、符号比例、重复率）+ 分类器打分</td></tr>
+            <tr><td class="dim">5</td><td><b>去重</b>：URL 级、文档级、段落级；常用 MinHash 做近似去重</td></tr>
+            <tr><td class="dim">6</td><td><b>去毒 / 去隐私 / 去评测集污染</b>，再按领域<b>配比</b>混合</td></tr>
+          </table></div>
+      </div>
+      <div>
+        <div class="card t-green"><div class="t green">一个可验证的公开例子：FineWeb（2024）</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><td style="width:150px">规模</td><td><b>15 万亿 token</b>，来自 <b>96</b> 个 Common Crawl 快照</td></tr>
+            <tr><td>方法</td><td>只做数据处理，<b>不动模型结构</b>，用同一套小模型做对照实验</td></tr>
+            <tr><td>结果</td><td>在相同训练预算下，超过当时同类的公开数据集</td></tr>
+            <tr><td class="orange">最反直觉的发现</td><td><b>「去重去得越狠越好」是错的。</b>他们发现<b>按快照分别去重</b>，效果好于把全部 96 个快照放在一起做全局去重 —— 全局去重会把高质量的、被反复引用的内容当成冗余删掉，剩下的反而是长尾垃圾</td></tr>
+          </table>
+          <div class="cap mt" style="margin-top:10px">这个例子的价值在于：<b>它把「数据处理」变成了可以做消融实验的科学问题</b>，而不是各家闭门的手艺。</div></div>
+        <div class="g2 mt">
+          <div class="note b-orange"><div class="t orange">配比也是个决策</div>
+            <div class="sub">代码占比高 → 推理和结构化能力更强（即便你不考它写代码）；多语言占比 → 决定非英语表现；书籍/论文 → 长文连贯性。<b>这些比例是超参数，要靠小规模实验定。</b></div></div>
+          <div class="note b-red"><div class="t red">两条硬约束</div>
+            <div class="sub"><b>评测集污染</b>：训练数据里混进了测试题，跑分虚高。必须主动清洗，且要公布方法。<br><b>高质量数据快见底</b>：所以合成数据、多轮筛选、以及「同样的数据训更多遍」都成了现实选项。</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="大模型训练">
+  <div class="hd"><h2>预训练：一个目标，一条曲线</h2></div>
+  <div class="bd">
+    <div class="g2">
+      <div>
+        <div class="card t-blue"><div class="t blue">一个目标：让文本自己当标注</div>
+          <div class="code" style="margin-top:8px">L = − Σ log P( xₜ | x₁ … xₜ₋₁ )</div>
+          <div class="sub" style="margin-top:10px">最大化「给定前文时，真实的下一个 token」的概率。这是<b>自监督</b>：标签就是文本自己的下一个字，<b>不需要任何人工标注</b>。ImageNet 那 120 万张图是几万人标了两年多——<b class="orange">标注这个瓶颈不是被扩产解决的，是被绕过去了</b>。</div>
+          <div class="cap" style="margin-top:8px">于是互联网上所有的文本一下子全部变成了训练数据。又因为有因果掩码，一条长度 n 的序列<b>一次前向就产生 n 个训练信号</b>——这是相比 RNN 真正的训练效率代差。</div></div>
+        <div class="card t-purple" style="margin-top:12px"><div class="t purple">为什么这个「低级」目标能逼出高级能力</div>
+          <div class="sub" style="margin-top:6px">因为「下一个词是什么」<b>取决于一切</b>。梯度会去找<b>任何</b>能降低损失的规律：</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><td style="width:210px">…… 的复数形式是 ___</td><td>逼出<b>语法</b></td></tr>
+            <tr><td>法国的首都是 ___</td><td>逼出<b>事实存储</b></td></tr>
+            <tr><td>3 + 5 = ___</td><td>逼出<b>算术</b></td></tr>
+            <tr><td>凶手其实是 ___</td><td>逼出<b>跨越全文的推理</b></td></tr>
+          </table>
+          <div class="cap" style="margin-top:8px"><b>压缩和理解在这里是同一件事</b>：要把文本预测得足够准，等价于要把产生它的规律学到手。<br>整个预训练就是「取一批 → 前向 → 算损失 → 反向 → 更新」跑几十万次，<b>数学上没有新东西，难的全部在工程</b>——下一页。</div></div>
+      </div>
+      <div>
+        <div class="card w"><div class="t">一条曲线：这条路上唯一的经验定律</div>
+          <div class="sub" style="margin-top:6px">损失 L 与<b>参数量 N</b>、<b>数据量 D</b>、<b>算力 C</b> 呈<b>幂律</b>，双对数坐标上是一条直线。它不是定理，是拟合出来的经验规律，但稳到<b>可以拿来做几亿美元的预算决定</b>：先用一批小模型拟合，外推出大模型能到哪儿，再决定投不投。</div>
+          <div class="code" style="margin-top:10px">C ≈ 6 · N · D</div>
+          <div class="cap" style="margin-top:8px">算力（FLOPs）≈ 6 × 参数量 × 训练 token 数，<b>要记住的一个式子</b>。<span class="red">口径</span>：只算矩阵乘、忽略注意力本身的开销，长上下文时会明显低估。</div>
+          <table class="tbl s" style="margin-top:10px">
+            <tr><td class="green" style="width:112px"><b>Chinchilla</b><br>2022</td><td>训了 <b>400 多个</b>模型做对照：给定算力，<b>N 和 D 要同比例增长</b>，约 <b>20 token / 参数</b>。同算力下 70B × 1.4T <b>全面胜过 280B 的 Gopher</b>，<b class="red">此前的大模型普遍严重欠训</b></td></tr>
+            <tr><td class="orange"><b>今天的做法</b></td><td><b>普遍远超 20 倍，即「超训」</b>。Chinchilla 只优化了<b>训练</b>算力，可模型训完要被调用几十亿次，推理成本随参数量走——算进去，最优点就大幅移向<b>更小的模型 + 更多的数据</b>。Llama-3 8B 用 15T token ≈ 1875 tok/参数；2026 年推理时算力也能换性能，天平<b>进一步偏向超训</b></td></tr>
+          </table>
+          <div class="cap" style="margin-top:8px"><b class="red">该记的不是 20 这个数</b>，是这句话：<b>参数和数据必须一起长，往哪边偏取决于你打算训一次、用多少次。</b>另外幂律预测的是<b>损失</b>，损失和你关心的能力之间还隔着一层。</div></div>
+        <div class="note b-green" style="margin-top:12px"><div class="t green">一个反直觉的细节</div>
+          <div class="sub">预训练一般<b>只跑 1 个 epoch 左右甚至不到</b>，每条数据只见一次——「过拟合」在这里基本不是问题，Dropout 普遍不用，与小数据集上的直觉正好相反。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="大模型训练">
+  <div class="hd"><h2>工程实况：装不下、算不完、还老是坏</h2></div>
+  <div class="bd">
+    <div class="sub" style="margin-bottom:2px">上一页说「数学上没有新东西」。那难在哪里？难在这三件事上，而它们全都不是数学问题。</div>
+    <div class="g3">
+      <div>
+        <div class="card t-red"><div class="t red">一、装不下：先算一笔显存账</div>
+          <div class="cap" style="margin-top:6px">8B 模型，AdamW + 混合精度：</div>
+          <table class="tbl s" style="margin-top:6px">
+            <tr><th style="width:104px">项</th><th style="width:56px">B/参数</th><th>8B 合计</th></tr>
+            <tr><td>参数 BF16</td><td>2</td><td>16 GB</td></tr>
+            <tr><td>梯度 BF16</td><td>2</td><td>16 GB</td></tr>
+            <tr><td>FP32 主权重</td><td>4</td><td>32 GB</td></tr>
+            <tr><td class="red">优化器两个状态</td><td class="red">8</td><td class="red">64 GB</td></tr>
+            <tr><td><b>小计</b></td><td><b>16</b></td><td><b>128 GB</b></td></tr>
+          </table>
+          <div class="cap" style="margin-top:8px">激活值另计，随 batch × 序列长度线性涨。<b>一张 H100 只有 80 GB</b>——哪怕 8B 这种「小」模型，全量训练也装不进一张卡。</div></div>
+        <div class="note b-green" style="margin-top:10px"><div class="t green">两个省显存的常规手段</div>
+          <div class="sub"><b>混合精度</b>：BF16 算、FP32 存主权重；BF16 指数位与 FP32 相同，比 FP16 抗溢出。<br><b>梯度检查点</b>：前向不存激活、反向按需重算，<b>用约 30% 算力换显存</b>。</div></div>
+      </div>
+      <div>
+        <div class="card w"><div class="t">二、算不完：四种并行，切的是不同的东西</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><td style="width:78px">数据并行<br>DP</td><td>切<b>数据</b>。每卡一份完整模型，各算各的 batch 再汇总梯度。最简单，但每卡都要装下整个模型</td></tr>
+            <tr><td class="green"><b>ZeRO<br>FSDP</b></td><td>切<b>状态</b>。优化器状态、梯度、参数<b>分片到各卡</b>，用时再聚合。128 GB 直接摊薄，<b>今天最常用</b></td></tr>
+            <tr><td>张量并行<br>TP</td><td>切<b>矩阵</b>。一层里的大矩阵按行列切到多卡，一次前向多次通信，<b>只在单机 NVLink 内用</b></td></tr>
+            <tr><td>流水线<br>PP</td><td>切<b>层</b>。1–8 层在卡 A、9–16 层在卡 B，像装配线。会有<b>气泡</b>（空转），靠微批来填</td></tr>
+          </table>
+          <div class="cap" style="margin-top:8px">MoE 还有<b>专家并行 EP</b>（切专家，按路由发 token）。实际都是组合：典型「机内 TP + 机间 PP + 全局 ZeRO」，叫 <b>3D 并行</b>。</div></div>
+        <div class="note b-orange" style="margin-top:10px"><div class="t orange">真正的难点是那一次求和</div>
+          <div class="sub">每步都要把所有卡的梯度<b>汇总成同一个数（all-reduce）</b>。<b>上万张卡时，决定效率的往往不是算力而是网络。</b></div></div>
+      </div>
+      <div>
+        <div class="card w"><div class="t">三、老是坏：Llama 3 405B 的 54 天</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><td style="width:96px">集群 / 时长</td><td><b>16,384</b> 张 H100，连续 <b>54 天</b>，约 <b>2100 万</b> GPU 小时，吃 <b>15.6 万亿</b> token</td></tr>
+            <tr><td class="red">意外中断</td><td><b>466 次</b>，其中 <b>419 次</b>非计划——<b>平均每 3 小时坏一次</b></td></tr>
+            <tr><td>故障来源</td><td><b>78%</b> 归因到硬件：GPU 本身 <b>58.7%</b>，HBM3 显存 <b>17.2%</b></td></tr>
+            <tr><td class="green">人工介入</td><td>整个 54 天只有 <b>3 次</b>，其余全部自动恢复；有效训练时间 <b>&gt;90%</b></td></tr>
+          </table>
+          <div class="cap" style="margin-top:8px">硬件故障在这个规模上<b>不是异常事件，是必然事件</b>。检查点存太密影响吞吐、太稀则一次故障赔掉几小时算力——这个频率是要认真权衡的工程参数。</div></div>
+        <div class="note b-red" style="margin-top:10px"><div class="t red">还有一种坏法：损失尖峰</div>
+          <div class="sub">loss 突然垂直飙升，模型可能就此训废，<b>规模越大越容易发生且无法事前预测</b>。PaLM 540B 出现过 <b>20 多次</b>，处置：回滚到尖峰前约 100 步的检查点 → 跳过那 200–500 个批次 → 继续。<b class="orange">同样的数据换个顺序就不再触发</b>——不是数据「有毒」，是数据顺序 × 参数状态的特定组合出了事。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="大模型训练">
+  <div class="hd"><h2>后训练：把「会续写」变成「会听话、还合你意」</h2></div>
+  <div class="bd">
+    <div class="g2">
+      <div>
+        <div class="card t-orange"><div class="t orange">练完出来的，是一个只会续写的东西</div>
+          <div class="sub" style="margin-top:6px">输入「中国的首都是哪里？」，它可能续写出<b>「……B. 上海　C. 广州　D. 深圳」</b>——它没有错，语料里这句后面<b>确实</b>常跟着选项。<b class="red">Base model 只会续写最像训练数据的东西，它不知道「你在问它」。</b></div></div>
+        <div class="card w" style="margin-top:10px"><div class="t">SFT：同一个目标，换一批数据</div>
+          <div class="sub" style="margin-top:6px">继续用<b>完全相同</b>的目标（预测下一个 token）训练，只是把数据换成人写的<b>「指令 → 理想回答」</b>对，并套上对话模板。</div>
+          <div class="code" style="margin-top:8px">&lt;|system|&gt; 你是一个有用的助手
+&lt;|user|&gt;   中国的首都是哪里？
+&lt;|assistant|&gt; 中国的首都是北京。</div>
+          <div class="cap" style="margin-top:8px"><b>关键细节：只对 assistant 部分算损失</b>，否则模型会顺带学会「编用户的问题」。数据量几万到几百万条，相比预训练的十万亿 token <b>是极小的量</b>——够了，因为要教的只是格式和习惯，不是知识。</div></div>
+        <div class="note b-purple" style="margin-top:10px"><div class="t purple">全量微调太贵：LoRA 与它的边界</div>
+          <div class="sub">全量微调 8B 要 128 GB。LoRA <b>冻住原模型全部参数</b>，只在每个权重矩阵旁挂一对小矩阵 <b>W′ = W + B·A</b>（r 取 8–64），要训的参数量降到<b>千分之几</b>，省掉的正是最贵的那 14 字节/参数。QLoRA 再把底座 4-bit 量化，<b>单卡就能微调几十 B 的模型</b>。<br><b class="red">但微调不擅长灌入新的事实知识</b>：少量数据压不过预训练学到的分布，还容易<b>灾难性遗忘</b>。私有资料先考虑 RAG。</div></div>
+      </div>
+      <div>
+        <div class="card w"><div class="t">偏好对齐：SFT 只能教「一个正确答案」</div>
+          <div class="sub" style="margin-top:6px">可很多问题有<b>无数个都对</b>的答案，差别在<b>哪个人更想要</b>。这种偏好写不成标注，只能靠<b>比较</b>：给两个回答，问人更喜欢哪个。</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><td style="width:80px">RLHF<br>（PPO）<br><span class="dim">2022</span></td><td>① 用人类排序数据训一个<b>奖励模型</b>打分　② 用强化学习让模型<b>最大化这个分数</b>，同时用 KL 惩罚拴住它。ChatGPT 的原始方案，<b class="red">但要同时在显存里放四个模型</b>，超参敏感、复现困难</td></tr>
+            <tr><td class="green"><b>DPO</b><br><span class="dim">2023</span></td><td>证明那个 RL 目标存在<b>闭式解</b>，可改写成偏好对上的一个分类损失：<b>不用奖励模型也不用跑 RL</b>，像 SFT 一样梯度下降。开源社区默认。局限：<b>只能用离线固定数据，无法探索新回答</b></td></tr>
+            <tr><td class="green"><b>GRPO</b><br><span class="dim">2024–</span></td><td>回到在线 RL，但对同一问题<b>采样一组回答</b>，拿<b>组内相对好坏</b>当优势信号，<b>删掉价值网络</b>。显存与复杂度大降又保住在线探索；DeepSeek 用它训出强推理模型后成为主流</td></tr>
+            <tr><td class="orange"><b>RLVR</b></td><td>换奖励来源：不用人类偏好，改用<b>可自动验证的结果</b>——数学题对不对、代码过不过测试。奖励客观、可无限扩展，<b>是当前推理模型提升的主要来源</b>；前提是任务可验证</td></tr>
+          </table>
+          <div class="cap" style="margin-top:8px"><b>这条线的规律：每一代都在删掉一个组件。</b>PPO 删手工奖励函数 → DPO 删奖励模型 → GRPO 删价值网络 → RLVR 删人类标注。方向始终一致：<b>让训练信号更便宜、更可扩展。</b></div></div>
+        <div class="note b-red" style="margin-top:10px"><div class="t red">共同的、尚未解决的问题：奖励攻陷</div>
+          <div class="sub">模型会找到<b>让评分变高但并没真变好</b>的捷径：写得又长又客气、迎合提问者的预设、猜格式而不是真解题。<b>这是当前对齐研究最核心的开放问题，没有通用解法。</b></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="大模型训练">
+  <div class="hd"><h2>推理与部署：训练是一次性支出，推理是每次请求都要付的钱</h2></div>
+  <div class="bd">
+    <div class="g3">
+      <div>
+        <div class="card t-blue"><div class="t blue">一、生成天然是串行的</div>
+          <div class="sub" style="margin-top:6px">不是一次算完，而是<b>一次只出一个 token，再接回输入重算</b>，直到出现结束符。</div>
+          <div class="code" style="margin-top:8px">「今天」    → 天气
+「今天天气」 → 很
+「今天天气很」→ 好</div>
+          <div class="cap" style="margin-top:8px">输出 200 个 token 就要跑 200 次前向。<b>这是延迟的根源，也是所有推理优化的战场。</b></div></div>
+        <div class="card t-green" style="margin-top:10px"><div class="t green">KV cache：最重要的一个优化</div>
+          <div class="sub" style="margin-top:6px">每步重算全部历史的 K、V 是纯浪费——它们根本不会变。<b>缓存下来，每步只算新 token 那一份</b>，复杂度从每步 O(n²) 降到 O(n)。</div>
+          <div class="cap" style="margin-top:8px"><b class="red">代价是显存</b>：缓存大小 ∝ 层数 × 头数 × 序列长度 × batch。<b>长上下文下 KV cache 会超过模型参数本身占的显存</b>——GQA、MLA、FP8 KV cache 要解决的就是它。</div></div>
+        <div class="note b-purple" style="margin-top:10px"><div class="t purple">用户感知的「快不快」，是这两个数</div>
+          <div class="sub"><b>首 token 延迟 TTFT</b> 由 prefill 决定，<b>每秒输出 token 数 TPS</b> 由 decode 决定。它们分别对应右边那两个阶段，优化手段完全不同。</div></div>
+      </div>
+      <div>
+        <div class="card w"><div class="t">二、拿到概率分布之后怎么选</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><td style="width:62px">贪心</td><td>永远取概率最高的那个。确定性任务用，但容易重复、死板</td></tr>
+            <tr><td class="green"><b>温度 T</b></td><td>softmax 前把 logits 除以 T。<b>T&lt;1 更保守，T&gt;1 更发散，T→0 退化成贪心</b>。控制创造性的总开关</td></tr>
+            <tr><td>Top-k</td><td>只在概率最高的 k 个里采样，砍掉长尾胡话</td></tr>
+            <tr><td class="green"><b>Top-p</b><br><span class="dim">核采样</span></td><td>按概率从高到低累加，够 p（如 0.9）就截断。<b>候选个数随分布形状自动变</b>，比固定 k 更合理，<b>今天的默认</b></td></tr>
+            <tr><td>重复惩罚</td><td>对已出现过的 token 降分，抑制复读</td></tr>
+          </table>
+          <div class="cap" style="margin-top:8px"><b>同一个模型，换解码参数就是两种性格。</b>写代码用 T≈0，写文案用 T≈0.8–1.0。<b>这一层完全不涉及训练</b>——很多「模型不稳定」的抱怨其实来自这里。</div></div>
+        <div class="note b-purple" style="margin-top:10px"><div class="t purple">推理时算力也能换性能</div>
+          <div class="sub"><b>思维链</b>：先写推理过程再给答案，把「一步算出来」摊成多步。<b>自洽性</b>：同一问题采样多次取多数。<b>都不改一个参数，只花更多推理算力</b>。</div></div>
+      </div>
+      <div>
+        <div class="note b-orange"><div class="t orange">三、先分清两个阶段，否则优化无从下手</div>
+          <div class="sub"><b>预填充 prefill</b>：整个提示词一次算完，<b>算力受限</b>。<b>解码 decode</b>：一个一个吐字，<b>显存带宽受限</b>——每出一个 token 要把全部权重读一遍。<b>批处理救 decode，前缀缓存救 prefill</b>。</div></div>
+        <div class="card w" style="margin-top:10px"><div class="t">把成本压下来的几种手段</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><td class="green" style="width:74px"><b>量化</b></td><td>权重 FP16 → INT8 / FP8 / 4-bit。8B 的 16 GB <b>降到约 5 GB 且通常掉点很小</b>；KV cache 也能量化</td></tr>
+            <tr><td class="green"><b>分页<br>KV cache</b></td><td>借虚拟内存的思路把缓存切成固定块<b>按需分配</b>，消灭碎片，<b>显存利用率提升数倍</b>。vLLM 的核心机制</td></tr>
+            <tr><td>连续批处理<br>+ 前缀复用</td><td>请求随到随进、谁先结束谁先走；共享的系统提示词<b>只算一次</b></td></tr>
+            <tr><td>投机解码</td><td>小模型先猜几个 token，大模型<b>并行验证</b>，是<b>输出逐字一致</b>的无损加速</td></tr>
+            <tr><td>蒸馏</td><td>用教师模型的输出训小模型，学的是<b>完整概率分布</b>。各家的「小杯」多是这么来的</td></tr>
+          </table></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="大模型训练">
+  <div class="hd"><h2>评测与失效：知道它什么时候不该被信</h2></div>
+  <div class="bd">
+    <div class="g2">
+      <div>
+        <div class="card w"><div class="t">怎么评</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><td style="width:110px">标准基准</td><td>MMLU（多学科知识）、GSM8K / MATH（数学）、HumanEval（代码）、长上下文与工具调用类基准</td></tr>
+            <tr><td>人类偏好</td><td>盲测对战按胜率排名（如 Arena 类榜单）。更贴近真实体验，但受回答长度、格式等表面因素影响</td></tr>
+            <tr><td>模型当裁判</td><td>用强模型给回答打分。便宜、可扩展，但有明显偏好偏差（偏长、偏自家风格）</td></tr>
+            <tr><td>红队</td><td>主动构造攻击性输入，测安全边界</td></tr>
+          </table>
+          <div class="cap mt" style="margin-top:10px"><b class="red">跑分的头号陷阱是数据污染</b>：测试题混进了训练语料，分数就没有意义。判断一个跑分可不可信，先看它有没有说明去污染方法、以及有没有在<b>发布后新出的</b>题目上验证。</div></div>
+      </div>
+      <div>
+        <div class="card t-red"><div class="t red">五种典型失效，以及它们的成因</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><th style="width:100px">现象</th><th>为什么会这样</th></tr>
+            <tr><td>幻觉</td><td>训练目标是「让下一个 token 概率最大」，<b>从来不是「说真话」</b>。模型没有「我不知道」这个内建状态，流畅地编造与流畅地陈述事实，在目标函数眼里是一回事</td></tr>
+            <tr><td>知识过期</td><td>参数里的知识<b>冻结在预训练截止那天</b>。这是 RAG 与工具调用存在的根本理由</td></tr>
+            <tr><td>算不对 / 数不清</td><td>部分源于分词（第 38 页），部分源于它做的是模式匹配而非符号运算。<b>该交给计算器，不该硬算</b></td></tr>
+            <tr><td>迎合用户</td><td>偏好训练奖励「让人满意」。用户一质疑就改口，是<b>被训出来的行为</b>，不是理解不够</td></tr>
+            <tr><td>提示注入</td><td>模型无法可靠区分「系统指令」和「数据里夹带的指令」。<b>这是 Agent 接入外部内容时最现实的安全风险</b>，目前没有彻底解法，只能靠权限隔离和输出校验</td></tr>
+          </table></div>
+        <div class="note b-orange mt"><div class="t orange">对齐税</div>
+          <div class="sub">对齐做得越强，模型往往在某些能力上越保守：拒答变多、创造性下降、某些基准掉点。<b>安全与能力之间存在真实的权衡</b>，各家产品在这条线上的取舍不同 —— 这解释了为什么同代模型「感觉」差别很大。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="附录">
+  <div class="hd"><h2>术语中英对照速查</h2></div>
+  <div class="bd">
+    <div class="g3">
+      <div>
+        <div class="card w"><div class="t blue">机器学习基础</div>
+          <table class="tbl s" style="margin-top:6px">
+            <tr><td style="width:110px">监督学习</td><td>supervised learning</td></tr>
+            <tr><td>自监督</td><td>self-supervised</td></tr>
+            <tr><td>特征 / 标签</td><td>feature / label</td></tr>
+            <tr><td>损失函数</td><td>loss function</td></tr>
+            <tr><td>正则化</td><td>regularization</td></tr>
+            <tr><td>泛化</td><td>generalization</td></tr>
+            <tr><td>过拟合 / 欠拟合</td><td>over- / underfitting</td></tr>
+            <tr><td>偏差 / 方差</td><td>bias / variance</td></tr>
+            <tr><td>归纳偏置</td><td>inductive bias</td></tr>
+            <tr><td>超参数</td><td>hyperparameter</td></tr>
+          </table></div>
+      </div>
+      <div>
+        <div class="card w"><div class="t purple">神经网络与 Transformer</div>
+          <table class="tbl s" style="margin-top:6px">
+            <tr><td style="width:110px">前向 / 反向传播</td><td>forward / back-propagation</td></tr>
+            <tr><td>激活函数</td><td>activation function</td></tr>
+            <tr><td>梯度消失 / 爆炸</td><td>vanishing / exploding gradient</td></tr>
+            <tr><td>残差连接</td><td>residual connection</td></tr>
+            <tr><td>嵌入 / 词向量</td><td>embedding</td></tr>
+            <tr><td>自注意力</td><td>self-attention</td></tr>
+            <tr><td>多头注意力</td><td>multi-head attention</td></tr>
+            <tr><td>旋转位置编码</td><td>RoPE</td></tr>
+            <tr><td>分组查询注意力</td><td>GQA</td></tr>
+            <tr><td>混合专家</td><td>MoE</td></tr>
+          </table></div>
+      </div>
+      <div>
+        <div class="card w"><div class="t green">大模型训练与部署</div>
+          <table class="tbl s" style="margin-top:6px">
+            <tr><td style="width:110px">分词 / 词元</td><td>tokenization / token</td></tr>
+            <tr><td>规模定律</td><td>scaling law</td></tr>
+            <tr><td>监督微调</td><td>SFT</td></tr>
+            <tr><td>低秩适配</td><td>LoRA</td></tr>
+            <tr><td>人类反馈强化学习</td><td>RLHF</td></tr>
+            <tr><td>直接偏好优化</td><td>DPO</td></tr>
+            <tr><td>可验证奖励强化学习</td><td>RLVR</td></tr>
+            <tr><td>核采样</td><td>top-p / nucleus</td></tr>
+            <tr><td>键值缓存</td><td>KV cache</td></tr>
+            <tr><td>思维链 / 蒸馏</td><td>CoT / distillation</td></tr>
+          </table></div>
+      </div>
+    </div>
+    <div class="note mt"><div class="t">读英文材料时的三个提醒</div>
+      <div class="sub">① 同一概念常有多个叫法：<b>weight decay ≈ L2 正则</b>、<b>FSDP ≈ ZeRO-3</b>；<b>fine-tuning</b> 可能指 SFT，也可能指继续预训练。② <b>B = billion</b>，「8B」= 80 亿参数；<b>MoE 要看清是「总参数」还是「激活参数」</b>，两个数能差十倍。③ <b>token 不是字也不是词</b>，是分词器切出的片段 —— 上下文长度、计价、吞吐都以它为单位。</div></div>
+  </div>
+</section>
+<section class="slide" data-act="附录">
+  <div class="hd"><h2>一页知识清单</h2></div>
+  <div class="bd">
+    <div class="g2">
+      <div>
+        <div class="card t-blue"><div class="t blue">要能默写的五个式子</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><td style="width:180px">一层神经网络</td><td>a = σ(Wx + b)</td></tr>
+            <tr><td>交叉熵</td><td>L = − log P(正确答案)</td></tr>
+            <tr><td>梯度下降</td><td>w ← w − η·∂L/∂w</td></tr>
+            <tr><td>自注意力</td><td>softmax(QKᵀ/√d_k)·V</td></tr>
+            <tr><td>训练算力</td><td>C ≈ 6 · N · D</td></tr>
+          </table></div>
+        <div class="card t-orange mt"><div class="t orange">要能报出的七个数</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><td style="width:180px">AlexNet 2012</td><td>top-5 错误率 15.3%，次名 26.2%</td></tr>
+            <tr><td>Chinchilla 最优比</td><td>约 20 token / 参数</td></tr>
+            <tr><td>今天的实际比</td><td>常在数百至上千 token / 参数</td></tr>
+            <tr><td>参数量估算</td><td>≈ 12 · L · d²</td></tr>
+            <tr><td>FP16 推理显存</td><td>2 字节 / 参数</td></tr>
+            <tr><td>AdamW 训练显存</td><td>约 16 字节 / 参数</td></tr>
+            <tr><td>Llama 3 405B</td><td>16,384 卡 × 54 天，466 次中断</td></tr>
+          </table></div>
+      </div>
+      <div>
+        <div class="card w"><div class="t">十个「一句话结论」</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><td style="width:22px" class="dim">1</td><td>机器学习是<b>用数据搜出一个函数</b>，不是写规则</td></tr>
+            <tr><td class="dim">2</td><td><b>只有没见过的数据算数</b>；测试集只能用一次</td></tr>
+            <tr><td class="dim">3</td><td><b>没有免费的午餐</b>：有用的模型都靠内建偏好取胜</td></tr>
+            <tr><td class="dim">4</td><td><b>非线性</b>让深度有意义，<b>残差和归一化</b>让深度训得动</td></tr>
+            <tr><td class="dim">5</td><td>注意力 = <b>两位置一步可达 + 可并行</b>，代价是 n²</td></tr>
+            <tr><td class="dim">6</td><td>注意力管「看哪儿」，<b>FFN</b> 管「想什么」且占参数大头</td></tr>
+            <tr><td class="dim">7</td><td>预训练<b>只有一个目标</b>：预测下一个 token，能力是副产品</td></tr>
+            <tr><td class="dim">8</td><td>Scaling law 让「花多少钱得到什么」<b>可事先算出来</b></td></tr>
+            <tr><td class="dim">9</td><td>万卡训练里<b>硬件故障是必然事件</b>，工程与算力同等重要</td></tr>
+            <tr><td class="dim">10</td><td><b>SFT 和对齐改行为不改知识</b>；幻觉是训练目标的后果</td></tr>
+          </table></div>
+        <div class="note b-purple mt"><div class="t purple">最容易记混的三对</div>
+          <table class="tbl s" style="margin-top:6px">
+            <tr><td style="width:118px">参数 / 超参数</td><td>梯度下降调<b>参数</b>；<b>超参数</b>由人定，见第 8 页</td></tr>
+            <tr><td>损失 / 误差</td><td><b>损失</b>可求导、用来优化；<b>误差</b>才是真正关心的</td></tr>
+            <tr><td>参数量 / 显存</td><td>推理约 <b>2 字节/参数</b>，训练约 <b>16 字节/参数</b></td></tr>
+          </table></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="收尾">
+  <div class="hd"><h2>回到起点：六个问题，各自结在哪一句话上</h2></div>
+  <div class="bd">
+    <div class="p mb">这一章是从第 3 页那六个问题倒着推出来的。推完一圈，把答案压成六句话——<b>能把这六句复述出来，这一章的目的就达到了。</b></div>
+    <table class="tbl s">
+      <tr><th style="width:26px"></th><th style="width:230px">问题</th><th>它最后结在哪一句话上</th><th style="width:52px">在</th></tr>
+      <tr><td class="blue"><b>①</b></td><td>公式到底有哪些</td><td>一层就是「<b>多头注意力 → Add&amp;Norm → FFN → Add&amp;Norm</b>」，外面套 N 次；前面加嵌入与位置，后面接输出层。<span class="dim">四个最容易错的地方：√d_k 不能省、LayerNorm 沿特征维、掩码要用 −∞、Post-LN 与 Pre-LN 不是同一个东西</span></td><td class="green"><b>30</b></td></tr>
+      <tr><td class="blue"><b>②</b></td><td>用人话讲这都在干嘛</td><td>每个式子都在完成<b>一个动作</b>：定身份、给座位、发问、应答、定听谁的比例、调音量、分组听、把原样留住、把量纲拉齐、关起门消化一遍</td><td class="green"><b>31</b></td></tr>
+      <tr><td class="blue"><b>③</b></td><td>一步一步在算什么</td><td>把它当程序看：<b>每一步拿到什么形状、产出什么形状</b>。n 个字进去、n 个向量出来，中间那张 n×n 的表是唯一让位置之间互相看见的地方</td><td class="green"><b>32</b></td></tr>
+      <tr><td class="orange"><b>④</b></td><td>算出来的到底是什么</td><td><b>公式是流程，W 是知识，概率是产出，选词是动作，循环是生成。</b>出口处永远是整个词表上的一个概率分布——训练时拿它比对，推理时拿它采样</td><td class="green"><b>33</b></td></tr>
+      <tr><td class="orange"><b>⑤</b></td><td>哪些参数是要学的</td><td>符号分三堆：<b>要学的、写死的、每次输入重算的</b>。「1750 亿参数」只数第一堆；同一行 LayerNorm 里 γ、β 属第一堆，μ、σ² 属第三堆</td><td class="green"><b>34</b></td></tr>
+      <tr><td class="orange"><b>⑥</b></td><td>用具体的数走一遍</td><td>「我」原本是 [1,0,0,1]，一轮注意力后掺进了 27% 的「爱」。<b>所谓「融合了上下文」，落到数上就是一次加权平均——没有别的。</b></td><td class="green"><b>35</b></td></tr>
+    </table>
+    <div class="g2 mt">
+      <div class="note b-red"><div class="t red">这一章没有讲的</div>
+        <div class="sub"><b>数学推导</b>——公式只给结论形式和它在算什么。<b>动手写代码</b>——目标是看懂别人在说什么，不是自己训一个。<b>模型横评与排行榜</b>——过期太快。<b>多模态、扩散、语音与视觉生成</b>——本章的范围是文本这一条线。</div></div>
+      <div class="note b-purple"><div class="t purple">到这里你手上有什么，还差什么</div>
+        <div class="sub">有的是一个<b>会听指令、能对话、能生成文本的模型</b>。它<b>还不会</b>：主动拆解目标、调用外部工具、在多轮中维护状态、根据执行结果纠正自己——<b>从「会说」到「会办事」，是下一章的内容。</b></div></div>
+    </div>
+    <div class="note b-green" style="margin-top:12px"><div class="t green">这一章适合被回查，不适合被读完</div>
+      <div class="cap">别顺读第二遍。后面几章里遇到卡住的词，回到第 45 页查中英对照，或按第 2 页的地图直接翻到对应那一页——<b>每一页都是自足的，单独拿出来看就成立。</b></div></div>
+    <div class="src" style="margin-top:10px">数字均标注口径与来源年份；训练实况引自 Llama 3 与 PaLM 的公开技术报告　·　核对日期 2026-08</div>
+  </div>
+</section>
+<!--SLIDES-END-->
+</main></div></div>
+
+<div id="ov"><div id="ovg"></div></div>
+
+<script>
+(function(){
+  var deck=document.getElementById('deck'), bar=document.getElementById('bar'),
+      ov=document.getElementById('ov'), ovg=document.getElementById('ovg'),
+      slides=[].slice.call(document.querySelectorAll('.slide')),
+      N=slides.length, cur=0, ovOpen=false, built=false;
+
+  // 页眉幕名 + 页脚页码（封面不加）
+  slides.forEach(function(s,i){
+    var hd=s.querySelector('.hd'), act=s.getAttribute('data-act');
+    if(hd&&act){ var b=document.createElement('b'); b.textContent=act; hd.appendChild(b); }
+    if(!s.classList.contains('cover')){
+      var ft=document.createElement('div'); ft.className='ft';
+      var p=document.createElement('span'); p.className='pg';
+      p.textContent=(i+1)+' / '+N; ft.appendChild(p); s.appendChild(ft);
+    }
+  });
+
+  function fit(){
+    var k=Math.min(window.innerWidth/1280, window.innerHeight/720)*0.96;
+    deck.style.transform='scale('+k+')';
+  }
+  window.addEventListener('resize',fit); fit();
+
+  function check(i){
+    var s=slides[i], b=s.querySelector('.bd'); if(!b) return;
+    var vo=b.scrollHeight-b.clientHeight, ho=0;
+    var els=b.querySelectorAll('*');
+    for(var k=0;k<els.length;k++){
+      if(els[k].closest('svg')) continue;
+      var d=els[k].scrollWidth-els[k].clientWidth; if(d>ho) ho=d;
+    }
+    if(vo>1||ho>1){ s.style.outline='3px solid #dc2626'; s.style.outlineOffset='-3px';
+      console.warn('[溢出] 第'+(i+1)+'页　纵向 +'+vo+'　横向 +'+ho); }
+    else { s.style.outline=''; }
+  }
+
+  function go(i){
+    i=Math.max(0,Math.min(N-1,i));
+    slides[cur].classList.remove('on'); cur=i; slides[cur].classList.add('on');
+    bar.style.width=((cur+1)/N*100)+'%';
+    history.replaceState(null,'','#'+(cur+1));
+    check(cur);
+  }
+  function next(){ if(cur<N-1) go(cur+1); }
+  function prev(){ if(cur>0) go(cur-1); }
+
+  function build(){
+    if(built) return; built=true;
+    slides.forEach(function(s,i){
+      var c=document.createElement('div'); c.className='ovc';
+      var w=document.createElement('div'); w.className='ovi';
+      var cl=s.cloneNode(true); cl.classList.add('on'); cl.style.animation='none';
+      w.appendChild(cl); c.appendChild(w);
+      var n=document.createElement('div'); n.className='ovn'; n.textContent=i+1; c.appendChild(n);
+      c.addEventListener('click',function(){ go(i); toggleOv(false); });
+      ovg.appendChild(c);
+    });
+  }
+  function toggleOv(on){ ovOpen=(on===undefined)?!ovOpen:on; if(ovOpen) build();
+    ov.classList.toggle('on',ovOpen); }
+
+  document.addEventListener('keydown',function(e){
+    var k=e.key;
+    if(k==='Escape'){ if(ovOpen) toggleOv(false);
+      else if(document.fullscreenElement) document.exitFullscreen(); return; }
+    if(k==='o'||k==='O'){ toggleOv(); e.preventDefault(); return; }
+    if(ovOpen) return;
+    if(k==='ArrowRight'||k==='PageDown'||k===' '||k==='j'||k==='J'){ next(); e.preventDefault(); }
+    else if(k==='ArrowLeft'||k==='PageUp'||k==='k'||k==='K'){ prev(); e.preventDefault(); }
+    else if(k==='Home'){ go(0); e.preventDefault(); }
+    else if(k==='End'){ go(N-1); e.preventDefault(); }
+    else if(k==='f'||k==='F'){ document.fullscreenElement?document.exitFullscreen()
+      :document.documentElement.requestFullscreen(); e.preventDefault(); }
+  });
+
+  document.getElementById('stage').addEventListener('click',function(e){
+    if(ovOpen) return;
+    if(e.target.closest('a,.code,.kbd')) return;
+    if(String(window.getSelection()).length>0) return;
+    (e.clientX/window.innerWidth < 0.28) ? prev() : next();
+  });
+
+  var tx=0;
+  document.addEventListener('touchstart',function(e){ tx=e.changedTouches[0].clientX; },{passive:true});
+  document.addEventListener('touchend',function(e){
+    if(ovOpen) return; var d=e.changedTouches[0].clientX-tx;
+    if(Math.abs(d)>50){ d<0?next():prev(); }
+  },{passive:true});
+
+  window.addEventListener('hashchange',function(){
+    var n=parseInt(location.hash.slice(1),10); if(!isNaN(n)&&n-1!==cur) go(n-1);
+  });
+
+  var h=parseInt(location.hash.slice(1),10);
+  go(isNaN(h)?0:h-1);
+})();
+</script>
+</body>
+</html>
