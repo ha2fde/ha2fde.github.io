@@ -31,6 +31,10 @@
     "desc": "第六章初版（含多 Agent 一节），已被重写版替换，仅作对照归档",
     "src": "C:\\Users\\think\\_stage\\agent-principles-ch6-v1"
   },
+  "agent-principles-ch6-v2": {
+    "desc": "第六章第二版（16 页，含四道闸），已被更科普的第三版替换",
+    "src": "C:\\Users\\think\\_stage\\agent-principles-ch6-v2"
+  },
   "agent-principles-flash": {
     "desc": "同一套提示词交给 DeepSeek Flash 生成的六章版本，可与 posts/agent-principles/ 对照看模型差异。_parts/ 是分片源和拼装脚本",
     "src": "/Users/fde/Documents/agent ppt flash"
