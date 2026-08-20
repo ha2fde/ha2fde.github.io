@@ -39,6 +39,10 @@
     "desc": "Agent 协议层（tools / MCP / CLI / Skills / A2A / ACI）双版 PPT，深讲版 + 精简版",
     "src": "~/agent-protocol-ppt/"
   },
+  "agi-roadmap": {
+    "desc": "把 scaling / RLVR / 连续学习 / 世界模型 / 具身 / 多agent / RSI / AGI 八个词摆回各自层级，讲清各自卡在哪、怎么依赖",
+    "src": "C:\\Users\\think\\_stage\\agi-roadmap"
+  },
   "ai-agent-training": {
     "desc": "AI Agent 系列培训七讲（第一代，2026-08 前）。PDF/PPTX 已剥离，可由 slides/ 本地再生",
     "src": "原站点根目录 /ai-agent-training/"
