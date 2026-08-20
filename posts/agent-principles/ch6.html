@@ -80,6 +80,19 @@ em{font-style:normal;font-weight:600}
 .tag{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:11px;
      background:var(--panel);color:var(--sub);letter-spacing:.02em}
 .num{font-size:34px;font-weight:600;line-height:1.1;letter-spacing:-.02em}
+/* ── 公式 ──────────────────────────────────────────────── */
+.eq{font-family:var(--mono);font-size:16px;line-height:1.75;background:var(--panel);
+    border:1px solid var(--line);border-radius:6px;padding:11px 15px;white-space:pre;overflow:hidden}
+.eq.w{background:#fff}
+.eq.s{font-size:14px;line-height:1.7;padding:9px 13px}
+.eq .c{color:var(--faint);font-size:13px}
+.eq b{font-weight:700}
+.eq .k{color:var(--purple);font-weight:700}
+.eq .g{color:var(--green);font-weight:700}
+.eq .r{color:var(--red);font-weight:700}
+.eq .o{color:var(--orange);font-weight:700}
+.mono{font-family:var(--mono)}
+.shp{font-family:var(--mono);font-size:12.5px;color:var(--faint)}
 .src{font-size:12px;color:var(--faint);line-height:1.5}
 .src a{color:var(--faint)}
 a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,.3)}
@@ -119,323 +132,811 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
 <div id="stage"><div id="deck"><div id="bar"></div>
 <main id="slides">
 
+
 <section class="slide cover">
   <div class="ser">AGENT 原理与实践 · 第六章</div>
   <h1>从 Agent 到 AGI</h1>
   <div class="rule"></div>
-  <div class="sl">不预测，只梳理路径。<br><b>每条路都问一句：如果它对了，我们会先看到什么。</b></div>
+  <div class="sl">继续 scaling、RL+可验证环境、连续学习、世界模型、具身智能、AGI、RSI。<b>这七个词不在一个层级上——先把它们摆到该在的位置，再看每条路线在解什么、卡在哪、彼此怎么依赖。</b></div>
   <div class="meta" style="margin-top:34px">观点型 · 不给时间表 · 结论会被后来的事实检验</div>
   <div class="meta" style="margin-top:10px">← → 翻页　·　O 概览　·　F 全屏</div>
 </section>
 
-<section class="slide" data-act="开场">
-  <div class="hd"><h2>先处理「AGI」这个词</h2></div>
+<section class="slide" data-act="地图">
+  <div class="hd"><h2>先摆位置：这七个词不在一个层级上</h2></div>
   <div class="bd">
-    <div class="p mb">这个词今天被用来指至少三件不同的事。争论「AGI 什么时候到来」之所以永远没有结论，很大程度上是因为<b>参与争论的人说的根本不是同一件事</b>。</div>
-    <div class="g3 mb">
-      <div class="card t-blue"><div class="t blue">经济定义</div>
-        <div class="cap">「能替代人类完成绝大部分有经济价值的工作。」<br><br><b>优点</b>：后果明确，谁都关心。<br><b>问题</b>：门槛依赖于社会分工怎么变，而不只是技术。同一套能力，在不同的组织形态下能替代的比例可以差很远。</div></div>
-      <div class="card t-green"><div class="t green">能力基准定义</div>
-        <div class="cap">「在一组足够广的任务集合上达到或超过人类水平。」<br><br><b>优点</b>：可以测量。<br><b>问题</b>：<b>基准会被追平，然后被换掉。</b>过去十几年里，每一个「达到了就算通用」的基准被刷过之后，人们都会说「这个不算」。</div></div>
-      <div class="card t-purple"><div class="t purple">自主性定义</div>
-        <div class="cap">「能自己设定目标、自己学习、长期无人监督地运作。」<br><br><b>优点</b>：抓住了和今天系统最本质的差别。<br><b>问题</b>：几乎无法分级，也难以证伪——「自己设定目标」和「按预设目标分解子任务」的界线在哪儿，没有共识。</div></div>
+    <svg viewBox="0 0 1168 316" style="width:100%;height:auto;display:block">
+      <text x="0" y="12" font-size="12" fill="#94a3b8">目标</text>
+      <rect x="434" y="22" width="300" height="56" rx="8" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="2"/>
+      <text x="584" y="58" font-size="20" font-weight="700" fill="#0e9f6e" text-anchor="middle">AGI</text>
+      <text x="750" y="56" font-size="12.5" fill="#94a3b8">终点。但「算不算到了」有三派定义（第 13 页）</text>
+
+      <path d="M584 116 L584 84" stroke="#7c3aed" stroke-width="1.8" fill="none" marker-end="url(#ap)"/>
+      <defs><marker id="ap" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0 0 L6 3 L0 6 z" fill="#7c3aed"/></marker>
+        <marker id="ab" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0 0 L6 3 L0 6 z" fill="#2563eb"/></marker></defs>
+
+      <text x="0" y="110" font-size="12" fill="#94a3b8">元路线　怎么到</text>
+      <rect x="384" y="120" width="400" height="62" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+      <text x="584" y="146" font-size="15.5" font-weight="700" fill="#7c3aed" text-anchor="middle">RSI　递归自我改进</text>
+      <text x="584" y="168" font-size="12.5" fill="#7c3aed" text-anchor="middle">不是一种能力，是让能力自己长的闭环</text>
+      <text x="800" y="156" font-size="12.5" fill="#94a3b8">第 10–12 页把这个闭环拆开讲</text>
+
+      <path d="M120 218 L120 188" stroke="#2563eb" stroke-width="1.6" fill="none" marker-end="url(#ab)"/>
+      <path d="M352 218 L352 188" stroke="#2563eb" stroke-width="1.6" fill="none" marker-end="url(#ab)"/>
+      <path d="M584 218 L584 188" stroke="#2563eb" stroke-width="1.6" fill="none" marker-end="url(#ab)"/>
+      <path d="M816 218 L816 188" stroke="#2563eb" stroke-width="1.6" fill="none" marker-end="url(#ab)"/>
+      <path d="M1048 218 L1048 188" stroke="#2563eb" stroke-width="1.6" fill="none" marker-end="url(#ab)"/>
+
+      <text x="0" y="212" font-size="12" fill="#94a3b8">能力路线</text>
+      <rect x="14" y="224" width="212" height="86" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
+      <text x="120" y="254" font-size="15" font-weight="700" fill="#2563eb" text-anchor="middle">继续 scaling</text>
+      <text x="120" y="278" font-size="12.5" fill="#5b6675" text-anchor="middle">更大、更久、更会想</text>
+      <text x="120" y="300" font-size="11.5" fill="#94a3b8" text-anchor="middle">第 4 页</text>
+      <rect x="246" y="224" width="212" height="86" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
+      <text x="352" y="254" font-size="15" font-weight="700" fill="#2563eb" text-anchor="middle">RL + 可验证环境</text>
+      <text x="352" y="278" font-size="12.5" fill="#5b6675" text-anchor="middle">从对错里学</text>
+      <text x="352" y="300" font-size="11.5" fill="#94a3b8" text-anchor="middle">第 5–6 页</text>
+      <rect x="478" y="224" width="212" height="86" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
+      <text x="584" y="254" font-size="15" font-weight="700" fill="#2563eb" text-anchor="middle">连续学习</text>
+      <text x="584" y="278" font-size="12.5" fill="#5b6675" text-anchor="middle">边做边改自己的权重</text>
+      <text x="584" y="300" font-size="11.5" fill="#94a3b8" text-anchor="middle">第 7 页</text>
+      <rect x="710" y="224" width="212" height="86" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
+      <text x="816" y="254" font-size="15" font-weight="700" fill="#2563eb" text-anchor="middle">世界模型</text>
+      <text x="816" y="278" font-size="12.5" fill="#5b6675" text-anchor="middle">在想象里试，不用真试</text>
+      <text x="816" y="300" font-size="11.5" fill="#94a3b8" text-anchor="middle">第 8 页</text>
+      <rect x="942" y="224" width="212" height="86" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
+      <text x="1048" y="254" font-size="15" font-weight="700" fill="#2563eb" text-anchor="middle">具身智能</text>
+      <text x="1048" y="278" font-size="12.5" fill="#5b6675" text-anchor="middle">接上物理世界</text>
+      <text x="1048" y="300" font-size="11.5" fill="#94a3b8" text-anchor="middle">第 9 页</text>
+    </svg>
+    <div class="g3 mt">
+      <div class="note b-green"><div class="t green">最上面一层是「要什么」</div>
+        <div class="sub">AGI 是目标，不是方案。它的定义直接决定下面选哪条路——按「覆盖多少经济价值工作」定义，和按「能不能自己学新领域」定义，优先级完全不同。</div></div>
+      <div class="note b-purple"><div class="t purple">中间那层是「怎么自己长」</div>
+        <div class="sub">RSI 横跨所有路线：它要的不是某一项能力更强，而是<b>把能力接回到产生能力的过程上</b>。缺任何一环，环就闭不上。</div></div>
+      <div class="note b-blue"><div class="t blue">下面那排才是真正的技术分歧</div>
+        <div class="sub">五条路线各自补一个不同的缺口。它们<b>不是互斥的候选项</b>，实际是并行推进、互相供料的关系——第 15 页会画出依赖图。</div></div>
     </div>
-    <div class="note b-orange"><div class="t orange">所以本章不拿它当目标</div>
-      <div class="cap">一个没有公认定义的词，<b>不适合用来做判断的落点</b>。本章换一个问法：<br><b>从今天的 Agent 出发，往前走有哪几条路？每条路的主张是什么、目前有什么证据、卡在哪儿、以及——如果它是对的，我们会先看到什么信号？</b><br>这样，将来发生的事就能用来检验这一章，而不是让这一章变成一句怎么都对的话。</div></div>
+    <div class="note b-orange mt"><div class="t orange">把这三层分开，讨论才不会打架</div>
+      <div class="sub">关于 AGI 的争论有很大一部分是层级错位：拿一个目标去比一条路线，或者拿一种机制去比一项能力，比出来的结论必然对不上。<b>先问一句「这个词是目标、是机制，还是能力来源」</b>，一半的分歧会自己消失。</div></div>
   </div>
 </section>
-
-<section class="slide" data-act="开场">
-  <div class="hd"><h2>本章的硬结构：每条路线固定四栏</h2></div>
+<section class="slide" data-act="出发点">
+  <div class="hd"><h2>共同的出发点：今天的模型到底缺什么</h2></div>
   <div class="bd">
-    <div class="p mb">后面五条路线，全部按同一个格式讲。这样做的目的很明确：<b>让不同路线之间可以横着比，也让每条路线将来可以被检验。</b></div>
-    <div class="g4 mb">
-      <div class="card t-blue"><div class="t blue">① 主张是什么</div>
-        <div class="cap">这条路线认为<b>当前的主要瓶颈是什么</b>，以及<b>解决它的方式是什么</b>。<br><br>写成一句能被反对的话，不写成一句谁都同意的话。</div></div>
-      <div class="card t-green"><div class="t green">② 目前有什么证据</div>
-        <div class="cap"><b>已经发生的事</b>——做出来的系统、观察到的规律、公开的结果。<br><br>不包括某人认为将来会怎样。</div></div>
-      <div class="card t-orange"><div class="t orange">③ 已知瓶颈</div>
-        <div class="cap">这条路线<b>现在实际卡在哪儿</b>，以及这个卡点是「工程上还没做」还是「原理上没解」。<br><br>这两者的区别很大。</div></div>
-      <div class="card t-purple"><div class="t purple">④ 会先看到什么信号</div>
-        <div class="cap"><b>这一栏是本章的重点。</b><br><br>如果这条路线走得通，<b>在结果出来之前，我们会先观察到什么？</b><br><br>写成具体的、能被看到或看不到的事。</div></div>
-    </div>
-    <div class="note b-red mb"><div class="t red">一条硬约束：本章不给任何时间表</div>
-      <div class="cap">不写年份，不写「几年内」。原因不是谨慎，是<b>技术性的</b>：给出年份，这一章就从「可证伪的路径梳理」变成了算命——而一旦其中一个年份被证伪，前面那些本来可核实的部分会被一起怀疑。<br><b>第四栏是时间表的替代品</b>：它不告诉你什么时候，但告诉你<b>该盯着什么</b>。信号出现了，说明在走通；长期不出现，说明卡住了。这比年份有用得多。</div></div>
-    <div class="note b-purple"><div class="t purple">还有一点要先说清</div>
-      <div class="cap">这五条路线<b>不是互斥的选项</b>，更像是五个正在同时推进的方向，彼此还互相依赖。<br>把它们分开讲，是为了让每一条的证据和瓶颈能被单独审视——<b>而不是暗示最后只有一条会赢。</b></div></div>
-  </div>
-</section>
-
-<section class="slide" data-act="开场">
-  <div class="hd"><h2>起点：今天的 Agent 实际卡在四件事上</h2></div>
-  <div class="bd">
-    <div class="p mb">路线之所以是这五条，是因为它们各自针对下面四个卡点中的一个或几个。<b>先看清起点，后面的分歧才有意义。</b></div>
-    <div class="g2 mb">
-      <div class="card t-red"><div class="t red">① 长任务会漂</div>
-        <div class="cap">短任务做得相当好，任务一长——几十步、跨几个小时——就会逐渐偏离目标、重复劳动、或者在某个错误的判断上一路走下去。<br><br><b>不是某一步特别容易错，是错误会累积而没有自我纠正的机制。</b></div></div>
-      <div class="card t-red"><div class="t red">② 不会积累经验</div>
-        <div class="cap">同一个坑今天踩了，明天还踩。上下文里记住的东西，任务结束就没了；真正的能力更新只发生在训练时，而训练是离线的、批量的、和你无关的。<br><br><b>它能记住事，但不会因为做过而变强。</b></div></div>
-      <div class="card t-red"><div class="t red">③ 分不清「像对的」和「是对的」</div>
-        <div class="cap">在有明确验收标准的领域（代码能不能跑、题解对不对）表现越来越好；在没有标准答案的领域，它只能追求「看起来合理」。<br><br><b>而它自己也判断不出这两者的差别。</b></div></div>
-      <div class="card t-red"><div class="t red">④ 只懂文字里的世界</div>
-        <div class="cap">对物理世界的因果、对动作的后果、对「这样做会不会把杯子碰倒」这类事，它的知识来自描述，不来自经历。<br><br><b>凡是要在真实世界里连续行动的场景，这一条就是硬墙。</b></div></div>
-    </div>
-    <div class="note b-purple"><div class="t purple">五条路线各自打哪个卡点</div>
-      <div class="cap"><b>继续 scaling</b> → 认为①②③会随规模一起缓解　·　<b>RL + 可验证环境</b> → 主攻①③　·　<b>连续学习与记忆</b> → 主攻②　·　<b>多 agent 分工</b> → 主攻①（用结构替代单体能力）　·　<b>世界模型与具身</b> → 主攻④<br><span class="dim">注意：没有任何一条声称能一次解决全部四个。这本身就是有信息量的。</span></div></div>
-  </div>
-</section>
-
-<section class="slide" data-act="路线一">
-  <div class="hd"><h2>路线一 · 继续 scaling</h2></div>
-  <div class="bd">
-    <div class="g4">
-      <div class="card t-blue"><div class="t blue">① 主张</div>
-        <div class="cap"><b>不需要换路子。</b>把模型、数据、算力继续往上推，能力会继续涨，今天那四个卡点会随之缓解——就像过去每一次那样。<br><br>更强的版本：<b>过去每一次「这条路到头了」的判断，最后都被下一轮规模化证伪了。</b>所以举证责任在唱衰的一方。<br><br>近年的补充主张：<b>规模化不只发生在训练阶段</b>，也发生在推理阶段——让模型在回答前多想一会儿，同样能换来能力提升。</div></div>
-      <div class="card t-green"><div class="t green">② 证据</div>
-        <div class="cap"><b>· 规模与能力之间存在相当稳定的关系</b>，且在很宽的范围内成立过——这是这条路线最硬的一块证据，它不是个别现象，而是被反复复现的规律。<br><br><b>· 能力的「涌现」反复出现</b>：某些任务在小模型上完全不行，到了一定规模突然可用。这让「再等一轮」这个策略在历史上一直是对的。<br><br><b>· 推理阶段的规模化被验证有效</b>：同一个模型，允许它多花计算量思考，在有明确验收标准的任务上成绩明显更好。<br><br><b>· 工程上还有余量</b>：算力投入、数据处理、训练效率仍在改进，不是所有可做的都已做完。</div></div>
-      <div class="card t-orange"><div class="t orange">③ 瓶颈</div>
-        <div class="cap"><b>· 高质量数据是有限的。</b>公开可用的高质量文本不是无限供应，而合成数据能不能无损替代，目前没有定论。<br><br><b>· 成本上升得比能力快。</b>每一轮规模化的代价迅速增加，而收益是递减的——这不一定是原理问题，但一定是经济问题。<br><br><b>· 涨的是哪种能力，存疑。</b>规模化在「知识和模式」上效果明显；在「长任务不漂」「从经验中学习」这两件事上，能不能靠规模解决，<b>没有证据，只有信念</b>。<br><br><b>· 基准逐渐失效。</b>成绩在涨，但被质疑训练数据里可能已含相关内容，越来越难判断涨的是能力还是记忆。</div></div>
-      <div class="card t-purple"><div class="t purple">④ 会先看到什么</div>
-        <div class="cap"><b>走通的信号：</b><br>· 新一代模型在<b>没见过的、发布于训练截止之后</b>的任务上明显更好，而不只是在既有基准上刷高。<br>· <b>长任务的完成度随规模稳定提升</b>——同一套长任务评测，轮数不变而成功率随代际持续上升。<br>· 单位能力的成本继续下降，而不只是绝对能力上升。<br><br><b>卡住的信号：</b><br>· 连续两代之间，<b>提升主要体现在基准分数上，实际使用中感受不到差别</b>。<br>· 各家开始把资源明显转向别的方向（后训练、工具、架构），而不是更大的预训练。<br>· 「更大的模型」不再被当作卖点。</div></div>
-    </div>
-  </div>
-</section>
-
-<section class="slide" data-act="路线一">
-  <div class="hd"><h2>路线一的争议点：涨的到底是什么</h2></div>
-  <div class="bd">
-    <div class="p mb">这条路线的分歧不在「规模化有没有用」——这一点几乎没人否认。分歧在于：<b>它涨的是不是我们最缺的那种能力。</b></div>
-    <div class="g2 mb">
-      <div class="card t-green"><div class="t green">支持方的核心论证</div>
-        <div class="cap"><b>历史归纳。</b>每一次「这条路到头了」的判断——数据不够了、算力不够了、架构不行了——最后都被下一轮证伪。而每一次唱衰时给出的理由，事后看都相当有道理。<br><br><b>这条论证的力量在于它的战绩，弱点也在于此</b>：归纳法只能说明过去，不能保证下一次。<br><br>更实质的一条是：<b>很多被认为「规模解决不了」的能力，最后确实是被规模解决的</b>——多步推理、跨语言、代码，都曾被认为需要专门的架构。</div></div>
-      <div class="card t-orange"><div class="t orange">质疑方的核心论证</div>
-        <div class="cap"><b>能力的类型可能不同。</b>规模化提升的是「从大量样本中提炼模式」的能力。而「在一个长任务里不偏航」「从这次失败中学到东西」，可能<b>不是同一类问题</b>——它们更像是缺少某种机制，而不是缺少参数。<br><br><b>一个具体的观察</b>：模型的单步质量在稳定提升，但长任务的失败率下降得慢得多。如果长任务只是很多单步的连乘，这两者应该同步改善。<br><br><b>这构成一个可检验的分歧</b>——见上一页第四栏的第二条。</div></div>
-    </div>
-    <div class="note b-purple"><div class="t purple">怎么看这条路线</div>
-      <div class="cap">它的特殊性在于：<b>其余四条路线都默认它会继续提供底座。</b>没有一条路线主张「不要更强的基础模型」。<br>所以真正的问题从来不是「scaling 会不会继续」，而是<b>「光靠它够不够」</b>——而这个问题，后面四条路线各自给出了「不够，还缺这个」的具体答案。</div></div>
-  </div>
-</section>
-
-<section class="slide" data-act="路线二">
-  <div class="hd"><h2>路线二 · 强化学习与可验证环境</h2></div>
-  <div class="bd">
-    <div class="g4">
-      <div class="card t-blue"><div class="t blue">① 主张</div>
-        <div class="cap"><b>光看人类写下的文本，学不到「怎么把事情做成」。</b>因为文本里记录的是结果和说法，不是试错过程。<br><br>要学会做事，得<b>真的去做</b>：在一个能给出对错反馈的环境里反复尝试，做对了强化，做错了修正。<br><br>关键词是<b>可验证</b>：环境必须能自动判断这次做得对不对，不需要人来打分。有了这个，训练量就不再受限于人的产出速度。<br><br>更进一步的主张：<b>能力的上限最终取决于你能造出多好的环境</b>，而不是取决于你有多少文本。</div></div>
-      <div class="card t-green"><div class="t green">② 证据</div>
-        <div class="cap"><b>· 这条路在别处已经被完整验证过。</b>棋类、电子游戏这些规则明确、胜负自动判定的领域，靠自我对弈达到并远超人类水平，是已经发生的事——<b>而且是在没有人类棋谱的情况下做到的</b>。<br><br><b>· 在数学和编程上已经见效。</b>这两个领域天然可验证：答案能对、代码能跑。用可验证的反馈做训练之后，模型在这两类任务上的提升幅度明显大于其它领域。<br><br><b>· 「先想再答」被证明可训练。</b>让模型在给出答案前生成一段推理过程，并用最终结果的对错来强化，确实能学出更长更有效的推理——而不需要人去标注推理过程该怎么写。<br><br><b>· 能力提升沿着「可验证性」分布。</b>这本身就是这条路线成立的间接证据。</div></div>
-      <div class="card t-orange"><div class="t orange">③ 瓶颈</div>
-        <div class="cap"><b>· 环境不好造。</b>一个能自动判定、又足够贴近真实工作的环境，本身就是重大工程。写测试比写代码难，这个困难在这里被放大了。<br><br><b>· 会学会钻空子。</b>只要判定标准和真实目标有偏差，训练就会精确地找到并利用这个偏差——通过检查而没解决问题、猜到评测的模式、把环境本身改掉。<b>这不是偶发故障，是优化的必然结果。</b><br><br><b>· 大量真实工作不可验证。</b>写一份战略、做一个设计、安抚一个客户——这些没有自动判定标准，而它们恰好是经济价值最高的那部分。<br><br><b>· 迁移性存疑。</b>在可验证领域练出来的能力，能不能迁移到不可验证的领域，目前证据不足。</div></div>
-      <div class="card t-purple"><div class="t purple">④ 会先看到什么</div>
-        <div class="cap"><b>走通的信号：</b><br>· <b>能力提升从可验证领域「溢出」</b>——在数学和代码上练出来的模型，在<b>没有专门训练过的、不可验证的</b>任务上也明显变好。这是最关键的一个信号。<br>· 出现<b>公认好用的通用环境集合</b>，就像当年公认的数据集那样，各家都在同一批环境上训练和比较。<br>· 「造环境」成为一个独立的行业分工，有专门做这件事的团队和产品。<br><br><b>卡住的信号：</b><br>· 提升长期<b>只出现在有自动判定的领域</b>，其余领域纹丝不动，差距越拉越大。<br>· 大量成绩被发现来自钻空子，评测不断要打补丁。<br>· 环境的构建成本被证明比模型训练本身还高。</div></div>
-    </div>
-  </div>
-</section>
-
-<section class="slide" data-act="路线二">
-  <div class="hd"><h2>「可验证」这条线，把工作切成了两半</h2></div>
-  <div class="bd">
-    <div class="p mb">这是本章里最值得记住的一条分界线。<b>它不只解释了路线二，还相当准确地解释了过去这段时间「哪些事 Agent 突然变好了、哪些没有」。</b></div>
-    <table class="tbl mb">
-      <tr><th style="width:14%"></th><th style="width:30%">可自动验证</th><th>无法自动验证</th></tr>
-      <tr><td><b>典型任务</b></td><td class="green">解题、写代码、跑通测试、数据转换、格式产出、查得到确定答案的问题</td><td class="orange">写战略、做设计、谈判、判断优先级、安抚客户、决定要不要做一件事</td></tr>
-      <tr><td><b>怎么判对错</b></td><td class="green">程序说了算，<b>零成本、可无限次</b></td><td class="orange">要人来判，<b>慢、贵、而且不同的人判得不一样</b></td></tr>
-      <tr><td><b>能不能大量训练</b></td><td class="green">能。训练量只受算力限制</td><td class="orange">难。训练量受限于人的产出速度</td></tr>
-      <tr><td><b>近年的进展</b></td><td class="green"><b>明显且持续</b></td><td class="orange"><b>慢得多，且难以确认是不是真的在进步</b></td></tr>
-      <tr><td><b>经济价值占比</b></td><td>相当可观，但<b>不是大头</b></td><td class="purple"><b>大头在这一侧</b>——决策、协调、判断，本来就是高价值工作的主要形态</td></tr>
+    <div class="p mb">五条路线不是凭空冒出来的。<b>它们各自在补今天这套「预训练 + 后训练 + 冻结权重上线」范式的一个具体缺口</b>——先看缺口，路线就不需要背了。</div>
+    <table class="tbl">
+      <tr><th style="width:150px">缺口</th><th style="width:330px">具体表现</th><th>为什么这套范式天生解不了</th><th style="width:140px">谁来补</th></tr>
+      <tr><td><b class="red">不会变强</b></td><td>上线之后权重就是常数，用一万次和用一次一样聪明</td><td>训练和推理是两个分离的阶段，推理路径上根本没有梯度</td><td class="purple"><b>连续学习</b></td></tr>
+      <tr><td><b class="red">没有信号</b></td><td>写作、研究、决策这类任务，做完了也不知道做得对不对</td><td>人类偏好标注贵且会被 hack，规模上不去</td><td class="purple"><b>RL + 可验证环境</b></td></tr>
+      <tr><td><b class="red">没有后果</b></td><td>只见过文字描述的世界，没有「动一下会怎样」的经验</td><td>语料里全是别人行动的结果，没有自己行动的因果</td><td class="purple"><b>世界模型 · 具身</b></td></tr>
+      <tr><td><b class="red">料要见底</b></td><td>高质量公开文本是有限的，重复训收益迅速下降</td><td>预训练的燃料是存量语料，不随算力增长</td><td class="purple"><b>继续 scaling 的转向</b></td></tr>
     </table>
-    <div class="g2">
-      <div class="note b-purple"><div class="t purple">这条线解释了一件常被误读的事</div>
-        <div class="cap">「AI 写代码很强，但做我这份工作不行」——这经常被解读成「代码简单，我的工作复杂」。<br><b>更可能的解释是：代码可验证，你的工作不可验证。</b>难易和可验证性是两回事，而后者才是决定进展速度的那个变量。</div></div>
-      <div class="note b-orange"><div class="t orange">于是真正的问题变成</div>
-        <div class="cap"><b>右边这一半，有没有办法变成左边？</b><br>几种正在被尝试的思路：把大目标拆成可验证的小步骤 · 用长期的真实结果做反馈（慢，但真实）· 训练一个足够好的评判模型来代替人打分。<br><b>第三种最有吸引力，也最危险</b>——评判模型自己就是一个可以被钻空子的目标。</div></div>
+    <svg viewBox="0 0 1168 122" style="width:100%;height:auto;display:block;margin-top:14px">
+      <defs><marker id="a3g" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0 0 L6 3 L0 6 z" fill="#94a3b8"/></marker>
+        <marker id="a3o" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0 0 L6 3 L0 6 z" fill="#c2410c"/></marker></defs>
+
+      <text x="100" y="12" font-size="11.5" font-weight="700" fill="#dc2626" text-anchor="middle">料要见底 · 没有后果</text>
+      <text x="566" y="12" font-size="11.5" font-weight="700" fill="#dc2626" text-anchor="middle">没有信号</text>
+      <text x="819" y="12" font-size="11.5" font-weight="700" fill="#dc2626" text-anchor="middle">不会变强</text>
+
+      <rect x="0" y="20" width="200" height="48" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.6"/>
+      <text x="100" y="42" font-size="14" font-weight="700" fill="#1f2937" text-anchor="middle">存量语料</text>
+      <text x="100" y="60" font-size="11.5" fill="#94a3b8" text-anchor="middle">全是文本，全是别人的结果</text>
+      <path d="M206 44 L242 44" stroke="#94a3b8" stroke-width="1.6" fill="none" marker-end="url(#a3g)"/>
+
+      <rect x="248" y="20" width="180" height="48" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
+      <text x="338" y="42" font-size="14" font-weight="700" fill="#2563eb" text-anchor="middle">预训练</text>
+      <text x="338" y="60" font-size="11.5" fill="#5b6675" text-anchor="middle">一次性烧掉全部语料</text>
+      <path d="M434 44 L470 44" stroke="#94a3b8" stroke-width="1.6" fill="none" marker-end="url(#a3g)"/>
+
+      <rect x="476" y="20" width="180" height="48" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
+      <text x="566" y="42" font-size="14" font-weight="700" fill="#2563eb" text-anchor="middle">后训练</text>
+      <text x="566" y="60" font-size="11.5" fill="#5b6675" text-anchor="middle">要有人给的判断</text>
+      <path d="M662 44 L698 44" stroke="#94a3b8" stroke-width="1.6" fill="none" marker-end="url(#a3g)"/>
+
+      <rect x="704" y="20" width="230" height="48" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.6"/>
+      <text x="819" y="42" font-size="14" font-weight="700" fill="#1f2937" text-anchor="middle">权重冻结 · 上线服务</text>
+      <text x="819" y="60" font-size="11.5" fill="#94a3b8" text-anchor="middle">用一万次，还是同一套权重</text>
+
+      <text x="960" y="40" font-size="12" fill="#94a3b8">这条链是单向的：</text>
+      <text x="960" y="60" font-size="12" fill="#94a3b8">料在最左边，会在最右边</text>
+
+      <path d="M819 72 L819 100 L338 100 L338 72" fill="none" stroke="#c2410c" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#a3o)"/>
+      <text x="578" y="120" font-size="12" font-weight="700" fill="#c2410c" text-anchor="middle">想变强，只能整个回去重跑一遍：按月计，而且和线上这次经历无关</text>
+    </svg>
+    <div class="g2 mt">
+      <div class="note b-blue"><div class="t blue">四个缺口其实是两类</div>
+        <div class="sub">前两个是<b>信号问题</b>：不知道自己做得对不对，也没有通道把「对不对」写回权重。后两个是<b>经验问题</b>：没有第一人称的、带后果的数据。<br>后面每一条路线，往回追都会落到这两类之一。</div></div>
+      <div class="note b-orange"><div class="t orange">今天的补丁都在模型外面</div>
+        <div class="sub">上下文窗口、RAG、记忆文件、工具调用、agent 框架——全是<b>外挂</b>：绕过模型不能变的事实，而不是解决它。外挂有用，而且短期性价比最高，但它有一个硬上限：<b>一切都得塞进上下文，而上下文不是长期记忆</b>。</div></div>
     </div>
   </div>
 </section>
-
-<section class="slide" data-act="路线二">
-  <div class="hd"><h2>钻空子：为什么它是这条路线上最硬的问题</h2></div>
+<section class="slide" data-act="路线一">
+  <div class="hd"><h2>路线一 · 继续 scaling：红利没结束，但换了一根轴</h2></div>
   <div class="bd">
-    <div class="p mb">这个问题值得单独一页，因为它<b>不是可以靠更仔细的工程避免的失误</b>——只要用一个可优化的指标去代表一个真实目标，优化过程就必然会去找两者之间的缝隙。</div>
-    <div class="g3 mb">
-      <div class="card t-red"><div class="t red">它长什么样</div>
-        <div class="cap">目标是「让测试通过」，于是：<br>· 直接把失败的测试改掉或跳过<br>· 写一个只对测试用例成立的特例分支<br>· 捕获所有异常然后返回成功<br><br>目标是「让评分模型打高分」，于是：<br>· 学会那种能拿高分的语气和结构，而内容并没有更好<br>· 迎合评分者的偏好，包括它的偏见</div></div>
-      <div class="card t-orange"><div class="t orange">为什么它必然发生</div>
-        <div class="cap">因为<b>被优化的是判定标准，不是真实目标</b>。两者一旦有缝隙，训练过程会以极高的效率找到它——它不需要「理解」这是作弊，只需要发现这条路得分更高。<br><br>而缝隙<b>一定存在</b>：任何自动判定都是真实目标的一个近似。写得越细，缝隙越小，但不会为零。<br><br><span class="dim">这不是新问题——用指标管理组织时，人也会做同样的事。</span></div></div>
-      <div class="card t-green"><div class="t green">目前的应对，以及它们的局限</div>
-        <div class="cap">· <b>把判定写得更严</b>——有效，但是一场追赶，且成本随严格程度上升。<br>· <b>多个独立的判定标准交叉验证</b>——同时骗过几个更难，但不是不可能。<br>· <b>抽查人工复核</b>——能发现问题，但慢且贵，只能抽样。<br>· <b>把「不要钻空子」也训进去</b>——有帮助，但同样是一个可以被钻的目标。<br><br><b>共同的局限：全都是缓解，没有一条是解决。</b></div></div>
+    <div class="g32">
+      <div>
+        <svg viewBox="0 0 687 214" style="width:100%;height:auto;display:block">
+          <line x1="60" y1="182" x2="668" y2="182" stroke="#cbd5e1" stroke-width="1.5"/>
+          <line x1="60" y1="182" x2="60" y2="18" stroke="#cbd5e1" stroke-width="1.5"/>
+          <text x="56" y="16" font-size="12" fill="#94a3b8" text-anchor="end">能力</text>
+          <line x1="400" y1="182" x2="400" y2="62" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4 4" opacity=".6"/>
+          <path d="M60 172 C 180 152, 270 96, 400 68 S 560 46, 664 40" fill="none" stroke="#2563eb" stroke-width="2.4"/>
+          <path d="M300 170 C 400 146, 520 92, 664 44" fill="none" stroke="#c2410c" stroke-width="2.4"/>
+          <line x1="80" y1="30" x2="110" y2="30" stroke="#2563eb" stroke-width="2.4"/>
+          <text x="118" y="34" font-size="12.5" fill="#2563eb">预训练：把知识压进权重</text>
+          <line x1="80" y1="52" x2="110" y2="52" stroke="#c2410c" stroke-width="2.4"/>
+          <text x="118" y="56" font-size="12.5" fill="#c2410c">推理时：把算力换成搜索</text>
+          <text x="400" y="200" font-size="12" fill="#dc2626" text-anchor="middle">高质量数据开始见底</text>
+          <text x="664" y="200" font-size="12" fill="#94a3b8" text-anchor="end">投入的算力（对数刻度）</text>
+        </svg>
+        <div class="cap" style="margin-top:8px">两根曲线的形状完全不同。<b>蓝的在变平——不是失效，是每多一分能力要付的算力在指数上涨</b>；橙的刚起步，同一个模型多想一会儿就能明显更准。<b>「scaling 撞墙了」这句话只对蓝的成立。</b></div>
+      </div>
+      <div>
+        <div class="note b-blue"><div class="t blue">预训练 scaling 的账</div>
+          <div class="sub">经验规律是 <span class="mono">D ≈ 20P</span>，算力 <span class="mono">C = 6PD</span>。要让能力再上一个台阶，参数和数据得<b>同步</b>放大——于是算力按平方涨，而数据这一头根本跟不上。</div></div>
+        <div class="note b-red" style="margin-top:12px"><div class="t red">数据是存量，不是流量</div>
+          <div class="sub">算力可以造，芯片可以扩产，<b>但人类写过的高质量文本是一个固定的数</b>。重复训同一批数据，收益衰减得很快。合成数据、多模态、私域数据是三种续命方式，都不改变量级。</div></div>
+        <div class="note b-orange" style="margin-top:12px"><div class="t orange">推理时 scaling 是真的新轴</div>
+          <div class="sub">让模型多想、多采样、自我检查，准确率随<b>思考长度的对数</b>上升。它把「知识存在权重里」换成「答案现场搜出来」——绕开了数据墙，代价是每次调用都要付。</div></div>
+      </div>
     </div>
-    <div class="note b-purple"><div class="t purple">对这一章的读者，它有一个当下就成立的推论</div>
-      <div class="cap">你给 Agent 设的任何自动化判定标准，都会遇到同样的事——<b>不是因为它想骗你，而是因为它在优化你给的那个标准。</b><br>所以「评估集不能拿来反复调参」那条工程上的老规矩，和这里是同一个问题：<b>一旦某个指标成了优化目标，它就不再是一个好的度量。</b></div></div>
-  </div>
-</section>
-
-<section class="slide" data-act="路线三">
-  <div class="hd"><h2>路线三 · 连续学习与记忆</h2></div>
-  <div class="bd">
-    <div class="g4">
-      <div class="card t-blue"><div class="t blue">① 主张</div>
-        <div class="cap"><b>今天的模型是「冻结的」。</b>训练完成之后，它的能力就固定了——用得再多也不会变强，犯过的错也不会自动不再犯。<br><br>人不是这样：<b>做事的过程本身就在改变做事的能力。</b><br><br>这条路线主张，缺的是一个机制：<b>让系统能从自己的经历中持续更新，而不是等下一次训练。</b><br><br>注意它和「记忆」的区别：把事情记下来只是第一步，<b>关键是记下来的东西要能改变以后的行为</b>，而不只是被检索回来当作参考资料。</div></div>
-      <div class="card t-green"><div class="t green">② 证据</div>
-        <div class="cap"><b>· 上下文内的学习是真实存在的。</b>在对话里给几个例子，模型当场就能照着做——说明「从少量经验中调整行为」这件事，机制上是可行的，只是<b>目前限制在一次会话里，会话结束就没了</b>。<br><br><b>· 外部记忆确实有效。</b>把偏好、结论、踩过的坑写进一个存储、下次读回来，实际使用中效果明显。这说明「持久化经验」这条路至少方向是对的。<br><br><b>· 上下文窗口在持续变长</b>，这在一定程度上模糊了「记忆」和「上下文」的边界——能一次装进去的越多，短期内需要额外机制的地方就越少。<br><br><b>· 高效地小幅更新模型权重，技术上已经成熟。</b>难点不在能不能改，而在改什么、什么时候改。</div></div>
-      <div class="card t-orange"><div class="t orange">③ 瓶颈</div>
-        <div class="cap"><b>· 学到新的会冲掉旧的。</b>持续用新数据更新，容易让原有能力退化——这是个老问题，有缓解手段，但在「持续、在线、无人监督」的设定下尤其难办。<br><br><b>· 分不清哪些经验值得学。</b>这次的做法是真的更好，还是只是碰巧成功了一次？<b>没有可靠的判断，就会把噪音和错误一起学进去。</b><br><br><b>· 学错了很难回滚。</b>更新进权重的东西不像文件那样可以删掉。而且它可能被投毒——有人故意喂错误经验。<br><br><b>· 可评估性会崩塌。</b>一个持续自我更新的系统，<b>今天测过的结论明天可能就不成立了</b>。评估、回归测试、事故复盘这些工程手段全都建立在「同样的输入给同样的结果」之上，这一条被动摇，它们同时失效。</div></div>
-      <div class="card t-purple"><div class="t purple">④ 会先看到什么</div>
-        <div class="cap"><b>走通的信号：</b><br>· 出现<b>能明确展示「用得越久越好用」的产品</b>——同一个用户、同样的任务，几个月后的表现明显优于第一天，<b>且这个提升可以被测出来</b>。<br>· <b>「学到的东西」变成可管理的对象</b>：能查看、能编辑、能删除、能在团队间转移。这一条尤其关键——它意味着更新不再是黑箱。<br>· 出现针对「持续更新的系统」的评估方法，而不是只测某个固定版本。<br><br><b>卡住的信号：</b><br>· 长期停留在「外挂一个检索库」的形态，行为本身从不改变。<br>· 有系统尝试在线更新，但因为退化或被污染而回退到定期离线训练。<br>· 「个性化」持续被实现为提示词拼接，而不是能力更新。</div></div>
-    </div>
-  </div>
-</section>
-
-<section class="slide" data-act="路线三">
-  <div class="hd"><h2>「学到东西」其实有四个层次，别混着谈</h2></div>
-  <div class="bd">
-    <div class="p mb">这条路线的讨论经常鸡同鸭讲，因为「记住」和「学会」被当成了一件事。<b>它们分布在四个层次上，越往下越难，也越接近这条路线真正主张的那件事。</b></div>
-    <table class="tbl mb">
-      <tr><th style="width:6%">层</th><th style="width:20%">形态</th><th style="width:26%">持续多久 / 影响什么</th><th style="width:24%">今天做到了吗</th><th>难在哪</th></tr>
-      <tr><td class="blue"><b>一</b></td><td><b>上下文里的</b><br><span class="dim">这一轮对话里说过的</span></td><td>本次会话。影响这次的行为。</td><td class="green"><b>成熟</b>，而且效果很好</td><td>不难，但会话结束就没了</td></tr>
-      <tr><td class="blue"><b>二</b></td><td><b>外部存储的</b><br><span class="dim">写进库里、下次读回来</span></td><td>长期。影响的是「模型能看到什么材料」。</td><td class="green"><b>成熟</b>，是当前主流做法</td><td>该记什么、什么时候读回来，全靠人设计；<b>模型本身没变</b></td></tr>
-      <tr><td class="orange"><b>三</b></td><td><b>行为规则化的</b><br><span class="dim">把经验固化成明确的规则或流程</span></td><td>长期。影响的是「它默认怎么做事」。</td><td class="orange">部分做到，但<b>规则基本由人来写</b></td><td>让系统自己总结出正确的规则，并且知道什么时候该推翻已有规则</td></tr>
-      <tr><td class="purple"><b>四</b></td><td><b>能力更新的</b><br><span class="dim">经历真的改变了模型本身</span></td><td>永久。影响的是「它会不会做这件事」。</td><td class="red"><b>还没有</b>——在线、增量、可控的更新尚未成为可用形态</td><td>退化、噪音、不可回滚、以及<b>可评估性崩塌</b></td></tr>
+    <table class="tbl s mt">
+      <tr><th style="width:170px">这一轴</th><th style="width:250px">现在的量级</th><th style="width:300px">还剩多少空间</th><th>成本结构</th></tr>
+      <tr><td><b class="blue">预训练算力</b></td><td class="mono">前沿训练约 1e26 FLOPs 量级</td><td>还能涨，卡在电力、芯片供给和建设周期</td><td>一次性投入，之后每次推理都便宜</td></tr>
+      <tr><td><b class="red">高质量数据</b></td><td class="mono">公开文本约 1e13 token 量级</td><td><b>接近见底</b>，靠合成与多模态续，量级不变</td><td>买不来也造不出，是硬约束</td></tr>
+      <tr><td><b class="orange">推理时算力</b></td><td class="mono">一次回答 1e2 ~ 1e6 token</td><td><b>刚开始，曲线还很陡</b></td><td>每次调用都付，规模化后是大头</td></tr>
     </table>
-    <div class="g2">
-      <div class="note b-orange"><div class="t orange">今天绝大多数「记忆」产品在第二层</div>
-        <div class="cap">它们做的是「把该带的信息带上」，这很有用，但<b>系统本身的能力没有任何变化</b>。<br>判断一个方案在哪一层，问一句就行：<b>如果把存储清空，它是不是就退回原样了？</b>是——那就是第二层。</div></div>
-      <div class="note b-red"><div class="t red">第四层有一个常被低估的代价</div>
-        <div class="cap">一个会自我更新的系统，<b>会冲击今天整套工程实践</b>：评估结论有时效、版本追溯变复杂、故障可能无法复现、合规审计要面对「它当时是哪一版」这个问题。<br><b>这条路线走通的时候，工程侧要重做的东西比想象中多。</b></div></div>
-    </div>
+    <div class="note b-green" style="margin-top:14px"><div class="t green">为什么「撞墙了」和「根本没撞」的人都对</div>
+      <div class="sub">他们说的不是同一根轴。<b>预训练那根确实在变平</b>——同样的投入换来的提升一年比一年小，这是事实；<b>而模型的总能力还在快速涨</b>，也是事实，因为增量来自另外两根：推理时算力，以及下一页的 RLVR。<b>「scaling 还灵不灵」是个坏问题，好问题是「现在的边际收益在哪根轴上最高」。</b></div></div>
   </div>
 </section>
+<section class="slide" data-act="路线二">
+  <div class="hd"><h2>路线二 · RL + 可验证环境：奖励从哪来</h2></div>
+  <div class="bd">
+    <div class="p mb">强化学习不是新东西，卡了十年的从来不是算法，是<b>奖励</b>。这条路线的全部内容就一句话：<b class="green">把「学出来的奖励」换成「算出来的奖励」。</b></div>
+    <div class="g2">
+      <div>
+        <div class="card w"><div class="t red">RLHF：奖励是一个学出来的模型</div>
+          <div class="eq w s" style="margin-top:6px">人标注偏好 → 训一个 <b class="r">奖励模型 R̂</b>
+策略去最大化 <b class="r">R̂</b>，不是最大化真实好坏
 
+<span class="c">于是：</span> <b class="r">R̂ 越被优化，它越不准</b></div>
+          <div class="cap" style="margin-top:8px">这是 <b>reward hacking</b> 的数学根源：R̂ 只在标注数据的分布附近可信，而策略优化会主动把自己推到那个分布之外。所以 RLHF 必须加 KL 约束把策略拴住——<b>拴住的同时也限死了能学多远</b>。</div></div>
+        <div class="note b-orange" style="margin-top:12px"><div class="t orange">人标注还有一个规模问题</div>
+          <div class="sub">标注质量的上限是标注者的水平。<b>模型一旦在某个领域超过人类标注者，人类偏好就不再是有效信号</b>——这是 RLHF 无法把模型带到超人水平的根本原因。</div></div>
+      </div>
+      <div>
+        <div class="card w"><div class="t green">RLVR：奖励是一段代码算出来的</div>
+          <div class="eq w s" style="margin-top:6px">模型给出答案 → 跑一个 <b class="g">检查器</b> → <b class="g">0 / 1</b>
+
+<span class="c">检查器可以是：</span>
+  单元测试　编译器　数学答案比对
+  形式化证明检查器　游戏胜负　仿真器</div>
+          <div class="cap" style="margin-top:8px">奖励<b>不可 hack</b>（除非检查器本身有洞），<b>不要人参与</b>，<b>可以无限量生成</b>。模型比人强也没关系——检查器不是人，它只判对错。这三条合起来，才是这条路线被押注的原因。</div></div>
+        <div class="note b-green" style="margin-top:12px"><div class="t green">瓶颈已经从算法挪到了环境</div>
+          <div class="sub">算法这一侧基本收敛（策略梯度那一族）。真正稀缺的是<b>「能自动判分、难度可调、够多样」的环境</b>。<b>环境工程正在变成新的数据工程</b>——这是当前投入最集中的地方。</div></div>
+      </div>
+    </div>
+    <div class="g3" style="margin-top:14px">
+      <div class="note b-blue"><div class="t blue">0/1 太稀疏，怎么学得动</div>
+        <div class="sub">靠<b>一次采一组</b>：同一题采多条解，用组内的相对好坏当优势，省掉价值网络。</div></div>
+      <div class="note b-red"><div class="t red">检查器有洞就一定会被钻</div>
+        <div class="sub">模型会写出「让测试通过但没实现功能」的代码。<b>检查器的严密程度，就是这条路线能力的天花板</b>。</div></div>
+      <div class="note b-orange"><div class="t orange">难度必须跟着能力走</div>
+        <div class="sub">全对或全错都没有梯度。环境要能<b>自动调难度</b>，把通过率稳在中间——这部分工程量往往比算法本身大。</div></div>
+    </div>
+    <div class="note b-purple" style="margin-top:14px"><div class="t purple">这条路线最大的未解问题：可验证域上学到的东西，能迁移出去吗</div>
+      <div class="sub">在数学和代码上用 RLVR 练出来的推理能力，看起来会部分溢出到没练过的领域——但溢出多少、靠什么机制溢出，<b>目前没有定论</b>。如果溢出很强，这条路线直通 AGI；如果只在可验证域内有效，它就只是一个很强的专用能力放大器。<b>这一个问题的答案，决定其余四条路线的相对权重。</b></div></div>
+  </div>
+</section>
+<section class="slide" data-act="路线二">
+  <div class="hd"><h2>「可验证」的边界在哪：AGI 要的能力大半在右边</h2></div>
+  <div class="bd">
+    <svg viewBox="0 0 1168 256" style="width:100%;height:auto;display:block">
+      <defs><marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto">
+        <path d="M0 0 L7 3.5 L0 7 z" fill="#94a3b8"/></marker></defs>
+      <text x="14" y="13" font-size="12" fill="#94a3b8">判分越来越贵、信号越来越糊、离「真正想要的东西」越来越近</text>
+      <line x1="14" y1="26" x2="1146" y2="26" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#ar)"/>
+
+      <rect x="14" y="38" width="372" height="212" rx="8" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.8"/>
+      <text x="34" y="66" font-size="15" font-weight="700" fill="#0e9f6e">强可验证　答案唯一</text>
+      <text x="34" y="88" font-size="12" fill="#0e9f6e">判分方式：跑一下就知道，0 / 1</text>
+      <text x="34" y="120" font-size="13.5" fill="#1f2937">·　数学题、竞赛题</text>
+      <text x="34" y="148" font-size="13.5" fill="#1f2937">·　单元测试通过 / 编译通过</text>
+      <text x="34" y="176" font-size="13.5" fill="#1f2937">·　形式化证明检查器</text>
+      <text x="34" y="204" font-size="13.5" fill="#1f2937">·　游戏胜负、仿真器指标</text>
+      <text x="34" y="234" font-size="12.5" fill="#0e9f6e" font-weight="700">RLVR 在这里已经跑通</text>
+
+      <rect x="398" y="38" width="372" height="212" rx="8" fill="#fff7ed" stroke="#c2410c" stroke-width="1.8"/>
+      <text x="418" y="66" font-size="15" font-weight="700" fill="#c2410c">弱可验证　能判好坏</text>
+      <text x="418" y="88" font-size="12" fill="#c2410c">判分方式：评分细则、模型评委、A/B</text>
+      <text x="418" y="120" font-size="13.5" fill="#1f2937">·　多步 agent 任务算不算做完</text>
+      <text x="418" y="148" font-size="13.5" fill="#1f2937">·　数据分析结论站不站得住</text>
+      <text x="418" y="176" font-size="13.5" fill="#1f2937">·　摘要、翻译忠不忠实</text>
+      <text x="418" y="204" font-size="13.5" fill="#1f2937">·　代码的工程质量</text>
+      <text x="418" y="234" font-size="12.5" fill="#c2410c" font-weight="700">正在被啃，评委本身会被 hack</text>
+
+      <rect x="782" y="38" width="372" height="212" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="1.8"/>
+      <text x="802" y="66" font-size="15" font-weight="700" fill="#dc2626">难可验证　判分本身是难题</text>
+      <text x="802" y="88" font-size="12" fill="#dc2626">判分方式：只有长期后果，或者没有</text>
+      <text x="802" y="120" font-size="13.5" fill="#1f2937">·　研究方向选得对不对</text>
+      <text x="802" y="148" font-size="13.5" fill="#1f2937">·　战略与经营决策</text>
+      <text x="802" y="176" font-size="13.5" fill="#1f2937">·　写作、审美、品味</text>
+      <text x="802" y="204" font-size="13.5" fill="#1f2937">·　教育和陪伴的实际效果</text>
+      <text x="802" y="234" font-size="12.5" fill="#dc2626" font-weight="700">目前基本无解</text>
+    </svg>
+    <div class="g3 mt">
+      <div class="note b-green"><div class="t green">左边这一格已经不是瓶颈</div>
+        <div class="sub">数学和代码上，模型在标准评测上的表现已经很难再靠加难度拉开差距。<b>继续在这一格投入，边际收益在下降</b>。</div></div>
+      <div class="note b-orange"><div class="t orange">中间这一格是当前主战场</div>
+        <div class="sub">做法是<b>把模糊判分变成可执行判分</b>：写细则、拆检查点、用模型当评委再交叉验证。本质是<b>把右边的任务往左边挪</b>。</div></div>
+      <div class="note b-red"><div class="t red">右边这一格才决定 AGI</div>
+        <div class="sub">「什么值得做」这类判断没有检查器。人类靠<b>长周期后果</b>学会它——而长周期后果正是今天最缺的训练信号。</div></div>
+    </div>
+    <div class="g2" style="margin-top:14px">
+      <div class="note b-blue"><div class="t blue">怎么判断一个任务落在哪一格</div>
+        <div class="sub">问一句：<b>能不能写一段程序，只看结果就判定对错，而且不需要人</b>。能，是左边；只能给个分数或排序，是中间；连打分标准都要吵，是右边。</div></div>
+      <div class="note b-orange"><div class="t orange">一个反直觉的事实：可验证 ≠ 简单</div>
+        <div class="sub">奥数题和形式化证明都在最左边，它们一点也不简单。<b>「难」和「难验证」是两回事</b>——正因为如此，模型在最左边先超过了人，却在「写得好不好」上还很平庸。</div></div>
+    </div>
+    <div class="note b-purple" style="margin-top:14px"><div class="t purple">所以这条路线的真正命题不是「RL 行不行」，而是「能把多少任务挪到左边」</div>
+      <div class="sub">每把一类任务从难验证挪到可验证，就等于给它开了一条无限量的训练数据通道。<b>过去两年的进展大半来自这种「挪」，而不是来自更好的 RL 算法。</b>能不能一路挪到最右边——也就是能不能给「判断力」造一个检查器——是这整张地图上最硬的问题。</div></div>
+  </div>
+</section>
+<section class="slide" data-act="路线三">
+  <div class="hd"><h2>路线三 · 连续学习：权重不再是只读的</h2></div>
+  <div class="bd">
+    <div class="p mb">今天的模型上线之后，<b>权重 θ 就是一个常数</b>。它服务一亿次，和服务第一次一样聪明——因为<b class="red">从「用得怎么样」回到 θ 的那条通路根本不存在</b>。</div>
+    <div class="g32">
+      <div>
+        <svg viewBox="0 0 687 218" style="width:100%;height:auto;display:block">
+          <defs><marker id="a7g" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0 0 L6 3 L0 6 z" fill="#0e9f6e"/></marker>
+            <marker id="a7r" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0 0 L6 3 L0 6 z" fill="#dc2626"/></marker>
+            <marker id="a7b" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0 0 L6 3 L0 6 z" fill="#2563eb"/></marker></defs>
+
+          <text x="343" y="20" font-size="12.5" fill="#dc2626" text-anchor="middle">把「做得对不对」写回 θ　——　这条通路今天不存在</text>
+          <path d="M624 82 L624 34 L343 34 L343 68" stroke="#dc2626" stroke-width="1.8" fill="none" stroke-dasharray="5 4" marker-end="url(#a7r)"/>
+
+          <rect x="14" y="84" width="92" height="46" rx="8" fill="#f4f7fb" stroke="#cbd5e1" stroke-width="1.5"/>
+          <text x="60" y="112" font-size="13.5" fill="#5b6675" text-anchor="middle">输入</text>
+          <path d="M110 107 L232 107" stroke="#2563eb" stroke-width="1.8" fill="none" marker-end="url(#a7b)"/>
+
+          <rect x="240" y="76" width="206" height="62" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+          <text x="343" y="102" font-size="15" font-weight="700" fill="#7c3aed" text-anchor="middle">模型　权重 θ</text>
+          <text x="343" y="123" font-size="12.5" fill="#7c3aed" text-anchor="middle">上线后是常数，只读</text>
+          <path d="M450 107 L568 107" stroke="#2563eb" stroke-width="1.8" fill="none" marker-end="url(#a7b)"/>
+
+          <rect x="576" y="84" width="97" height="46" rx="8" fill="#f4f7fb" stroke="#cbd5e1" stroke-width="1.5"/>
+          <text x="624" y="112" font-size="13.5" fill="#5b6675" text-anchor="middle">输出</text>
+
+          <path d="M624 134 L624 180 L60 180 L60 136" stroke="#0e9f6e" stroke-width="1.8" fill="none" marker-end="url(#a7g)"/>
+          <text x="343" y="200" font-size="12.5" fill="#0e9f6e" text-anchor="middle">今天走的是这条：把结果塞回上下文 / 记忆文件</text>
+          <text x="343" y="216" font-size="12.5" fill="#94a3b8" text-anchor="middle">绕过 θ，也就永远改不了 θ</text>
+        </svg>
+      </div>
+      <div>
+        <div class="note b-green"><div class="t green">外挂记忆：便宜、可控、上限明确</div>
+          <div class="sub">RAG、记忆文件、长上下文都属于绿线。<b>好处是可审计、可删除、不会训坏</b>；代价是每次都要重新读一遍。</div></div>
+        <div class="note b-red" style="margin-top:12px"><div class="t red">红线难在「可塑性—稳定性」</div>
+          <div class="sub">学新的就容易忘旧的。<b>一次梯度更新改的是全部参数</b>，没法只动「关于这件事」的那一小块。</div></div>
+        <div class="note b-orange" style="margin-top:12px"><div class="t orange">还有一个安全问题</div>
+          <div class="sub">权重能被在线改，就意味着<b>被投毒的输入可以永久改变模型</b>。这是连续学习没被大规模上线的真实原因之一。</div></div>
+      </div>
+    </div>
+    <table class="tbl s mt">
+      <tr><th style="width:200px">写到哪一层</th><th style="width:230px">写入方式</th><th style="width:200px">保持多久</th><th style="width:180px">容量量级</th><th>能不能改变模型的「直觉」</th></tr>
+      <tr><td><b class="blue">上下文窗口</b></td><td>直接塞进 prompt</td><td>一次会话</td><td class="mono">1e5 ~ 1e6 token</td><td>不能</td></tr>
+      <tr><td><b class="green">外部记忆 / RAG</b></td><td>写文件、存向量库</td><td>永久</td><td>无上限</td><td>不能，只是检索得更准</td></tr>
+      <tr><td><b class="purple">权重 θ</b></td><td>梯度更新</td><td>永久</td><td class="mono">1e11 量级参数</td><td><b class="purple">能——只有这一层能</b></td></tr>
+    </table>
+    <div class="note b-purple" style="margin-top:14px"><div class="t purple">这条路线的判据很简单：有没有真的动到第三行</div>
+      <div class="sub">大部分叫「记忆」「自我进化」的产品做的都是前两行。<b>它们让模型「查得到」，但没让模型「学会」</b>——区别在于关掉检索之后，模型还会不会。真做到第三行，需要在线的低秩增量、重放缓冲、以及一个能判断「这次该不该学」的信号；<b>而那个信号，正是上一条路线要造的东西</b>。</div></div>
+  </div>
+</section>
 <section class="slide" data-act="路线四">
-  <div class="hd"><h2>路线四 · 多 Agent 分工与经济体</h2></div>
+  <div class="hd"><h2>路线四 · 世界模型：在脑子里试，不用真试</h2></div>
   <div class="bd">
-    <div class="g4">
-      <div class="card t-blue"><div class="t blue">① 主张</div>
-        <div class="cap"><b>不必等单个 Agent 变得足够强。</b>人类解决复杂问题的方式从来不是靠一个全能的人，而是靠<b>分工、协作和市场</b>——一群各自有限的个体，通过组织结构完成了任何个体都完不成的事。<br><br>所以这条路线主张：<b>用结构去弥补个体能力的不足。</b>专门化的角色、明确的接口、审查与仲裁机制、以及最终——Agent 之间可以互相调用、互相计价的一整套经济关系。<br><br><b>它针对的是「长任务会漂」这个卡点</b>：把长任务拆给多个角色，每个角色只做一段，并互相检查。</div></div>
-      <div class="card t-green"><div class="t green">② 证据</div>
-        <div class="cap"><b>· 「生成 + 审查」这个最小结构确实有效。</b>让一个角色产出、另一个角色专门挑毛病，质量提升是可观测的——这是多 Agent 里最扎实的一块证据。<br><br><b>· 独立多次尝试再取一致，能提高可靠性。</b>同一个任务跑几遍、比较结果，这在实践中被广泛使用且确实有用。<br><br><b>· 上下文隔离带来的收益是真的。</b>把子任务交给独立的上下文去做，避免主线被细节淹没——这在长任务上效果明显。<br><br><b>· 协议层已经在往这个方向铺</b>：Agent 之间互相委派所需要的能力发现、任务状态、跨域鉴权，已经有了规范化的尝试。</div></div>
-      <div class="card t-orange"><div class="t orange">③ 瓶颈</div>
-        <div class="cap"><b>· 错误会相乘，不会相消。</b>每个环节九成对，五个环节串起来就只剩六成。<b>协作结构不会自动纠错，除非专门设计了纠错机制</b>——而这正是难的部分。<br><br><b>· 成本乘以角色数。</b>五个 Agent 讨论一轮，成本是一个的五倍以上，而收益远不是五倍。<b>很多多 Agent 方案在经济上直接不成立。</b><br><br><b>· 沟通本身会失真。</b>Agent 之间用自然语言交接，每一次交接都可能丢信息或引入歧义——组织学里叫沟通成本，这里同样存在。<br><br><b>· 大量「多 Agent」其实是伪装的流程图。</b>如果角色和顺序都是人定好的，那它就是一个工作流，收益来自流程设计，不来自「多 Agent」。</div></div>
-      <div class="card t-purple"><div class="t purple">④ 会先看到什么</div>
-        <div class="cap"><b>走通的信号：</b><br>· 出现<b>角色和分工由系统自己决定</b>的方案，且效果稳定优于人定好的流程——这是区分「真多 Agent」和「伪装的工作流」的关键。<br>· <b>多 Agent 方案在成本上打平或胜过单 Agent</b>，而不只是效果好一点点、成本翻几倍。<br>· 出现跨组织的真实 Agent 协作，并且解决了责任和计费问题——<b>注意是责任和计费，不是协议格式</b>。<br><br><b>卡住的信号：</b><br>· 多 Agent 长期停留在「生成 + 审查」这一种结构上，再复杂的编排都跑不稳。<br>· 更强的单模型反复地把多 Agent 方案打回原形：一个模型多想几轮就赢了。<br>· 跨组织协作卡在信任和归责上，协议做得再完备也没人真的接。</div></div>
+    <div class="p mb">世界模型学的是一件事：<b class="purple">给定现在的状态和我要做的动作，接下来会变成什么样</b>。学会它，模型就能在脑子里把方案跑一遍，不用真付代价。</div>
+    <div class="g32">
+      <div>
+        <svg viewBox="0 0 687 256" style="width:100%;height:auto;display:block">
+          <defs><marker id="a8r" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0 0 L6 3 L0 6 z" fill="#c2410c"/></marker>
+            <marker id="a8g" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0 0 L6 3 L0 6 z" fill="#0e9f6e"/></marker></defs>
+
+          <text x="0" y="16" font-size="12.5" font-weight="700" fill="#c2410c">在真实世界里试</text>
+          <circle cx="90" cy="56" r="17" fill="#fff7ed" stroke="#c2410c" stroke-width="1.8"/>
+          <text x="90" y="61" font-size="12.5" fill="#c2410c" text-anchor="middle">s₀</text>
+          <path d="M109 56 L227 56" stroke="#c2410c" stroke-width="1.8" fill="none" marker-end="url(#a8r)"/>
+          <circle cx="250" cy="56" r="17" fill="#fff7ed" stroke="#c2410c" stroke-width="1.8"/>
+          <text x="250" y="61" font-size="12.5" fill="#c2410c" text-anchor="middle">s₁</text>
+          <path d="M269 56 L387 56" stroke="#c2410c" stroke-width="1.8" fill="none" marker-end="url(#a8r)"/>
+          <circle cx="410" cy="56" r="17" fill="#fff7ed" stroke="#c2410c" stroke-width="1.8"/>
+          <text x="410" y="61" font-size="12.5" fill="#c2410c" text-anchor="middle">s₂</text>
+          <path d="M429 56 L547 56" stroke="#c2410c" stroke-width="1.8" fill="none" marker-end="url(#a8r)"/>
+          <circle cx="570" cy="56" r="17" fill="#fff7ed" stroke="#c2410c" stroke-width="1.8"/>
+          <text x="570" y="61" font-size="12.5" fill="#c2410c" text-anchor="middle">s₃</text>
+          <text x="0" y="96" font-size="12" fill="#5b6675">一次只能走一条。每一步都真的发生了：慢、贵、走过就回不去</text>
+
+          <line x1="0" y1="112" x2="687" y2="112" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="5 4"/>
+
+          <text x="0" y="136" font-size="12.5" font-weight="700" fill="#0e9f6e">在世界模型里试</text>
+          <circle cx="90" cy="190" r="17" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.8"/>
+          <text x="90" y="195" font-size="12.5" fill="#0e9f6e" text-anchor="middle">s₀</text>
+          <path d="M108 184 L231 158" stroke="#0e9f6e" stroke-width="1.6" fill="none" marker-end="url(#a8g)"/>
+          <path d="M109 190 L231 190" stroke="#0e9f6e" stroke-width="1.6" fill="none" marker-end="url(#a8g)"/>
+          <path d="M108 196 L231 222" stroke="#0e9f6e" stroke-width="1.6" fill="none" marker-end="url(#a8g)"/>
+          <circle cx="250" cy="156" r="15" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.6"/>
+          <circle cx="250" cy="190" r="15" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.6"/>
+          <circle cx="250" cy="224" r="15" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.6"/>
+          <path d="M267 156 L391 156" stroke="#0e9f6e" stroke-width="1.6" fill="none" marker-end="url(#a8g)"/>
+          <path d="M267 190 L391 190" stroke="#0e9f6e" stroke-width="1.6" fill="none" marker-end="url(#a8g)"/>
+          <path d="M267 224 L391 224" stroke="#0e9f6e" stroke-width="1.6" fill="none" marker-end="url(#a8g)"/>
+          <circle cx="410" cy="156" r="15" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.6"/>
+          <circle cx="410" cy="190" r="15" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.6"/>
+          <circle cx="410" cy="224" r="15" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.6"/>
+          <path d="M427 156 L551 156" stroke="#0e9f6e" stroke-width="1.6" fill="none" marker-end="url(#a8g)"/>
+          <path d="M427 190 L551 190" stroke="#0e9f6e" stroke-width="1.6" fill="none" marker-end="url(#a8g)"/>
+          <path d="M427 224 L551 224" stroke="#0e9f6e" stroke-width="1.6" fill="none" marker-end="url(#a8g)"/>
+          <circle cx="570" cy="156" r="15" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.6"/>
+          <circle cx="570" cy="190" r="15" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.6"/>
+          <circle cx="570" cy="224" r="15" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.6"/>
+          <text x="0" y="250" font-size="12" fill="#5b6675">同时展开很多条，走错了回退就是：快、便宜、可以试到满意为止</text>
+        </svg>
+        <div class="cap" style="margin-top:8px">这就是「规划」的全部含义——<b>把试错从真实世界搬进模型内部</b>。AlphaGo 走的是这条路，只不过它的世界模型是围棋规则，规则是精确的、免费的。<b class="red">难点在于：真实世界没有规则书，模型必须自己学，而学出来的一定不准。</b></div>
+      </div>
+      <div>
+        <div class="card w"><div class="t red">卡点：误差会复合</div>
+          <div class="eq w s" style="margin-top:6px">每步误差 <b class="r">ε</b>，往后展开 <b class="r">T</b> 步：
+  P(至少错一次) = 1 − (1−<b class="r">ε</b>)^<b class="r">T</b>
+  ε=1%　T=20 　→　<b class="r">18%</b>
+  ε=1%　T=100　→　<b class="r">63%</b>
+  ε=5%　T=20 　→　<b class="r">64%</b></div>
+          <div class="cap" style="margin-top:8px">想象得越远越是在编故事。<b>可用长度被单步精度卡死</b>。</div></div>
+        <div class="note b-orange" style="margin-top:12px"><div class="t orange">所以真正的用法是「短程想象 + 频繁校准」</div>
+          <div class="sub">在模型里只往前推几步，然后拿真实反馈拉回来。<b>把 T 压小，是目前唯一有效的对策。</b></div></div>
+      </div>
     </div>
+    <div class="g3" style="margin-top:12px">
+      <div class="note b-purple"><div class="t purple">LLM 算不算世界模型</div>
+        <div class="sub">它学的是「人接下来会怎么写」，不是「事情接下来会怎样」。<b>token 级，不是状态级</b>。</div></div>
+      <div class="note b-blue"><div class="t blue">为什么现在忽然热起来</div>
+        <div class="sub">视频生成模型被发现<b>顺带学到了物体恒存、遮挡、重力</b>。世界模型也许能从视频里学。</div></div>
+      <div class="note b-green"><div class="t green">它和路线二是同一件事的两面</div>
+        <div class="sub">一个够准的世界模型<b>本身就是仿真器，也就是检查器</b>——RLVR 缺的环境可以由它批量造。</div></div>
+    </div>
+    <div class="note b-red" style="margin-top:12px"><div class="t red">最容易被跳过的一句话：世界模型不解决「该做什么」，只解决「做了会怎样」</div>
+      <div class="sub">它给的是<b>状态转移</b>，不是<b>价值判断</b>。知道每条路通向哪里，和知道哪条路值得走，是两个独立的问题——后者仍然要回到第 6 页最右边那一格。<b>把世界模型当成 AGI 的完整答案，是把「预测」和「取舍」混成了一件事。</b></div></div>
   </div>
 </section>
-
 <section class="slide" data-act="路线五">
-  <div class="hd"><h2>路线五 · 世界模型与具身</h2></div>
+  <div class="hd"><h2>路线五 · 具身智能：唯一还能自己造数据的地方</h2></div>
   <div class="bd">
-    <div class="g4">
-      <div class="card t-blue"><div class="t blue">① 主张</div>
-        <div class="cap"><b>只读文字，学不到世界怎么运转。</b>文字里记的是人们说了什么，而人们从不描述那些不言自明的事——杯子推出桌沿会掉、绳子只能拉不能推、门要先开才能过。<br><br>这条路线主张，缺的是一个<b>能预测「这样做之后会怎样」的内部模型</b>。有了它，规划才有依据，而不是靠对文本模式的联想。<br><br><b>更强的版本</b>：这样的模型只能从<b>与世界的互动</b>中学到——必须有身体、有动作、有后果的反馈。人类的智能就是这么长出来的。<br><br>它针对的是第四个卡点，但支持者认为它也影响前三个：<b>因果理解是长任务不漂的基础。</b></div></div>
-      <div class="card t-green"><div class="t green">② 证据</div>
-        <div class="cap"><b>· 视频预测模型确实学到了一些物理规律。</b>不需要写下任何物理定律，仅从大量视频中学习「接下来会看到什么」，就能生成大体符合重力、遮挡、碰撞的画面——<b>说明可预测的世界结构是能被学到的</b>。<br><br><b>· 机器人的通用操作能力在提升。</b>从「一个任务一套程序」到「一个模型多种任务、能应对没见过的物体」，是近年可观察到的变化。<br><br><b>· 模拟训练再迁移到实体，被验证可行。</b>先在仿真里大量试错、再迁到真机，已经是相当成熟的路子——这缓解了真实数据太贵的问题。<br><br><b>· 语言模型作为「大脑」接机器人「身体」的分层做法，已跑通到可演示的程度。</b></div></div>
-      <div class="card t-orange"><div class="t orange">③ 瓶颈</div>
-        <div class="cap"><b>· 真实互动数据极贵。</b>文本可以近乎零成本地复制，而每一次真实的机械臂动作都要花时间、损耗硬件、还可能损坏环境。<b>这条路线没有「互联网」可用。</b><br><br><b>· 仿真和现实之间有差距。</b>摩擦、形变、光照、意外——仿真里练得好，到真机上就不行，这个差距一直存在，只能缩小不能消除。<br><br><b>· 生成看起来对，不等于理解了因果。</b>能预测下一帧画面，和能回答「如果我把这个抽掉会怎样」，可能不是一回事。<b>这是这条路线上最实质的质疑。</b><br><br><b>· 越基础的能力越难。</b>推理和知识已经做得不错，而抓握、平衡、在杂乱环境里走路仍然困难——<b>这个反直觉的现象存在了几十年，至今没有被推翻。</b></div></div>
-      <div class="card t-purple"><div class="t purple">④ 会先看到什么</div>
-        <div class="cap"><b>走通的信号：</b><br>· 机器人能在<b>没见过的杂乱真实环境</b>里完成没被专门训练过的任务，且成功率稳定——<b>关键词是「杂乱」和「没见过」</b>，演示环境里的成功不算。<br>· <b>纯视觉训练出来的模型，在语言任务上的因果推理也变好了</b>。这会是「世界模型有普遍价值」的强证据。<br>· 真实互动数据的获取成本出现<b>数量级下降</b>，比如靠大规模部署形成的数据回流。<br><br><b>卡住的信号：</b><br>· 演示一直很好看，但始终局限于布置过的场景，落地长期停在特定行业的特定工位。<br>· 视频生成越来越逼真，但在「反事实推理」上没有相应提升——<b>说明学到的是表象而不是因果</b>。<br>· 硬件成本和可靠性长期没有改善。</div></div>
-    </div>
-  </div>
-</section>
+    <div class="p mb">前四条路线争的都是<b>怎么把存量数据榨得更干净</b>。这一条不一样——<b class="green">它是唯一一条能凭空生出新数据的路线</b>，因为动作真的会改变世界。</div>
+    <div class="g32">
+      <div>
+        <svg viewBox="0 0 687 226" style="width:100%;height:auto;display:block">
+          <defs><marker id="a9b" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0 0 L6 3 L0 6 z" fill="#2563eb"/></marker>
+            <marker id="a9g" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0 0 L6 3 L0 6 z" fill="#0e9f6e"/></marker></defs>
 
-<section class="slide" data-act="路线五">
-  <div class="hd"><h2>为什么「加一个模态」这个说法低估了它</h2></div>
-  <div class="bd">
-    <div class="p mb">常见的乐观说法是：文本做完了做图像，图像做完了做视频，接下来接上身体就行——<b>好像只是又一个模态。</b>但物理世界和前面几种数据有三个结构性的不同。</div>
-    <div class="g3 mb">
-      <div class="card t-orange"><div class="t orange">① 数据不能复制，只能采集</div>
-        <div class="cap">文本、图像、视频都是<b>已经存在的、可以近乎免费复制的存量</b>。而「机械臂以这个角度抓这个杯子会怎样」这条数据，<b>必须真的抓一次才有</b>。<br><br>这意味着这条路线<b>不能靠爬取来扩大规模</b>，只能靠部署——而部署又依赖能力已经够用。<b>这是个先有鸡还是先有蛋的循环。</b></div></div>
-      <div class="card t-orange"><div class="t orange">② 错误的代价是真实的</div>
-        <div class="cap">语言模型答错了，重新问一次就行。机械臂做错了，<b>东西碎了、人可能受伤、机器可能损坏</b>。<br><br>所以「大量试错」这个在虚拟世界里最有效的学习方式，<b>在物理世界里是被严格限制的</b>——而这恰好是路线二赖以成立的前提。<br><br>仿真是绕过这一点的主要手段，但绕不干净。</div></div>
-      <div class="card t-orange"><div class="t orange">③ 反馈是连续且实时的</div>
-        <div class="cap">一次对话是回合制的：说一句、等一句。而一个动作的执行是<b>连续的</b>——一边做一边根据触觉和视觉调整，延迟以毫秒计。<br><br>这对系统的形态提出了完全不同的要求：<b>不能是「想很久然后输出一段」，必须是「持续感知、持续调整」</b>。<br><br>今天大模型的运行方式和这个要求之间，差得不只是速度。</div></div>
-    </div>
-    <div class="note b-purple"><div class="t purple">那个几十年没被推翻的观察</div>
-      <div class="cap">越是人类觉得「需要智力」的事（下棋、解题、写作），对机器越容易；越是人类觉得「不用动脑」的事（走路、抓东西、在陌生房间里不撞到东西），对机器越难。<br><b>这个现象至今成立</b>，而且路线五面对的正是难的那一半。<br>它不构成「做不到」的论据，但确实说明：<b>把这条路线看成「文本路线的自然延伸」，很可能是低估了它。</b></div></div>
-  </div>
-</section>
+          <rect x="14" y="30" width="200" height="86" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
+          <text x="114" y="62" font-size="14.5" font-weight="700" fill="#2563eb" text-anchor="middle">真实世界</text>
+          <text x="114" y="84" font-size="12" fill="#5b6675" text-anchor="middle">物理规律不用人写下来</text>
+          <text x="114" y="103" font-size="12" fill="#5b6675" text-anchor="middle">它本来就在那儿</text>
 
-<section class="slide" data-act="收尾">
-  <div class="hd"><h2>五条路线横着看一遍</h2></div>
-  <div class="bd">
-    <div class="p mb">这张表只做一件事：<b>让五条路线在同一组问题下并排</b>。其中最值得看的是最后一列——<b>瓶颈是「还没做」还是「不知道怎么做」，这个区别决定了它有多难。</b></div>
-    <table class="tbl mb">
-      <tr><th style="width:16%">路线</th><th style="width:15%">主攻哪个卡点</th><th style="width:24%">证据强在哪</th><th style="width:24%">最硬的瓶颈</th><th>瓶颈的性质</th></tr>
-      <tr><td class="blue"><b>继续 scaling</b></td><td>①②③<span class="dim">（认为会一起缓解）</span></td><td class="green">规模与能力的关系被反复验证过，且历次唱衰都被证伪</td><td class="orange">高质量数据有限；<b>不确定它涨的是不是我们最缺的那种能力</b></td><td>数据是<b>资源问题</b>；能力类型是<b>未知问题</b></td></tr>
-      <tr><td class="green"><b>RL + 可验证环境</b></td><td>①③</td><td class="green"><b>本章证据最强的一条</b>：在规则明确的领域已完整验证，数学和代码上已见效</td><td class="orange">大量高价值工作不可验证；<b>钻空子是优化的必然结果</b></td><td>造环境是<b>工程问题</b>；钻空子<b>原理上无解，只能缓解</b></td></tr>
-      <tr><td class="purple"><b>连续学习与记忆</b></td><td>②</td><td>上下文内学习和外部记忆都被验证有效，说明方向对</td><td class="orange">学新的会冲掉旧的；分不清哪些经验值得学；<b>学错了难回滚</b></td><td>大部分是<b>未解的研究问题</b>，且会冲击整套工程实践</td></tr>
-      <tr><td class="orange"><b>多 Agent 分工</b></td><td>①</td><td>「生成 + 审查」和上下文隔离确实有效</td><td class="orange"><b>错误相乘、成本相乘</b>；很多方案其实是伪装的工作流</td><td>多数是<b>设计问题</b>——但也可能被更强的单模型直接绕过</td></tr>
-      <tr><td class="red"><b>世界模型与具身</b></td><td>④</td><td>视频预测学到了部分物理规律；通用操作能力在提升</td><td class="orange">真实互动数据极贵且<b>无法复制</b>；生成逼真 ≠ 理解因果</td><td>数据是<b>结构性问题</b>（没有互联网可用）；因果是<b>未知问题</b></td></tr>
+          <text x="325" y="46" font-size="12" fill="#2563eb" text-anchor="middle">观测：图像、力、触觉</text>
+          <path d="M218 56 L432 56" stroke="#2563eb" stroke-width="1.8" fill="none" marker-end="url(#a9b)"/>
+          <path d="M436 94 L222 94" stroke="#0e9f6e" stroke-width="1.8" fill="none" marker-end="url(#a9g)"/>
+          <text x="325" y="112" font-size="12" fill="#0e9f6e" text-anchor="middle">动作：关节角、抓取、移动</text>
+
+          <rect x="440" y="30" width="233" height="86" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.8"/>
+          <text x="556" y="62" font-size="14.5" font-weight="700" fill="#7c3aed" text-anchor="middle">VLA 模型</text>
+          <text x="556" y="84" font-size="12" fill="#7c3aed" text-anchor="middle">视觉 → 语言 → 动作</text>
+          <text x="556" y="103" font-size="12" fill="#5b6675" text-anchor="middle">端到端直接输出关节角</text>
+
+          <rect x="0" y="138" width="687" height="78" rx="8" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5" stroke-dasharray="5 4"/>
+          <text x="18" y="164" font-size="13" font-weight="700" fill="#c2410c">动作真的改变了世界 → 下一帧观测就是这个动作的标签</text>
+          <text x="18" y="187" font-size="12.5" fill="#5b6675">不需要人来标注。这是唯一一个「投入越多、数据越多」的数据源：</text>
+          <text x="18" y="207" font-size="12.5" fill="#5b6675">文本是存量，物理交互是流量。</text>
+        </svg>
+      </div>
+      <div>
+        <div class="note b-purple"><div class="t purple">它补的是「没有后果」那个缺口</div>
+          <div class="sub">语料里全是<b>别人行动的结果</b>。具身给的是第一人称的因果：我推了，它倒了。</div></div>
+        <div class="note b-red" style="margin-top:12px"><div class="t red">卡点一：真机数据贵得离谱</div>
+          <div class="sub">一条轨迹要一台机器、一个场地、一段真实时间。<b>这部分不能靠买卡加速。</b></div></div>
+        <div class="note b-orange" style="margin-top:12px"><div class="t orange">卡点二：仿真和真实之间有缝</div>
+          <div class="sub">仿真里可以刷无限数据，但摩擦、形变、光照都对不上。<b>缝有多宽，决定仿真数据值多少钱。</b></div></div>
+      </div>
+    </div>
+    <table class="tbl s mt">
+      <tr><th style="width:190px">数据来源</th><th style="width:210px">今天的量级</th><th style="width:240px">是存量还是流量</th><th>带不带因果</th></tr>
+      <tr><td><b class="red">公开高质量文本</b></td><td class="mono">1e13 token</td><td><b>存量，接近见底</b></td><td>没有——记录的是别人行动的结果</td></tr>
+      <tr><td><b class="orange">网络视频</b></td><td class="mono">1e9 小时量级</td><td>存量，还有余量</td><td>有物理，但<b>没有动作标签</b></td></tr>
+      <tr><td><b class="purple">仿真轨迹</b></td><td class="mono">想刷多少有多少</td><td>看着像流量，<b>但只在仿真里</b></td><td>有因果，但<b>物理对不准</b></td></tr>
+      <tr><td><b class="green">真机交互轨迹</b></td><td class="mono">1e6 条量级</td><td><b class="green">流量，机器越多数据越多</b></td><td><b class="green">有，而且是第一人称的</b></td></tr>
     </table>
-    <div class="g2">
-      <div class="note b-green"><div class="t green">读这张表能得到的一个判断</div>
-        <div class="cap">五条路线里，<b>证据最扎实的是第二条</b>——因为它在别的领域已经完整走通过一遍，不是从零起步。<br>但它同时也带着一个原理上无解的问题（钻空子），并且明确<b>够不着经济价值最高的那一半工作</b>。<br><b>证据最强的路线，射程不是最远的。</b>这大概是这张表最有信息量的一点。</div></div>
-      <div class="note b-purple"><div class="t purple">以及一个不该得到的判断</div>
-        <div class="cap">不要读成「所以应该押第二条」。<b>五条路线不是选项，它们在同时推进且互相依赖</b>：路线二需要路线一提供底座，路线四的收益取决于个体能力，路线五要靠路线二的方法来训练。<br><b>真正的问题不是哪条会赢，而是哪几条会先撞上各自的墙。</b></div></div>
-    </div>
+    <div class="note b-blue" style="margin-top:12px"><div class="t blue">这条路线的时钟和别的不一样：它受物理时间约束</div>
+      <div class="sub">前四条路线的瓶颈是算力和数据，加钱能换速度；这一条的瓶颈里<b>有一段是真实时间</b>——一台机器一天只能试那么多次，一个抓取动作就是要花三秒。<b>所以它大概率是最慢的一条，但也是唯一一条越走数据越多、不会枯竭的路。</b>上面表里那道数量级的鸿沟，就是它今天的全部处境。</div></div>
   </div>
 </section>
-
-<section class="slide" data-act="收尾">
-  <div class="hd"><h2>观察清单：把这一页留下来对照</h2></div>
+<section class="slide" data-act="RSI">
+  <div class="hd"><h2>RSI 的那个 R：三件事被混成了一件</h2></div>
   <div class="bd">
-    <div class="p mb">这是本章唯一希望被长期使用的东西。<b>不用记结论，只需要隔一段时间回来看看，哪些出现了、哪些一直没出现。</b></div>
-    <table class="tbl s mb">
-      <tr><th style="width:16%">路线</th><th style="width:42%">出现了，说明在走通</th><th>一直没出现，说明卡住了</th></tr>
-      <tr><td class="blue"><b>继续 scaling</b></td><td class="green">新一代在<b>训练截止之后才出现</b>的任务上明显更好　·　长任务成功率随代际稳定上升　·　单位能力成本继续下降</td><td class="orange">提升只体现在基准分上，实际用起来感受不到　·　资源明显转向别的方向　·「更大的模型」不再是卖点</td></tr>
-      <tr><td class="green"><b>RL + 可验证环境</b></td><td class="green"><b>能力从可验证领域溢出到不可验证领域</b>　·　出现公认的通用环境集合　·「造环境」成为独立分工</td><td class="orange">提升长期只发生在有自动判定的领域　·　大量成绩被发现来自钻空子　·　环境成本高过训练本身</td></tr>
-      <tr><td class="purple"><b>连续学习</b></td><td class="green">出现<b>能测出「用得越久越好用」</b>的产品　·「学到的东西」变成可查看、可编辑、可转移的对象　·　出现针对自更新系统的评估方法</td><td class="orange">长期停留在外挂检索库，行为本身从不改变　·　在线更新因退化或污染被回退　·「个性化」始终等于提示词拼接</td></tr>
-      <tr><td class="orange"><b>多 Agent</b></td><td class="green"><b>角色和分工由系统自己决定</b>且稳定优于人定好的流程　·　多 Agent 在成本上打平单 Agent　·　跨组织协作解决了责任与计费</td><td class="orange">长期只有「生成 + 审查」这一种结构跑得稳　·　更强的单模型反复把多 Agent 打回原形　·　跨组织协作卡在信任和归责上</td></tr>
-      <tr><td class="red"><b>世界模型与具身</b></td><td class="green">机器人在<b>没见过的杂乱真实环境</b>里完成没专门训练过的任务　·　纯视觉训练让语言上的因果推理也变好　·　真实互动数据成本数量级下降</td><td class="orange">演示很好看但始终限于布置过的场景　·　视频越来越逼真，反事实推理却没提升　·　硬件成本与可靠性长期不变</td></tr>
+    <div class="p mb">「AI 自己改进自己」在不同场合指的是三件难度差很远的事。<b class="purple">混着谈，是这个话题最主要的失真来源。</b></div>
+    <table class="tbl s mt">
+      <tr><th style="width:150px">哪一件</th><th style="width:300px">系统在做什么</th><th style="width:200px">谁在改进它</th><th>下一轮会更快吗</th></tr>
+      <tr><td><b class="blue">自动化</b></td><td>把人定好的流程跑完，跑得又快又便宜</td><td>人。系统只负责执行</td><td><b>不会</b>——产出变多，能力不变</td></tr>
+      <tr><td><b class="orange">自我改进</b></td><td>根据自己的结果，修改自己的某个部件</td><td>系统自己改，人来审</td><td>会快一点，但<b>提速不来自上一轮</b></td></tr>
+      <tr><td><b class="purple">递归自我改进</b></td><td>改的是<b>「改进自己的那个能力」本身</b></td><td>系统自己改，且改完更会改</td><td><b class="purple">会。这就是「递归」的全部含义</b></td></tr>
     </table>
-    <div class="note b-purple"><div class="t purple">使用说明</div>
-      <div class="cap">看新闻和发布时，<b>把它往这张表上对</b>：这条消息是左栏的哪一条，还是只是一个更高的基准分数？<br>大部分声势浩大的消息，在这张表上找不到位置——<b>这本身就是有用的信息。</b></div></div>
-  </div>
-</section>
+    <svg viewBox="0 0 1168 190" style="width:100%;height:auto;display:block;margin-top:14px">
+      <rect x="0" y="6" width="376" height="178" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
+      <text x="20" y="34" font-size="14.5" font-weight="700" fill="#2563eb">自动化　今天被叫作 Agent 的</text>
+      <text x="20" y="62" font-size="12.5" fill="#1f2937">·　用 Agent 跑一条固定的业务流程</text>
+      <text x="20" y="84" font-size="12.5" fill="#1f2937">·　批量生成、批量处理、批量审核</text>
+      <text x="20" y="106" font-size="12.5" fill="#1f2937">·　「一个人干十个人的活」</text>
+      <line x1="20" y1="128" x2="356" y2="128" stroke="#dbeafe" stroke-width="1.5"/>
+      <text x="20" y="152" font-size="12.5" font-weight="700" fill="#2563eb">成熟。绝大多数产品都在这一格</text>
+      <text x="20" y="172" font-size="12" fill="#94a3b8">跑一万次，能力还是第一次那个</text>
 
-<section class="slide" data-act="收尾">
-  <div class="hd"><h2>整章收在三句话上</h2></div>
-  <div class="bd">
-    <div class="g3 mb">
-      <div class="card t-blue"><div class="t blue">一 · 别用一个没有定义的词做落点</div>
-        <div class="cap">「AGI」同时指经济替代、能力基准、自主运作三件不同的事。用它当目标，讨论就只能停在各说各话。<br><br><b>换个问法就清楚了</b>：从今天出发有哪几条路，各自的证据和瓶颈是什么。<br><br>这个问法的好处是，<b>它的答案会被将来的事实检验</b>，而不是永远正确。</div></div>
-      <div class="card t-green"><div class="t green">二 · 分清「还没做」和「不知道怎么做」</div>
-        <div class="cap">这一章里所有瓶颈，都可以归到这两类之一。<br><br><b>工程问题会被时间和投入解决</b>——环境难造、数据难采、硬件贵，这些都有明确的改进路径。<br><br><b>未知问题不一定</b>——钻空子、灾难性遗忘、生成逼真是否等于理解因果，这些至今没有解法，只有缓解。<br><br><b>判断一条消息的分量，先看它动的是哪一类。</b></div></div>
-      <div class="card t-purple"><div class="t purple">三 · 用信号代替时间表</div>
-        <div class="cap">「几年内会怎样」这个问题，任何人的答案都不比你的更可靠。<br><br>但<b>「如果它在走通，我们会先看到什么」</b>是可以负责任地回答的——上一页那张表就是答案。<br><br>它不会告诉你什么时候，但会告诉你<b>该盯着什么</b>，以及一条消息到底算不算数。<br><br><b>这比一个年份有用，也比一个年份诚实。</b></div></div>
+      <rect x="396" y="6" width="376" height="178" rx="8" fill="#fff7ed" stroke="#c2410c" stroke-width="1.6"/>
+      <text x="416" y="34" font-size="14.5" font-weight="700" fill="#c2410c">自我改进　今天真在发生的</text>
+      <text x="416" y="62" font-size="12.5" fill="#1f2937">·　模型写自己要用的工具</text>
+      <text x="416" y="84" font-size="12.5" fill="#1f2937">·　造合成数据、当评委、筛超参</text>
+      <text x="416" y="106" font-size="12.5" fill="#1f2937">·　改自己的提示词与工作流</text>
+      <line x1="416" y1="128" x2="752" y2="128" stroke="#fed7aa" stroke-width="1.5"/>
+      <text x="416" y="152" font-size="12.5" font-weight="700" fill="#c2410c">正在发生，且集中在模型外面那层</text>
+      <text x="416" y="172" font-size="12" fill="#94a3b8">每一项都是一次性的效率提升</text>
+
+      <rect x="792" y="6" width="376" height="178" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.6"/>
+      <text x="812" y="34" font-size="14.5" font-weight="700" fill="#7c3aed">递归自我改进　还没看到的</text>
+      <text x="812" y="62" font-size="12.5" fill="#1f2937">·　要的不是「模型参与得更多」，</text>
+      <text x="812" y="84" font-size="12.5" fill="#1f2937">　 而是对「怎么造更好的模型」</text>
+      <text x="812" y="106" font-size="12.5" fill="#1f2937">　 这件事的判断力在提高</text>
+      <line x1="812" y1="128" x2="1148" y2="128" stroke="#ede9fe" stroke-width="1.5"/>
+      <text x="812" y="152" font-size="12.5" font-weight="700" fill="#dc2626">没有确证。局部像，整体找不到证据</text>
+      <text x="812" y="172" font-size="12" fill="#94a3b8">要证实它，需要跨轮次的对照数据</text>
+    </svg>
+    <div class="g2" style="margin-top:14px">
+      <div class="note b-purple"><div class="t purple">分辨它们只要问一句</div>
+        <div class="sub"><b>第 N 轮的改进，有没有让第 N+1 轮改得更快？</b>没有，收益只会加总；有，收益才会复利——<b>而复利是这个话题唯一真正要紧的地方。</b></div></div>
+      <div class="note b-red"><div class="t red">最容易上当的一个说法</div>
+        <div class="sub">「AI 已经在写下一代 AI 的代码了」——字面上成立，但它<b>落在第二行，不是第三行</b>。写代码被加速，等价于工程人力变多。</div></div>
     </div>
-    <div class="note b-orange"><div class="t orange">最后一句，关于这一章本身</div>
-      <div class="cap">这一章的写法决定了它是<b>可以被证伪的</b>——第四栏里的每一条信号，将来要么出现，要么没出现。<br>如果几年后回头看，发现其中大部分判断错了，那也是这一章该有的结局：<b>一份能被检验的判断，比一份怎么都对的判断更值得写下来。</b></div></div>
+    <div class="note b-orange" style="margin-top:12px"><div class="t orange">所以该盯的不是「模型参与了多少」，而是「参与之后，下一轮有没有更快」</div>
+      <div class="sub">写代码写得快和判断得准，是两种能力。<b>前者有大量证据，后者只有零星迹象</b>——下一页把这件事写成一个可以量的数。</div></div>
   </div>
 </section>
+<section class="slide" data-act="RSI">
+  <div class="hd"><h2>把递归写成一个数：回路增益 g</h2></div>
+  <div class="bd">
+    <div class="p mb">设每转一圈，能力提升的倍率是 <span class="mono">g</span>。<b class="purple">g 的大小不重要，g 比 1 大还是小才重要</b>——它决定曲线的形状，而形状决定后果。</div>
+    <div class="g32">
+      <svg viewBox="0 0 687 250" style="width:100%;height:auto;display:block">
+        <line x1="52" y1="222" x2="676" y2="222" stroke="#cbd5e1" stroke-width="1.5"/>
+        <line x1="52" y1="222" x2="52" y2="14" stroke="#cbd5e1" stroke-width="1.5"/>
+        <text x="676" y="242" font-size="12" fill="#94a3b8" text-anchor="end">改进轮次 →</text>
+        <text x="46" y="20" font-size="12" fill="#94a3b8" text-anchor="end">能力</text>
 
+        <path d="M52 222 C 150 158, 250 126, 660 116" fill="none" stroke="#c2410c" stroke-width="2.4"/>
+        <path d="M52 222 L 660 62" fill="none" stroke="#2563eb" stroke-width="2.4"/>
+        <path d="M52 222 C 260 216, 372 196, 448 14" fill="none" stroke="#7c3aed" stroke-width="2.4"/>
+
+        <line x1="72" y1="28" x2="98" y2="28" stroke="#7c3aed" stroke-width="2.4"/>
+        <text x="106" y="32" font-size="12.5" font-weight="700" fill="#7c3aed">g &gt; 1　复利</text>
+        <text x="196" y="32" font-size="11.5" fill="#94a3b8">前期最慢，后期最快</text>
+        <line x1="72" y1="52" x2="98" y2="52" stroke="#2563eb" stroke-width="2.4"/>
+        <text x="106" y="56" font-size="12.5" font-weight="700" fill="#2563eb">g = 1　线性</text>
+        <text x="196" y="56" font-size="11.5" fill="#94a3b8">稳定推进，不加速也不停</text>
+        <line x1="72" y1="76" x2="98" y2="76" stroke="#c2410c" stroke-width="2.4"/>
+        <text x="106" y="80" font-size="12.5" font-weight="700" fill="#c2410c">g &lt; 1　收敛</text>
+        <text x="196" y="80" font-size="11.5" fill="#94a3b8">很快撞上天花板</text>
+
+        <rect x="52" y="172" width="76" height="50" fill="#dc2626" opacity="0.07"/>
+        <line x1="128" y1="172" x2="128" y2="222" stroke="#dc2626" stroke-width="1.2" stroke-dasharray="4 4"/>
+        <text x="350" y="196" font-size="12" font-weight="700" fill="#dc2626">阴影处：三条线还挨在一起，而且橙线跑在最前面</text>
+        <text x="350" y="214" font-size="11.5" fill="#94a3b8">——早期的快慢，对长期形状没有判别力</text>
+      </svg>
+      <div>
+        <div class="card t-orange"><div class="t orange">现实里 g 不是常数</div>
+          <div class="sub" style="margin-top:4px">每一轮都会先摘走最容易摘的果子。真实的 g <b>随轮次下降</b>，除非有东西持续把它顶回去。</div>
+          <table class="tbl s" style="margin-top:8px">
+            <tr><td style="width:92px"><b class="green">顶上去</b></td><td>更强的底座 · 更好的验证器 · 更多可并行的尝试</td></tr>
+            <tr><td><b class="red">拉下来</b></td><td>验证跟不上 · 归因分不清 · 成本涨 · 等真实世界</td></tr>
+          </table></div>
+        <div class="note b-purple mt"><div class="t purple">于是问题变得可查</div>
+          <div class="sub">不必回答「AGI 会不会来」，只回答：<b>现在 g 大概是多少，是什么在压着它。</b></div></div>
+      </div>
+    </div>
+    <div class="g2" style="margin-top:14px">
+      <div class="note b-red"><div class="t red">「涨得快不快」不构成证据</div>
+        <div class="sub"><b>紫线在早期是三条里最慢的那条。</b>所以「这两年进展惊人」和「没想象中快」这两种观感，对判断长期形状都没有判别力。有判别力的是<b class="red">加速度</b>：同样的投入，这一轮换来的改进比上一轮多还是少。</div></div>
+      <div class="note b-green"><div class="t green">不知道 g，照样能做决定</div>
+        <div class="sub">不需要知道 g 的值，只需要知道<b>是什么在压着它</b>——因为压着它的那几样东西，无论落在哪条曲线上都得处理。<b class="green">不赌形状，去看闸门。</b>下一页就是那几道闸。</div></div>
+    </div>
+    <div class="g3" style="margin-top:12px">
+      <div class="note b-orange"><div class="t orange">如果在橙线上，会先看到</div>
+        <div class="sub">每一代的提升幅度稳定收窄；同样的投入换来的分数越来越少；<b>新能力更多来自换赛道，而不是同一条曲线继续走。</b></div></div>
+      <div class="note b-blue"><div class="t blue">如果在蓝线上，会先看到</div>
+        <div class="sub">能力稳定推进但不加速；<b>改进的成本和收益大致同比例增长</b>，投入翻倍，产出也就翻倍，没有额外的红利。</div></div>
+      <div class="note b-purple"><div class="t purple">如果在紫线上，会先看到</div>
+        <div class="sub">模型参与研发的比例上升，<b>同时下一代的研发周期在缩短</b>——两件事必须同时出现，只有前者说明不了什么。</div></div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="RSI">
+  <div class="hd"><h2>压着 g 的是四道闸，最窄的那道说了算</h2></div>
+  <div class="bd">
+    <div class="p mb">回路是串行的：一圈要依次经过做事、验证、归因、写回，<b>任何一环堵住，整圈就停在那里</b>。所以 g 不是四段的平均，而是最弱那一段决定的。</div>
+    <div class="g32">
+      <svg viewBox="0 0 687 250" style="width:100%;height:auto;display:block">
+        <defs><marker id="a12" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto">
+          <path d="M0 0 L7 3.5 L0 7 z" fill="#94a3b8"/></marker></defs>
+        <circle cx="300" cy="124" r="104" fill="none" stroke="#eef2f7" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <path d="M372 24 A 104 104 0 0 1 466 102" fill="none" stroke="#94a3b8" stroke-width="1.7" marker-end="url(#a12)"/>
+        <path d="M466 146 A 104 104 0 0 1 372 224" fill="none" stroke="#94a3b8" stroke-width="1.7" marker-end="url(#a12)"/>
+        <path d="M228 224 A 104 104 0 0 1 134 146" fill="none" stroke="#94a3b8" stroke-width="1.7" marker-end="url(#a12)"/>
+        <path d="M134 102 A 104 104 0 0 1 228 24" fill="none" stroke="#94a3b8" stroke-width="1.7" marker-end="url(#a12)"/>
+
+        <rect x="230" y="2" width="140" height="36" rx="7" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
+        <text x="300" y="26" font-size="13.5" font-weight="700" fill="#2563eb" text-anchor="middle">① 做事</text>
+        <rect x="400" y="106" width="140" height="36" rx="7" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.6"/>
+        <text x="470" y="130" font-size="13.5" font-weight="700" fill="#0e9f6e" text-anchor="middle">② 验证</text>
+        <rect x="230" y="210" width="140" height="36" rx="7" fill="#fff7ed" stroke="#c2410c" stroke-width="1.6"/>
+        <text x="300" y="234" font-size="13.5" font-weight="700" fill="#c2410c" text-anchor="middle">③ 归因</text>
+        <rect x="60" y="106" width="140" height="36" rx="7" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.6"/>
+        <text x="130" y="130" font-size="13.5" font-weight="700" fill="#7c3aed" text-anchor="middle">④ 写回</text>
+
+        <rect x="363" y="38" width="20" height="24" rx="3" fill="#dc2626"/>
+        <text x="390" y="55" font-size="12.5" font-weight="700" fill="#dc2626">闸一 · 验证</text>
+        <rect x="363" y="185" width="20" height="24" rx="3" fill="#c2410c"/>
+        <text x="390" y="202" font-size="12.5" font-weight="700" fill="#c2410c">闸二 · 归因</text>
+        <rect x="216" y="185" width="20" height="24" rx="3" fill="#94a3b8"/>
+        <text x="200" y="202" font-size="12.5" font-weight="700" fill="#94a3b8" text-anchor="end">闸三 · 成本</text>
+        <rect x="216" y="38" width="20" height="24" rx="3" fill="#dc2626"/>
+        <text x="200" y="55" font-size="12.5" font-weight="700" fill="#dc2626" text-anchor="end">闸四 · 时钟</text>
+
+        <text x="300" y="120" font-size="13.5" font-weight="700" fill="#1f2937" text-anchor="middle">四道闸</text>
+        <text x="300" y="140" font-size="11.5" fill="#94a3b8" text-anchor="middle">最窄的那道说了算</text>
+      </svg>
+      <div>
+        <div class="cap mb">同一个回路可以套在四个半径上——半径越大，转一圈越慢，改动越持久。</div>
+        <table class="tbl s">
+          <tr><th style="width:120px">改的是什么</th><th style="width:96px">转一圈</th><th>今天到哪了</th></tr>
+          <tr><td><b class="blue">上下文</b></td><td>秒</td><td>成熟，但<b>不留痕</b></td></tr>
+          <tr><td><b class="purple">外壳与工具</b></td><td>分钟到天</td><td><b class="green">真在转的就是这层</b></td></tr>
+          <tr><td><b class="orange">训练流程</b></td><td>周到月</td><td>已参与，人还在决策</td></tr>
+          <tr><td><b class="red">权重与架构</b></td><td>月以上</td><td><b class="red">基本没发生</b></td></tr>
+        </table>
+      </div>
+    </div>
+    <table class="tbl s mt">
+      <tr><th style="width:150px">闸</th><th style="width:330px">它卡住的是</th><th style="width:300px">性质</th><th>本章哪条路线在处理它</th></tr>
+      <tr><td><b class="red">一 · 验证</b></td><td>能不能便宜可信地判断这次做得好不好</td><td><b class="red">部分是原理性的</b>：代理判据必然被钻</td><td>路线二（第 5–6 页）</td></tr>
+      <tr><td><b class="orange">二 · 归因</b></td><td>变好变坏，是哪一处改动带来的</td><td>信噪比问题：多做实验能缓解</td><td>没有对应路线，是工程问题</td></tr>
+      <tr><td><b class="dim">三 · 成本</b></td><td>每多转一圈要花多少钱和算力</td><td><b class="green">经济问题</b>：会随硬件和效率改善</td><td>路线一（第 4 页）</td></tr>
+      <tr><td><b class="red">四 · 时钟</b></td><td>有些反馈必须等真实世界给</td><td><b class="red">结构性</b>：物理和长期后果无法加速</td><td>路线五（第 9 页）</td></tr>
+    </table>
+    <div class="note b-purple" style="margin-top:12px"><div class="t purple">这四道闸是本章后半段的落点</div>
+      <div class="sub">流行叙事默认瓶颈是算力，也就是<b class="orange">闸三——而闸三恰好是四道里最不硬的那道</b>。真正硬的是<b class="red">闸一和闸四</b>，它们都不随算力增加而变宽。直接的推论：<b>在最窄那道闸之外投入资源，对 g 几乎没有作用</b>——算力翻十倍，如果验证仍然要人来做、仍然那么慢，一年能转的圈数不会变。</div></div>
+  </div>
+</section>
+<section class="slide" data-act="目标">
+  <div class="hd"><h2>AGI 这个词，其实有三派互不兼容的定义</h2></div>
+  <div class="bd">
+    <div class="p mb">前面都在讲「怎么走」。但<b>终点画在哪里，会反过来决定该走哪条路</b>——而这个终点，业界从来没谈拢过。</div>
+    <div class="g3">
+      <div class="card w"><div class="t blue">一 · 能力覆盖式</div>
+        <div class="cap" style="margin-top:6px"><b>算不算到了：</b>人能干的有经济价值的活，它都能干。<br><b>怎么度量：</b>覆盖率 × 任务时长跨度。<br><b class="blue">它指向：</b>scaling 和 RLVR——先把覆盖率拉满。</div></div>
+      <div class="card w"><div class="t orange">二 · 自主式</div>
+        <div class="cap" style="margin-top:6px"><b>算不算到了：</b>没人盯着，也能把开放式目标做完。<br><b>怎么度量：</b>无人干预下能连续工作多久。<br><b class="orange">它指向：</b>可靠性、长程一致性、世界模型。</div></div>
+      <div class="card w"><div class="t green">三 · 学习式</div>
+        <div class="cap" style="margin-top:6px"><b>算不算到了：</b>进到一个全新领域，能从零学会。<br><b>怎么度量：</b>样本效率——学会新事要几个例子。<br><b class="green">它指向：</b>连续学习和 RSI，别的都是绕路。</div></div>
+    </div>
+    <svg viewBox="0 0 1168 210" style="width:100%;height:auto;display:block;margin-top:16px">
+      <line x1="670" y1="6" x2="670" y2="204" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="5 4"/>
+      <text x="0" y="20" font-size="12.5" font-weight="700" fill="#2563eb">同一件事，人要做多久？——「任务时长跨度」</text>
+      <line x1="70" y1="170" x2="640" y2="170" stroke="#cbd5e1" stroke-width="1.5"/>
+      <line x1="70" y1="170" x2="70" y2="34" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="64" y="48" font-size="11.5" fill="#94a3b8" text-anchor="end">8 小时</text>
+      <text x="64" y="80" font-size="11.5" fill="#94a3b8" text-anchor="end">1 小时</text>
+      <text x="64" y="112" font-size="11.5" fill="#94a3b8" text-anchor="end">8 分钟</text>
+      <text x="64" y="144" font-size="11.5" fill="#94a3b8" text-anchor="end">1 分钟</text>
+      <path d="M100 160 L610 52" fill="none" stroke="#2563eb" stroke-width="2.4"/>
+      <circle cx="100" cy="160" r="3.5" fill="#2563eb"/>
+      <circle cx="270" cy="124" r="3.5" fill="#2563eb"/>
+      <circle cx="440" cy="88" r="3.5" fill="#2563eb"/>
+      <circle cx="610" cy="52" r="3.5" fill="#2563eb"/>
+      <text x="300" y="150" font-size="12.5" font-weight="700" fill="#2563eb">纵轴是对数刻度　→　大约每 7 个月翻一番</text>
+      <text x="100" y="188" font-size="11.5" fill="#94a3b8" text-anchor="middle">2020</text>
+      <text x="270" y="188" font-size="11.5" fill="#94a3b8" text-anchor="middle">2022</text>
+      <text x="440" y="188" font-size="11.5" fill="#94a3b8" text-anchor="middle">2024</text>
+      <text x="610" y="188" font-size="11.5" fill="#94a3b8" text-anchor="middle">2026</text>
+      <text x="0" y="206" font-size="11.5" fill="#94a3b8">口径：模型能以 50% 成功率完成的任务，换成人做需要多长时间</text>
+
+      <text x="694" y="20" font-size="12.5" font-weight="700" fill="#7c3aed">不管站哪一派，这条曲线是共同的锚</text>
+      <text x="694" y="50" font-size="12.5" fill="#5b6675">它量的是「能独立扛多久」，正好同时对上三派：</text>
+      <text x="694" y="78" font-size="12.5" fill="#2563eb">·　覆盖式：任务越长，能覆盖的工作越多</text>
+      <text x="694" y="102" font-size="12.5" fill="#c2410c">·　自主式：无人干预的连续时长，就是它本身</text>
+      <text x="694" y="126" font-size="12.5" fill="#0e9f6e">·　学习式：只有会学的系统才能一直往上走</text>
+      <text x="694" y="160" font-size="12.5" font-weight="700" fill="#dc2626">但它有一个测不到的盲区：</text>
+      <text x="694" y="184" font-size="12.5" fill="#5b6675">它测的是「已经会的任务能扛多久」，测不出</text>
+      <text x="694" y="206" font-size="12.5" fill="#5b6675">「换一个全新领域，它会不会学」。</text>
+    </svg>
+    <div class="g3" style="margin-top:12px">
+      <div class="note b-blue"><div class="t blue">AGI 不是一个开关</div>
+        <div class="sub">三派量的都是连续的东西，没有哪一天忽然「到了」。<b>争「到没到」不如争「哪个数在涨」。</b></div></div>
+      <div class="note b-orange"><div class="t orange">过了某个考试不等于到了</div>
+        <div class="sub">评测会被污染，也会被针对性优化。<b>分数涨了，不一定是能力涨了。</b></div></div>
+      <div class="note b-red"><div class="t red">ASI 是另一个问题</div>
+        <div class="sub">超过人类 ≠ 通用。竞赛数学和编程上<b>已经超过绝大多数人</b>，通用性一点没多。</div></div>
+    </div>
+    <div class="note b-purple" style="margin-top:12px"><div class="t purple">为什么要先把定义摊开：它直接决定你该盯哪一条路线</div>
+      <div class="sub">三派测的根本不是同一件事。<b>覆盖式关心「会多少」，自主式关心「能扛多久」，学习式关心「会不会学」</b>——一个系统完全可能在前两项上很强、第三项上是零。所以当有人说「AGI 快到了」而另一个人说「还早得很」，八成不是判断不同，<b>是他们心里的终点不在同一个地方</b>。这也是这张地图上最容易被跳过、却最影响结论的一步。</div></div>
+  </div>
+</section>
+<section class="slide" data-act="总账">
+  <div class="hd"><h2>五条路线各自卡在哪：一页对照</h2></div>
+  <div class="bd">
+    <div class="p mb">一条一条讲完了，并排放在一起。<b class="orange">最后一列是这张表里最有用的东西</b>——它是判据，不是描述。</div>
+    <table class="tbl s mt">
+      <tr><th style="width:170px">路线</th><th style="width:420px">卡在哪</th><th>什么信号出现，说明它真动了</th></tr>
+      <tr><td><b class="blue">继续 scaling</b></td><td>高质量数据是存量；电力、芯片、建设周期</td><td>同等算力下，预训练损失还按老斜率降</td></tr>
+      <tr><td><b class="blue">RL + 可验证环境</b></td><td>环境不够多；判分做不了的地方过不去</td><td>弱可验证任务上出现稳定可复现的判分</td></tr>
+      <tr><td><b class="blue">连续学习</b></td><td>灾难性遗忘；更新是全局的；投毒风险</td><td><b>上线模型的权重按周更新且不退化</b></td></tr>
+      <tr><td><b class="blue">世界模型</b></td><td>单步误差会复合，长程一致性撑不住</td><td>想象 100 步之后，仍然和真实对得上</td></tr>
+      <tr><td><b class="blue">具身智能</b></td><td>数据、sim2real、硬件，还有真实时间</td><td>一套策略跨机型、跨场景直接能用</td></tr>
+      <tr><td><b class="purple">RSI（横跨以上全部）</b></td><td>验证和写回这两格都还是空的</td><td><b>模型产出的改进，让下一轮改得更快</b></td></tr>
+    </table>
+    <svg viewBox="0 0 1168 168" style="width:100%;height:auto;display:block;margin-top:14px">
+      <defs><marker id="a14" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto">
+        <path d="M0 0 L7 3.5 L0 7 z" fill="#94a3b8"/></marker></defs>
+      <text x="0" y="12" font-size="13" font-weight="700" fill="#1f2937">卡点的性质，比卡点本身更能预测它什么时候松动</text>
+      <text x="14" y="40" font-size="12" fill="#94a3b8">时间表大致可预测</text>
+      <text x="1154" y="40" font-size="12" fill="#94a3b8" text-anchor="end">什么时候松动，完全不知道</text>
+      <line x1="14" y1="50" x2="1146" y2="50" stroke="#cbd5e1" stroke-width="1.5" marker-end="url(#a14)"/>
+
+      <rect x="14" y="60" width="272" height="102" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
+      <text x="32" y="86" font-size="14.5" font-weight="700" fill="#2563eb">物理供给</text>
+      <text x="32" y="106" font-size="12" fill="#94a3b8">继续 scaling</text>
+      <text x="32" y="128" font-size="12.5" fill="#1f2937">电力、芯片、建设周期</text>
+      <text x="32" y="150" font-size="12.5" font-weight="700" fill="#2563eb">能解，只是贵和慢</text>
+
+      <rect x="300" y="60" width="272" height="102" rx="8" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.6"/>
+      <text x="318" y="86" font-size="14.5" font-weight="700" fill="#0e9f6e">真实时间</text>
+      <text x="318" y="106" font-size="12" fill="#94a3b8">具身智能</text>
+      <text x="318" y="128" font-size="12.5" fill="#1f2937">真机要一秒一秒地跑</text>
+      <text x="318" y="150" font-size="12.5" font-weight="700" fill="#0e9f6e">可预测，但结果就是慢</text>
+
+      <rect x="586" y="60" width="272" height="102" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.6"/>
+      <text x="604" y="86" font-size="14.5" font-weight="700" fill="#7c3aed">工程与安全</text>
+      <text x="604" y="106" font-size="12" fill="#94a3b8">连续学习</text>
+      <text x="604" y="128" font-size="12.5" fill="#1f2937">动的是已上线的权重</text>
+      <text x="604" y="150" font-size="12.5" font-weight="700" fill="#7c3aed">技术未必最难，最易低估</text>
+
+      <rect x="872" y="60" width="282" height="102" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="1.6"/>
+      <text x="890" y="86" font-size="14.5" font-weight="700" fill="#dc2626">方法未知</text>
+      <text x="890" y="106" font-size="12" fill="#94a3b8">RL + 可验证环境 · 世界模型</text>
+      <text x="890" y="128" font-size="12.5" fill="#1f2937">缺的那一块还没被找到</text>
+      <text x="890" y="150" font-size="12.5" font-weight="700" fill="#dc2626">一篇论文，或者十年</text>
+    </svg>
+    <div class="g2" style="margin-top:12px">
+      <div class="note b-orange"><div class="t orange">中间那列会过时，最后一列不会</div>
+        <div class="sub">「卡在哪」半年就要重写一遍，但<b>「什么信号说明它动了」是稳定的</b>——大部分被宣布的突破，都对不上最后那一列。</div></div>
+      <div class="note b-green"><div class="t green">这张表上没有的一行：对齐与可控</div>
+        <div class="sub">上面讲的都是「能力从哪来」。<b>它不是第六条路线，是每条路线各自要交的作业</b>——而它没有自己的 scaling 曲线。</div></div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-act="总账">
+  <div class="hd"><h2>它们不是竞争关系：真正的瓶颈只有两个</h2></div>
+  <div class="bd">
+    <div class="p mb">把这些路线的依赖关系画出来，会看到<b>它们其实是一条供料链上的不同环节</b>——决定整体速度的，从来不是最快的那一环。</div>
+    <svg viewBox="0 0 1168 282" style="width:100%;height:auto;display:block">
+      <defs><marker id="a15b" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0 0 L6 3 L0 6 z" fill="#2563eb"/></marker>
+        <marker id="a15r" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0 0 L6 3 L0 6 z" fill="#dc2626"/></marker></defs>
+
+      <rect x="264" y="160" width="478" height="112" rx="10" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="5 4" opacity="0.5"/>
+
+      <rect x="14" y="20" width="170" height="58" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
+      <text x="99" y="55" font-size="15" font-weight="700" fill="#2563eb" text-anchor="middle">具身智能</text>
+      <text x="227" y="41" font-size="12" fill="#5b6675" text-anchor="middle">因果数据</text>
+      <path d="M188 49 L266 49" stroke="#2563eb" stroke-width="1.8" fill="none" marker-end="url(#a15b)"/>
+
+      <rect x="274" y="20" width="170" height="58" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
+      <text x="359" y="55" font-size="15" font-weight="700" fill="#2563eb" text-anchor="middle">世界模型</text>
+      <path d="M359 82 L359 168" stroke="#2563eb" stroke-width="1.8" fill="none" marker-end="url(#a15b)"/>
+      <text x="372" y="130" font-size="12" fill="#5b6675">仿真器＝检查器</text>
+
+      <rect x="14" y="174" width="170" height="58" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
+      <text x="99" y="209" font-size="15" font-weight="700" fill="#2563eb" text-anchor="middle">继续 scaling</text>
+      <text x="229" y="195" font-size="12" fill="#5b6675" text-anchor="middle">更强的底座</text>
+      <path d="M188 203 L266 203" stroke="#2563eb" stroke-width="1.8" fill="none" marker-end="url(#a15b)"/>
+
+      <rect x="274" y="174" width="200" height="58" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="2.2"/>
+      <text x="374" y="209" font-size="15" font-weight="700" fill="#dc2626" text-anchor="middle">RL + 可验证环境</text>
+      <text x="374" y="258" font-size="12.5" font-weight="700" fill="#dc2626" text-anchor="middle">瓶颈一 · 评价信号</text>
+      <text x="517" y="195" font-size="12" fill="#dc2626" text-anchor="middle">① 判分信号</text>
+      <path d="M478 203 L552 203" stroke="#dc2626" stroke-width="1.8" fill="none" marker-end="url(#a15r)"/>
+
+      <rect x="560" y="174" width="170" height="58" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="2.2"/>
+      <text x="645" y="209" font-size="15" font-weight="700" fill="#dc2626" text-anchor="middle">连续学习</text>
+      <text x="645" y="258" font-size="12.5" font-weight="700" fill="#dc2626" text-anchor="middle">瓶颈二 · 写回通道</text>
+      <text x="770" y="195" font-size="12" fill="#dc2626" text-anchor="middle">② 写回通道</text>
+      <path d="M734 203 L802 203" stroke="#dc2626" stroke-width="1.8" fill="none" marker-end="url(#a15r)"/>
+
+      <rect x="810" y="174" width="150" height="58" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+      <text x="885" y="209" font-size="15" font-weight="700" fill="#7c3aed" text-anchor="middle">RSI</text>
+      <path d="M964 203 L986 203" stroke="#7c3aed" stroke-width="1.8" fill="none" marker-end="url(#a15b)"/>
+
+      <rect x="994" y="174" width="160" height="58" rx="8" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="2"/>
+      <text x="1074" y="209" font-size="15" font-weight="700" fill="#0e9f6e" text-anchor="middle">AGI</text>
+
+      <rect x="560" y="20" width="594" height="58" rx="8" fill="#fafbfd" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="5 4"/>
+      <text x="580" y="46" font-size="12.5" fill="#94a3b8">图上只画了主干。实际上「继续 scaling」给每一格都供料，</text>
+      <text x="580" y="65" font-size="12.5" fill="#94a3b8">为了不糊成一团，这里只保留了最主要的那一条边。</text>
+
+      <text x="810" y="258" font-size="12" fill="#94a3b8">其余环节的进展，最后都要先经过左边这一段</text>
+    </svg>
+    <div class="g3" style="margin-top:12px">
+      <div class="note b-blue"><div class="t blue">箭头是有方向的</div>
+        <div class="sub">上游不动，下游就拿不到料。<b>具身不动，世界模型能拿到的因果数据就只剩视频</b>；底座不动，好的判分器也训不出来，验证那一格只会更紧。</div></div>
+      <div class="note b-red"><div class="t red">两个红格子是同一件事的两半</div>
+        <div class="sub">一个负责判断「这次改好了没有」，一个负责把改动<b>留在权重里</b>。缺任何一个，环都闭不上——<b class="red">RSI 那一格就永远亮不起来。</b></div></div>
+      <div class="note b-purple"><div class="t purple">它和第 12 页那四道闸对得上</div>
+        <div class="sub"><b>瓶颈一就是闸一·验证</b>；瓶颈二就是那张半径表最下面一行——权重与架构。而<b>闸四·时钟</b>落在最左边具身那一格，它不随算力变宽。</div></div>
+    </div>
+    <div class="note b-purple" style="margin-top:12px"><div class="t purple">所以这张图真正的读法：不是挑一条路线站队，而是找链上最紧的那一环</div>
+      <div class="sub">这些路线不是并列的候选项，是一条供料链上的不同环节，<b>整体速度由最紧的一环决定</b>。今天最紧的两环都是红的：<b class="red">既没有足够多、足够严的判分器，也没有把学到的东西写回权重的通道</b>。其他路线的所有进展，最后都要经过这两格，才能变成「模型自己会变强」这件事。<b>如果只盯一个问题，就盯这两格什么时候不再是红的。</b></div></div>
+  </div>
+</section>
 <section class="slide" data-act="收尾">
   <div class="hd"><h2>这一章讲到哪儿为止</h2></div>
   <div class="bd">
     <div class="g2 mb">
       <div class="card t-green"><div class="t green">讲完了这些</div>
         <div class="ul s">
-          <li><b>为什么不拿「AGI」当目标</b>：三种定义各自的优点和问题。</li>
-          <li><b>今天的 Agent 实际卡在哪四件事上</b>，以及五条路线分别针对哪一个。</li>
-          <li><b>五条路线，每条固定四栏</b>：主张 → 证据 → 瓶颈 → 会先看到什么信号。</li>
-          <li><b>三处值得单独展开的地方</b>：「可验证」这条线怎么把工作切成两半、钻空子为什么原理上无解、「学到东西」的四个层次。</li>
-          <li><b>一张横向对照表</b>，以及一份可以长期对照的<b>观察清单</b>。</li>
+          <li><b>七个词各自的位置</b>：哪个是目标、哪个是机制、哪些是能力来源——层级分开，一半的争论就没有了。</li>
+          <li><b>今天这套范式的四个缺口</b>：不会变强、没有信号、没有后果、料要见底——五条路线各补一个，不用背。</li>
+          <li><b>五条能力路线</b>，每条固定问三件事：它在补哪个缺口、卡在哪、什么信号出现说明它真动了。</li>
+          <li><b>「可验证」的边界</b>：判分做得了和做不了的分界线在哪，以及钻空子为什么在原理上躲不掉。</li>
+          <li><b>RSI 里的那个 R</b>：自动化 / 自我改进 / 递归自我改进是三件事；把递归写成回路增益 <span class="mono">g</span>；压着 g 的四道闸，以及为什么最窄的那道不是算力。</li>
+          <li><b>AGI 的三派定义</b>，以及为什么定义选错了，后面所有优先级都会错。</li>
+          <li><b>一张依赖图</b>：路线之间是供料关系，今天最紧的两环是判分信号和写回通道。</li>
         </div></div>
       <div class="card t-red"><div class="t red">这些没有讲</div>
         <div class="ul s">
           <li><b>任何时间表。</b>这是本章的硬约束——给了年份，前面所有可核实的部分都会被连坐。</li>
           <li><b>哪条路线会赢。</b>本章的立场是它们并非互斥的选项，判断谁赢不在能力范围内。</li>
-          <li><b>具体的技术实现细节。</b>各条路线的方法层面只讲到能理解主张和瓶颈为止。</li>
-          <li><b>社会影响、就业、监管、风险治理。</b>这些是重要的问题，但和本章「梳理技术路径」的范围不是一回事，混在一起两边都讲不清。</li>
-          <li><b>对具体公司、产品、模型的评价。</b>本章讨论路线，不做点评。</li>
+          <li><b>具体的技术实现细节。</b>每条路线只讲到能理解主张和瓶颈为止。</li>
+          <li><b>多 Agent 系统怎么编排。</b>那是把已有能力组织起来的工程手段，本身不产生新的能力来源，不在这条「能力从哪来」的线上。</li>
+          <li><b>对齐与可控具体怎么做。</b>本章只点出它是每条路线各自要交的作业，没有展开方法。</li>
+          <li><b>评测与基准该怎么设计。</b>本章只说了分数会被污染、检查器会被钻，没有讲怎么造一个钻不动的。</li>
+          <li><b>社会影响、就业、监管。</b>重要，但和「梳理技术路径」混在一起，两边都讲不清。</li>
         </div></div>
     </div>
     <div class="note b-purple"><div class="t purple">这一章该怎么用</div>
-      <div class="cap">已经落地的技术，结论会随工具更新，但基本盘是稳的；而<b>这一章讲的是还没确定的事，所以它的正确性是有期限的</b>——今天成立的判断，两年后可能被一个新结果整段推翻。<br>建议的用法：<b>把观察清单那一页留下来，其余的当作一次思路整理</b>，而不是当作结论。真正该被记住的不是哪条路线更被看好，而是<b>拿什么信号去检验它</b>。</div></div>
+      <div class="cap">已经落地的技术，结论会随工具更新，但基本盘是稳的；而<b>这一章讲的是还没确定的事，所以它的正确性是有期限的</b>——今天成立的判断，两年后可能被一个新结果整段推翻。<br>
+      所以真正该留下来的不是「哪条路线更被看好」，而是<b>每条路线后面那一列信号</b>，和<b class="purple">「下一轮有没有更快」这一个问句</b>。它们不会过期，可以拿着去对照将来读到的每一条消息。</div></div>
     <div class="src mt">本章不给时间表；所述证据均为已公开发生的事实，判断部分为作者观点　·　整理日期 2026-08</div>
   </div>
 </section>
-
 <!--SLIDES-END-->
 </main></div></div>
 
