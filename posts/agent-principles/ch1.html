@@ -230,30 +230,33 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
 <section class="slide" data-act="主线">
   <div class="hd"><h2>整章的地基：客户端和模型是两回事</h2></div>
   <div class="bd">
-    <svg viewBox="0 0 1160 320" style="width:100%;height:auto">
-      <text x="220" y="36" text-anchor="middle" font-size="15" font-weight="600" fill="#2563eb" letter-spacing="1">客户端 CLIENT</text>
-      <text x="940" y="36" text-anchor="middle" font-size="15" font-weight="600" fill="#7c3aed" letter-spacing="1">模型 MODEL</text>
-      <rect x="100" y="60" width="240" height="64" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
-      <text x="220" y="98" text-anchor="middle" font-size="17" fill="#1f2937">对话式客户端</text>
-      <rect x="100" y="148" width="240" height="64" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
-      <text x="220" y="186" text-anchor="middle" font-size="17" fill="#1f2937">命令行 Agent</text>
-      <rect x="100" y="236" width="240" height="64" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
-      <text x="220" y="274" text-anchor="middle" font-size="17" fill="#1f2937">编辑器 / IDE</text>
-      <rect x="820" y="60" width="240" height="64" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
-      <text x="940" y="98" text-anchor="middle" font-size="17" fill="#1f2937">云端 · 官方</text>
-      <rect x="820" y="148" width="240" height="64" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
-      <text x="940" y="186" text-anchor="middle" font-size="17" fill="#1f2937">云端 · 第三方</text>
-      <rect x="820" y="236" width="240" height="64" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
-      <text x="940" y="274" text-anchor="middle" font-size="17" fill="#1f2937">本地跑</text>
-      <path d="M580,92 L580,268" stroke="#94a3b8" stroke-width="1.5"/>
-      <path d="M340,92 L580,92 M340,180 L580,180 M340,268 L580,268" stroke="#94a3b8" stroke-width="1.5"/>
-      <path d="M580,92 L820,92 M580,180 L820,180 M580,268 L820,268" stroke="#94a3b8" stroke-width="1.5"/>
-      <rect x="500" y="160" width="160" height="40" rx="20" fill="#fff" stroke="#94a3b8" stroke-width="1.5"/>
-      <text x="580" y="185" text-anchor="middle" font-size="15" font-weight="600" fill="#5b6675">任意组合</text>
+    <svg viewBox="0 0 1160 440" style="width:100%;height:auto">
+      <text x="220" y="44" text-anchor="middle" font-size="15" font-weight="600" fill="#2563eb" letter-spacing="1">客户端 CLIENT</text>
+      <text x="940" y="44" text-anchor="middle" font-size="15" font-weight="600" fill="#7c3aed" letter-spacing="1">模型 MODEL</text>
+
+      <path d="M350 108 L560 218 M350 234 L560 234 M350 360 L560 250" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+      <path d="M600 218 L810 108 M600 234 L810 234 M600 250 L810 360" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+
+      <rect x="90" y="70" width="260" height="76" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="220" y="114" text-anchor="middle" font-size="17" fill="#1f2937">对话式客户端</text>
+      <rect x="90" y="196" width="260" height="76" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="220" y="240" text-anchor="middle" font-size="17" fill="#1f2937">命令行 Agent</text>
+      <rect x="90" y="322" width="260" height="76" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="220" y="366" text-anchor="middle" font-size="17" fill="#1f2937">编辑器 / IDE</text>
+      <rect x="810" y="70" width="260" height="76" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="940" y="114" text-anchor="middle" font-size="17" fill="#1f2937">云端 · 官方</text>
+      <rect x="810" y="196" width="260" height="76" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="940" y="240" text-anchor="middle" font-size="17" fill="#1f2937">云端 · 第三方</text>
+      <rect x="810" y="322" width="260" height="76" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="940" y="366" text-anchor="middle" font-size="17" fill="#1f2937">本地跑</text>
+
+      <rect x="505" y="212" width="150" height="44" rx="22" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.6"/>
+      <text x="580" y="240" text-anchor="middle" font-size="15" font-weight="600" fill="#5b6675">任意组合</text>
+      <text x="580" y="288" text-anchor="middle" font-size="13" fill="#94a3b8">3 × 3 ＝ 9 种搭法</text>
     </svg>
     <div class="note b-blue mt2">
       <div class="t">左边任选一个，右边任选一个，就是一套可用的 Agent。</div>
-      <div class="sub">这两边是各自独立演进的。左边不满意就换左边，右边不满意就换右边——不用整套推翻重来。后面「怎么换模型」讲的就是这条竖线上发生的事。</div>
+      <div class="sub">这两边是各自独立演进的。左边不满意就换左边，右边不满意就换右边——不用整套推翻重来。后面「怎么换模型」讲的就是中间这一步。</div>
     </div>
   </div>
 </section>
