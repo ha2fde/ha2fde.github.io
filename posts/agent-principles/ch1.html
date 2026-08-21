@@ -846,28 +846,24 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
 </section>
 
 <section class="slide" data-act="收尾">
-  <div class="hd"><h2>这一章讲到哪儿为止</h2></div>
+  <div class="hd"><h2>对号入座：主流产品都在这一张表里</h2></div>
   <div class="bd">
-    <div class="g2">
-      <div class="card t-green"><div class="t green">你现在手上有的</div>
-        <ul class="ul s mt" style="margin-top:8px">
-          <li>一个能干活的 Agent，以及换掉它任一半的能力</li>
-          <li>一套自己估算的本地硬件对照——知道这台机器跑得动多大的模型，也知道显存够不等于跑得快</li>
-          <li>一套自己会算账的思路：贵在反复重发的历史，省在缓存和选对模型档位</li>
-          <li>五条安全底线，和一个「先怀疑哪一侧」的排查习惯</li>
-        </ul>
-      </div>
-      <div class="card"><div class="t">这一章刻意没讲的</div>
-        <ul class="ul s mt" style="margin-top:8px">
-          <li><b>它为什么能做到</b>——模型内部怎么工作，一句都没讲。这一章全程只把模型当一个可以替换的部件</li>
-          <li><b>那个循环的内部</b>——只讲到「思考 → 行动 → 看结果」，没有展开模型是按什么套路在决定下一步</li>
-          <li><b>工具是怎么接上去的</b>——你看到了它调用工具，但没看到那份约定长什么样、由谁执行</li>
-          <li><b>模型是怎么训出来的</b>——「模型从哪来」这一节讲的是买卖口径：从哪买、怎么部署、怎么计价</li>
-        </ul>
-      </div>
-    </div>
-    <div class="note b-orange mt2"><div class="t orange">但这不影响你现在就用</div>
-      <div class="cap">不懂发动机也能开车，这话在这里成立。上面这些空白不会挡住你今晚跑通第一个任务——<b>动手比读懂原理更早产生收益</b>，而且你带着实际用过的问题再去看原理，效率完全不一样。</div></div>
+    <div class="p mb">前面讲的每一类，落到具体产品上就是下面这张表。<b>以国外主流为主，每一行只列代表，不是排名。</b></div>
+    <table class="tbl s mt">
+      <tr><th style="width:160px">类型</th><th style="width:460px">代表产品</th><th>一句话认出它</th></tr>
+      <tr><td><b class="blue">对话式客户端</b></td><td>ChatGPT · Claude · Gemini · Grok</td><td>一个聊天框，上手最快；现在也能调工具、传文件</td></tr>
+      <tr><td><b class="dim">代码补全</b></td><td>GitHub Copilot</td><td>光标处接着写几行，按 Tab 才算采纳</td></tr>
+      <tr><td><b class="orange">命令行编程 Agent</b></td><td>Claude Code · Codex CLI · Gemini CLI · opencode</td><td>在终端里跑，直接读写文件、执行命令</td></tr>
+      <tr><td><b class="orange">编辑器插件 Agent</b></td><td>Cline · Kilo Code · Copilot 的 Agent 模式</td><td>寄在 VS Code / JetBrains 里，改动逐条审</td></tr>
+      <tr><td><b class="blue">AI 编辑器</b></td><td>Cursor · Windsurf · Zed</td><td>整个编辑器换掉，补全和 Agent 都自带</td></tr>
+      <tr><td><b class="purple">云端异步编程</b></td><td>Devin · Jules · Codex 云端版</td><td>丢个任务过去，它自己开分支、提 PR</td></tr>
+      <tr><td><b class="purple">通用任务 Agent</b></td><td>ChatGPT Agent · Manus · Comet</td><td>会看屏幕、点鼠标、填表单，不限于代码</td></tr>
+      <tr><td><b class="green">办公套件内置</b></td><td>Microsoft 365 Copilot · Gemini in Workspace</td><td>绑在你的文档、邮箱、日历里</td></tr>
+      <tr><td><b class="red">自己搭</b></td><td>OpenAI / Anthropic 的 Agent SDK · LangGraph · OpenHands</td><td>直接调接口自己写循环，给做产品的人</td></tr>
+    </table>
+    <div class="note b-orange mt"><div class="t orange">这张表怎么用</div>
+      <div class="sub">每一行都是<b>客户端</b>的一种形态，右边接哪个模型基本是自由的——这就是「客户端和模型是两回事」落到货架上的样子。<b class="red">这类产品换代极快，名字一年一变，形态基本不变：先认形态，再挑当下的具体产品。</b>至于它们内部为什么能做到，第二、三、四章接着讲。</div></div>
+    <div class="src mt">表中产品仅为各类型的代表，不构成推荐或排名　·　整理日期 2026-08</div>
   </div>
 </section>
 
