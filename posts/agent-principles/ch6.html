@@ -80,19 +80,6 @@ em{font-style:normal;font-weight:600}
 .tag{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:11px;
      background:var(--panel);color:var(--sub);letter-spacing:.02em}
 .num{font-size:34px;font-weight:600;line-height:1.1;letter-spacing:-.02em}
-/* ── 公式 ──────────────────────────────────────────────── */
-.eq{font-family:var(--mono);font-size:16px;line-height:1.75;background:var(--panel);
-    border:1px solid var(--line);border-radius:6px;padding:11px 15px;white-space:pre;overflow:hidden}
-.eq.w{background:#fff}
-.eq.s{font-size:14px;line-height:1.7;padding:9px 13px}
-.eq .c{color:var(--faint);font-size:13px}
-.eq b{font-weight:700}
-.eq .k{color:var(--purple);font-weight:700}
-.eq .g{color:var(--green);font-weight:700}
-.eq .r{color:var(--red);font-weight:700}
-.eq .o{color:var(--orange);font-weight:700}
-.mono{font-family:var(--mono)}
-.shp{font-family:var(--mono);font-size:12.5px;color:var(--faint)}
 .src{font-size:12px;color:var(--faint);line-height:1.5}
 .src a{color:var(--faint)}
 a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,.3)}
@@ -137,649 +124,443 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
   <div class="ser">AGENT 原理与实践 · 第六章</div>
   <h1>从 Agent 到 AGI</h1>
   <div class="rule"></div>
-  <div class="sl">五个主题：<b>继续 scaling、RL+可验证环境、连续学习、世界模型、具身智能</b>。每个都在补今天这套模型的一个缺口。最后再看两件事：<b>RSI 里的「递归」到底是什么意思，AGI 这个终点又指的是哪儿。</b></div>
+  <div class="sl"><b>Scaling　·　RL + 可验证环境　·　世界模型　·　连续学习　·　具身智能　·　RSI</b><br>六块拼图，一块一页，<b>拼成一张通向 AGI 的地图。</b></div>
   <div class="meta" style="margin-top:34px">观点型 · 不给时间表 · 结论会被后来的事实检验</div>
   <div class="meta" style="margin-top:10px">← → 翻页　·　O 概览　·　F 全屏</div>
 </section>
 
-<section class="slide" data-act="出发点">
-  <div class="hd"><h2>出发点：今天的模型缺什么</h2></div>
+<section class="slide" data-act="问题定位">
+  <div class="hd"><h2>这几个词，回答的是同一个问题</h2></div>
   <div class="bd">
-    <div class="p mb">今天的模型是这么造出来的：<b>拿存量文本训一遍，再调教一遍，然后把权重冻住上线</b>。四个缺口都长在这条链上。</div>
-    <svg viewBox="0 0 1168 272" style="width:100%;height:auto;display:block">
-      <defs><marker id="a2g" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-        <path d="M0 0 L6 3 L0 6 z" fill="#94a3b8"/></marker>
-        <marker id="a2o" markerWidth="8" markerHeight="8" refX="8" refY="3" orient="auto">
-        <path d="M0 0 L6 3 L0 6 z" fill="#c2410c"/></marker></defs>
-
-      <text x="0" y="14" font-size="12" fill="#94a3b8">这条链是单向的：料在最左边，会在最右边</text>
-
-      <rect x="0" y="32" width="250" height="100" rx="9" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.8"/>
-      <text x="125" y="76" font-size="16" font-weight="700" fill="#1f2937" text-anchor="middle">存量语料</text>
-      <text x="125" y="104" font-size="12.5" fill="#94a3b8" text-anchor="middle">人类写过的所有文字</text>
-      <path d="M256 82 L288 82" stroke="#94a3b8" stroke-width="1.8" fill="none" marker-end="url(#a2g)"/>
-
-      <rect x="300" y="32" width="210" height="100" rx="9" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
-      <text x="405" y="76" font-size="16" font-weight="700" fill="#2563eb" text-anchor="middle">预训练</text>
-      <text x="405" y="104" font-size="12.5" fill="#5b6675" text-anchor="middle">一次性烧完</text>
-      <path d="M516 82 L548 82" stroke="#94a3b8" stroke-width="1.8" fill="none" marker-end="url(#a2g)"/>
-
-      <rect x="560" y="32" width="210" height="100" rx="9" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
-      <text x="665" y="76" font-size="16" font-weight="700" fill="#2563eb" text-anchor="middle">后训练</text>
-      <text x="665" y="104" font-size="12.5" fill="#5b6675" text-anchor="middle">靠人给的判断调教</text>
-      <path d="M776 82 L808 82" stroke="#94a3b8" stroke-width="1.8" fill="none" marker-end="url(#a2g)"/>
-
-      <rect x="820" y="32" width="348" height="100" rx="9" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.8"/>
-      <text x="994" y="76" font-size="16" font-weight="700" fill="#1f2937" text-anchor="middle">权重冻结 · 上线服务</text>
-      <text x="994" y="104" font-size="12.5" fill="#94a3b8" text-anchor="middle">用一万次，还是同一套权重</text>
-
-      <circle cx="70" cy="32" r="13" fill="#dc2626"/><text x="70" y="37" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">1</text>
-      <circle cx="180" cy="32" r="13" fill="#dc2626"/><text x="180" y="37" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">2</text>
-      <circle cx="665" cy="32" r="13" fill="#dc2626"/><text x="665" y="37" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">3</text>
-      <circle cx="994" cy="32" r="13" fill="#dc2626"/><text x="994" y="37" font-size="13" font-weight="700" fill="#fff" text-anchor="middle">4</text>
-
-      <path d="M994 132 L994 212 L405 212 L405 132" fill="none" stroke="#c2410c" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#a2o)"/>
-      <text x="700" y="240" font-size="13" font-weight="700" fill="#c2410c" text-anchor="middle">想变强，只能整条链回去重跑一遍——按月计</text>
-      <text x="700" y="262" font-size="12" fill="#94a3b8" text-anchor="middle">而且和它在线上这一次的经历无关</text>
-    </svg>
-    <div class="g4 mt">
-      <div class="card w"><div class="t red">1 · 料要见底</div>
-        <div class="cap" style="margin-top:6px">人写过的高质量文字是个固定的数，训完就没了。<br><b class="purple">→ 继续 scaling</b></div></div>
-      <div class="card w"><div class="t red">2 · 没有后果</div>
-        <div class="cap" style="margin-top:6px">语料里全是别人做完的结果，没有「我动一下会怎样」。<br><b class="purple">→ 世界模型 · 具身智能</b></div></div>
-      <div class="card w"><div class="t red">3 · 没有信号</div>
-        <div class="cap" style="margin-top:6px">写作、研究、决策做完了，也不知道做得对不对。<br><b class="purple">→ RL + 可验证环境</b></div></div>
-      <div class="card w"><div class="t red">4 · 不会变强</div>
-        <div class="cap" style="margin-top:6px">上线之后权重就是常数，用一万次和用一次一样聪明。<br><b class="purple">→ 连续学习</b></div></div>
-    </div>
-    <div class="note b-blue mt"><div class="t blue">四个缺口其实只有两类</div>
-      <div class="sub">1、2 是<b>没有料</b>——缺第一人称的、带后果的经验；3、4 是<b>没有回路</b>——不知道自己做得对不对，也没有通道把「对不对」写回权重。<b class="blue">后面五个主题，往回追都会落到这两类里的一类。</b></div></div>
-  </div>
-</section>
-<section class="slide" data-act="地图">
-  <div class="hd"><h2>这一章要讲的主题，一张图</h2></div>
-  <div class="bd">
-    <div class="p mb">五个主题，<b>每个补一个缺口</b>。它们不是五个互相竞争的选项，而是同一件事的五个方向。<b class="purple">RSI 和 AGI 不是第六、第七个主题——一个是机制，一个是终点。</b></div>
-    <svg viewBox="0 0 1168 350" style="width:100%;height:auto;display:block">
-      <defs><marker id="a4u" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-        <path d="M0 0 L6 3 L0 6 z" fill="#94a3b8"/></marker></defs>
-
-      <rect x="384" y="0" width="400" height="60" rx="10" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="2"/>
-      <text x="584" y="27" font-size="17" font-weight="700" fill="#0e9f6e" text-anchor="middle">AGI ＝ 终点</text>
-      <text x="584" y="49" font-size="12.5" fill="#5b6675" text-anchor="middle">想去哪儿 · 但三派人说的根本不是一回事（第 11 页）</text>
-
-      <path d="M584 116 L584 68" stroke="#94a3b8" stroke-width="1.8" fill="none" marker-end="url(#a4u)"/>
-
-      <rect x="334" y="122" width="500" height="66" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
-      <text x="584" y="150" font-size="17" font-weight="700" fill="#7c3aed" text-anchor="middle">RSI ＝ 机制</text>
-      <text x="584" y="172" font-size="12.5" fill="#5b6675" text-anchor="middle">下面这五件事，能不能由 AI 自己往前推（第 10 页）</text>
-
-      <path d="M584 240 L584 196" stroke="#94a3b8" stroke-width="1.8" fill="none" marker-end="url(#a4u)"/>
-      <text x="608" y="222" font-size="12" fill="#94a3b8">有了机制，才谈得上速度</text>
-      <path d="M108 254 L108 240 L1060 240 L1060 254" fill="none" stroke="#94a3b8" stroke-width="1.6"/>
-      <path d="M346 254 L346 240 M822 254 L822 240" fill="none" stroke="#94a3b8" stroke-width="1.6"/>
-
-      <text x="0" y="222" font-size="13" font-weight="700" fill="#2563eb">五个主题 ＝ 能力从哪来</text>
-
-      <rect x="0" y="254" width="216" height="96" rx="9" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
-      <text x="108" y="284" font-size="15" font-weight="700" fill="#2563eb" text-anchor="middle">继续 scaling</text>
-      <text x="108" y="308" font-size="12" fill="#5b6675" text-anchor="middle">补：料要见底</text>
-      <text x="108" y="332" font-size="11.5" fill="#94a3b8" text-anchor="middle">第 4 页</text>
-
-      <rect x="238" y="254" width="216" height="96" rx="9" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
-      <text x="346" y="284" font-size="15" font-weight="700" fill="#2563eb" text-anchor="middle">RL + 可验证环境</text>
-      <text x="346" y="308" font-size="12" fill="#5b6675" text-anchor="middle">补：没有信号</text>
-      <text x="346" y="332" font-size="11.5" fill="#94a3b8" text-anchor="middle">第 5–6 页</text>
-
-      <rect x="476" y="254" width="216" height="96" rx="9" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
-      <text x="584" y="284" font-size="15" font-weight="700" fill="#2563eb" text-anchor="middle">连续学习</text>
-      <text x="584" y="308" font-size="12" fill="#5b6675" text-anchor="middle">补：不会变强</text>
-      <text x="584" y="332" font-size="11.5" fill="#94a3b8" text-anchor="middle">第 7 页</text>
-
-      <rect x="714" y="254" width="216" height="96" rx="9" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
-      <text x="822" y="284" font-size="15" font-weight="700" fill="#2563eb" text-anchor="middle">世界模型</text>
-      <text x="822" y="308" font-size="12" fill="#5b6675" text-anchor="middle">补：没有后果</text>
-      <text x="822" y="332" font-size="11.5" fill="#94a3b8" text-anchor="middle">第 8 页</text>
-
-      <rect x="952" y="254" width="216" height="96" rx="9" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
-      <text x="1060" y="284" font-size="15" font-weight="700" fill="#2563eb" text-anchor="middle">具身智能</text>
-      <text x="1060" y="308" font-size="12" fill="#5b6675" text-anchor="middle">补：没有后果</text>
-      <text x="1060" y="332" font-size="11.5" fill="#94a3b8" text-anchor="middle">第 9 页</text>
-    </svg>
-    <div class="g2 mt">
-      <div class="note b-blue"><div class="t blue">每个主题都按同一个格式讲</div>
-        <div class="sub">它在补哪个缺口 → 它卡在哪 → <b>什么信号出现，说明它真的动了</b>。第三条最有用，可以拿去对照将来看到的每条新闻。</div></div>
-      <div class="note b-orange"><div class="t orange">读的时候把这三层分开</div>
-        <div class="sub">「AGI 什么时候到」是在问终点，「AI 会不会自己加速」是在问机制，「哪个方向更快」是在问能力来源——<b>三个问题，不能混着答</b>。</div></div>
-    </div>
-  </div>
-</section>
-<section class="slide" data-act="主题一">
-  <div class="hd"><h2>主题一 · 继续 scaling：红利没结束，但换了一根轴</h2></div>
-  <div class="bd">
-    <div class="p mb">继续加算力，还灵不灵？<b>要看你说的是哪一根轴</b>——今天有两根，形状完全不一样。</div>
-    <div class="g32">
-      <div>
-        <svg viewBox="0 0 687 214" style="width:100%;height:auto;display:block">
-          <line x1="60" y1="182" x2="668" y2="182" stroke="#cbd5e1" stroke-width="1.5"/>
-          <line x1="60" y1="182" x2="60" y2="18" stroke="#cbd5e1" stroke-width="1.5"/>
-          <text x="56" y="16" font-size="12" fill="#94a3b8" text-anchor="end">能力</text>
-          <line x1="400" y1="182" x2="400" y2="62" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4 4" opacity=".6"/>
-          <path d="M60 172 C 180 152, 270 96, 400 68 S 560 46, 664 40" fill="none" stroke="#2563eb" stroke-width="2.4"/>
-          <path d="M300 170 C 400 146, 520 92, 664 44" fill="none" stroke="#c2410c" stroke-width="2.4"/>
-          <line x1="80" y1="30" x2="110" y2="30" stroke="#2563eb" stroke-width="2.4"/>
-          <text x="118" y="34" font-size="12.5" fill="#2563eb">预训练：把知识压进权重</text>
-          <line x1="80" y1="52" x2="110" y2="52" stroke="#c2410c" stroke-width="2.4"/>
-          <text x="118" y="56" font-size="12.5" fill="#c2410c">推理时：把算力换成搜索</text>
-          <text x="400" y="200" font-size="12" fill="#dc2626" text-anchor="middle">高质量数据开始见底</text>
-          <text x="664" y="200" font-size="12" fill="#94a3b8" text-anchor="end">投入的算力（对数刻度）</text>
-        </svg>
-        <div class="cap" style="margin-top:8px">两根曲线的形状完全不同。<b>蓝的在变平——不是失效，是每多一分能力要付的算力在指数上涨</b>；橙的刚起步，同一个模型多想一会儿就能明显更准。<b>「scaling 撞墙了」这句话只对蓝的成立。</b></div>
-      </div>
-      <div>
-        <div class="note b-blue"><div class="t blue">为什么蓝线会变平</div>
-          <div class="sub">要让能力再上一个台阶，<b>模型和数据得同步放大</b>，于是算力大致按平方往上涨。而数据那一头根本跟不上。</div></div>
-        <div class="note b-red" style="margin-top:12px"><div class="t red">数据是存量，不是流量</div>
-          <div class="sub">算力可以造，芯片可以扩产，<b>但人类写过的高质量文本是个固定的数</b>。合成数据、多模态、私域数据是三种续命方式，都不改变量级。</div></div>
-        <div class="note b-orange" style="margin-top:12px"><div class="t orange">「多想一会儿」是真的新轴</div>
-          <div class="sub">让模型多想、多试几遍、自己检查，准确率就会往上走。它把知识<b>存在权重里</b>换成答案<b>现场搜出来</b>——绕开了数据墙，代价是每次用都要付钱。</div></div>
-      </div>
-    </div>
-    <table class="tbl s mt">
-      <tr><th style="width:170px">这一轴</th><th style="width:250px">现在的量级</th><th style="width:300px">还剩多少空间</th><th>成本结构</th></tr>
-      <tr><td><b class="blue">预训练算力</b></td><td class="mono">前沿训练约 1e26 FLOPs 量级</td><td>还能涨，卡在电力、芯片供给和建设周期</td><td>一次性投入，之后每次推理都便宜</td></tr>
-      <tr><td><b class="red">高质量数据</b></td><td class="mono">公开文本约 1e13 token 量级</td><td><b>接近见底</b>，靠合成与多模态续，量级不变</td><td>买不来也造不出，是硬约束</td></tr>
-      <tr><td><b class="orange">推理时算力</b></td><td class="mono">一次回答 1e2 ~ 1e6 token</td><td><b>刚开始，曲线还很陡</b></td><td>每次调用都付，规模化后是大头</td></tr>
-    </table>
-    <div class="note b-green" style="margin-top:14px"><div class="t green">为什么「撞墙了」和「根本没撞」的人都对</div>
-      <div class="sub">他们说的不是同一根轴。<b>预训练那根确实在变平</b>，同样的投入换来的提升一年比一年小；<b>而模型的总能力还在快速涨</b>，因为增量来自另外两根——多想一会儿，以及下一页要讲的「可验证奖励」。<b>所以「scaling 还灵不灵」是个坏问题。</b></div></div>
-  </div>
-</section>
-<section class="slide" data-act="主题二">
-  <div class="hd"><h2>主题二 · RL + 可验证环境：奖励从哪来</h2></div>
-  <div class="bd">
-    <div class="p mb">强化学习不是新东西，卡了十年的从来不是算法，是<b>奖励</b>。这个主题的全部内容就一句话：<b class="green">把「学出来的奖励」换成「算出来的奖励」。</b></div>
-    <div class="g2">
-      <div>
-        <div class="card w"><div class="t red">RLHF：奖励是一个学出来的模型</div>
-          <div class="eq w s" style="margin-top:6px">人标注偏好 → 训一个 <b class="r">奖励模型 R̂</b>
-模型去追 <b class="r">R̂</b> 的高分，而不是追真实的好坏
-
-<span class="c">于是：</span> <b class="r">R̂ 越被优化，它越不准</b></div>
-          <div class="cap" style="margin-top:8px">这就是<b>「钻空子」</b>的来源：R̂ 只在人标注过的那一小片范围里靠谱，而模型为了拿高分，会主动往那片范围外面跑。<b>所以只能拿绳子把它拴住——拴住的同时，也限死了它能学多远。</b></div></div>
-        <div class="note b-orange" style="margin-top:12px"><div class="t orange">人标注还有一个规模问题</div>
-          <div class="sub">标注质量的上限是标注者的水平。<b>模型一旦在某个领域超过人类标注者，人类偏好就不再是有效信号</b>——这是 RLHF 无法把模型带到超人水平的根本原因。</div></div>
-      </div>
-      <div>
-        <div class="card w"><div class="t green">RLVR：奖励是一段代码算出来的</div>
-          <div class="eq w s" style="margin-top:6px">模型给出答案 → 跑一个 <b class="g">检查器</b> → <b class="g">0 / 1</b>
-
-<span class="c">检查器可以是：</span>
-  单元测试　编译器　数学答案比对
-  形式化证明检查器　游戏胜负　仿真器</div>
-          <div class="cap" style="margin-top:8px">奖励<b>糊弄不了</b>（除非检查器本身有洞），<b>不要人参与</b>，<b>可以无限量生成</b>。模型比人强也没关系——检查器不是人，它只判对错。这三条合起来，才是这个主题被押注的原因。</div></div>
-        <div class="note b-green" style="margin-top:12px"><div class="t green">瓶颈已经从算法挪到了环境</div>
-          <div class="sub">算法这一侧基本定型了。真正稀缺的是<b>「能自动判分、难度可调、够多样」的环境</b>。<b>环境工程正在变成新的数据工程</b>——这是当前投入最集中的地方。</div></div>
-      </div>
-    </div>
-    <div class="g3" style="margin-top:14px">
-      <div class="note b-blue"><div class="t blue">只给对错，学得动吗</div>
-        <div class="sub">办法是<b>同一题一次做很多遍</b>，再比较这几遍之间谁好谁差——信息就出来了。</div></div>
-      <div class="note b-red"><div class="t red">检查器有洞就一定会被钻</div>
-        <div class="sub">模型会写出「让测试通过但没实现功能」的代码。<b>检查器的严密程度，就是这个主题的天花板</b>。</div></div>
-      <div class="note b-orange"><div class="t orange">难度必须跟着能力走</div>
-        <div class="sub">全对或全错都没有梯度。环境要能<b>自动调难度</b>，把通过率稳在中间——这部分工程量往往比算法本身大。</div></div>
-    </div>
-    <div class="note b-purple" style="margin-top:14px"><div class="t purple">这个主题最大的未解问题：能判分的地方练出来的本事，能带到别处去吗</div>
-      <div class="sub">在数学和代码上练出来的推理能力，看起来会<b>部分溢出</b>到没练过的领域——但溢出多少、为什么会溢出，<b>目前没有定论</b>。溢出很强，这个主题就直通 AGI；只在能判分的地方管用，它就只是一个很强的专用放大器。<b>这个问题的答案，决定其余四个主题的相对权重。</b></div></div>
-  </div>
-</section>
-<section class="slide" data-act="主题二">
-  <div class="hd"><h2>「可验证」的边界在哪：AGI 要的能力大半在右边</h2></div>
-  <div class="bd">
-    <div class="p mb">这个主题能扩多远，取决于一件很具体的事：<b>这个任务，能不能写一段程序来判对错</b>。照这个标准，任务分成三格。</div>
-    <svg viewBox="0 0 1168 326" style="width:100%;height:auto;display:block">
-      <defs><marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto">
+    <div class="p mb">预训练已经把「人类写下来的文字」学得差不多了。<b>接下来，智能靠什么继续长？</b>下面这些词经常成群出现在同一类文章里，它们不是六个孤立的技术名词——<b class="blue">每一个都是对这同一个问题的一种回答。</b></div>
+    <svg viewBox="0 0 1168 495" style="width:100%;height:auto;display:block">
+      <defs><marker id="p2a" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto">
         <path d="M0 0 L7 3.5 L0 7 z" fill="#94a3b8"/></marker></defs>
-      <text x="14" y="13" font-size="12" fill="#94a3b8">判分越来越贵、信号越来越糊、离「真正想要的东西」越来越近</text>
-      <line x1="14" y1="26" x2="1146" y2="26" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#ar)"/>
 
-      <rect x="14" y="38" width="372" height="282" rx="8" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.8"/>
-      <text x="34" y="66" font-size="15" font-weight="700" fill="#0e9f6e">强可验证　答案唯一</text>
-      <text x="34" y="88" font-size="12" fill="#0e9f6e">判分方式：跑一下就知道，0 / 1</text>
-      <text x="34" y="130" font-size="13.5" fill="#1f2937">·　数学题、竞赛题</text>
-      <text x="34" y="172" font-size="13.5" fill="#1f2937">·　单元测试通过 / 编译通过</text>
-      <text x="34" y="214" font-size="13.5" fill="#1f2937">·　形式化证明检查器</text>
-      <text x="34" y="256" font-size="13.5" fill="#1f2937">·　游戏胜负、仿真器指标</text>
-      <text x="34" y="300" font-size="12.5" fill="#0e9f6e" font-weight="700">RLVR 在这里已经跑通</text>
+      <rect x="0" y="30" width="358" height="408" rx="12" fill="#fbfcfe" stroke="#2563eb" stroke-width="1.8"/>
+      <text x="28" y="74" font-size="18" font-weight="700" fill="#2563eb">一 · 怎么变得更强</text>
+      <text x="28" y="100" font-size="13.5" fill="#94a3b8">引擎：能力从哪儿来</text>
+      <rect x="28" y="140" width="302" height="76" rx="38" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
+      <text x="179" y="186" font-size="20" font-weight="700" fill="#2563eb" text-anchor="middle">Scaling</text>
+      <rect x="28" y="240" width="302" height="76" rx="38" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
+      <text x="179" y="286" font-size="20" font-weight="700" fill="#2563eb" text-anchor="middle">RL + 可验证环境</text>
+      <text x="28" y="380" font-size="13.5" fill="#5b6675">堆资源，把基座做大；</text>
+      <text x="28" y="408" font-size="13.5" fill="#5b6675">再放进能自动判对错的环境里练。</text>
 
-      <rect x="398" y="38" width="372" height="282" rx="8" fill="#fff7ed" stroke="#c2410c" stroke-width="1.8"/>
-      <text x="418" y="66" font-size="15" font-weight="700" fill="#c2410c">弱可验证　能判好坏</text>
-      <text x="418" y="88" font-size="12" fill="#c2410c">判分方式：评分细则、模型评委、A/B</text>
-      <text x="418" y="130" font-size="13.5" fill="#1f2937">·　多步 agent 任务算不算做完</text>
-      <text x="418" y="172" font-size="13.5" fill="#1f2937">·　数据分析结论站不站得住</text>
-      <text x="418" y="214" font-size="13.5" fill="#1f2937">·　摘要、翻译忠不忠实</text>
-      <text x="418" y="256" font-size="13.5" fill="#1f2937">·　代码的工程质量</text>
-      <text x="418" y="300" font-size="12.5" fill="#c2410c" font-weight="700">正在被啃，评委本身会被 hack</text>
+      <path d="M366 234 L400 234" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#p2a)"/>
 
-      <rect x="782" y="38" width="372" height="282" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="1.8"/>
-      <text x="802" y="66" font-size="15" font-weight="700" fill="#dc2626">难可验证　判分本身是难题</text>
-      <text x="802" y="88" font-size="12" fill="#dc2626">判分方式：只有长期后果，或者没有</text>
-      <text x="802" y="130" font-size="13.5" fill="#1f2937">·　研究方向选得对不对</text>
-      <text x="802" y="172" font-size="13.5" fill="#1f2937">·　战略与经营决策</text>
-      <text x="802" y="214" font-size="13.5" fill="#1f2937">·　写作、审美、品味</text>
-      <text x="802" y="256" font-size="13.5" fill="#1f2937">·　教育和陪伴的实际效果</text>
-      <text x="802" y="300" font-size="12.5" fill="#dc2626" font-weight="700">目前基本无解</text>
+      <rect x="405" y="30" width="358" height="408" rx="12" fill="#fdfcff" stroke="#7c3aed" stroke-width="1.8"/>
+      <text x="433" y="74" font-size="18" font-weight="700" fill="#7c3aed">二 · 智能长在什么上面</text>
+      <text x="433" y="100" font-size="13.5" fill="#94a3b8">形态：想象、记忆、身体</text>
+      <rect x="433" y="128" width="302" height="66" rx="33" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.6"/>
+      <text x="584" y="168" font-size="19" font-weight="700" fill="#7c3aed" text-anchor="middle">世界模型</text>
+      <rect x="433" y="214" width="302" height="66" rx="33" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.6"/>
+      <text x="584" y="254" font-size="19" font-weight="700" fill="#7c3aed" text-anchor="middle">连续学习</text>
+      <rect x="433" y="300" width="302" height="66" rx="33" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.6"/>
+      <text x="584" y="340" font-size="19" font-weight="700" fill="#7c3aed" text-anchor="middle">具身智能</text>
+      <text x="433" y="406" font-size="13.5" fill="#5b6675">在脑子里试　·　用完不忘　·　真去动手。</text>
+
+      <path d="M771 234 L805 234" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#p2a)"/>
+
+      <rect x="810" y="30" width="358" height="408" rx="12" fill="#fbfefc" stroke="#0e9f6e" stroke-width="1.8"/>
+      <text x="838" y="74" font-size="18" font-weight="700" fill="#0e9f6e">三 · 会不会自己加速</text>
+      <text x="838" y="100" font-size="13.5" fill="#94a3b8">闭环，和终点</text>
+      <rect x="838" y="140" width="302" height="76" rx="38" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.6"/>
+      <text x="989" y="186" font-size="20" font-weight="700" fill="#0e9f6e" text-anchor="middle">RSI 递归自我改进</text>
+      <rect x="838" y="240" width="302" height="76" rx="38" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.6"/>
+      <text x="989" y="286" font-size="20" font-weight="700" fill="#0e9f6e" text-anchor="middle">AGI</text>
+      <text x="838" y="380" font-size="13.5" fill="#5b6675">前面那些进展，能不能反过来</text>
+      <text x="838" y="408" font-size="13.5" fill="#5b6675">加速研发本身；以及终点画在哪儿。</text>
+
+      <text x="584" y="482" font-size="14.5" font-weight="700" fill="#c2410c" text-anchor="middle">每一块只讲三件事：它是什么　·　为什么绕不开　·　今天卡在哪</text>
     </svg>
-    <div class="g3 mt">
-      <div class="note b-green"><div class="t green">左边这格已经不是瓶颈</div>
-        <div class="sub">数学和代码上，模型在标准评测上已经很难再拉开差距。<b>继续往这格投，边际收益在降。</b></div></div>
-      <div class="note b-orange"><div class="t orange">中间这格是当前主战场</div>
-        <div class="sub">办法是<b>把模糊的判分变成能跑的判分</b>：写细则、拆检查点、让模型当评委再互相核对。</div></div>
-      <div class="note b-red"><div class="t red">右边这格才决定 AGI</div>
-        <div class="sub">「什么值得做」没有检查器。人靠<b>很久以后的后果</b>学会它——而这正是今天最缺的信号。</div></div>
-    </div>
-    <div class="g2" style="margin-top:14px">
-      <div class="note b-blue"><div class="t blue">可验证 ≠ 简单</div>
-        <div class="sub">奥数题在最左边，它一点也不简单。<b>「难」和「难验证」是两回事</b>——所以模型能在奥数上超过人，却在「写得好不好」上还很平庸。</div></div>
-      <div class="note b-purple"><div class="t purple">这个主题真正的问题：能把多少任务挪到左边</div>
-        <div class="sub">每挪过来一类任务，就等于给它开了一条无限量的训练通道。<b>过去两年的进展大半来自这种「挪」，而不是更好的算法。</b></div></div>
-    </div>
   </div>
 </section>
-<section class="slide" data-act="主题三">
-  <div class="hd"><h2>主题三 · 连续学习：权重不再是只读的</h2></div>
+<section class="slide" data-act="全景">
+  <div class="hd"><h2>先看整张图：六块拼图怎么咬合</h2></div>
   <div class="bd">
-    <div class="p mb">今天的模型上线之后，<b>权重就是一个常数</b>。它服务一亿次，和第一次一样聪明——因为<b class="red">从「用得怎么样」回到权重的那条路，根本不存在</b>。</div>
-    <div class="g32">
-      <div>
-        <svg viewBox="0 0 687 280" style="width:100%;height:auto;display:block">
-          <defs><marker id="a7g" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-            <path d="M0 0 L6 3 L0 6 z" fill="#0e9f6e"/></marker>
-            <marker id="a7r" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-            <path d="M0 0 L6 3 L0 6 z" fill="#dc2626"/></marker>
-            <marker id="a7b" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-            <path d="M0 0 L6 3 L0 6 z" fill="#2563eb"/></marker></defs>
+    <div class="p mb">自下而上读一遍，这一章后面的顺序就是这张图的顺序。</div>
+    <svg viewBox="0 0 1168 470" style="width:100%;height:auto;display:block">
+      <defs>
+        <marker id="p3g" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 z" fill="#94a3b8"/></marker>
+        <marker id="p3p" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 z" fill="#7c3aed"/></marker>
+        <marker id="p3o" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 z" fill="#c2410c"/></marker>
+        <marker id="p3r" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 z" fill="#dc2626"/></marker>
+      </defs>
 
-          <text x="343" y="22" font-size="13" fill="#dc2626" text-anchor="middle">把「做得对不对」写回权重　——　这条路今天不存在</text>
-          <path d="M626 96 L626 40 L343 40 L343 82" stroke="#dc2626" stroke-width="1.8" fill="none" stroke-dasharray="5 4" marker-end="url(#a7r)"/>
+      <path d="M796 96 L1148 96 L1148 424 L896 424" fill="none" stroke="#dc2626" stroke-width="1.8" stroke-dasharray="6 5" marker-end="url(#p3r)"/>
+      <text x="1128" y="176" font-size="13.5" font-weight="700" fill="#dc2626" text-anchor="end">反哺：更强的模型、</text>
+      <text x="1128" y="200" font-size="13.5" font-weight="700" fill="#dc2626" text-anchor="end">更好的环境、更多的数据</text>
 
-          <rect x="14" y="100" width="102" height="56" rx="8" fill="#f4f7fb" stroke="#cbd5e1" stroke-width="1.5"/>
-          <text x="65" y="134" font-size="14.5" fill="#5b6675" text-anchor="middle">输入</text>
-          <path d="M120 128 L232 128" stroke="#2563eb" stroke-width="1.8" fill="none" marker-end="url(#a7b)"/>
+      <rect x="434" y="0" width="300" height="52" rx="26" fill="#0e9f6e"/>
+      <text x="584" y="33" font-size="20" font-weight="700" fill="#fff" text-anchor="middle">AGI　终点</text>
+      <path d="M584 56 L584 66" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#p3g)"/>
 
-          <rect x="240" y="90" width="206" height="76" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
-          <text x="343" y="122" font-size="16" font-weight="700" fill="#7c3aed" text-anchor="middle">模型的权重</text>
-          <text x="343" y="146" font-size="13" fill="#7c3aed" text-anchor="middle">上线后是常数，只读</text>
-          <path d="M450 128 L568 128" stroke="#2563eb" stroke-width="1.8" fill="none" marker-end="url(#a7b)"/>
+      <rect x="372" y="70" width="424" height="72" rx="10" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="2"/>
+      <text x="584" y="103" font-size="18" font-weight="700" fill="#0e9f6e" text-anchor="middle">RSI　递归自我改进</text>
+      <text x="584" y="127" font-size="13.5" fill="#5b6675" text-anchor="middle">飞轮：AI 开始加速 AI 研发本身</text>
+      <path d="M584 146 L584 158" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#p3g)"/>
 
-          <rect x="576" y="100" width="102" height="56" rx="8" fill="#f4f7fb" stroke="#cbd5e1" stroke-width="1.5"/>
-          <text x="627" y="134" font-size="14.5" fill="#5b6675" text-anchor="middle">输出</text>
+      <rect x="372" y="162" width="424" height="72" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+      <text x="584" y="195" font-size="18" font-weight="700" fill="#7c3aed" text-anchor="middle">连续学习</text>
+      <text x="584" y="219" font-size="13.5" fill="#5b6675" text-anchor="middle">时间维度：上线之后还在学，而且不忘</text>
+      <path d="M584 238 L584 250" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#p3g)"/>
 
-          <path d="M627 160 L627 226 L65 226 L65 162" stroke="#0e9f6e" stroke-width="1.8" fill="none" marker-end="url(#a7g)"/>
-          <text x="343" y="252" font-size="13" fill="#0e9f6e" text-anchor="middle">今天走的是这条：把结果塞回上下文 / 记忆文件</text>
-          <text x="343" y="272" font-size="13" fill="#94a3b8" text-anchor="middle">绕过了权重，也就永远改不了权重</text>
-        </svg>
-      </div>
-      <div>
-        <div class="note b-green"><div class="t green">外挂记忆：便宜、可控、上限明确</div>
-          <div class="sub">RAG、记忆文件、长上下文都属于绿线。<b>好处是可审计、可删除、不会训坏</b>；代价是每次都要重新读一遍。</div></div>
-        <div class="note b-red" style="margin-top:12px"><div class="t red">红线真正难的地方：学新的会冲掉旧的</div>
-          <div class="sub">学新的就容易忘旧的。<b>改一次动的是整套参数</b>，没法只动「关于这件事」的那一小块。</div></div>
-        <div class="note b-orange" style="margin-top:12px"><div class="t orange">还有一个安全问题</div>
-          <div class="sub">权重能被在线改，就意味着<b>被投毒的输入可以永久改变模型</b>。这是连续学习没被大规模上线的真实原因之一。</div></div>
-      </div>
-    </div>
-    <table class="tbl s mt">
-      <tr><th style="width:200px">写到哪一层</th><th style="width:230px">写入方式</th><th style="width:200px">保持多久</th><th style="width:180px">容量量级</th><th>能不能改变模型的「直觉」</th></tr>
-      <tr><td><b class="blue">上下文窗口</b></td><td>直接塞进 prompt</td><td>一次会话</td><td class="mono">1e5 ~ 1e6 token</td><td>不能</td></tr>
-      <tr><td><b class="green">外部记忆 / RAG</b></td><td>写文件、存向量库</td><td>永久</td><td>无上限</td><td>不能，只是检索得更准</td></tr>
-      <tr><td><b class="purple">权重本身</b></td><td>训练时更新参数</td><td>永久</td><td class="mono">1e11 量级参数</td><td><b class="purple">能——只有这一层能</b></td></tr>
-    </table>
-    <div class="note b-purple" style="margin-top:14px"><div class="t purple">这个主题的判据很简单：有没有真的动到第三行</div>
-      <div class="sub">大部分叫「记忆」「自我进化」的产品，做的都是前两行。<b>它们让模型「查得到」，但没让模型「学会」</b>——分辨方法：把检索关掉，看它还会不会。而要真动第三行，先得有一个信号告诉它「这次该不该学」，<b>那个信号正是上一个主题要造的东西</b>。</div></div>
+      <rect x="372" y="254" width="424" height="80" rx="10" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="2.4"/>
+      <text x="584" y="289" font-size="18" font-weight="700" fill="#0e9f6e" text-anchor="middle">RL + 可验证环境</text>
+      <text x="584" y="314" font-size="13.5" fill="#5b6675" text-anchor="middle">引擎：从「会说话」到「会做事」</text>
+
+      <rect x="0" y="262" width="270" height="64" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.8"/>
+      <text x="135" y="290" font-size="17" font-weight="700" fill="#7c3aed" text-anchor="middle">世界模型</text>
+      <text x="135" y="313" font-size="12.5" fill="#94a3b8" text-anchor="middle">在想象里试错</text>
+      <path d="M274 294 L366 294" stroke="#7c3aed" stroke-width="2" fill="none" marker-end="url(#p3p)"/>
+      <text x="318" y="284" font-size="12.5" font-weight="700" fill="#7c3aed" text-anchor="middle">供环境</text>
+
+      <rect x="880" y="262" width="240" height="64" rx="10" fill="#fff7ed" stroke="#c2410c" stroke-width="1.8"/>
+      <text x="1000" y="290" font-size="17" font-weight="700" fill="#c2410c" text-anchor="middle">具身智能</text>
+      <text x="1000" y="313" font-size="12.5" fill="#94a3b8" text-anchor="middle">在物理世界里试错</text>
+      <path d="M876 294 L802 294" stroke="#c2410c" stroke-width="2" fill="none" marker-end="url(#p3o)"/>
+      <text x="839" y="284" font-size="12.5" font-weight="700" fill="#c2410c" text-anchor="middle">供数据</text>
+
+      <path d="M584 386 L584 348" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#p3g)"/>
+
+      <rect x="276" y="390" width="616" height="76" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="2.4"/>
+      <text x="584" y="423" font-size="18" font-weight="700" fill="#2563eb" text-anchor="middle">Scaling　规模扩展</text>
+      <text x="584" y="447" font-size="13.5" fill="#5b6675" text-anchor="middle">地基：算力 · 数据 · 参数，把基座做大</text>
+    </svg>
+    <div class="cap mt"><b>地基</b>撑起<b>引擎</b>；两翼给引擎供「试错的场所」；引擎之上是<b>连续学习</b>；再往上，<b class="red">RSI 那条虚线把整座塔反过来推一把——这条虚线转不转得动，就是全部分歧所在。</b></div>
   </div>
 </section>
-<section class="slide" data-act="主题四">
-  <div class="hd"><h2>主题四 · 世界模型：在脑子里试，不用真试</h2></div>
+<section class="slide" data-act="Scaling">
+  <div class="hd"><h2>Scaling：换挡，不是熄火</h2></div>
   <div class="bd">
-    <div class="p mb">世界模型学的是一件事：<b class="purple">给定现在的状态和我要做的动作，接下来会变成什么样</b>。学会它，模型就能在脑子里把方案跑一遍，不用真付代价。</div>
-    <div class="g32">
-      <div>
-        <svg viewBox="0 0 687 256" style="width:100%;height:auto;display:block">
-          <defs><marker id="a8r" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-            <path d="M0 0 L6 3 L0 6 z" fill="#c2410c"/></marker>
-            <marker id="a8g" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-            <path d="M0 0 L6 3 L0 6 z" fill="#0e9f6e"/></marker></defs>
+    <div class="p mb">算法框架基本不动，把<b>算力、数据、参数一起放大</b>，模型就稳定地变强——这个规律从 2020 年起被反复验证，让「堆资源」从蛮干变成了可以规划的事。<b class="red">2024 年之后，它换了个堆法。</b></div>
+    <svg viewBox="0 0 1168 320" style="width:100%;height:auto;display:block">
+      <defs><marker id="p4a" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto">
+        <path d="M0 0 L7 3.5 L0 7 z" fill="#c2410c"/></marker></defs>
 
-          <text x="0" y="16" font-size="12.5" font-weight="700" fill="#c2410c">在真实世界里试</text>
-          <circle cx="90" cy="56" r="17" fill="#fff7ed" stroke="#c2410c" stroke-width="1.8"/>
-          <text x="90" y="61" font-size="12.5" fill="#c2410c" text-anchor="middle">s₀</text>
-          <path d="M109 56 L227 56" stroke="#c2410c" stroke-width="1.8" fill="none" marker-end="url(#a8r)"/>
-          <circle cx="250" cy="56" r="17" fill="#fff7ed" stroke="#c2410c" stroke-width="1.8"/>
-          <text x="250" y="61" font-size="12.5" fill="#c2410c" text-anchor="middle">s₁</text>
-          <path d="M269 56 L387 56" stroke="#c2410c" stroke-width="1.8" fill="none" marker-end="url(#a8r)"/>
-          <circle cx="410" cy="56" r="17" fill="#fff7ed" stroke="#c2410c" stroke-width="1.8"/>
-          <text x="410" y="61" font-size="12.5" fill="#c2410c" text-anchor="middle">s₂</text>
-          <path d="M429 56 L547 56" stroke="#c2410c" stroke-width="1.8" fill="none" marker-end="url(#a8r)"/>
-          <circle cx="570" cy="56" r="17" fill="#fff7ed" stroke="#c2410c" stroke-width="1.8"/>
-          <text x="570" y="61" font-size="12.5" fill="#c2410c" text-anchor="middle">s₃</text>
-          <text x="0" y="96" font-size="12" fill="#5b6675">一次只能走一条。每一步都真的发生了：慢、贵、走过就回不去</text>
+      <rect x="0" y="200" width="358" height="120" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="179" y="238" font-size="19" font-weight="700" fill="#2563eb" text-anchor="middle">预训练 Scaling</text>
+      <text x="179" y="266" font-size="14" fill="#5b6675" text-anchor="middle">把知识压进权重</text>
+      <text x="179" y="294" font-size="13" fill="#94a3b8" text-anchor="middle">2018 – 2024　·　涨的是「知道」</text>
 
-          <line x1="0" y1="112" x2="687" y2="112" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="5 4"/>
+      <rect x="405" y="120" width="358" height="200" rx="10" fill="#fff7ed" stroke="#c2410c" stroke-width="2"/>
+      <text x="584" y="158" font-size="19" font-weight="700" fill="#c2410c" text-anchor="middle">后训练 Scaling</text>
+      <text x="584" y="186" font-size="14" fill="#5b6675" text-anchor="middle">在能自动判对错的环境里做 RL</text>
+      <text x="584" y="214" font-size="13" fill="#94a3b8" text-anchor="middle">2024 起　·　涨的是「会做」</text>
 
-          <text x="0" y="136" font-size="12.5" font-weight="700" fill="#0e9f6e">在世界模型里试</text>
-          <circle cx="90" cy="190" r="17" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.8"/>
-          <text x="90" y="195" font-size="12.5" fill="#0e9f6e" text-anchor="middle">s₀</text>
-          <path d="M108 184 L231 158" stroke="#0e9f6e" stroke-width="1.6" fill="none" marker-end="url(#a8g)"/>
-          <path d="M109 190 L231 190" stroke="#0e9f6e" stroke-width="1.6" fill="none" marker-end="url(#a8g)"/>
-          <path d="M108 196 L231 222" stroke="#0e9f6e" stroke-width="1.6" fill="none" marker-end="url(#a8g)"/>
-          <circle cx="250" cy="156" r="15" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.6"/>
-          <circle cx="250" cy="190" r="15" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.6"/>
-          <circle cx="250" cy="224" r="15" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.6"/>
-          <path d="M267 156 L391 156" stroke="#0e9f6e" stroke-width="1.6" fill="none" marker-end="url(#a8g)"/>
-          <path d="M267 190 L391 190" stroke="#0e9f6e" stroke-width="1.6" fill="none" marker-end="url(#a8g)"/>
-          <path d="M267 224 L391 224" stroke="#0e9f6e" stroke-width="1.6" fill="none" marker-end="url(#a8g)"/>
-          <circle cx="410" cy="156" r="15" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.6"/>
-          <circle cx="410" cy="190" r="15" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.6"/>
-          <circle cx="410" cy="224" r="15" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.6"/>
-          <path d="M427 156 L551 156" stroke="#0e9f6e" stroke-width="1.6" fill="none" marker-end="url(#a8g)"/>
-          <path d="M427 190 L551 190" stroke="#0e9f6e" stroke-width="1.6" fill="none" marker-end="url(#a8g)"/>
-          <path d="M427 224 L551 224" stroke="#0e9f6e" stroke-width="1.6" fill="none" marker-end="url(#a8g)"/>
-          <circle cx="570" cy="156" r="15" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.6"/>
-          <circle cx="570" cy="190" r="15" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.6"/>
-          <circle cx="570" cy="224" r="15" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.6"/>
-          <text x="0" y="250" font-size="12" fill="#5b6675">同时展开很多条，走错了回退就是：快、便宜、可以试到满意为止</text>
-        </svg>
-        <div class="cap" style="margin-top:8px">这就是「规划」的全部含义——<b>把试错从真实世界搬进模型内部</b>。AlphaGo 走的是这条路，只不过它的世界模型是围棋规则，规则是精确的、免费的。<b class="red">难点在于：真实世界没有规则书，模型必须自己学，而学出来的一定不准。</b></div>
-      </div>
-      <div>
-        <div class="card w"><div class="t red">卡点：误差会滚雪球</div>
-          <div class="eq w s" style="margin-top:6px">每步误差 <b class="r">ε</b>，往后展开 <b class="r">T</b> 步：
-  P(至少错一次) = 1 − (1−<b class="r">ε</b>)^<b class="r">T</b>
-  ε=1%　T=20 　→　<b class="r">18%</b>
-  ε=1%　T=100　→　<b class="r">63%</b>
-  ε=5%　T=20 　→　<b class="r">64%</b></div>
-          <div class="cap" style="margin-top:8px">想象得越远越是在编故事。<b>可用长度被单步精度卡死</b>。</div></div>
-        <div class="note b-orange" style="margin-top:12px"><div class="t orange">所以真正的用法是「短程想象 + 频繁校准」</div>
-          <div class="sub">在模型里只往前推几步，然后拿真实反馈拉回来。<b>把 T 压小，是目前唯一有效的对策。</b></div></div>
-      </div>
-    </div>
-    <div class="g3" style="margin-top:12px">
-      <div class="note b-purple"><div class="t purple">LLM 算不算世界模型</div>
-        <div class="sub">它学的是「人接下来会怎么写」，不是「事情接下来会怎样」。<b>token 级，不是状态级</b>。</div></div>
-      <div class="note b-blue"><div class="t blue">为什么现在忽然热起来</div>
-        <div class="sub">视频生成模型被发现<b>顺带学到了物体恒存、遮挡、重力</b>。世界模型也许能从视频里学。</div></div>
-      <div class="note b-green"><div class="t green">它和主题二是同一件事的两面</div>
-        <div class="sub">一个够准的世界模型<b>本身就是仿真器，也就是检查器</b>——主题二缺的那种环境，它能批量造。</div></div>
-    </div>
-    <div class="note b-red" style="margin-top:12px"><div class="t red">最容易被跳过的一句话：世界模型不解决「该做什么」，只解决「做了会怎样」</div>
-      <div class="sub">它给的是<b>状态转移</b>，不是<b>价值判断</b>。知道每条路通向哪里，和知道哪条路值得走，是两个独立的问题——后者仍然要回到第 6 页最右边那一格。<b>把世界模型当成 AGI 的完整答案，是把「预测」和「取舍」混成了一件事。</b></div></div>
+      <rect x="810" y="40" width="358" height="280" rx="10" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="2"/>
+      <text x="989" y="78" font-size="19" font-weight="700" fill="#0e9f6e" text-anchor="middle">推理时 Scaling</text>
+      <text x="989" y="106" font-size="14" fill="#5b6675" text-anchor="middle">答题的时候多想几步、多试几遍</text>
+      <text x="989" y="134" font-size="13" fill="#94a3b8" text-anchor="middle">2024 秋起　·　涨的是「想透」</text>
+
+      <path d="M30 186 L406 106 L812 26" fill="none" stroke="#c2410c" stroke-width="2.6" marker-end="url(#p4a)"/>
+      <text x="380" y="50" font-size="15" font-weight="700" fill="#c2410c" text-anchor="middle">同一枚硬币：算力换能力，只是投入的位置在往右挪</text>
+    </svg>
+    <div class="note b-orange mt"><div class="t orange">打个比方</div>
+      <div class="sub">学生把图书馆读完了（预训练），再读一遍收获有限；于是转去<b>刷题</b>（后训练），并且学会了<b>考试时打草稿、反复验算</b>（推理时多想）。</div></div>
+    <div class="note b-red" style="margin-top:12px"><div class="t red">争论在哪</div>
+      <div class="sub">「预训练撞墙了」这句话，只对<b>最左边那一格</b>成立——高质量文本是存量，芯片能扩产，人写过的字不能。<b>另外两格刚起步，而且要花的是每一次使用的钱，不是一次性的训练钱。</b></div></div>
   </div>
 </section>
-<section class="slide" data-act="主题五">
-  <div class="hd"><h2>主题五 · 具身智能：唯一还能自己造数据的地方</h2></div>
+<section class="slide" data-act="RL">
+  <div class="hd"><h2>RL + 可验证环境：新引擎</h2></div>
   <div class="bd">
-    <div class="p mb">前四个主题争的都是<b>怎么把存量数据榨得更干净</b>。它不一样——<b class="green">这是唯一一个能凭空生出新数据的方向</b>，因为动作真的会改变世界。</div>
-    <div class="g32">
-      <div>
-        <svg viewBox="0 0 687 226" style="width:100%;height:auto;display:block">
-          <defs><marker id="a9b" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-            <path d="M0 0 L6 3 L0 6 z" fill="#2563eb"/></marker>
-            <marker id="a9g" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-            <path d="M0 0 L6 3 L0 6 z" fill="#0e9f6e"/></marker></defs>
+    <div class="p mb">不让人一条条打分，而是把模型丢进<b>能自动判对错的环境</b>里海量试错：数学对答案、代码跑测试、游戏看输赢。<b class="green">答对给奖励，答错不给，循环上百万次。</b></div>
+    <svg viewBox="0 0 1168 415" style="width:100%;height:auto;display:block">
+      <defs><marker id="p5a" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto">
+        <path d="M0 0 L7 3.5 L0 7 z" fill="#0e9f6e"/></marker></defs>
 
-          <rect x="14" y="30" width="200" height="86" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
-          <text x="114" y="62" font-size="14.5" font-weight="700" fill="#2563eb" text-anchor="middle">真实世界</text>
-          <text x="114" y="84" font-size="12" fill="#5b6675" text-anchor="middle">物理规律不用人写下来</text>
-          <text x="114" y="103" font-size="12" fill="#5b6675" text-anchor="middle">它本来就在那儿</text>
+      <rect x="0" y="12" width="450" height="132" rx="10" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.8"/>
+      <text x="24" y="46" font-size="16" font-weight="700" fill="#5b6675">旧引擎：人来打分</text>
+      <text x="24" y="78" font-size="13.5" fill="#5b6675">·　人给回答排序，再训个模型去模仿这个打分</text>
+      <text x="24" y="104" font-size="13.5" fill="#5b6675">·　慢、贵、量上不去</text>
+      <text x="24" y="130" font-size="13.5" fill="#dc2626">·　分数是模糊的，模型学会专门讨好打分器</text>
 
-          <text x="325" y="46" font-size="12" fill="#2563eb" text-anchor="middle">观测：图像、力、触觉</text>
-          <path d="M218 56 L432 56" stroke="#2563eb" stroke-width="1.8" fill="none" marker-end="url(#a9b)"/>
-          <path d="M436 94 L222 94" stroke="#0e9f6e" stroke-width="1.8" fill="none" marker-end="url(#a9g)"/>
-          <text x="325" y="112" font-size="12" fill="#0e9f6e" text-anchor="middle">动作：关节角、抓取、移动</text>
+      <rect x="0" y="178" width="450" height="132" rx="10" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="2"/>
+      <text x="24" y="212" font-size="16" font-weight="700" fill="#0e9f6e">新引擎：写段程序去判</text>
+      <text x="24" y="244" font-size="13.5" fill="#5b6675">·　规则自动判分，只有对和错</text>
+      <text x="24" y="270" font-size="13.5" fill="#5b6675">·　快、便宜、可以无限量供题</text>
+      <text x="24" y="296" font-size="13.5" fill="#0e9f6e">·　糊弄不了：模型比人强也没关系，程序只判对错</text>
 
-          <rect x="440" y="30" width="233" height="86" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.8"/>
-          <text x="556" y="62" font-size="14.5" font-weight="700" fill="#7c3aed" text-anchor="middle">VLA 模型</text>
-          <text x="556" y="84" font-size="12" fill="#7c3aed" text-anchor="middle">视觉 → 语言 → 动作</text>
-          <text x="556" y="103" font-size="12" fill="#5b6675" text-anchor="middle">端到端直接输出关节角</text>
+      <path d="M760 60 A 105 105 0 0 1 865 165" fill="none" stroke="#0e9f6e" stroke-width="2.2" marker-end="url(#p5a)"/>
+      <path d="M865 165 A 105 105 0 0 1 760 270" fill="none" stroke="#0e9f6e" stroke-width="2.2" marker-end="url(#p5a)"/>
+      <path d="M760 270 A 105 105 0 0 1 655 165" fill="none" stroke="#0e9f6e" stroke-width="2.2" marker-end="url(#p5a)"/>
+      <path d="M655 165 A 105 105 0 0 1 760 60" fill="none" stroke="#0e9f6e" stroke-width="2.2" marker-end="url(#p5a)"/>
 
-          <rect x="0" y="138" width="687" height="78" rx="8" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5" stroke-dasharray="5 4"/>
-          <text x="18" y="164" font-size="13" font-weight="700" fill="#c2410c">动作真的改变了世界 → 下一帧观测就是这个动作的标签</text>
-          <text x="18" y="187" font-size="12.5" fill="#5b6675">不需要人来标注。这是唯一一个「投入越多、数据越多」的数据源：</text>
-          <text x="18" y="207" font-size="12.5" fill="#5b6675">文本是存量，物理交互是流量。</text>
-        </svg>
-      </div>
-      <div>
-        <div class="note b-purple"><div class="t purple">它补的是「没有后果」那个缺口</div>
-          <div class="sub">语料里全是<b>别人行动的结果</b>。具身给的是第一人称的因果：我推了，它倒了。</div></div>
-        <div class="note b-red" style="margin-top:12px"><div class="t red">卡点一：真机数据贵得离谱</div>
-          <div class="sub">一条轨迹要一台机器、一个场地、一段真实时间。<b>这部分不能靠买卡加速。</b></div></div>
-        <div class="note b-orange" style="margin-top:12px"><div class="t orange">卡点二：仿真和真实之间有缝</div>
-          <div class="sub">仿真里可以刷无限数据，但摩擦、形变、光照都对不上。<b>缝有多宽，决定仿真数据值多少钱。</b></div></div>
-      </div>
-    </div>
-    <table class="tbl s mt">
-      <tr><th style="width:190px">数据来源</th><th style="width:210px">今天的量级</th><th style="width:240px">是存量还是流量</th><th>带不带因果</th></tr>
-      <tr><td><b class="red">公开高质量文本</b></td><td class="mono">1e13 token</td><td><b>存量，接近见底</b></td><td>没有——记录的是别人行动的结果</td></tr>
-      <tr><td><b class="orange">网络视频</b></td><td class="mono">1e9 小时量级</td><td>存量，还有余量</td><td>有物理，但<b>没有动作标签</b></td></tr>
-      <tr><td><b class="purple">仿真轨迹</b></td><td class="mono">想刷多少有多少</td><td>看着像流量，<b>但只在仿真里</b></td><td>有因果，但<b>物理对不准</b></td></tr>
-      <tr><td><b class="green">真机交互轨迹</b></td><td class="mono">1e6 条量级</td><td><b class="green">流量，机器越多数据越多</b></td><td><b class="green">有，而且是第一人称的</b></td></tr>
-    </table>
-    <div class="note b-blue" style="margin-top:12px"><div class="t blue">这个主题的时钟和别的不一样：它受物理时间约束</div>
-      <div class="sub">前四个主题的瓶颈是算力和数据，加钱能换速度；它的瓶颈里<b>有一段是真实时间</b>——一台机器一天只能试那么多次，一个抓取动作就是要花三秒。<b>所以它大概率是最慢的一条，但也是唯一一条越走数据越多、不会枯竭的路。</b>上面表里那道数量级的鸿沟，就是它今天的全部处境。</div></div>
+      <rect x="668" y="36" width="184" height="48" rx="8" fill="#fff" stroke="#0e9f6e" stroke-width="1.8"/>
+      <text x="760" y="66" font-size="14.5" font-weight="700" fill="#0e9f6e" text-anchor="middle">① 模型给出解法</text>
+      <rect x="880" y="141" width="184" height="48" rx="8" fill="#fff" stroke="#0e9f6e" stroke-width="1.8"/>
+      <text x="972" y="171" font-size="14.5" font-weight="700" fill="#0e9f6e" text-anchor="middle">② 交给验证器</text>
+      <rect x="668" y="246" width="184" height="48" rx="8" fill="#fff" stroke="#0e9f6e" stroke-width="1.8"/>
+      <text x="760" y="276" font-size="14.5" font-weight="700" fill="#0e9f6e" text-anchor="middle">③ 判分：对 / 错</text>
+      <rect x="456" y="141" width="184" height="48" rx="8" fill="#fff" stroke="#0e9f6e" stroke-width="1.8"/>
+      <text x="548" y="171" font-size="14.5" font-weight="700" fill="#0e9f6e" text-anchor="middle">④ 按分数改自己</text>
+      <text x="760" y="160" font-size="16" font-weight="700" fill="#5b6675" text-anchor="middle">上百万次</text>
+      <text x="760" y="184" font-size="12.5" fill="#94a3b8" text-anchor="middle">试错 → 反馈 → 改进</text>
+
+      <rect x="0" y="332" width="1168" height="83" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
+      <text x="26" y="366" font-size="17" font-weight="700" fill="#2563eb">核心洞察：验证比生成容易得多</text>
+      <text x="26" y="396" font-size="14" fill="#5b6675">出题难，批卷容易。这就打破了「必须有大量人工标注」这个老瓶颈——机器终于可以<tspan font-weight="700" fill="#2563eb">自己出题、自己做、自己批改</tspan>。</text>
+    </svg>
+    <div class="note b-red mt"><div class="t red">卡在哪：哪些事能写程序判？</div>
+      <div class="sub"><b class="green">判得了</b>：数学、代码、下棋——已经在大规模用。　<b class="orange">判得了一半</b>：写报告、做分析、在网页上连点二十步——得人来兜底，所以扩不大。　<b class="red">判不了</b>：设计好不好看、战略对不对、三年后的影响。<b>模型练得最凶的是第一格，而人真正想让它干的活，大半在后两格。</b></div></div>
+  </div>
+</section>
+<section class="slide" data-act="世界模型">
+  <div class="hd"><h2>世界模型：脑内沙盘</h2></div>
+  <div class="bd">
+    <div class="p mb">一个装在模型里的<b>模拟器</b>：给它当前状态和一个动作，它预测下一步会发生什么。<b class="purple">有了它，就不必每件事都到真实世界里去付学费。</b></div>
+    <svg viewBox="0 0 1168 380" style="width:100%;height:auto;display:block">
+      <defs>
+        <marker id="p6g" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 z" fill="#0e9f6e"/></marker>
+        <marker id="p6n" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 z" fill="#94a3b8"/></marker>
+      </defs>
+      <text x="0" y="18" font-size="13" fill="#94a3b8">虚线 = 在想象里试　·　实线 = 真实世界</text>
+
+      <line x1="118" y1="148" x2="212" y2="78" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5 4"/>
+      <line x1="118" y1="171" x2="212" y2="171" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5 4"/>
+      <line x1="118" y1="194" x2="212" y2="264" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5 4"/>
+      <circle cx="74" cy="171" r="44" fill="#7c3aed"/>
+      <text x="74" y="166" font-size="15" fill="#fff" text-anchor="middle">当前</text>
+      <text x="74" y="186" font-size="15" fill="#fff" text-anchor="middle">状态</text>
+
+      <rect x="214" y="40" width="266" height="74" rx="9" fill="#fff" stroke="#dc2626" stroke-width="1.6" stroke-dasharray="6 4"/>
+      <text x="347" y="72" font-size="15" font-weight="700" fill="#5b6675" text-anchor="middle">未来 A：快速伸手</text>
+      <text x="347" y="98" font-size="13" fill="#dc2626" text-anchor="middle">想象里：水杯碰倒了</text>
+
+      <rect x="214" y="134" width="266" height="74" rx="9" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="2"/>
+      <text x="347" y="166" font-size="15" font-weight="700" fill="#0e9f6e" text-anchor="middle">未来 B：端平慢移</text>
+      <text x="347" y="192" font-size="13" fill="#0e9f6e" text-anchor="middle">想象里：成功，水没洒</text>
+
+      <rect x="214" y="228" width="266" height="74" rx="9" fill="#fff" stroke="#cbd5e1" stroke-width="1.6" stroke-dasharray="6 4"/>
+      <text x="347" y="260" font-size="15" font-weight="700" fill="#5b6675" text-anchor="middle">未来 C：换只手拿</text>
+      <text x="347" y="286" font-size="13" fill="#94a3b8" text-anchor="middle">想象里：稳妥，但慢</text>
+
+      <path d="M484 171 L556 171" stroke="#0e9f6e" stroke-width="3" fill="none" marker-end="url(#p6g)"/>
+      <text x="520" y="157" font-size="13" font-weight="700" fill="#0e9f6e" text-anchor="middle">择优</text>
+
+      <rect x="562" y="134" width="220" height="74" rx="9" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+      <text x="672" y="166" font-size="15" font-weight="700" fill="#7c3aed" text-anchor="middle">真实世界里执行</text>
+      <text x="672" y="192" font-size="12.5" fill="#94a3b8" text-anchor="middle">只走被选中的那一步</text>
+
+      <path d="M786 171 L836 171" stroke="#94a3b8" stroke-width="1.8" fill="none" marker-end="url(#p6n)"/>
+      <rect x="842" y="134" width="200" height="74" rx="9" fill="#fff" stroke="#94a3b8" stroke-width="1.6"/>
+      <text x="942" y="166" font-size="15" font-weight="700" fill="#5b6675" text-anchor="middle">新的当前状态</text>
+      <text x="942" y="192" font-size="12.5" fill="#94a3b8" text-anchor="middle">循环往复</text>
+
+      <rect x="0" y="338" width="1168" height="42" rx="8" fill="#f5f3ff"/>
+      <text x="18" y="365" font-size="14" font-weight="700" fill="#7c3aed">同一个能力的第二个用途：<tspan fill="#5b6675" font-weight="400">直接生成训练环境。世界模型 × RL ＝ 无限量的「可验证题库」，正好接上上一页的瓶颈。</tspan></text>
+    </svg>
+    <div class="note b-orange mt"><div class="t orange">打个比方</div>
+      <div class="sub">棋手落子前在<b>脑子里推演十步</b>，新手只能走一步看一步。世界模型，就是把「脑内推演」这件事工业化。</div></div>
+    <div class="note b-red" style="margin-top:12px"><div class="t red">卡在哪</div>
+      <div class="sub">往前推一步就偏一点，<b>推得越远偏得越离谱</b>——所以今天只能往前想几步，然后拿真实情况校一次。另一个没定论的问题：能把视频生成得很像，算不算「学会了物理」？<b>目前的共识是学到了不少表面规律，因果和交互仍然不可靠。</b></div></div>
+  </div>
+</section>
+<section class="slide" data-act="连续学习">
+  <div class="hd"><h2>连续学习：别再失忆</h2></div>
+  <div class="bd">
+    <div class="p mb">上线之后还在学——从每天的经验里更新自己，<b>而且不丢掉旧本事</b>。今天的模型做不到第二条，所以干脆连第一条也不做。</div>
+    <svg viewBox="0 0 1168 356" style="width:100%;height:auto;display:block">
+      <text x="0" y="18" font-size="16" font-weight="700" fill="#2563eb">今天：切片式</text>
+      <line x1="60" y1="36" x2="60" y2="146" stroke="#cbd5e1" stroke-width="1.5"/>
+      <line x1="60" y1="146" x2="660" y2="146" stroke="#cbd5e1" stroke-width="1.5"/>
+      <path d="M60 140 H180 V112 H300 V84 H420 V56 H540 V34 H650" fill="none" stroke="#2563eb" stroke-width="2.6"/>
+      <circle cx="180" cy="112" r="4" fill="#2563eb"/><text x="190" y="106" font-size="12" fill="#94a3b8">v1</text>
+      <circle cx="300" cy="84" r="4" fill="#2563eb"/><text x="310" y="78" font-size="12" fill="#94a3b8">v1.5</text>
+      <circle cx="420" cy="56" r="4" fill="#2563eb"/><text x="430" y="50" font-size="12" fill="#94a3b8">v2</text>
+      <circle cx="540" cy="34" r="4" fill="#2563eb"/><text x="550" y="28" font-size="12" fill="#94a3b8">v3</text>
+      <text x="52" y="90" font-size="12" fill="#94a3b8" text-anchor="end">能力</text>
+      <text x="655" y="166" font-size="12" fill="#94a3b8" text-anchor="end">时间</text>
+      <text x="700" y="60" font-size="14" fill="#5b6675">两次发布之间，是同一个冻住的快照：</text>
+      <text x="700" y="88" font-size="14" fill="#5b6675">训练几个月 → 冻结 → 上线，所有人共用一份。</text>
+      <text x="700" y="116" font-size="14" font-weight="700" fill="#dc2626">今天犯的错，明天原样再犯；</text>
+      <text x="700" y="144" font-size="14" font-weight="700" fill="#dc2626">你没法让它「记住」教训。</text>
+
+      <line x1="0" y1="188" x2="1168" y2="188" stroke="#e2e8f0" stroke-width="1.5"/>
+
+      <text x="0" y="216" font-size="16" font-weight="700" fill="#7c3aed">目标：终身式</text>
+      <line x1="60" y1="234" x2="60" y2="326" stroke="#cbd5e1" stroke-width="1.5"/>
+      <line x1="60" y1="326" x2="660" y2="326" stroke="#cbd5e1" stroke-width="1.5"/>
+      <path d="M60 320 C 200 312, 320 288, 430 264 S 600 236, 650 230" fill="none" stroke="#7c3aed" stroke-width="2.6"/>
+      <text x="52" y="284" font-size="12" fill="#94a3b8" text-anchor="end">能力</text>
+      <text x="655" y="346" font-size="12" fill="#94a3b8" text-anchor="end">时间</text>
+      <text x="700" y="248" font-size="14" fill="#5b6675">今天走得通的三级台阶，越往下越难：</text>
+      <text x="700" y="278" font-size="14" fill="#5b6675">① 写进这次对话　—　关掉就没了</text>
+      <text x="700" y="306" font-size="14" fill="#5b6675">② 写进记忆文件　—　能带走，但只是笔记</text>
+      <text x="700" y="334" font-size="14" font-weight="700" fill="#7c3aed">③ 写进权重　—　只有这一层是真学会，也最难</text>
+    </svg>
+    <div class="note b-orange mt"><div class="t orange">打个比方</div>
+      <div class="sub"><b>每天从零开始的失忆实习生</b>，对上<b>越干越熟的老员工</b>。今天的模型是前者。</div></div>
+    <div class="note b-red" style="margin-top:12px"><div class="t red">卡在哪</div>
+      <div class="sub">主要拦路虎叫<b>灾难性遗忘</b>：神经网络学新东西会直接盖掉旧的，1989 年就被写清楚了，到今天仍然没有干净的解法。<b>还有个副作用：一个会自己变的系统，更难测试、也更难保证它变完还是原来那个样子。</b></div></div>
+  </div>
+</section>
+<section class="slide" data-act="具身智能">
+  <div class="hd"><h2>具身智能：给智能一个身体</h2></div>
+  <div class="bd">
+    <div class="p mb">让智能能在物理世界里感知、动手，<b>并且承担动作的后果</b>。绕不开的原因很朴素：<b class="orange">网上全是「关于世界的文字」，没有「跟世界互动的记录」</b>——这类数据只能亲手挣。</div>
+    <svg viewBox="0 0 1168 330" style="width:100%;height:auto;display:block">
+      <defs>
+        <marker id="p8n" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 z" fill="#94a3b8"/></marker>
+        <marker id="p8o" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 z" fill="#c2410c"/></marker>
+      </defs>
+
+      <rect x="0" y="20" width="236" height="62" rx="9" fill="#fff" stroke="#94a3b8" stroke-width="1.6"/>
+      <text x="118" y="48" font-size="14.5" font-weight="700" fill="#5b6675" text-anchor="middle">相机画面</text>
+      <text x="118" y="70" font-size="12.5" fill="#94a3b8" text-anchor="middle">看见了什么</text>
+      <rect x="0" y="110" width="236" height="62" rx="9" fill="#fff" stroke="#94a3b8" stroke-width="1.6"/>
+      <text x="118" y="138" font-size="14.5" font-weight="700" fill="#5b6675" text-anchor="middle">一句指令</text>
+      <text x="118" y="160" font-size="12.5" fill="#94a3b8" text-anchor="middle">「把杯子递给我」</text>
+      <path d="M240 54 L292 82" stroke="#94a3b8" stroke-width="1.8" fill="none" marker-end="url(#p8n)"/>
+      <path d="M240 140 L292 116" stroke="#94a3b8" stroke-width="1.8" fill="none" marker-end="url(#p8n)"/>
+
+      <rect x="298" y="34" width="264" height="124" rx="12" fill="#eff6ff" stroke="#2563eb" stroke-width="2.4"/>
+      <text x="430" y="82" font-size="20" font-weight="700" fill="#2563eb" text-anchor="middle">一个大模型</text>
+      <text x="430" y="112" font-size="14" fill="#5b6675" text-anchor="middle">看图 · 读话 · 出动作</text>
+      <text x="430" y="138" font-size="12.5" fill="#94a3b8" text-anchor="middle">端到端，中间不再拆成好几套系统</text>
+
+      <path d="M566 96 L618 96" stroke="#94a3b8" stroke-width="1.8" fill="none" marker-end="url(#p8n)"/>
+      <rect x="624" y="60" width="230" height="72" rx="9" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="2"/>
+      <text x="739" y="90" font-size="15.5" font-weight="700" fill="#0e9f6e" text-anchor="middle">一串动作</text>
+      <text x="739" y="114" font-size="12.5" fill="#94a3b8" text-anchor="middle">机械臂该怎么走</text>
+
+      <path d="M858 96 L910 96" stroke="#94a3b8" stroke-width="1.8" fill="none" marker-end="url(#p8n)"/>
+      <rect x="916" y="60" width="252" height="72" rx="9" fill="#fff7ed" stroke="#c2410c" stroke-width="2"/>
+      <text x="1042" y="90" font-size="15.5" font-weight="700" fill="#c2410c" text-anchor="middle">真机执行</text>
+      <text x="1042" y="114" font-size="12.5" fill="#94a3b8" text-anchor="middle">成功 / 失败 / 摔了，都是真的</text>
+
+      <rect x="0" y="212" width="1168" height="118" rx="10" fill="#fafbfd" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="24" y="246" font-size="15" font-weight="700" fill="#5b6675">数据从哪来：两条腿走路</text>
+      <rect x="24" y="262" width="380" height="48" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.6"/>
+      <text x="214" y="292" font-size="14.5" font-weight="700" fill="#7c3aed" text-anchor="middle">仿真里练（就是世界模型）</text>
+      <path d="M414 286 L500 286" stroke="#c2410c" stroke-width="2.2" fill="none" marker-end="url(#p8o)"/>
+      <text x="457" y="274" font-size="12.5" font-weight="700" fill="#c2410c" text-anchor="middle">这一步会掉链子</text>
+      <rect x="510" y="262" width="330" height="48" rx="8" fill="#fff7ed" stroke="#c2410c" stroke-width="1.6"/>
+      <text x="675" y="292" font-size="14.5" font-weight="700" fill="#c2410c" text-anchor="middle">搬到真机上</text>
+      <text x="866" y="282" font-size="13.5" fill="#5b6675">仿真里学会的，到真机上常常不管用：</text>
+      <text x="866" y="304" font-size="13.5" font-weight="700" fill="#dc2626">摩擦、光照、器件误差，全对不上。</text>
+    </svg>
+    <div class="note b-orange mt"><div class="t orange">打个比方</div>
+      <div class="sub"><b>考试满分的书呆子，不会收拾房间。</b>缺的不是知识，是跟世界打交道的手感——大模型是聪明的大脑，缺的是小脑和手。</div></div>
+    <div class="note b-red" style="margin-top:12px"><div class="t red">卡在哪</div>
+      <div class="sub">四十年前就有人指出这件怪事：<b>对机器来说，推理容易，感知和运动极难</b>——下棋比叠衣服简单得多。加上真机数据是一秒一秒攒出来的，<b>加钱能买到更多台机器，买不到更快的时间</b>：这是这一章里唯一一个花钱也解不开的卡点。</div></div>
   </div>
 </section>
 <section class="slide" data-act="RSI">
-  <div class="hd"><h2>RSI：那个「递归」到底是什么意思</h2></div>
+  <div class="hd"><h2>RSI：系统开始改进自己</h2></div>
   <div class="bd">
-    <div class="p mb">RSI 是「递归自我改进」。日常说的「AI 自己改进自己」，其实混着三件难度差很远的事——<b class="purple">分开这三件，这个话题就清楚了一大半</b>。</div>
-    <table class="tbl s mt">
-      <tr><th style="width:200px">说的是哪一件</th><th style="width:470px">AI 在做什么</th><th style="width:240px">谁在改进它</th><th>下一轮会更快吗</th></tr>
-      <tr><td><b class="blue">自动化</b></td><td>按人给好的方法去做事：写代码、跑实验、整理资料</td><td>人</td><td>不会</td></tr>
-      <tr><td><b class="orange">自我改进</b></td><td>参与改进自己：造训练数据、挑超参、出题目</td><td>人定方向，AI 出力</td><td>不一定</td></tr>
-      <tr><td><b class="purple">递归自我改进</b></td><td>改的是「怎么改自己」这件事本身</td><td><b>AI 自己</b></td><td><b class="purple">会 —— 这才是 R</b></td></tr>
-    </table>
-    <div class="g32" style="margin-top:12px">
-      <div>
-        <svg viewBox="0 0 687 190" style="width:100%;height:auto;display:block">
-          <text x="44" y="14" font-size="12" fill="#94a3b8" text-anchor="middle">能力</text>
-          <line x1="44" y1="22" x2="44" y2="162" stroke="#cbd5e1" stroke-width="1.5"/>
-          <line x1="44" y1="162" x2="660" y2="162" stroke="#cbd5e1" stroke-width="1.5"/>
+    <div class="p mb">RSI ＝ 递归自我改进。AI 实质性地参与 AI 自己的研发：<b>更强的 AI → 更快地做研发 → 更更强的 AI</b>。1965 年就有人写下这个念头，2025 年前后它从思想实验变成了工程话题。</div>
+    <svg viewBox="0 0 1168 336" style="width:100%;height:auto;display:block">
+      <defs><marker id="p9a" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto">
+        <path d="M0 0 L7 3.5 L0 7 z" fill="#7c3aed"/></marker></defs>
 
-          <path d="M50 152 L650 76" fill="none" stroke="#c2410c" stroke-width="2.4"/>
-          <path d="M50 152 C300 146 470 118 620 30" fill="none" stroke="#7c3aed" stroke-width="2.4"/>
+      <path d="M207 78 A 132 132 0 0 1 393 78" fill="none" stroke="#7c3aed" stroke-width="2" marker-end="url(#p9a)"/>
+      <path d="M393 78 A 132 132 0 0 1 393 264" fill="none" stroke="#7c3aed" stroke-width="2.8" marker-end="url(#p9a)"/>
+      <path d="M393 264 A 132 132 0 0 1 207 264" fill="none" stroke="#7c3aed" stroke-width="3.6" marker-end="url(#p9a)"/>
+      <path d="M207 264 A 132 132 0 0 1 207 78" fill="none" stroke="#7c3aed" stroke-width="4.4" marker-end="url(#p9a)"/>
 
-          <rect x="56" y="28" width="11" height="11" fill="#c2410c"/>
-          <text x="74" y="38" font-size="12.5" fill="#5b6675">不递归：每轮进步差不多，能力是<tspan font-weight="700">加起来</tspan>的</text>
-          <rect x="56" y="46" width="11" height="11" fill="#7c3aed"/>
-          <text x="74" y="56" font-size="12.5" fill="#5b6675">递归：这轮的成果让下轮更快，能力是<tspan font-weight="700">滚起来</tspan>的</text>
+      <rect x="205" y="12" width="190" height="56" rx="9" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
+      <text x="300" y="38" font-size="14.5" font-weight="700" fill="#2563eb" text-anchor="middle">更强的模型</text>
+      <text x="300" y="58" font-size="12" fill="#94a3b8" text-anchor="middle">Scaling + RL 练出来的</text>
 
-          <text x="652" y="70" font-size="12.5" font-weight="700" fill="#c2410c" text-anchor="end">加总</text>
-          <text x="612" y="20" font-size="12.5" font-weight="700" fill="#7c3aed" text-anchor="end">复利</text>
-          <text x="350" y="182" font-size="12" fill="#94a3b8" text-anchor="middle">一轮接一轮地改进 →</text>
-        </svg>
-        <div class="cap" style="margin-top:8px">R 就是这个形状的差别：不是「AI 在做事」，也不是「AI 变强了」，而是<b class="purple">这一轮变强，让下一轮变强得更快</b>。注意前半段两条线几乎贴在一起——<b class="red">所以早期的快慢，看不出是哪一种</b>。</div>
-      </div>
-      <div>
-        <div class="note b-purple"><div class="t purple">一句话就能分辨</div>
-          <div class="sub">问：<b>第 N 轮的改进，有没有让第 N+1 轮改得更快？</b>答不上来，那就还在上面两行里。</div></div>
-        <div class="note b-red" style="margin-top:12px"><div class="t red">最容易上当的一个说法</div>
-          <div class="sub">「AI 已经在写下一代 AI 的代码了」——是真的，但它落在第二行：<b>方向还是人定的，下一轮不会因此变快</b>。</div></div>
-      </div>
-    </div>
-    <div class="note b-orange mt"><div class="t orange">今天卡住它的不是算力，是两件很朴素的事</div>
-      <div class="sub">要让这个圈转起来，AI 得能<b>判断「这次改动到底算不算变好」</b>（第 5–6 页在解这件事），还得有通道<b>把改动真正留在自己身上</b>（第 7 页在解这件事）。这两件今天都没解决，所以现在看到的「自我改进」，几乎都停在第二行。</div></div>
-  </div>
-</section>
-<section class="slide" data-act="目标">
-  <div class="hd"><h2>AGI 这个词，有三派互不兼容的定义</h2></div>
-  <div class="bd">
-    <div class="p mb">前面都在讲「怎么走」。但<b>终点画在哪儿，会反过来决定该走哪条路</b>——而这个终点，从来没谈拢过。</div>
-    <div class="g3">
-      <div class="card w"><div class="t blue">一 · 能力覆盖式</div>
-        <div class="cap" style="margin-top:6px"><b>什么算到了：</b>人能干的有价值的活，它都能干。<br><b class="blue">它指向：</b>继续 scaling 和 RLVR——先把覆盖面拉满。</div></div>
-      <div class="card w"><div class="t orange">二 · 自主式</div>
-        <div class="cap" style="margin-top:6px"><b>什么算到了：</b>没人盯着，也能把一件事从头做完。<br><b class="orange">它指向：</b>可靠性、长程一致性、世界模型。</div></div>
-      <div class="card w"><div class="t green">三 · 学习式</div>
-        <div class="cap" style="margin-top:6px"><b>什么算到了：</b>进到一个全新领域，能从零学会。<br><b class="green">它指向：</b>连续学习和 RSI，别的都是绕路。</div></div>
-    </div>
-    <div class="g32" style="margin-top:14px">
-      <div>
-        <svg viewBox="0 0 687 292" style="width:100%;height:auto;display:block">
-          <text x="0" y="18" font-size="13" font-weight="700" fill="#2563eb">一个三派都认的数：它能独立扛多久</text>
-          <line x1="76" y1="44" x2="76" y2="236" stroke="#cbd5e1" stroke-width="1.5"/>
-          <line x1="76" y1="236" x2="660" y2="236" stroke="#cbd5e1" stroke-width="1.5"/>
-          <text x="68" y="70" font-size="12" fill="#94a3b8" text-anchor="end">8 小时</text>
-          <text x="68" y="120" font-size="12" fill="#94a3b8" text-anchor="end">1 小时</text>
-          <text x="68" y="170" font-size="12" fill="#94a3b8" text-anchor="end">8 分钟</text>
-          <text x="68" y="220" font-size="12" fill="#94a3b8" text-anchor="end">1 分钟</text>
-          <path d="M110 226 L630 55" fill="none" stroke="#2563eb" stroke-width="2.6"/>
-          <circle cx="110" cy="226" r="4" fill="#2563eb"/>
-          <circle cx="283" cy="169" r="4" fill="#2563eb"/>
-          <circle cx="456" cy="112" r="4" fill="#2563eb"/>
-          <circle cx="630" cy="55" r="4" fill="#2563eb"/>
-          <text x="320" y="220" font-size="12.5" font-weight="700" fill="#2563eb">纵轴是对数刻度　→　大约每 7 个月翻一番</text>
-          <text x="110" y="258" font-size="12" fill="#94a3b8" text-anchor="middle">2020</text>
-          <text x="283" y="258" font-size="12" fill="#94a3b8" text-anchor="middle">2022</text>
-          <text x="456" y="258" font-size="12" fill="#94a3b8" text-anchor="middle">2024</text>
-          <text x="630" y="258" font-size="12" fill="#94a3b8" text-anchor="middle">2026</text>
-          <text x="0" y="284" font-size="11.5" fill="#94a3b8">口径：模型能以 50% 成功率完成的任务，换成人做要多久</text>
-        </svg>
-      </div>
-      <div>
-        <div class="note b-purple"><div class="t purple">为什么这条线三派都认</div>
-          <div class="sub">覆盖式看「能干多少活」，自主式看「能撑多久不用人管」，学习式看「会不会自己学」——<b>任务越长，三样都得同时成立</b>。</div></div>
-        <div class="note b-red" style="margin-top:12px"><div class="t red">但它有一个测不到的盲区</div>
-          <div class="sub">它测的是<b>已经会的任务能扛多久</b>，测不出「换个全新领域，它会不会学」。第三派最在意的那件事，这条线看不见。</div></div>
-      </div>
-    </div>
-    <div class="g3" style="margin-top:12px">
-      <div class="note b-blue"><div class="t blue">AGI 不是一个开关</div>
-        <div class="sub">三派量的都是连续的东西。<b>争「到没到」不如争「哪个数在涨」。</b></div></div>
-      <div class="note b-orange"><div class="t orange">过了某个考试不等于到了</div>
-        <div class="sub">题会泄漏，也会被针对性刷。<b>分数涨了，不一定是能力涨了。</b></div></div>
-      <div class="note b-red"><div class="t red">ASI 是另一个问题</div>
-        <div class="sub">超过人 ≠ 通用。竞赛数学和编程上<b>已超过绝大多数人</b>，通用性没多。</div></div>
-    </div>
-  </div>
-</section>
-<section class="slide" data-act="总账">
-  <div class="hd"><h2>五个主题各自卡在哪：一页对照</h2></div>
-  <div class="bd">
-    <div class="p mb">五个主题讲完了，并排放在一起。<b class="orange">最后一列是这张表里最有用的东西</b>——它是判据，不是描述。</div>
-    <table class="tbl s mt">
-      <tr><th style="width:170px">主题</th><th style="width:420px">卡在哪</th><th>什么信号出现，说明它真动了</th></tr>
-      <tr><td><b class="blue">继续 scaling</b></td><td>高质量数据是存量；电力、芯片、建设周期</td><td>同等算力下，预训练效果还按老速度往上走</td></tr>
-      <tr><td><b class="blue">RL + 可验证环境</b></td><td>环境不够多；判分做不了的地方过不去</td><td>过去难判对错的任务上，也能稳定判出对错</td></tr>
-      <tr><td><b class="blue">连续学习</b></td><td>学新的容易忘旧的；改一次动的是整套参数；投毒风险</td><td><b>上线模型的权重按周更新且不退化</b></td></tr>
-      <tr><td><b class="blue">世界模型</b></td><td>一步的小误差会滚成大误差，想不远</td><td>想象 100 步之后，仍然和真实对得上</td></tr>
-      <tr><td><b class="blue">具身智能</b></td><td>数据、硬件、仿真对不准，还有真实时间</td><td>同一套模型换台机器、换个场景也能直接用</td></tr>
-      <tr><td><b class="purple">RSI（横跨以上全部）</b></td><td>验证和写回这两格都还是空的</td><td><b>模型产出的改进，让下一轮改得更快</b></td></tr>
-    </table>
-    <svg viewBox="0 0 1168 168" style="width:100%;height:auto;display:block;margin-top:14px">
-      <defs><marker id="a14" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto">
-        <path d="M0 0 L7 3.5 L0 7 z" fill="#94a3b8"/></marker></defs>
-      <text x="0" y="12" font-size="13" font-weight="700" fill="#1f2937">卡点的性质，比卡点本身更能预测它什么时候松动</text>
-      <text x="14" y="40" font-size="12" fill="#94a3b8">时间表大致可预测</text>
-      <text x="1154" y="40" font-size="12" fill="#94a3b8" text-anchor="end">什么时候松动，完全不知道</text>
-      <line x1="14" y1="50" x2="1146" y2="50" stroke="#cbd5e1" stroke-width="1.5" marker-end="url(#a14)"/>
+      <rect x="410" y="143" width="180" height="56" rx="9" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.8"/>
+      <text x="500" y="169" font-size="14.5" font-weight="700" fill="#7c3aed" text-anchor="middle">去做 AI 研发本身</text>
+      <text x="500" y="189" font-size="12" fill="#94a3b8" text-anchor="middle">写代码 · 跑实验 · 提方案</text>
 
-      <rect x="14" y="60" width="272" height="102" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
-      <text x="32" y="86" font-size="14.5" font-weight="700" fill="#2563eb">物理供给</text>
-      <text x="32" y="106" font-size="12" fill="#94a3b8">继续 scaling</text>
-      <text x="32" y="128" font-size="12.5" fill="#1f2937">电力、芯片、建设周期</text>
-      <text x="32" y="150" font-size="12.5" font-weight="700" fill="#2563eb">能解，只是贵和慢</text>
+      <rect x="205" y="274" width="190" height="56" rx="9" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.8"/>
+      <text x="300" y="300" font-size="14.5" font-weight="700" fill="#0e9f6e" text-anchor="middle">研发变快了</text>
+      <text x="300" y="320" font-size="12" fill="#94a3b8" text-anchor="middle">同样时间跑更多轮</text>
 
-      <rect x="300" y="60" width="272" height="102" rx="8" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.6"/>
-      <text x="318" y="86" font-size="14.5" font-weight="700" fill="#0e9f6e">真实时间</text>
-      <text x="318" y="106" font-size="12" fill="#94a3b8">具身智能</text>
-      <text x="318" y="128" font-size="12.5" fill="#1f2937">真机要一秒一秒地跑</text>
-      <text x="318" y="150" font-size="12.5" font-weight="700" fill="#0e9f6e">可预测，但结果就是慢</text>
+      <rect x="10" y="143" width="180" height="56" rx="9" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.8"/>
+      <text x="100" y="169" font-size="14.5" font-weight="700" fill="#7c3aed" text-anchor="middle">下一轮接手的更强</text>
+      <text x="100" y="189" font-size="12" fill="#94a3b8" text-anchor="middle">箭头越画越粗</text>
 
-      <rect x="586" y="60" width="272" height="102" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.6"/>
-      <text x="604" y="86" font-size="14.5" font-weight="700" fill="#7c3aed">工程与安全</text>
-      <text x="604" y="106" font-size="12" fill="#94a3b8">连续学习</text>
-      <text x="604" y="128" font-size="12.5" fill="#1f2937">动的是已上线的权重</text>
-      <text x="604" y="150" font-size="12.5" font-weight="700" fill="#7c3aed">技术未必最难，最易低估</text>
+      <text x="300" y="164" font-size="14" font-weight="700" fill="#5b6675" text-anchor="middle">每一圈</text>
+      <text x="300" y="186" font-size="14" font-weight="700" fill="#5b6675" text-anchor="middle">都比上一圈快</text>
 
-      <rect x="872" y="60" width="282" height="102" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="1.6"/>
-      <text x="890" y="86" font-size="14.5" font-weight="700" fill="#dc2626">方法未知</text>
-      <text x="890" y="106" font-size="12" fill="#94a3b8">RL + 可验证环境 · 世界模型</text>
-      <text x="890" y="128" font-size="12.5" fill="#1f2937">缺的那一块还没被找到</text>
-      <text x="890" y="150" font-size="12.5" font-weight="700" fill="#dc2626">一篇论文，或者十年</text>
+      <line x1="612" y1="8" x2="612" y2="330" stroke="#e2e8f0" stroke-width="1.5"/>
+
+      <text x="648" y="26" font-size="15" font-weight="700" fill="#5b6675">分歧不在方向，在斜率</text>
+      <line x1="680" y1="300" x2="680" y2="52" stroke="#cbd5e1" stroke-width="1.5"/>
+      <line x1="680" y1="300" x2="1140" y2="300" stroke="#cbd5e1" stroke-width="1.5"/>
+      <path d="M680 292 C 850 282, 930 224, 1020 120 L 1058 62" fill="none" stroke="#dc2626" stroke-width="2.6"/>
+      <path d="M680 292 C 840 280, 900 252, 980 234 S 1110 218, 1140 214" fill="none" stroke="#2563eb" stroke-width="2.6"/>
+      <text x="1074" y="74" font-size="14.5" font-weight="700" fill="#dc2626">快起飞</text>
+      <text x="1074" y="96" font-size="12" fill="#dc2626">瓶颈原来是人</text>
+      <text x="1140" y="176" font-size="12" fill="#2563eb" text-anchor="end">瓶颈是算力和真实实验</text>
+      <text x="1140" y="196" font-size="14.5" font-weight="700" fill="#2563eb" text-anchor="end">慢坡</text>
+      <text x="672" y="180" font-size="12" fill="#94a3b8" text-anchor="end">能力</text>
+      <text x="1138" y="322" font-size="12" fill="#94a3b8" text-anchor="end">时间</text>
     </svg>
-    <div class="g2" style="margin-top:12px">
-      <div class="note b-orange"><div class="t orange">中间那列会过时，最后一列不会</div>
-        <div class="sub">「卡在哪」半年就要重写一遍，但<b>「什么信号说明它动了」是稳定的</b>——大部分被宣布的突破，都对不上最后那一列。</div></div>
-      <div class="note b-green"><div class="t green">这张表上没有的一行：对齐与可控</div>
-        <div class="sub">上面讲的都是「能力从哪来」。<b>它不是第六个主题，是每个主题各自要交的作业</b>——而它没有自己的 scaling 曲线。</div></div>
-    </div>
+    <div class="note b-purple mt"><div class="t purple">一句话就能分辨真假</div>
+      <div class="sub"><b>第 N 轮的改进，有没有让第 N+1 轮改得更快？</b>没有，就只是「AI 在帮忙干活」，不是递归。<b class="red">「我们用 AI 帮我们训练下一代模型」这句话，绝大多数时候说的是前者。</b></div></div>
+    <div class="note b-red" style="margin-top:12px"><div class="t red">卡在哪</div>
+      <div class="sub">要让这个圈自己转起来，AI 得能<b>判断「这次改动到底算不算变好」</b>（那是 RL + 可验证环境那一格），还得有条路<b>把改动真正留在自己身上</b>（那是连续学习那一格）。<b>这两格今天都是空的，所以圈还得靠人一圈一圈推。</b></div></div>
   </div>
 </section>
-<section class="slide" data-act="总账">
-  <div class="hd"><h2>它们不是竞争关系：真正的瓶颈只有两个</h2></div>
+<section class="slide" data-act="AGI">
+  <div class="hd"><h2>AGI：一条锯齿状的前沿</h2></div>
   <div class="bd">
-    <div class="p mb">把这些主题的依赖关系画出来，会看到<b>它们其实是一条供料链上的不同环节</b>——决定整体速度的，从来不是最快的那一环。</div>
-    <svg viewBox="0 0 1168 282" style="width:100%;height:auto;display:block">
-      <defs><marker id="a15b" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-        <path d="M0 0 L6 3 L0 6 z" fill="#2563eb"/></marker>
-        <marker id="a15r" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-        <path d="M0 0 L6 3 L0 6 z" fill="#dc2626"/></marker></defs>
+    <div class="p mb">通常指<b>在大多数有经济价值的智力工作上，达到或超过人类专家水平</b>。今天的实际形状不是「差一截」，而是<b class="orange">有的项目早已越线，有的项目还在脚踝</b>——所以它更像一条参差不齐的前沿，不是一个开关。</div>
+    <svg viewBox="0 0 1168 350" style="width:100%;height:auto;display:block">
+      <text x="0" y="16" font-size="13" fill="#94a3b8">示意图：只表达相对高低，不是精确数据</text>
+      <line x1="66" y1="272" x2="1120" y2="272" stroke="#cbd5e1" stroke-width="1.5"/>
+      <line x1="66" y1="272" x2="66" y2="46" stroke="#cbd5e1" stroke-width="1.5"/>
+      <line x1="66" y1="92" x2="1120" y2="92" stroke="#dc2626" stroke-width="2" stroke-dasharray="8 5"/>
+      <text x="1120" y="82" font-size="13.5" font-weight="700" fill="#dc2626" text-anchor="end">人类专家水平</text>
+      <text x="58" y="180" font-size="12" fill="#94a3b8" text-anchor="end">能力</text>
 
-      <rect x="264" y="160" width="478" height="112" rx="10" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="5 4" opacity="0.5"/>
+      <rect x="96" y="56" width="112" height="216" rx="5" fill="#2563eb"/>
+      <text x="152" y="292" font-size="13.5" font-weight="700" fill="#2563eb" text-anchor="middle">竞赛数学</text>
+      <rect x="248" y="66" width="112" height="206" rx="5" fill="#2563eb"/>
+      <text x="304" y="292" font-size="13.5" font-weight="700" fill="#2563eb" text-anchor="middle">代码题</text>
+      <rect x="400" y="86" width="112" height="186" rx="5" fill="#2563eb"/>
+      <text x="456" y="292" font-size="13.5" font-weight="700" fill="#2563eb" text-anchor="middle">博士级问答</text>
 
-      <rect x="14" y="20" width="170" height="58" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
-      <text x="99" y="55" font-size="15" font-weight="700" fill="#2563eb" text-anchor="middle">具身智能</text>
-      <text x="227" y="41" font-size="12" fill="#5b6675" text-anchor="middle">因果数据</text>
-      <path d="M188 49 L266 49" stroke="#2563eb" stroke-width="1.8" fill="none" marker-end="url(#a15b)"/>
+      <rect x="552" y="196" width="112" height="76" rx="5" fill="#cbd5e1"/>
+      <text x="608" y="292" font-size="13.5" font-weight="700" fill="#5b6675" text-anchor="middle">干几个小时</text>
+      <text x="608" y="312" font-size="12" fill="#94a3b8" text-anchor="middle">不跑偏</text>
+      <rect x="704" y="214" width="112" height="58" rx="5" fill="#cbd5e1"/>
+      <text x="760" y="292" font-size="13.5" font-weight="700" fill="#5b6675" text-anchor="middle">动手做事</text>
+      <text x="760" y="312" font-size="12" fill="#94a3b8" text-anchor="middle">物理世界</text>
+      <rect x="856" y="228" width="112" height="44" rx="5" fill="#cbd5e1"/>
+      <text x="912" y="292" font-size="13.5" font-weight="700" fill="#5b6675" text-anchor="middle">从头学新技能</text>
+      <text x="912" y="312" font-size="12" fill="#94a3b8" text-anchor="middle">干中学</text>
+      <rect x="1008" y="238" width="112" height="34" rx="5" fill="#cbd5e1"/>
+      <text x="1064" y="292" font-size="13.5" font-weight="700" fill="#5b6675" text-anchor="middle">自己改进自己</text>
+      <text x="1064" y="312" font-size="12" fill="#94a3b8" text-anchor="middle">RSI</text>
 
-      <rect x="274" y="20" width="170" height="58" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
-      <text x="359" y="55" font-size="15" font-weight="700" fill="#2563eb" text-anchor="middle">世界模型</text>
-      <path d="M359 82 L359 168" stroke="#2563eb" stroke-width="1.8" fill="none" marker-end="url(#a15b)"/>
-      <text x="372" y="130" font-size="12" fill="#5b6675">仿真器＝检查器</text>
-
-      <rect x="14" y="174" width="170" height="58" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
-      <text x="99" y="209" font-size="15" font-weight="700" fill="#2563eb" text-anchor="middle">继续 scaling</text>
-      <text x="229" y="195" font-size="12" fill="#5b6675" text-anchor="middle">更强的底座</text>
-      <path d="M188 203 L266 203" stroke="#2563eb" stroke-width="1.8" fill="none" marker-end="url(#a15b)"/>
-
-      <rect x="274" y="174" width="200" height="58" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="2.2"/>
-      <text x="374" y="209" font-size="15" font-weight="700" fill="#dc2626" text-anchor="middle">RL + 可验证环境</text>
-      <text x="374" y="258" font-size="12.5" font-weight="700" fill="#dc2626" text-anchor="middle">瓶颈一 · 评价信号</text>
-      <text x="517" y="195" font-size="12" fill="#dc2626" text-anchor="middle">① 判分信号</text>
-      <path d="M478 203 L552 203" stroke="#dc2626" stroke-width="1.8" fill="none" marker-end="url(#a15r)"/>
-
-      <rect x="560" y="174" width="170" height="58" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="2.2"/>
-      <text x="645" y="209" font-size="15" font-weight="700" fill="#dc2626" text-anchor="middle">连续学习</text>
-      <text x="645" y="258" font-size="12.5" font-weight="700" fill="#dc2626" text-anchor="middle">瓶颈二 · 写回通道</text>
-      <text x="770" y="195" font-size="12" fill="#dc2626" text-anchor="middle">② 写回通道</text>
-      <path d="M734 203 L802 203" stroke="#dc2626" stroke-width="1.8" fill="none" marker-end="url(#a15r)"/>
-
-      <rect x="810" y="174" width="150" height="58" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
-      <text x="885" y="209" font-size="15" font-weight="700" fill="#7c3aed" text-anchor="middle">RSI</text>
-      <path d="M964 203 L986 203" stroke="#7c3aed" stroke-width="1.8" fill="none" marker-end="url(#a15b)"/>
-
-      <rect x="994" y="174" width="160" height="58" rx="8" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="2"/>
-      <text x="1074" y="209" font-size="15" font-weight="700" fill="#0e9f6e" text-anchor="middle">AGI</text>
-
-      <rect x="560" y="20" width="594" height="58" rx="8" fill="#fafbfd" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="5 4"/>
-      <text x="580" y="46" font-size="12.5" fill="#94a3b8">图上只画了主干。实际上「继续 scaling」给每一格都供料，</text>
-      <text x="580" y="65" font-size="12.5" fill="#94a3b8">为了不糊成一团，这里只保留了最主要的那一条边。</text>
-
-      <text x="810" y="258" font-size="12" fill="#94a3b8">其余环节的进展，最后都要先经过左边这一段</text>
+      <text x="304" y="140" font-size="14" font-weight="700" fill="#fff" text-anchor="middle">有标准答案</text>
+      <text x="304" y="164" font-size="14" font-weight="700" fill="#fff" text-anchor="middle">＝ 能自动判分</text>
+      <text x="304" y="188" font-size="14" font-weight="700" fill="#fff" text-anchor="middle">＝ 能海量刷</text>
+      <text x="836" y="148" font-size="14.5" font-weight="700" fill="#5b6675" text-anchor="middle">这四根矮柱，正对着前面四页</text>
+      <text x="836" y="172" font-size="14.5" font-weight="700" fill="#5b6675" text-anchor="middle">连续学习 · 具身智能 · 世界模型 · RSI</text>
+      <text x="836" y="196" font-size="13.5" fill="#94a3b8" text-anchor="middle">它们矮，正是因为「怎么判对错」还没解决</text>
     </svg>
-    <div class="g3" style="margin-top:12px">
-      <div class="note b-blue"><div class="t blue">箭头是有方向的</div>
-        <div class="sub">上游不动，下游就拿不到料。<b>具身不动，世界模型能拿到的因果数据就只剩视频</b>；底座不动，好的判分器也训不出来，验证那一格只会更紧。</div></div>
-      <div class="note b-red"><div class="t red">两个红格子是同一件事的两半</div>
-        <div class="sub">一个负责判断「这次改好了没有」，一个负责把改动<b>留在权重里</b>。缺任何一个，环都闭不上——<b class="red">RSI 那一格就永远亮不起来。</b></div></div>
-      <div class="note b-purple"><div class="t purple">RSI 不是旁边多出来的一条路</div>
-        <div class="sub">它在这条链的<b>末端</b>：前面两个红格子都通了，RSI 那一格才亮得起来。<b class="purple">所以谈 RSI，绕不开先谈判分和写回。</b></div></div>
-    </div>
-    <div class="note b-purple" style="margin-top:12px"><div class="t purple">这张图的读法：不是挑一个主题站队，而是找链上最紧的那一环</div>
-      <div class="sub">整体速度由最紧的一环决定，而今天最紧的两环都是红的：<b class="red">既没有足够多、足够严的判分器，也没有把学到的东西写回权重的通道</b>。其他主题的所有进展，最后都要经过这两格，才能变成「模型自己会变强」。<b>如果只盯一件事，就盯这两格什么时候不再是红的。</b></div></div>
-    <div class="src mt">本章不给时间表；所述证据均为已公开发生的事实，判断部分为作者观点　·　整理日期 2026-08</div>
+    <div class="note b-orange mt"><div class="t orange">怎么读这张图</div>
+      <div class="sub"><b>高矮的分界线不是「难不难」，是「能不能自动判对错」。</b>凡是能写程序判分的，模型已经越线；凡是判分要靠人、靠时间、靠真实后果的，就还矮着——<b class="red">所以 AGI 的进度条，本质上是「可验证的范围能扩多大」的进度条。</b></div></div>
+    <div class="note b-red" style="margin-top:12px"><div class="t red">一个反复出现的误读</div>
+      <div class="sub">拿蓝柱去推断灰柱：「数学都拿金牌了，收拾房间还远吗？」——<b>远。它们不在同一条曲线上。</b>反过来也一样，拿灰柱否定蓝柱同样不成立。</div></div>
+  </div>
+</section>
+<section class="slide" data-act="收口">
+  <div class="hd"><h2>六块拼图，各自卡在哪</h2></div>
+  <div class="bd">
+    <div class="p mb">这六件事没有一件是已经解决的。把分歧摊开看会发现一个规律：<b class="orange">争的几乎从来不是「方向对不对」，而是「还要多久、要不要换路子」。</b></div>
+    <table class="tbl s mt">
+      <tr><th style="width:150px">拼图</th><th style="width:150px">今天的卡点</th><th>乐观方说</th><th>怀疑方说</th></tr>
+      <tr><td><b class="blue">Scaling</b></td><td>高质量数据见底<br><span class="dim">电力与芯片产能</span></td><td>阵地换到后训练和推理时，曲线没断</td><td>换阵地就是承认老路走完了，新阵地更贵</td></tr>
+      <tr><td><b class="green">RL + 可验证环境</b></td><td>能自动判分的事太少</td><td>可验证的范围一直在扩，环境可以造</td><td>真正有价值的活大多判不了分</td></tr>
+      <tr><td><b class="purple">世界模型</b></td><td>推远了就失真<br><span class="dim">因果与交互不可靠</span></td><td>它同时供给具身和 RL，是最划算的一块</td><td>把画面预测得像，不等于理解物理</td></tr>
+      <tr><td><b class="purple">连续学习</b></td><td>灾难性遗忘<br><span class="dim">至今没有干净解法</span></td><td>先用记忆和检索顶住，够用</td><td>不改权重就不算学会，笔记替代不了</td></tr>
+      <tr><td><b class="orange">具身智能</b></td><td>真机数据攒得慢<br><span class="dim">仿真搬不到真机</span></td><td>大模型直接出动作已跑通，剩下是量</td><td>莫拉维克悖论没被绕开，感知运动仍最难</td></tr>
+      <tr><td><b class="red">RSI</b></td><td>缺判分、缺留存<br><span class="dim">要等上面两格</span></td><td>研发环节最容易自动化，一通则全通</td><td>算力和真实实验的周期，AI 缩不短</td></tr>
+    </table>
+    <div class="note b-orange mt"><div class="t orange">一条贯穿全章的线索</div>
+      <div class="sub">六格的卡点可以收成同一句话：<b>凡是能被自动判对错的，进展快得惊人；凡是判不了的，进展慢得反常。</b><b class="red">所以真正的胜负手不是「模型再大一点」，而是「有多少事能被变成可验证的」。</b></div></div>
+    <div class="src mt">图为示意，用于表达相对关系　·　所列证据均为已公开发生的事实，「乐观 / 怀疑」两栏为双方各自的观点，本章不给时间表　·　整理日期 2026-08</div>
   </div>
 </section>
 <!--SLIDES-END-->
