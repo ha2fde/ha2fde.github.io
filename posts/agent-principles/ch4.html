@@ -192,7 +192,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
   <div class="bd">
     <div class="g2">
       <div>
-        <div class="cap mb">① 宿主发请求，带上工具定义和用户消息</div>
+        <div class="cap mb">① 宿主程序（客户端）发请求，带上工具定义和用户消息</div>
         <div class="code" style="font-size:12.5px">  {
     "model": "...",
     "tools": [ { "name": "get_weather", ... } ],
@@ -375,7 +375,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
     <svg viewBox="0 0 1160 300" width="100%" height="300" style="display:block">
       <g font-family="PingFang SC,Hiragino Sans GB,-apple-system,sans-serif">
         <rect x="20" y="40" width="360" height="220" rx="8" fill="none" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="5 4"/>
-        <text x="40" y="30" font-size="13" fill="#2563eb">宿主进程（你装的那个客户端）</text>
+        <text x="40" y="30" font-size="13" fill="#2563eb">宿主程序（你装的那个客户端）</text>
 
         <rect x="45"  y="110" width="140" height="80" rx="6" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
         <text x="115" y="145" font-size="14" fill="#1f2937" text-anchor="middle">Agent</text>
@@ -480,7 +480,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
       <div class="card t-purple"><div class="t purple">Tools　→ 模型决定</div>
         <div class="cap">可执行的动作。<b>放进上下文后，由模型自己判断什么时候调、调哪个。</b><br><br>这是唯一会主动改变外部状态的一类，因此也是权限设计的重点对象。<br><br><span style="font-family:var(--mono);font-size:12px">tools/list　tools/call</span></div></div>
       <div class="card t-blue"><div class="t blue">Resources　→ 应用决定</div>
-        <div class="cap">可读取的数据，比如一个文件、一条数据库记录、一份日志。<br><br><b>模型不能自己去取</b>——由宿主应用决定把哪些资源放进上下文。<br><br>它是「给模型看的材料」，不是「给模型用的动作」。<br><br><span style="font-family:var(--mono);font-size:12px">resources/list　resources/read</span></div></div>
+        <div class="cap">可读取的数据，比如一个文件、一条数据库记录、一份日志。<br><br><b>模型不能自己去取</b>——由宿主决定把哪些资源放进上下文。<br><br>它是「给模型看的材料」，不是「给模型用的动作」。<br><br><span style="font-family:var(--mono);font-size:12px">resources/list　resources/read</span></div></div>
       <div class="card t-green"><div class="t green">Prompts　→ 用户决定</div>
         <div class="cap">预置好的提示词模板，通常暴露成用户可以主动选的一个命令或菜单项。<br><br><b>由用户触发</b>，模型和应用都不会自己去用它。<br><br><span style="font-family:var(--mono);font-size:12px">prompts/list　prompts/get</span></div></div>
     </div>
@@ -616,7 +616,7 @@ some-tool --version</div>
     <div class="p mb">tools、MCP、CLI 到这里都讲完了。把它们放进同一张表，会发现<b>绝大多数格子是一样的</b>——真正不同的只有一行。</div>
     <table class="tbl">
       <tr><th style="width:22%"></th><th style="width:26%">tools</th><th style="width:26%">MCP</th><th>CLI</th></tr>
-      <tr><td><b>谁定义能力</b></td><td>宿主应用的开发者</td><td>Server 的开发者（可以是别人）</td><td>没人专门定义，机器上装了什么就是什么</td></tr>
+      <tr><td><b>谁定义能力</b></td><td>宿主程序的开发者</td><td>Server 的开发者（可以是别人）</td><td>没人专门定义，机器上装了什么就是什么</td></tr>
       <tr><td><b>怎么传到模型面前</b></td><td>请求里的 <span style="font-family:var(--mono);font-size:13px">tools</span> 数组</td><td>Client 取回后，<b>拍平进同一个 tools 数组</b></td><td>就一条 <span style="font-family:var(--mono);font-size:13px">bash</span> 工具，也在这个数组里</td></tr>
       <tr><td><b>模型看到什么</b></td><td colspan="3" class="green" style="text-align:center"><b>完全一样：一份工具清单——名字、说明、参数形状</b></td></tr>
       <tr><td><b>谁执行</b></td><td colspan="3" class="green" style="text-align:center"><b>完全一样：宿主程序。模型只发起，从不执行</b></td></tr>

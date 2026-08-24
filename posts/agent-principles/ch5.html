@@ -166,6 +166,29 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
       <div class="card t-red"><div class="t red">⑥ 没人认领它的产出</div>
         <div class="cap">「Agent 写的报告出了错，算谁的」——这个问题在上线评审上被问出来，而团队没准备过答案。<b>于是无限期搁置。</b></div></div>
     </div>
+        <div class="mb">
+      <svg viewBox="0 0 1168 152" style="width:100%;height:auto;display:block">
+        <defs><marker id="c5a" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0 L9 4.5 L0 9 z" fill="#94a3b8"/></marker></defs>
+        <text x="188" y="18" text-anchor="middle" font-size="14" fill="#5b6675">做 demo 的时候</text>
+        <text x="576" y="18" text-anchor="middle" font-size="14" fill="#c2410c">上线评审那一天</text>
+        <text x="972" y="18" text-anchor="middle" font-size="14" fill="#dc2626">真上线之后</text>
+        <rect x="8" y="30" width="360" height="112" rx="10" fill="#fafbfd" stroke="#e2e8f0" stroke-width="1.5"/>
+        <rect x="396" y="30" width="360" height="112" rx="10" fill="#fff7ed" stroke="#e2e8f0" stroke-width="1.5"/>
+        <rect x="784" y="30" width="376" height="112" rx="10" fill="#fef2f2" stroke="#e2e8f0" stroke-width="1.5"/>
+        <line x1="370" y1="86" x2="392" y2="86" stroke="#94a3b8" stroke-width="2" marker-end="url(#c5a)"/>
+        <line x1="758" y1="86" x2="780" y2="86" stroke="#94a3b8" stroke-width="2" marker-end="url(#c5a)"/>
+        <text x="188" y="80" text-anchor="middle" font-size="16" fill="#1f2937">六条一条都不显形</text>
+        <text x="188" y="108" text-anchor="middle" font-size="13" fill="#94a3b8">主流程能跑通，看起来一切正常</text>
+        <text x="416" y="62" font-size="14" fill="#1f2937">③ 算不过账</text>
+        <text x="416" y="92" font-size="14" fill="#1f2937">⑤ 权限一刀切</text>
+        <text x="416" y="122" font-size="14" fill="#1f2937">⑥ 没人认领产出</text>
+        <text x="740" y="92" text-anchor="end" font-size="13" fill="#c2410c">当场把你挡下来</text>
+        <text x="804" y="62" font-size="14" fill="#1f2937">① 剩下那一成没人管</text>
+        <text x="804" y="92" font-size="14" fill="#1f2937">② 不敢改，也不敢上</text>
+        <text x="804" y="122" font-size="14" fill="#1f2937">④ 出事了查不清</text>
+        <text x="1144" y="92" text-anchor="end" font-size="13" fill="#dc2626">一直耗着你</text>
+      </svg>
+    </div>
     <div class="note b-orange"><div class="t orange">这六条的共同点</div>
       <div class="cap"><b>没有一条是模型能力问题。</b>换个更强的模型，六条一条都不会消失。<br>它们全都是<b>工程和组织问题</b>——也正因为如此，它们全都是你能提前设计的。</div></div>
   </div>
@@ -186,11 +209,30 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
   </div>
 </section>
 
+<section class="slide" data-act="开场">
+  <div class="hd"><h2>凭什么能上线：七个问题，七个不同的提问人</h2></div>
+  <div class="bd">
+    <div class="p mb">demo 到生产之所以难，是因为<b>提问的人换了</b>。demo 阶段只有你一个提问人，上线评审上会坐进来六个。下面每一节对应一个人的问题。</div>
+    <table class="tbl">
+      <tr><th style="width:13%">谁在问</th><th style="width:30%">他的问题</th><th style="width:27%">demo 阶段的答案</th><th>生产要求的答案</th></tr>
+      <tr><td class="purple"><b>你自己</b><br><span class="dim">评估</span></td><td>我改的这一版，到底是变好了还是变差了？</td><td>「感觉好多了」</td><td class="purple"><b>一组固定的例子，一个能重复跑出来的分数。</b><span class="dim">放最前，因为其余六项的改进都要靠它来验证。</span></td></tr>
+      <tr><td class="blue"><b>用户</b><br><span class="dim">记忆</span></td><td>为什么它不知道我们公司的情况，也不记得我上次说过什么？</td><td>「我在提示词里贴给它了」</td><td class="blue"><b>该带的信息每次自动带上，且带得准、带得省。</b></td></tr>
+      <tr><td class="red"><b>安全</b><br><span class="dim">安全</span></td><td>它能碰到什么？被人骗了会怎样？</td><td>「我用的是自己的账号」</td><td class="red"><b>权限按最小面给，外来内容一律当不可信。</b></td></tr>
+      <tr><td class="orange"><b>法务与合规</b><br><span class="dim">治理</span></td><td>它做的决定，谁负责？出事怎么追？</td><td>「还没想过」</td><td class="orange"><b>责任人明确，动作可追溯，数据去向可说明。</b></td></tr>
+      <tr><td class="green"><b>财务</b><br><span class="dim">成本与延迟</span></td><td>一次多少钱？多久出结果？规模上去了呢？</td><td>「跑一次好像几分钱」</td><td class="green"><b>单位成本算得清，且比它替代的方式便宜。</b></td></tr>
+      <tr><td class="blue"><b>值班的人</b><br><span class="dim">可观测性</span></td><td>用户说结果不对，这一次到底发生了什么？</td><td>「我翻翻终端记录」</td><td class="blue"><b>任意一次执行都能完整回放。</b></td></tr>
+      <tr><td class="orange"><b>业务负责人</b><br><span class="dim">人在环</span></td><td>哪些事它能自己做主，哪些要先问人？</td><td>「我一直看着呢」</td><td class="orange"><b>审批点固定在流程里，不靠人盯着。</b></td></tr>
+    </table>
+    <div class="note b-purple mt2"><div class="t purple">这张表就是这一章后半段的目录</div>
+      <div class="cap">顺序是有讲究的：<b>评估必须在最前</b>——没有它，后面六项的任何改动都无法验证是不是真的改好了。</div></div>
+  </div>
+</section>
+
 <section class="slide" data-act="控制权">
   <div class="hd"><h2>一条轴，先把所有做法放上去</h2></div>
   <div class="bd">
     <div class="p mb">「用不用 Agent」是个假问题。真实的问题只有一个：<b>下一步做什么，由谁决定。</b>这不是二选一，是一条连续的轴——你的每个功能都落在这条轴的某个位置上。</div>
-    <svg viewBox="0 0 1160 250" width="100%" height="250" style="display:block">
+    <svg viewBox="0 0 1160 400" style="width:100%;height:auto;display:block">
       <g font-family="PingFang SC,Hiragino Sans GB,-apple-system,sans-serif">
         <rect x="40" y="16" width="200" height="52" rx="6" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
         <text x="140" y="48" font-size="15" fill="#1f2937" text-anchor="middle">流程全固定</text>
@@ -234,6 +276,17 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
 
         <text x="40" y="232" font-size="13" fill="#2563eb">← 可预测、可测试、可审计，但只能处理你想到的情况</text>
         <text x="1100" y="232" font-size="13" fill="#7c3aed" text-anchor="end">能处理你没想到的情况，但每次都可能不一样 →</text>
+        <line x1="40" y1="272" x2="1100" y2="272" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="6 5"/>
+        <text x="40" y="300" font-size="13" fill="#5b6675">同一个产品里，不同功能落在不同位置——比如一个客服系统：</text>
+        <rect x="40" y="318" width="200" height="42" rx="6" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="140" y="344" font-size="14" fill="#1f2937" text-anchor="middle">工单自动分类</text>
+        <text x="140" y="382" font-size="12" fill="#94a3b8" text-anchor="middle">模型只做一次判断</text>
+        <rect x="300" y="318" width="200" height="42" rx="6" fill="#ecfdf5" stroke="#047857" stroke-width="1.5"/>
+        <text x="400" y="344" font-size="14" fill="#1f2937" text-anchor="middle">回复草稿生成</text>
+        <text x="400" y="382" font-size="12" fill="#94a3b8" text-anchor="middle">抽取 → 起草 → 校验，三步固定</text>
+        <rect x="900" y="318" width="200" height="42" rx="6" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="1000" y="344" font-size="14" fill="#1f2937" text-anchor="middle">疑难工单排查</text>
+        <text x="1000" y="382" font-size="12" fill="#94a3b8" text-anchor="middle">查哪儿取决于看到什么</text>
       </g>
     </svg>
   </div>
@@ -262,6 +315,43 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
   <div class="hd"><h2>做法一：代码决定每一步</h2></div>
   <div class="bd">
     <div class="p mb">模型在这里是一个<b>被调用的函数</b>：给它一段输入，拿到一段输出，接下来做什么由代码判断。它有几种反复出现的形状。</div>
+        <div class="mb">
+      <svg viewBox="0 0 1168 118" style="width:100%;height:auto;display:block">
+        <defs><marker id="c5b" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0 L8 4 L0 8 z" fill="#94a3b8"/></marker></defs>
+        <rect x="30" y="45" width="56" height="28" rx="6" fill="#ffffff" stroke="#0e9f6e" stroke-width="1.5"/>
+        <rect x="112" y="45" width="56" height="28" rx="6" fill="#ffffff" stroke="#0e9f6e" stroke-width="1.5"/>
+        <rect x="194" y="45" width="56" height="28" rx="6" fill="#ffffff" stroke="#0e9f6e" stroke-width="1.5"/>
+        <line x1="88" y1="59" x2="110" y2="59" stroke="#94a3b8" stroke-width="2" marker-end="url(#c5b)"/>
+        <line x1="170" y1="59" x2="192" y2="59" stroke="#94a3b8" stroke-width="2" marker-end="url(#c5b)"/>
+        <rect x="354" y="45" width="56" height="28" rx="6" fill="#ffffff" stroke="#0e9f6e" stroke-width="1.5"/>
+        <line x1="412" y1="59" x2="430" y2="59" stroke="#94a3b8" stroke-width="2" marker-end="url(#c5b)"/>
+        <path d="M434 31 L434 87" stroke="#94a3b8" stroke-width="2" fill="none"/>
+        <line x1="434" y1="31" x2="456" y2="31" stroke="#94a3b8" stroke-width="2" marker-end="url(#c5b)"/>
+        <line x1="434" y1="87" x2="456" y2="87" stroke="#94a3b8" stroke-width="2" marker-end="url(#c5b)"/>
+        <rect x="458" y="17" width="60" height="28" rx="6" fill="#ffffff" stroke="#0e9f6e" stroke-width="1.5"/>
+        <rect x="458" y="73" width="60" height="28" rx="6" fill="#ffffff" stroke="#0e9f6e" stroke-width="1.5"/>
+        <rect x="620" y="45" width="56" height="28" rx="6" fill="#ffffff" stroke="#0e9f6e" stroke-width="1.5"/>
+        <path d="M688 31 L688 87" stroke="#94a3b8" stroke-width="2" fill="none"/>
+        <path d="M676 59 L688 59" stroke="#94a3b8" stroke-width="2" fill="none"/>
+        <line x1="688" y1="31" x2="698" y2="31" stroke="#94a3b8" stroke-width="2" marker-end="url(#c5b)"/>
+        <line x1="688" y1="59" x2="698" y2="59" stroke="#94a3b8" stroke-width="2" marker-end="url(#c5b)"/>
+        <line x1="688" y1="87" x2="698" y2="87" stroke="#94a3b8" stroke-width="2" marker-end="url(#c5b)"/>
+        <rect x="700" y="19" width="52" height="24" rx="6" fill="#ffffff" stroke="#0e9f6e" stroke-width="1.5"/>
+        <rect x="700" y="47" width="52" height="24" rx="6" fill="#ffffff" stroke="#0e9f6e" stroke-width="1.5"/>
+        <rect x="700" y="75" width="52" height="24" rx="6" fill="#ffffff" stroke="#0e9f6e" stroke-width="1.5"/>
+        <path d="M764 31 L764 87" stroke="#94a3b8" stroke-width="2" fill="none"/>
+        <path d="M752 31 L764 31" stroke="#94a3b8" stroke-width="2" fill="none"/>
+        <path d="M752 59 L764 59" stroke="#94a3b8" stroke-width="2" fill="none"/>
+        <path d="M752 87 L764 87" stroke="#94a3b8" stroke-width="2" fill="none"/>
+        <line x1="764" y1="59" x2="786" y2="59" stroke="#94a3b8" stroke-width="2" marker-end="url(#c5b)"/>
+        <rect x="788" y="45" width="56" height="28" rx="6" fill="#ffffff" stroke="#0e9f6e" stroke-width="1.5"/>
+        <rect x="950" y="39" width="64" height="28" rx="6" fill="#ffffff" stroke="#0e9f6e" stroke-width="1.5"/>
+        <line x1="1014" y1="53" x2="1040" y2="53" stroke="#94a3b8" stroke-width="2" marker-end="url(#c5b)"/>
+        <rect x="1042" y="39" width="64" height="28" rx="6" fill="#ffffff" stroke="#0e9f6e" stroke-width="1.5"/>
+        <path d="M1074 67 L1074 92 L982 92 L982 71" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#c5b)"/>
+        <text x="1028" y="110" text-anchor="middle" font-size="12" fill="#94a3b8">不合格就打回</text>
+      </svg>
+    </div>
     <div class="g4 mb">
       <div class="card t-green"><div class="t green">串行</div>
         <div class="cap">上一步的输出是下一步的输入。<br><br><b>用在</b>：能拆成固定几步的活——先抽取、再归类、最后成文。</div></div>
@@ -285,6 +375,23 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
   <div class="hd"><h2>做法二：模型决定每一步</h2></div>
   <div class="bd">
     <div class="p mb">这就是自主循环：给它目标和一组工具，然后<b>反复地「想一步 → 做一件事 → 看结果 → 再想一步」</b>，直到它认为完成。代码在这里只负责执行工具和收结果，不参与决定。</div>
+        <div class="mb">
+      <svg viewBox="0 0 1168 186" style="width:100%;height:auto;display:block">
+        <defs><marker id="c5d" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0 L9 4.5 L0 9 z" fill="#94a3b8"/></marker></defs>
+        <rect x="40" y="44" width="150" height="46" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/><text x="115" y="73" text-anchor="middle" font-size="15" fill="#1f2937">想一步</text>
+        <rect x="230" y="44" width="150" height="46" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/><text x="305" y="73" text-anchor="middle" font-size="15" fill="#1f2937">做一件事</text>
+        <rect x="420" y="44" width="150" height="46" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/><text x="495" y="73" text-anchor="middle" font-size="15" fill="#1f2937">看结果</text>
+        <line x1="192" y1="67" x2="228" y2="67" stroke="#94a3b8" stroke-width="2" marker-end="url(#c5d)"/>
+        <line x1="382" y1="67" x2="418" y2="67" stroke="#94a3b8" stroke-width="2" marker-end="url(#c5d)"/>
+        <path d="M495 90 L495 126 L115 126 L115 94" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#c5d)"/>
+        <text x="305" y="150" text-anchor="middle" font-size="13" fill="#94a3b8">代码只负责执行和收结果，不参与决定</text>
+        <line x1="610" y1="16" x2="610" y2="176" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="6 5"/>
+        <text x="652" y="30" font-size="14" fill="#c2410c">这个圈能不能上线，看的是右边这三样</text>
+        <circle cx="652" cy="67" r="5" fill="#dc2626"/><text x="670" y="72" font-size="15" fill="#dc2626">硬停止条件</text><text x="768" y="72" font-size="13" fill="#5b6675">最多多少轮 · 多少钱 · 多久</text>
+        <circle cx="652" cy="113" r="5" fill="#dc2626"/><text x="670" y="118" font-size="15" fill="#dc2626">失败可见</text><text x="768" y="118" font-size="13" fill="#5b6675">做不了就明说，不允许编一个完成</text>
+        <circle cx="652" cy="159" r="5" fill="#dc2626"/><text x="670" y="164" font-size="15" fill="#dc2626">全程留痕</text><text x="768" y="164" font-size="13" fill="#5b6675">每一轮想了什么、调了什么、看到什么</text>
+      </svg>
+    </div>
     <div class="g2 mb">
       <div class="card t-purple"><div class="t purple">它换来的那一样东西</div>
         <div class="cap"><b>你不需要提前知道路径。</b><br><br>「把这个报错查清楚」——查哪个日志、要不要看代码、要不要复现，取决于第一眼看到了什么。这类任务写不出流程图，<b>因为流程图本身就依赖于中间结果。</b><br><br>这是往右走唯一的理由。如果路径能提前写出来，就不该用它。</div></div>
@@ -406,25 +513,6 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
   </div>
 </section>
 
-<section class="slide" data-act="上线">
-  <div class="hd"><h2>凭什么能上线：七个问题，七个不同的提问人</h2></div>
-  <div class="bd">
-    <div class="p mb">demo 到生产之所以难，是因为<b>提问的人换了</b>。demo 阶段只有你一个提问人，上线评审上会坐进来六个。下面每一节对应一个人的问题。</div>
-    <table class="tbl">
-      <tr><th style="width:13%">谁在问</th><th style="width:30%">他的问题</th><th style="width:27%">demo 阶段的答案</th><th>生产要求的答案</th></tr>
-      <tr><td class="purple"><b>你自己</b><br><span class="dim">评估</span></td><td>我改的这一版，到底是变好了还是变差了？</td><td>「感觉好多了」</td><td class="purple"><b>一组固定的例子，一个能重复跑出来的分数。</b><span class="dim">放最前，因为其余六项的改进都要靠它来验证。</span></td></tr>
-      <tr><td class="blue"><b>用户</b><br><span class="dim">记忆</span></td><td>为什么它不知道我们公司的情况，也不记得我上次说过什么？</td><td>「我在提示词里贴给它了」</td><td class="blue"><b>该带的信息每次自动带上，且带得准、带得省。</b></td></tr>
-      <tr><td class="red"><b>安全</b><br><span class="dim">安全</span></td><td>它能碰到什么？被人骗了会怎样？</td><td>「我用的是自己的账号」</td><td class="red"><b>权限按最小面给，外来内容一律当不可信。</b></td></tr>
-      <tr><td class="orange"><b>法务与合规</b><br><span class="dim">治理</span></td><td>它做的决定，谁负责？出事怎么追？</td><td>「还没想过」</td><td class="orange"><b>责任人明确，动作可追溯，数据去向可说明。</b></td></tr>
-      <tr><td class="green"><b>财务</b><br><span class="dim">成本与延迟</span></td><td>一次多少钱？多久出结果？规模上去了呢？</td><td>「跑一次好像几分钱」</td><td class="green"><b>单位成本算得清，且比它替代的方式便宜。</b></td></tr>
-      <tr><td class="blue"><b>值班的人</b><br><span class="dim">可观测性</span></td><td>用户说结果不对，这一次到底发生了什么？</td><td>「我翻翻终端记录」</td><td class="blue"><b>任意一次执行都能完整回放。</b></td></tr>
-      <tr><td class="orange"><b>业务负责人</b><br><span class="dim">人在环</span></td><td>哪些事它能自己做主，哪些要先问人？</td><td>「我一直看着呢」</td><td class="orange"><b>审批点固定在流程里，不靠人盯着。</b></td></tr>
-    </table>
-    <div class="note b-purple mt2"><div class="t purple">这张表就是这一章后半段的目录</div>
-      <div class="cap">顺序是有讲究的：<b>评估必须在最前</b>——没有它，后面六项的任何改动都无法验证是不是真的改好了。</div></div>
-  </div>
-</section>
-
 <section class="slide" data-act="评估">
   <div class="hd"><h2>评估：为什么它必须是第一件事</h2></div>
   <div class="bd">
@@ -470,6 +558,27 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
   <div class="hd"><h2>记忆：先分清是哪一种「记不住」</h2></div>
   <div class="bd">
     <div class="p mb">「它记不住」是个笼统的抱怨，底下其实是三个完全不同的问题，解法也完全不同。<b>先分清是哪一种，再谈方案。</b></div>
+        <div class="mb">
+      <svg viewBox="0 0 1168 172" style="width:100%;height:auto;display:block">
+        <defs><marker id="c5c" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0 L9 4.5 L0 9 z" fill="#94a3b8"/></marker></defs>
+        <rect x="404" y="30" width="360" height="112" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+        <text x="584" y="56" text-anchor="middle" font-size="15" fill="#2563eb">这一次请求的上下文</text>
+        <text x="584" y="86" text-anchor="middle" font-size="14" fill="#1f2937">① 工具回执把它撑爆了</text>
+        <text x="584" y="112" text-anchor="middle" font-size="13" fill="#94a3b8">早期内容被挤掉或淹没</text>
+        <rect x="8" y="46" width="230" height="80" rx="10" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+        <text x="123" y="76" text-anchor="middle" font-size="15" fill="#0e9f6e">② 跨会话存储</text>
+        <text x="123" y="102" text-anchor="middle" font-size="13" fill="#94a3b8">偏好、约定、历史结论</text>
+        <line x1="240" y1="86" x2="400" y2="86" stroke="#94a3b8" stroke-width="2" marker-end="url(#c5c)"/>
+        <text x="320" y="76" text-anchor="middle" font-size="12" fill="#5b6675">按需读回来</text>
+        <rect x="930" y="46" width="230" height="80" rx="10" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="1045" y="76" text-anchor="middle" font-size="15" fill="#7c3aed">③ 外部知识库</text>
+        <text x="1045" y="102" text-anchor="middle" font-size="13" fill="#94a3b8">产品、流程、内部数据</text>
+        <line x1="928" y1="86" x2="768" y2="86" stroke="#94a3b8" stroke-width="2" marker-end="url(#c5c)"/>
+        <text x="848" y="76" text-anchor="middle" font-size="12" fill="#5b6675">用的时候去查</text>
+        <text x="584" y="164" text-anchor="middle" font-size="13" fill="#5b6675">三者最后都变成同一件事：这一次上下文里到底装了什么——区别只在于它从哪里来
+        </text>
+      </svg>
+    </div>
     <div class="g3 mb">
       <div class="card t-blue"><div class="t blue">① 这一轮之内的记不住</div>
         <div class="cap"><b>现象</b>：任务做到一半，前面看过的东西忘了、或者开始重复之前做过的步骤。<br><br><b>原因</b>：上下文被工具回执塞满了，早期内容被挤掉或淹没。<br><br><b>解法</b>：控制回执大小、阶段性把中间结论写成一份摘要、把大块内容存到外部只留引用。<br><br><span class="dim">这是上下文管理问题，不是「记忆」问题。</span></div></div>
@@ -515,7 +624,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
           <li><b>能碰生产环境。</b>demo 阶段图方便直接连了生产库，然后就一直没改。<b>默认连非生产环境</b>，接生产是需要单独评审的动作。</li>
         </div></div>
       <div class="card t-orange"><div class="t orange">怎么定这个「最小面」</div>
-        <div class="cap">列出它要完成的任务，<b>逐个任务问：为了做成这件事，最少需要哪些权限？</b>然后把并集给它，别多给。<br><br>几个具体的收窄手段：<br>· <b>限定范围</b>——只能访问指定目录、指定表、指定项目。<br>· <b>限定动作</b>——枚举允许的操作，不在名单里的直接拒。<br>· <b>限定用量</b>——每小时最多调多少次、单次最多处理多少条。<br>· <b>加时效</b>——凭证短期有效，过期重新签发。<br><br><b>这些约束都在宿主侧执行，不写在提示词里。</b>写在提示词里的约束，是建议，不是限制。</div></div>
+        <div class="cap">列出它要完成的任务，<b>逐个任务问：为了做成这件事，最少需要哪些权限？</b>然后把并集给它，别多给。<br><br>几个具体的收窄手段：<br>· <b>限定范围</b>——只能访问指定目录、指定表、指定项目。<br>· <b>限定动作</b>——枚举允许的操作，不在名单里的直接拒。<br>· <b>限定用量</b>——每小时最多调多少次、单次最多处理多少条。<br>· <b>加时效</b>——凭证短期有效，过期重新签发。<br><br><b>这些约束都在你自己的应用侧执行，不写在提示词里。</b>写在提示词里的约束，是建议，不是限制。</div></div>
     </div>
     <div class="note b-red"><div class="t red">一个容易忽略的方向：输出也要管</div>
       <div class="cap">大家通常只盯着「它能做什么」，但<b>「它能把什么送出去」同样重要</b>。一个能读内部文档、又能发外部请求的 Agent，两个权限单独看都合理，组合起来就是一条数据外泄的通路。<br><b>检查权限时，永远要看组合，不能只看单项。</b></div></div>
@@ -578,6 +687,25 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
   <div class="hd"><h2>延迟：它比成本更早被用户感知</h2></div>
   <div class="bd">
     <div class="p mb">一个自主循环跑十轮，每轮几秒，加上工具执行，一次任务几十秒到几分钟很正常。<b>这个时长在一个对话框里是灾难，在一个后台任务里毫无问题。</b>——所以延迟的可接受程度，取决于交互形态，而交互形态是你能选的。</div>
+        <div class="mb">
+      <svg viewBox="0 0 1168 168" style="width:100%;height:auto;display:block">
+        <line x1="200" y1="132" x2="1150" y2="132" stroke="#cbd5e1" stroke-width="1.5"/>
+        <text x="182" y="48" text-anchor="end" font-size="14" fill="#2563eb">同步对话</text>
+        <text x="182" y="86" text-anchor="end" font-size="14" fill="#0e9f6e">可见进度</text>
+        <text x="182" y="124" text-anchor="end" font-size="14" fill="#c2410c">异步交付</text>
+        <rect x="200" y="30" width="180" height="26" rx="5" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+        <rect x="200" y="68" width="460" height="26" rx="5" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+        <rect x="200" y="106" width="950" height="26" rx="5" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/>
+        <text x="394" y="48" font-size="13" fill="#5b6675">几秒就到顶，只适合往左的做法</text>
+        <text x="674" y="86" font-size="13" fill="#5b6675">把每一步显示出来，几十秒变得可接受</text>
+        <text x="1140" y="124" text-anchor="end" font-size="13" fill="#7c2d12">几分钟到几小时都没问题</text>
+        <text x="200" y="152" text-anchor="middle" font-size="12" fill="#94a3b8">1 秒</text>
+        <text x="440" y="152" text-anchor="middle" font-size="12" fill="#94a3b8">10 秒</text>
+        <text x="660" y="152" text-anchor="middle" font-size="12" fill="#94a3b8">1 分钟</text>
+        <text x="900" y="152" text-anchor="middle" font-size="12" fill="#94a3b8">10 分钟</text>
+        <text x="1120" y="152" text-anchor="middle" font-size="12" fill="#94a3b8">1 小时</text>
+      </svg>
+    </div>
     <div class="g3 mb">
       <div class="card t-blue"><div class="t blue">先选对形态</div>
         <div class="cap">· <b>同步对话</b>：用户盯着等。这里能容忍的上限很低，基本只适合往左的做法。<br>· <b>可见进度</b>：把每一步在界面上显示出来。<b>等待感会大幅下降</b>，几十秒变得可接受。<br>· <b>异步交付</b>：提交后去做别的，完成了通知。<b>几分钟到几小时都没问题。</b><br><br><b>选错形态，再怎么优化都救不回来。</b></div></div>

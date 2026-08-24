@@ -133,7 +133,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
   <div class="bd">
     <div class="g2">
       <div class="card"><div class="t">起点：一个自回归的下一词预测器</div>
-        <div class="cap mt" style="margin-top:6px">给它一段文本，它输出<b>下一个词元的概率分布</b>；采样一个，接到后面，再预测下一个。循环往复。<br><br>这就是它做的<b>全部</b>事情。它不知道什么是问题、什么是回答，也不知道自己在跟人说话。</div></div>
+        <div class="cap mt" style="margin-top:6px">给它一段文本，它输出<b>下一个词元（token）的概率分布</b>；采样一个，接到后面，再预测下一个。循环往复。<br><br>这就是它做的<b>全部</b>事情。它不知道什么是问题、什么是回答，也不知道自己在跟人说话。</div></div>
       <div class="card t-green"><div class="t green">终点：一个能干活的 Agent</div>
         <div class="cap mt" style="margin-top:6px">给它一个目标，它能拆解步骤、判断自己缺什么信息、发出调用外部工具的请求、拿到结果后接着往下推进，直到任务完成。</div></div>
     </div>
