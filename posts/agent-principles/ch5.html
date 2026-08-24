@@ -198,6 +198,23 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
   <div class="hd"><h2>说到数据，先把两类东西分开</h2></div>
   <div class="bd">
     <div class="p mb">这个话题周围有大量数字在流传。用之前必须先分清一件事：<b>哪些是已经发生的观察，哪些是对未来的预测。</b>两者混着用，会让整个论证变得不可靠。</div>
+        <div class="mb">
+      <svg viewBox="0 0 1168 160" style="width:100%;height:auto;display:block">
+        <defs><marker id="c5e" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0 L9 4.5 L0 9 z" fill="#dc2626"/></marker></defs>
+        <rect x="8" y="34" width="558" height="78" rx="10" fill="#ecfdf5" stroke="#e2e8f0" stroke-width="1.5"/>
+        <rect x="602" y="34" width="558" height="78" rx="10" fill="#fff7ed" stroke="#e2e8f0" stroke-width="1.5"/>
+        <line x1="584" y1="24" x2="584" y2="118" stroke="#5b6675" stroke-width="2"/>
+        <text x="584" y="16" text-anchor="middle" font-size="13" fill="#5b6675">今天</text>
+        <text x="28" y="62" font-size="15" fill="#0e9f6e">已经发生的 · 可以核对</text>
+        <text x="546" y="62" text-anchor="end" font-size="13" fill="#0e9f6e">当依据</text>
+        <text x="28" y="94" font-size="13" fill="#5b6675">落地复盘 · 行业调研里「已上线 / 停在试点」的比例 · 公开的失败案例</text>
+        <text x="622" y="62" font-size="15" fill="#c2410c">还没发生的 · 无从核对</text>
+        <text x="1140" y="62" text-anchor="end" font-size="13" fill="#c2410c">只能当假设</text>
+        <text x="622" y="94" font-size="13" fill="#5b6675">分析机构的预测：「到某年会有多少比例的项目被取消」</text>
+        <path d="M900 114 L900 132 L300 132 L300 116" stroke="#dc2626" stroke-width="2" fill="none" stroke-dasharray="6 5" marker-end="url(#c5e)"/>
+        <text x="600" y="154" text-anchor="middle" font-size="13" fill="#dc2626">最常见的一次性错误：把右边的数字搬到左边，当成现状引用</text>
+      </svg>
+    </div>
     <div class="g2 mb">
       <div class="card t-green"><div class="t green">已发生的：可以当依据</div>
         <div class="cap">企业内部的落地复盘、行业调研里「已上线 / 停留在试点」的比例、公开的失败案例分析。<br><br>这类材料的价值在于<b>它告诉你别人卡在了哪一步</b>——而卡点的分布是相当一致的：评估缺失、成本失控、权限过不了合规。<br><br><b>用它的方式</b>：拿来对照你自己的清单，看有没有漏项。</div></div>
@@ -407,7 +424,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
   <div class="hd"><h2>做法三：代码定骨架，模型定局部</h2></div>
   <div class="bd">
     <div class="p mb">真实产品几乎都落在这里，原因很朴素：<b>一个任务里，不同阶段的确定性是不一样的</b>。有些阶段路径明确，有些阶段确实得当场判断。既然如此，就没必要整条链用同一种控制方式。</div>
-    <svg viewBox="0 0 1160 200" width="100%" height="200" style="display:block">
+    <svg viewBox="0 0 1160 344" style="width:100%;height:auto;display:block">
       <g font-family="PingFang SC,Hiragino Sans GB,-apple-system,sans-serif">
         <text x="40" y="26" font-size="13" fill="#5b6675">一条真实的处理链：外层由代码固定，只有中间那一段交给模型自己循环</text>
         <rect x="40" y="46" width="180" height="66" rx="6" fill="#ecfdf5" stroke="#047857" stroke-width="1.5"/>
@@ -443,6 +460,16 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
         <text x="590" y="174" font-size="13" fill="#7c3aed" text-anchor="middle">不确定性被关在这一段里</text>
         <text x="130" y="174" font-size="13" fill="#047857">左边确定</text>
         <text x="1040" y="174" font-size="13" fill="#047857" text-anchor="middle">右边确定</text>
+        <line x1="40" y1="198" x2="1120" y2="198" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="6 5"/>
+        <text x="40" y="222" font-size="13" fill="#5b6675">用一段时间之后，自主段里某些固定下来的路径被写成代码——同一条链会变成这样：</text>
+        <text x="190" y="264" text-anchor="end" font-size="13" fill="#5b6675">今天</text>
+        <rect x="200" y="246" width="360" height="28" rx="4" fill="#ecfdf5" stroke="#047857" stroke-width="1.5"/><rect x="560" y="246" width="240" height="28" rx="4" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/><rect x="800" y="246" width="80" height="28" rx="4" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/><rect x="880" y="246" width="240" height="28" rx="4" fill="#ecfdf5" stroke="#047857" stroke-width="1.5"/>
+        <text x="380" y="265" text-anchor="middle" font-size="12" fill="#047857">代码固定</text><text x="680" y="265" text-anchor="middle" font-size="12" fill="#7c3aed">自主循环</text><text x="1000" y="265" text-anchor="middle" font-size="12" fill="#047857">代码固定</text>
+        <text x="190" y="308" text-anchor="end" font-size="13" fill="#5b6675">三个月后</text>
+        <rect x="200" y="290" width="480" height="28" rx="4" fill="#ecfdf5" stroke="#047857" stroke-width="1.5"/><rect x="680" y="290" width="120" height="28" rx="4" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/><rect x="800" y="290" width="80" height="28" rx="4" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/><rect x="880" y="290" width="240" height="28" rx="4" fill="#ecfdf5" stroke="#047857" stroke-width="1.5"/>
+        <text x="440" y="309" text-anchor="middle" font-size="12" fill="#047857">代码固定（多了一块）</text><text x="740" y="309" text-anchor="middle" font-size="12" fill="#7c3aed">自主</text><text x="1000" y="309" text-anchor="middle" font-size="12" fill="#047857">代码固定</text>
+        <line x1="800" y1="330" x2="700" y2="330" stroke="#7c3aed" stroke-width="1.5"/><polygon points="692,330 702,325 702,335" fill="#7c3aed"/>
+        <text x="1120" y="334" text-anchor="end" font-size="13" fill="#7c3aed">自主的那一段越缩越小——这是好的方向</text>
       </g>
     </svg>
     <div class="g3 mt">
@@ -480,6 +507,24 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
   <div class="hd"><h2>「用不用框架」是另一个维度，别和上面那条混着讲</h2></div>
   <div class="bd">
     <div class="p mb">这是这一章里最容易搞混的一处。<b>「控制权交出去多少」和「用什么工具来实现」是两条独立的轴</b>——但讨论里它们经常被当成一件事，于是变成「上不上 LangGraph」这种问不出答案的争论。</div>
+        <div class="mb">
+      <svg viewBox="0 0 1168 168" style="width:100%;height:auto;display:block">
+        <text x="615" y="12" text-anchor="middle" font-size="13" fill="#2563eb">控制权 →</text>
+        <text x="342" y="14" text-anchor="end" font-size="13" fill="#7c3aed">实现方式 ↓</text>
+        <text x="480" y="30" text-anchor="middle" font-size="14" fill="#2563eb">流程固定</text>
+        <text x="750" y="30" text-anchor="middle" font-size="14" fill="#2563eb">自主循环</text>
+        <text x="342" y="72" text-anchor="end" font-size="14" fill="#7c3aed">直接调接口</text>
+        <text x="342" y="134" text-anchor="end" font-size="14" fill="#7c3aed">上编排框架</text>
+        <rect x="350" y="40" width="260" height="54" rx="8" fill="#fafbfd" stroke="#e2e8f0" stroke-width="1.5"/><text x="480" y="72" text-anchor="middle" font-size="13" fill="#1f2937">一个脚本调三次接口</text>
+        <rect x="620" y="40" width="260" height="54" rx="8" fill="#fafbfd" stroke="#e2e8f0" stroke-width="1.5"/><text x="750" y="72" text-anchor="middle" font-size="13" fill="#1f2937">几十行手写的循环</text>
+        <rect x="350" y="102" width="260" height="54" rx="8" fill="#fafbfd" stroke="#e2e8f0" stroke-width="1.5"/><text x="480" y="134" text-anchor="middle" font-size="13" fill="#1f2937">常见的过度设计</text>
+        <rect x="620" y="102" width="260" height="54" rx="8" fill="#fafbfd" stroke="#e2e8f0" stroke-width="1.5"/><text x="750" y="134" text-anchor="middle" font-size="13" fill="#1f2937">框架托管的 Agent</text>
+        <text x="910" y="52" font-size="14" fill="#7c3aed">四个格子都成立</text>
+        <text x="910" y="80" font-size="13" fill="#5b6675">所以这是两条轴，不是一条</text>
+        <text x="910" y="116" font-size="13" fill="#5b6675">一旦压成一条，就变成</text>
+        <text x="910" y="140" font-size="13" fill="#dc2626">「上不上某某框架」——问不出答案</text>
+      </svg>
+    </div>
     <div class="g2 mb">
       <div class="card t-blue"><div class="t blue">第一条轴：控制权（前面讲完了）</div>
         <div class="cap">下一步做什么由谁决定。<b>这是设计决定</b>，由业务约束推出来——错了，做出来的东西不满足需求。<br><br>它决定的是：<b>你的系统长什么样。</b></div></div>
@@ -651,6 +696,24 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
   <div class="hd"><h2>治理：出事的时候，谁来负责、怎么说清</h2></div>
   <div class="bd">
     <div class="p mb">这一节最容易被工程团队跳过，也最容易在上线评审的最后十分钟把项目挡下来。<b>它问的不是技术问题，但答案必须由技术来支撑。</b></div>
+        <div class="mb">
+      <svg viewBox="0 0 1168 156" style="width:100%;height:auto;display:block">
+        <defs><marker id="c5g" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0 L8 4 L0 8 z" fill="#94a3b8"/></marker></defs>
+        <text x="8" y="16" font-size="14" fill="#c2410c">一次执行要留下的那一串</text>
+        <rect x="8" y="30" width="200" height="54" rx="8" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/><text x="108" y="52" text-anchor="middle" font-size="13" fill="#1f2937">谁发起的</text>
+        <rect x="244" y="30" width="200" height="54" rx="8" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/><text x="344" y="52" text-anchor="middle" font-size="13" fill="#1f2937">哪一版提示词</text><text x="344" y="72" text-anchor="middle" font-size="13" fill="#1f2937">哪个模型</text>
+        <rect x="480" y="30" width="200" height="54" rx="8" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/><text x="580" y="52" text-anchor="middle" font-size="13" fill="#1f2937">调了哪些工具</text><text x="580" y="72" text-anchor="middle" font-size="13" fill="#1f2937">参数是什么</text>
+        <rect x="716" y="30" width="200" height="54" rx="8" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/><text x="816" y="52" text-anchor="middle" font-size="13" fill="#1f2937">谁确认的</text>
+        <rect x="952" y="30" width="200" height="54" rx="8" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/><text x="1052" y="52" text-anchor="middle" font-size="13" fill="#1f2937">产出是什么</text>
+        <line x1="210" y1="57" x2="242" y2="57" stroke="#94a3b8" stroke-width="2" marker-end="url(#c5g)"/>
+        <line x1="446" y1="57" x2="478" y2="57" stroke="#94a3b8" stroke-width="2" marker-end="url(#c5g)"/>
+        <line x1="682" y1="57" x2="714" y2="57" stroke="#94a3b8" stroke-width="2" marker-end="url(#c5g)"/>
+        <line x1="918" y1="57" x2="950" y2="57" stroke="#94a3b8" stroke-width="2" marker-end="url(#c5g)"/>
+        <path d="M8 96 L8 106 L1152 106 L1152 96" stroke="#cbd5e1" stroke-width="1.5" fill="none"/>
+        <text x="580" y="128" text-anchor="middle" font-size="14" fill="#1f2937">三个月后被问起，这一串要能原样拼回来</text>
+        <text x="580" y="150" text-anchor="middle" font-size="13" fill="#dc2626">少任何一环，「谁批的、依据是什么」就答不上来</text>
+      </svg>
+    </div>
     <div class="g3 mb">
       <div class="card t-orange"><div class="t orange">① 责任归属</div>
         <div class="cap">「这份 Agent 生成的东西出了错，算谁的？」<br><br><b>唯一站得住的答案</b>：每一个上线的 Agent，都对应一个明确的负责人——通常就是这个业务流程原本的负责人。<br><br><b>Agent 不承担责任，它只是一个工具</b>。这一点必须写清楚，而不是留在含糊地带。</div></div>
