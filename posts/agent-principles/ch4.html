@@ -797,6 +797,23 @@ some-tool --version</div>
 <section class="slide" data-act="Skills">
   <div class="hd"><h2>写一个 Skill：四条要点</h2></div>
   <div class="bd">
+        <div class="mb">
+      <svg viewBox="0 0 1168 170" style="width:100%;height:auto;display:block">
+        <rect x="8" y="8" width="440" height="152" rx="8" fill="#fafbfd" stroke="#e2e8f0" stroke-width="1.5"/>
+        <text x="56" y="38" font-family="ui-monospace,Consolas,Menlo,monospace" font-size="14" fill="#1f2937">my-skill/</text>
+        <text x="56" y="68" font-family="ui-monospace,Consolas,Menlo,monospace" font-size="14" fill="#1f2937">├── SKILL.md</text>
+        <text x="56" y="98" font-family="ui-monospace,Consolas,Menlo,monospace" font-size="14" fill="#1f2937">├── templates/weekly.md</text>
+        <text x="56" y="128" font-family="ui-monospace,Consolas,Menlo,monospace" font-size="14" fill="#1f2937">└── scripts/validate.py</text>
+        <text x="56" y="152" font-size="12" fill="#94a3b8">没有编译、没有注册中心——就是一个文件夹</text>
+        <line x1="452" y1="62" x2="472" y2="62" stroke="#cbd5e1" stroke-width="1.5"/>
+        <line x1="452" y1="94" x2="472" y2="94" stroke="#cbd5e1" stroke-width="1.5"/>
+        <line x1="452" y1="124" x2="472" y2="124" stroke="#cbd5e1" stroke-width="1.5"/>
+        <text x="480" y="52" font-size="13" fill="#0e9f6e">① description：把用户可能的说法都列进去</text>
+        <text x="480" y="76" font-size="13" fill="#0e9f6e">② 正文：只写步骤、规则、反例，不写背景</text>
+        <text x="480" y="100" font-size="13" fill="#2563eb">③ 长模板、长示例放这儿——真要用时才读进来</text>
+        <text x="480" y="130" font-size="13" fill="#2563eb">④ 不允许每次结果不一样的步骤，写成脚本别交给模型现做</text>
+      </svg>
+    </div>
     <div class="g2 mb">
       <div class="card t-green"><div class="t green">① description 写触发条件</div>
         <div class="cap">上一页已经说了原因，这里补一句实操：<b>把你能想到的用户说法都列进去</b>。「周报 / 周会材料 / 本周进展 / 这周做了啥」——它是靠字面匹配上下文的，说法覆盖得越全，该触发时越不会漏。</div></div>
@@ -860,6 +877,29 @@ some-tool --version</div>
   <div class="hd"><h2>A2A：对面不再是工具，是另一个 Agent</h2></div>
   <div class="bd">
     <div class="p mb">前面所有内容都有一个共同假设：<b>对面是确定的</b>。函数会返回、命令会退出、Server 会应答，行为可预期。A2A 换掉的正是这个假设——<b>对面也是一个模型驱动的东西</b>。</div>
+        <div class="mb">
+      <svg viewBox="0 0 1168 158" style="width:100%;height:auto;display:block">
+        <defs><marker id="c4d" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0 L8 4 L0 8 z" fill="#94a3b8"/></marker></defs>
+        <text x="8" y="12" font-size="13" fill="#5b6675">调用一个工具</text>
+        <rect x="8" y="20" width="170" height="40" rx="8" fill="#f4f7fb" stroke="#cbd5e1" stroke-width="1.5"/><text x="93" y="45" text-anchor="middle" font-size="14" fill="#1f2937">你的 Agent</text>
+        <line x1="178" y1="32" x2="296" y2="32" stroke="#94a3b8" stroke-width="2" marker-end="url(#c4d)"/>
+        <text x="238" y="26" text-anchor="middle" font-size="12" fill="#5b6675">参数</text>
+        <line x1="298" y1="50" x2="180" y2="50" stroke="#94a3b8" stroke-width="2" marker-end="url(#c4d)"/>
+        <rect x="300" y="20" width="220" height="40" rx="8" fill="#f4f7fb" stroke="#cbd5e1" stroke-width="1.5"/><text x="410" y="45" text-anchor="middle" font-size="14" fill="#1f2937">一段确定的程序</text>
+        <text x="1160" y="45" text-anchor="end" font-size="13" fill="#5b6675">毫秒到秒 · 同步等着 · 重试结果一致</text>
+        <text x="8" y="88" font-size="13" fill="#7c3aed">委派给一个 Agent</text>
+        <rect x="8" y="96" width="170" height="40" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/><text x="93" y="121" text-anchor="middle" font-size="14" fill="#1f2937">你的 Agent</text>
+        <line x1="178" y1="106" x2="296" y2="106" stroke="#7c3aed" stroke-width="2" marker-end="url(#c4d)"/>
+        <text x="238" y="100" text-anchor="middle" font-size="12" fill="#7c3aed">一个目标</text>
+        <line x1="298" y1="128" x2="180" y2="128" stroke="#7c3aed" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#c4d)"/>
+        <text x="238" y="152" text-anchor="middle" font-size="12" fill="#7c3aed">中途还可能回来追问</text>
+        <rect x="300" y="90" width="220" height="52" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <text x="410" y="112" text-anchor="middle" font-size="14" fill="#1f2937">对方 Agent</text><text x="410" y="134" text-anchor="middle" font-size="12" fill="#7c3aed">自己规划 · 会犯错</text>
+        <line x1="522" y1="116" x2="596" y2="116" stroke="#7c3aed" stroke-width="2" marker-end="url(#c4d)"/>
+        <rect x="600" y="96" width="240" height="40" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/><text x="720" y="121" text-anchor="middle" font-size="13" fill="#1f2937">一份产出，或一段「做不了」</text>
+        <text x="1160" y="121" text-anchor="end" font-size="13" fill="#7c3aed">几分钟到几小时 · 有状态 · 重试可能不同</text>
+      </svg>
+    </div>
     <table class="tbl mb">
       <tr><th style="width:18%"></th><th style="width:41%">调用一个工具</th><th>委派给一个 Agent</th></tr>
       <tr><td><b>对面是什么</b></td><td>一段确定的程序</td><td class="purple"><b>另一个 Agent，自己会规划、会用工具、会犯错</b></td></tr>
