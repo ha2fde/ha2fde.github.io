@@ -140,7 +140,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
     <div class="note b-orange mt2"><div class="t orange">这中间的距离，比看上去大得多</div>
       <div class="cap">「预测下一个词」和「完成一项任务」不是同一类东西。中间隔着五步，<b>每一步都是被上一步的一个具体缺陷逼出来的</b>——这一章就是走这五步。</div></div>
     <div class="mt2">
-      <svg viewBox="0 0 1160 122" width="100%" height="122" style="display:block">
+      <svg viewBox="0 0 1160 122" style="width:100%;height:auto;display:block">
         <g font-family="PingFang SC,Hiragino Sans GB,-apple-system,sans-serif">
           <rect x="20"  y="30" width="180" height="50" rx="6" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
           <text x="110" y="60" font-size="14" fill="#1f2937" text-anchor="middle">预训练</text>
@@ -167,41 +167,18 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
       <div class="note b-orange"><div class="t orange">每一步都有代价</div>
         <div class="cap">对齐要付出多样性的损失，思维链要付出 token 和延迟，工具调用要付出一整套接口约定和安全面。<b>这一章会把每一步的代价一并说清楚</b>——只讲收益的讲法会让你高估它。</div></div>
       <div class="note b-green"><div class="t green">中间那条边界最重要</div>
-        <div class="cap">整条线上只有一条边界要一直记着：<b>模型负责决定，宿主负责执行。</b>后面所有让人困惑的现象——为什么它会"撒谎"说做完了、为什么权限要卡在外面——都能回到这条边界上解释。</div></div>
+        <div class="cap">整条线上只有一条边界要一直记着：<b>模型负责决定，宿主程序负责执行</b>（就是你用的那个客户端）。后面所有让人困惑的现象——为什么它会「撒谎」说做完了、为什么权限要卡在外面——都能回到这条边界上解释。</div></div>
     </div>
-  </div>
-</section>
-
-<section class="slide" data-act="预训练">
-  <div class="hd"><h2>预训练：一个训练目标，一件事反复做</h2></div>
-  <div class="bd">
-    <div class="g32">
-      <div>
-        <div class="p mb">训练目标简单到不像话：<b>拿海量文本，遮住下一个词元，让模型预测它，预测错了就调权重。</b>没有标注、没有任务定义、没有人告诉它什么叫「正确的回答」。</div>
-        <div class="code">  输入： 北京是中国的首
-  目标： 都
-       ↓ 模型输出概率分布
-  都  0.83
-  府  0.04
-  个  0.01
-  ⋮
-       ↓ 和真实答案比，算损失，反传，调权重
-       ↓ 换下一个位置，重复上万亿次</div>
-        <div class="cap mt">这就是<b>自回归</b>（autoregressive）加<b>下一词预测</b>（next-token prediction）。「文字接龙」这个说法可以用来向人解释，但它容易让人低估这件事——<b>接龙听起来像游戏，而这个训练目标实际上极其苛刻。</b></div>
-      </div>
-      <div>
-        <div class="card t-blue"><div class="t blue">为什么这么简单的目标能学出能力</div>
-          <div class="cap">因为要把下一个词预测准，<b>顺带必须学会的东西太多了</b>：<br><br>· 「他把水倒进杯子里，杯子__」<br>　→ 要预测「满了」，得懂物理常识<br>· 「23 × 7 = __」<br>　→ 要预测对，得会算<br>· 「这段代码报错的原因是__」<br>　→ 要预测对，得懂这段代码<br><br><b>预测下一个词是手段，不是目的。</b>要在足够多样的文本上把这件事做好，模型被迫在内部建立起关于世界、语言、逻辑的表示。<b>能力是这个压力的副产品。</b></div></div>
-      </div>
-    </div>
+    <div class="note b-purple mt2"><div class="t purple">另外有三件事，不在这五步里</div>
+      <div class="cap">这五步讲的是<b>能力怎么补出来的</b>。真跑起来还有三件事不属于任何一步，却决定它跑不跑得动：<b>这个圈要转多少轮、凭什么算干完了、上下文那点预算怎么花</b>——本章一并讲。</div></div>
   </div>
 </section>
 
 <section class="slide" data-act="预训练">
   <div class="hd"><h2>预训练结束，你拿到的是什么</h2></div>
   <div class="bd">
-    <div class="lead">一个<b>基座模型</b>（base model）。它的唯一行为是——<b>把你给的文本合理地续下去。</b></div>
-    <div class="g2 mt2">
+    <div class="lead">一个<b>基座模型</b>（base model）。训练目标从头到尾只有一个——<b>把给它的文本合理地续下去。</b></div>
+    <div class="g2">
       <div class="card t-red"><div class="t red">拿它当聊天机器人用，会这样</div>
         <div class="code" style="margin-top:8px;font-size:13px">  你输入：
   法国的首都是哪里？
@@ -211,34 +188,18 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
   德国的首都是哪里？
   意大利的首都是哪里？
   以上问题请在课后完成。</div>
-        <div class="cap mt" style="margin-top:8px">它没有出错。<b>在训练语料里，一行问句后面接着另一行问句是极其常见的模式</b>——习题册、问卷、试卷。它给出了一个统计上非常合理的续写。</div></div>
+        <div class="cap" style="margin-top:8px">它没有出错。<b>在训练语料里，一行问句后面接着另一行问句是极其常见的模式</b>——习题册、问卷、试卷。它给出了一个统计上非常合理的续写。</div></div>
       <div>
         <div class="card"><div class="t">它缺的到底是什么</div>
           <div class="cap"><b>不是知识，也不是能力。</b>它知道法国的首都是巴黎——换个写法就能逼出来：<br><br><span style="font-family:var(--mono);font-size:13px">「法国的首都是」→「巴黎」</span><br><br>它缺的是<b>一个「我在对话，我应该回答」的行为约定</b>。这个约定在预训练目标里从来没有出现过，所以它无从习得。</div></div>
         <div class="note b-orange mt2"><div class="t orange">这是整条链上的第一个缺口</div>
-          <div class="cap">能力有了，<b>但没有一个稳定的接口把能力取出来</b>。你得靠精心构造前缀去「骗」它进入正确的续写模式——这在当时确实是主要用法，也确实难用。<br><br>下一步补的就是这个。</div></div>
+          <div class="cap">能力有了，<b>但没有一个稳定的接口把能力取出来</b>。你得靠精心构造前缀去「骗」它进入正确的续写模式——这在当时确实是主要用法，也确实难用。<b>下一步补的就是这个。</b></div></div>
+        <div class="note b-purple mt2"><div class="t purple">另外记住一件事：「续写」这个底层动作，后面一直没变</div>
+          <div class="cap">后面三步改的都是<b>它续写什么</b>，不是<b>它在续写</b>。今天你和它对话，它做的仍然是把这段对话按格式续下去——只是被训得会在该停的地方停下来。</div></div>
       </div>
     </div>
-  </div>
-</section>
-
-<section class="slide" data-act="预训练">
-  <div class="hd"><h2>顺带说清预训练的工程量级</h2></div>
-  <div class="bd">
-    <div class="g3">
-      <div class="card"><div class="t">数据</div>
-        <div class="cap">量级在<b>万亿词元</b>。到这个规模，公开可用的高质量文本已经接近被用尽——所以现在的工作重心早已不是「多找点数据」，而是<b>清洗、去重、配比</b>：哪类文本占多少比例，直接影响模型擅长什么。</div></div>
-      <div class="card"><div class="t">算力</div>
-        <div class="cap">一次完整的预训练是<b>数千张加速卡跑数周到数月</b>，中途还要处理硬件故障、断点续训。<br><br>这是它和后面所有步骤最大的区别——<b>SFT 和对齐可以反复试错，预训练不能</b>。跑一次的成本高到没有反悔余地。</div></div>
-      <div class="card"><div class="t">规模带来的经验规律</div>
-        <div class="cap">模型参数量、数据量、算力这三者一起按比例放大时，模型的表现会<b>沿着相当平滑的曲线改善</b>。这条经验规律是过去几年不断加大投入的直接依据。<br><br>注意它是<b>经验观察</b>，不是定律——它在什么条件下失效，至今没有定论。</div></div>
-    </div>
-    <div class="g2 mt2">
-      <div class="note b-orange"><div class="t orange">为什么这一节对你有用</div>
-        <div class="cap">它解释了整个行业的形状：<b>预训练只有极少数机构做得起，而后面几步的门槛低得多。</b>所以你看到的是——基座模型来自少数几家，而基于它们做微调、做对齐、做工具能力的团队非常多。</div></div>
-      <div class="note b-red"><div class="t red">也解释了一个绕不开的限制</div>
-        <div class="cap">知识<b>冻结在训练数据的截止时间</b>。这不是 bug，是这个训练方式的必然结果——权重训完就固定了。<br><br>后面 ReAct 那一步之所以非做不可，根子就在这里：<b>要拿到新信息，只能从外部拿。</b></div></div>
-    </div>
+    <div class="note b-blue mt2"><div class="t blue">那它的能力是从哪来的：全是「预测下一个词」这个压力的副产品</div>
+      <div class="sub">要预测准「他把水倒进杯子里，杯子<b>__</b>」，得懂物理；预测准「23 × 7 ＝ <b>__</b>」，得会算；预测准「这段代码报错的原因是<b>__</b>」，得真读懂这段代码。<b>预测下一个词是手段，不是目的</b>——要在足够多样的文本上把这件事做好，模型被迫在内部建立起关于世界、语言和逻辑的表示。</div></div>
   </div>
 </section>
 
@@ -256,7 +217,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
   法国的首都是哪里？
   &lt;|assistant|&gt;
   巴黎。&lt;|end|&gt;</div>
-        <div class="cap mt">推理时，宿主把对话拼成这个格式，一直拼到 <span style="font-family:var(--mono);font-size:12px">&lt;|assistant|&gt;</span> 为止，然后让模型续写；模型吐出 <span style="font-family:var(--mono);font-size:12px">&lt;|end|&gt;</span> 就停。<br><br><b>「一轮对话」这件事，本质上是宿主用模板拼字符串拼出来的。</b>模型自始至终只是在续写。</div>
+        <div class="cap mt">推理时，宿主程序（客户端）把对话拼成这个格式，一直拼到 <span style="font-family:var(--mono);font-size:12px">&lt;|assistant|&gt;</span> 为止，然后让模型续写；模型吐出 <span style="font-family:var(--mono);font-size:12px">&lt;|end|&gt;</span> 就停。<br><br><b>「一轮对话」这件事，本质上是宿主用模板拼字符串拼出来的。</b>模型自始至终只是在续写。</div>
       </div>
       <div>
         <div class="card"><div class="t">监督微调（SFT）</div>
@@ -265,6 +226,8 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
           <div class="cap">相比预训练动辄上万亿词元，SFT 的数据量小了好几个数量级，算力也少得多。<br><br><b>因为它不教任何新知识，只教一个行为约定。</b>能力早就在预训练里长好了，这一步只是装了个把手。</div></div>
         <div class="note b-orange mt2"><div class="t orange">顺带解释一个现象</div>
           <div class="cap">不同厂商的模型对话模板不同（角色标记、分隔符、系统提示的位置都不一样）。<b>用错模板，模型表现会明显变差</b>——这也是换模型时最难查的一类问题：模型是好的，接口也通，但对话被拼成了它没见过的样子。</div></div>
+        <div class="note b-purple mt2"><div class="t purple">一个容易被忽略的细节：角色标记不是普通文本</div>
+          <div class="cap"><b>&lt;|system|&gt; 这类标记是词表里的专用词元</b>，不是「小于号加 system」这几个字符。你在输入框里原样打出来，分词器会把它切成一串普通词元，拼不出那个标记——<b>所以用户没法凭字面伪造一个系统角色。</b><br><br>但它挡住的只是字面伪造：用户仍然可以在自己那一段里写「忽略上面的规则」。<b>那是语义层面的事，词元管不着。</b></div></div>
       </div>
     </div>
   </div>
@@ -287,6 +250,8 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
           <div class="cap">· <b>能力上有损耗</b>：为了行为可控，模型在某些任务上的原始表现会比基座模型下降<br>· <b>过度拒绝</b>：把无害请求误判成有害，这是最常见的用户抱怨<br>· <b>倾向于迎合</b>：奖励模型是拿人的偏好训的，而人偏好被赞同——<b>模型会学到「顺着用户说」比「指出用户错了」得分更高</b><br>· <b>把偏好写进了模型</b>：什么算好回答，最终由标注群体和标注规范决定</div></div>
       </div>
     </div>
+    <div class="note b-purple mt2"><div class="t purple">今天这一步已经不止一种做法</div>
+      <div class="cap">上面这套「先训一个奖励模型、再用强化学习去调」是最早也最经典的路线，代价是要多训一个模型，而且强化学习那一段调起来并不稳。<b>后来出现了直接拿成对偏好数据去调模型的做法（DPO 一类），把奖励模型这一环整个跳过</b>，工程上简单得多，如今用得很广。<br>但换掉的只是<b>「怎么把偏好灌进去」</b>，上面那四条代价一条都没换掉——只要监督信号最终来自人的偏好，迎合、过度拒绝、标注群体的影响就都还在。</div></div>
   </div>
 </section>
 
@@ -313,6 +278,8 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
           <div class="cap">模型每生成<b>一个</b>词元，就是把输入过一遍那 N 层网络——<b>层数是固定的，题目再难也不会多给它几层。</b><br><br>所以：<b>如果答案必须一步吐出来，那么这道题能用的全部计算，就压在生成那一个词元的这一次前向里。</b><br><br>而写出中间步骤，等于把推理摊在几十上百个词元上——<b>每多写一个词元，就多过一遍完整的网络。可用的计算量是按词元数量线性增加的。</b></div></div>
         <div class="note b-blue mt2"><div class="t">还有第二重作用</div>
           <div class="cap">写出来的中间步骤会进入后续词元的上下文，<b>成为模型自己能看到的输入</b>。「还剩 3 个」这句话一旦写出来，后面就可以直接用它，不必在一次前向里凭空存住。<br><br><b>相当于把要记的东西挪到了纸面上。</b></div></div>
+        <div class="note b-purple mt2"><div class="t purple">顺着这条限制，能推出两件事</div>
+          <div class="cap"><b>一、能摊开的题才吃得到这个红利。</b>让它张口就报 47×83，整个乘法得挤在一次前向里做完，很容易错；让它列竖式，同一个模型基本不会错——竖式把这道题摊成了几十个词元，每个词元都换来一次完整的前向。<br><br><b>二、多写词元买到的是计算量，不是知识。</b>它本来就不知道的事实，推理链再长也推不出来，只会把这个空缺包装得更像模像样。<b>缺计算，写长点有用；缺信息，写多长都没用。</b></div></div>
       </div>
     </div>
   </div>
@@ -336,6 +303,72 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
       <div class="note b-red"><div class="t red">一个要打破的误解</div>
         <div class="cap">写出来的推理过程<b>不保证是模型内部真实的计算路径</b>。它是生成出来的文本，可能出现「过程有错但答案对」或「过程看着对但答案错」。<br><br><b>把它当作可读的中间产物，不要当作可信的解释。</b></div></div>
     </div>
+    <div class="note b-orange mt2"><div class="t orange">第三阶段还带来一个计费上的变化</div>
+      <div class="cap">训进模型之后，推理写不写、写多长是模型自己定的，<b>你事先并不知道这一次要花多少</b>；而这部分词元<b>按输出计费</b>，是价目表上最贵的一档。<br>更麻烦的是可见性：不少接口<b>只把推理过程的摘要返回给你，原始的那一大段看不到，但照样计进账单</b>。所以做成本估算时，按「问题多长、答案多长」去算会严重偏低——中间那段看不见的才是大头。</div></div>
+  </div>
+</section>
+
+<section class="slide" data-act="思维链">
+  <div class="hd"><h2>推理模型：把「多想一会儿」变成一个能调的旋钮</h2></div>
+  <div class="bd">
+    <div class="p mb">第三阶段训到最后，出现了一类新模型：<b>它默认先花大量词元自己想，想完了才开口。</b></div>
+    <svg viewBox="0 0 1168 268" style="width:100%;height:auto;display:block">
+      <defs><marker id="m3" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+        <path d="M0,0 L9,4.5 L0,9 z" fill="#94a3b8"/></marker></defs>
+      <rect x="8" y="10" width="1152" height="70" rx="10" fill="#fafbfd" stroke="#e2e8f0" stroke-width="1.5"/>
+      <rect x="8" y="94" width="1152" height="88" rx="10" fill="#fafbfd" stroke="#e2e8f0" stroke-width="1.5"/>
+      <rect x="22" y="28" width="106" height="36" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="75" y="51" text-anchor="middle" font-size="15" fill="#2563eb">不开思考</text>
+      <line x1="132" y1="46" x2="146" y2="46" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#m3)"/>
+      <rect x="152" y="26" width="200" height="40" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="252" y="51" text-anchor="middle" font-size="15" fill="#1f2937">直接给出答案</text>
+      <text x="856" y="40" font-size="14" fill="#5b6675">输出 ~10² 词元</text>
+      <text x="856" y="62" font-size="13" fill="#94a3b8">简单问题上，开了也是白开</text>
+      <rect x="22" y="120" width="106" height="36" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="75" y="143" text-anchor="middle" font-size="15" fill="#7c3aed">开思考</text>
+      <line x1="132" y1="138" x2="146" y2="138" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#m3)"/>
+      <rect x="152" y="118" width="112" height="40" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="208" y="143" text-anchor="middle" font-size="15" fill="#1f2937">拆解</text>
+      <line x1="266" y1="138" x2="292" y2="138" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#m3)"/>
+      <rect x="294" y="118" width="112" height="40" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="350" y="143" text-anchor="middle" font-size="15" fill="#1f2937">尝试</text>
+      <line x1="408" y1="138" x2="434" y2="138" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#m3)"/>
+      <rect x="436" y="118" width="112" height="40" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+      <text x="492" y="143" text-anchor="middle" font-size="15" fill="#1f2937">验算</text>
+      <line x1="550" y1="138" x2="576" y2="138" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#m3)"/>
+      <rect x="578" y="118" width="112" height="40" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
+      <text x="634" y="143" text-anchor="middle" font-size="15" fill="#dc2626">回溯重来</text>
+      <line x1="692" y1="138" x2="718" y2="138" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#m3)"/>
+      <rect x="720" y="118" width="112" height="40" rx="8" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="776" y="143" text-anchor="middle" font-size="15" fill="#0e9f6e">定稿作答</text>
+      <text x="634" y="110" text-anchor="middle" font-size="13" fill="#dc2626">这一步是关键：它会自己发现不对</text>
+      <line x1="844" y1="102" x2="844" y2="174" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="5 4"/>
+      <line x1="844" y1="20" x2="844" y2="70" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="5 4"/>
+      <text x="856" y="132" font-size="14" fill="#5b6675">输出 ~10³–10⁴ 词元，贵十几倍</text>
+      <text x="856" y="154" font-size="13" fill="#94a3b8">延迟从秒级拉到几十秒甚至几分钟</text>
+      <rect x="8" y="196" width="1152" height="62" rx="10" fill="#fafbfd" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="32" y="233" font-size="15" fill="#1f2937">这一档你能调</text>
+      <line x1="240" y1="227" x2="700" y2="227" stroke="#cbd5e1" stroke-width="3"/>
+      <circle cx="240" cy="227" r="7" fill="#94a3b8"/>
+      <circle cx="393" cy="227" r="7" fill="#7c3aed"/>
+      <circle cx="546" cy="227" r="7" fill="#7c3aed"/>
+      <circle cx="700" cy="227" r="7" fill="#7c3aed"/>
+      <text x="240" y="252" text-anchor="middle" font-size="13" fill="#94a3b8">关</text>
+      <text x="393" y="252" text-anchor="middle" font-size="13" fill="#7c3aed">低</text>
+      <text x="546" y="252" text-anchor="middle" font-size="13" fill="#7c3aed">中</text>
+      <text x="700" y="252" text-anchor="middle" font-size="13" fill="#7c3aed">高</text>
+      <text x="740" y="233" font-size="14" fill="#5b6675">同一个模型、同一个接口，只改这一档，答对率和账单一起变</text>
+    </svg>
+    <div class="g3 mt2">
+      <div class="card t-purple"><div class="t purple">多了一条加能力的路</div>
+        <div class="cap">以前想让它更强只有一个办法——<b>把模型练大</b>，投入以亿计、周期以月计。现在多了一条：<b>同一个模型，在回答时多花算力。</b>这条路按次付费、随时可调，不用等下一代模型。</div></div>
+      <div class="card t-blue"><div class="t blue">是训出来的，不是提示出来的</div>
+        <div class="cap">长思维链里模型会自己说「等一下，这里不对」，会验算、会推翻重来。这套行为来自<b>用「最终答案对不对」当奖励</b>的训练——<b>不是你在提示里写「一步步思考」能换来的。</b></div></div>
+      <div class="card t-orange"><div class="t orange">它成了你手上的一个参数</div>
+        <div class="cap">客户端和接口上那个 thinking / reasoning effort 档位，调的就是<b>允许它想多久</b>。第一章那些配置项里，<b>这一个对效果和账单的影响都最大。</b></div></div>
+    </div>
+    <div class="note b-orange mt2"><div class="t orange">什么时候该开，什么时候是纯浪费</div>
+      <div class="sub"><b class="green">值得开</b>：数学、代码调试、多步规划——<b>对错能被判定、且一步想不完</b>的题。　<b class="red">纯浪费</b>：翻译、改写、分类、闲聊，把账单和延迟乘十几倍换不来任何提升。另外，<b>写出来的思考过程仍然不保证是它真实的计算路径</b>——当中间产物看，别当解释看。</div></div>
   </div>
 </section>
 
@@ -343,18 +376,22 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
   <div class="hd"><h2>会想了，但想的全是脑子里的东西</h2></div>
   <div class="bd">
     <div class="g2">
-      <div class="card t-red"><div class="t red">纯推理撞到的三堵墙</div>
+      <div>
+        <div class="card t-red"><div class="t red">纯推理撞到的三堵墙</div>
         <ul class="ul s mt" style="margin-top:8px">
           <li><b>知识是冻结的</b>。模型的知识停在训练数据的截止时间。问它今天的事，它要么说不知道，要么<b>编一个</b>——而且编得很像真的。</li>
           <li><b>推理链会跑偏且无从纠正</b>。中间某一步错了，后面全部建立在错误之上。<b>它没有任何外部参照可以发现自己错了。</b></li>
           <li><b>它不能改变任何东西</b>。推理再漂亮，输出的还是一段文本。文件没被改、邮件没被发、代码没被跑。</li>
         </ul>
+        </div>
       </div>
       <div>
         <div class="card"><div class="t">缺的东西可以一句话概括</div>
           <div class="cap"><b>它缺一条通往外部世界的通路</b>——既包括读（获取它不知道的信息），也包括写（对世界产生影响）。<br><br>而且这条通路必须<b>嵌进推理过程里</b>，不能是「先查完再推理」。因为它经常是推到一半才发现自己缺什么。</div></div>
         <div class="note b-orange mt2"><div class="t orange">从这里开始，性质变了</div>
           <div class="cap">前面三步（预训练、对齐、思维链）都是在<b>改造模型本身</b>。<br><br>从这一步开始，重点转到<b>模型和外部之间的关系</b>——模型怎么表达它想做什么，谁来执行，结果怎么回来。<br><br><b>这也是「Agent」这个词开始有意义的地方。</b></div></div>
+        <div class="note b-purple mt2"><div class="t purple">这三堵墙不是同一类问题</div>
+          <div class="cap">你把今天的新闻贴进上下文，第一堵墙就矮了一截；把参考答案也贴进去，第二堵也能挡一挡。<b>但第三堵挡不住</b>——不管往里塞多少东西，它的输出仍然只是一段文本：文件没被改、代码没被跑。<br><br>所以下一步补的是<b>「能不能动手」</b>，不是<b>「知不知道」</b>。前者是结构上缺一块，后者只是喂得够不够。</div></div>
       </div>
     </div>
   </div>
@@ -384,6 +421,8 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
           <div class="cap">① 模型续写到 <span style="font-family:var(--mono);font-size:12px">Action:</span> 那一行<br>② 外部程序<b>把生成停下来</b>，用字符串解析把动作名和参数抠出来<br>③ 外部程序真的去执行（当年多半就是<b>调一个 API</b>）<br>④ 把结果拼成 <span style="font-family:var(--mono);font-size:12px">Observation:</span> 一行，接到文本后面<br>⑤ 让模型接着续写<br><br><b>模型全程只做了一件事：续写。</b>停下来、解析、执行、贴回去——全是外面那个程序干的。</div></div>
         <div class="note b-blue mt2"><div class="t">它解决的问题</div>
           <div class="cap">推理不再是闭门造车：<b>每一步都可以拿外部的真实结果来校正</b>。同时，「行动」这个环节让模型第一次能对外部产生影响。<br><br>Agent 那个「思考 → 行动 → 看结果」的循环，形态在这里就定下来了。</div></div>
+        <div class="note b-orange mt2"><div class="t orange">这是 2022 年的做法，但形态一直留到了今天</div>
+          <div class="cap">当时接口层什么都没有：没有工具定义的格式，没有存放调用参数的字段，模型也没被训练过要遵守任何约定。<b>手上只有提示词</b>，于是只能约定几个关键词，再让外面的程序去做字符串匹配。<br><br>今天你在各种框架里看到的「思考 → 调用 → 看结果」，形态就是在这里定下来的。<b>后来换掉的其实只有中间那一步：解析不再靠猜，改成接口来保证。</b></div></div>
       </div>
     </div>
   </div>
@@ -405,6 +444,8 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
     </div>
     <div class="note b-orange mt2"><div class="t orange">把问题归纳一下</div>
       <div class="cap">这四条其实是同一件事的四个面：<b>「模型想调用什么」这件事，是用自然语言表达的，而自然语言没有任何结构保证。</b><br><br>解法的方向因此很清楚——<b>把它变成有结构的、模型被训练过要遵守的、接口层面就能校验的东西。</b></div></div>
+    <div class="note b-red mt2"><div class="t red">这四条今天并没有消失，只是换了地方</div>
+      <div class="cap">支持工具调用的模型和接口把它们大部分接管了。<b>但只要你绕开接口自己搭一套，四条会原样重来一遍</b>——在提示词里写「请用 JSON 回复，格式如下」，然后自己去解析模型吐出来的那段文本：格式会破、参数没类型、说明得每轮重发，它还会顺手把结果一起编出来。<br>判断方法很简单：<b>看「模型想调用什么」这件事，走的是接口里一个有结构的字段，还是一段需要你自己去猜的自然语言。</b>是后者，这一页的四条你一条都躲不掉。</div></div>
   </div>
 </section>
 
@@ -417,12 +458,14 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
           <div class="cap">工具变成接口上的<b>一等参数</b>——请求里有专门的字段声明有哪些工具、每个工具接受哪些参数、参数是什么类型。<br><br>模型在训练时就见过大量这种形式的输入，<b>知道该怎么读它、怎么用它。</b></div></div>
         <div class="card"><div class="t">变化二：调用意图是结构化输出</div>
           <div class="cap">模型不再吐一行 <span style="font-family:var(--mono);font-size:12px">Action: search[...]</span>，而是输出一个<b>结构化的调用意图</b>：工具名一个字段，参数一个字段，还带一个调用标识用来和结果配对。<br><br>响应里还会带一个明确的状态，告诉宿主<b>「我这轮不是在说话，是在请求调用」</b>——不用再猜、不用再截断。</div></div>
+        <div class="card t-purple mt"><div class="t purple">变化四：格式还能被硬性锁死</div>
+          <div class="cap">训练只让它<b>倾向于</b>照格式来，仍然会偶尔多个逗号、少个引号。<b>约束解码</b>把这件事变成硬的：按照事先给定的结构，逐个词元算出「下一个合法的只可能是这几个」，其余全部置零再采样——<b>不合法的输出在采样那一步就生不出来</b>。这也是结构化输出今天能当接口用、而不只是「一般都对」的原因。</div></div>
       </div>
       <div>
         <div class="card t-green mb"><div class="t green">变化三：模型被专门训练过</div>
           <div class="cap">什么时候该调工具、该调哪个、参数怎么填、拿到结果后怎么继续——<b>这些都进了训练数据</b>，不再依赖提示词里的示范。<br><br>这也解释了一个常见现象：<b>没有经过这项训练的模型，接上去就是不会调工具</b>，跟提示词写得好不好无关。</div></div>
         <div class="note b-red"><div class="t red">但有一件事一点没变</div>
-          <div class="cap"><b>模型从不执行任何东西。</b><br><br>它输出的始终只是「我想调用 X，参数是 Y」这个<b>意图</b>。真正去发网络请求、去读文件、去跑命令的，永远是<b>宿主程序</b>——也就是你装在机器上的那个客户端。<br><br>结果拿回来之后，宿主再把它拼进上下文，让模型接着往下走。<br><br>这也解释了那个最让人恼火的现象：<b>它说「已经处理好了」，其实什么也没发生。</b>它输出的本来就只是文本——宿主没执行、或者执行失败没回传，它都无从知道，照样能续写出一句像模像样的完成汇报。<br><br><b>这条边界是后面所有权限设计、审批设计、安全设计的立足点</b>：能不能做、准不准做，决定权在宿主手上，不在模型手上。</div></div>
+          <div class="cap"><b>模型从不执行任何东西。</b><br><br>它输出的始终只是「我想调用 X，参数是 Y」这个<b>意图</b>。真正去发网络请求、去读文件、去跑命令的，永远是<b>宿主程序</b>——也就是你装在机器上的那个客户端。<br><br>结果拿回来之后，宿主再把它拼进上下文，让模型接着往下走。<br><br>这也解释了那个最让人恼火的现象：<b>它说「已经处理好了」，其实什么也没发生。</b>它输出的本来就只是文本——宿主没执行、或者执行失败没回传，它都无从知道，照样能续写出一句像模像样的完成汇报。<br><br><b>这条边界是后面所有权限设计、审批设计、安全设计的立足点</b>：能不能做、准不准做，决定权在宿主手上，不在模型手上。<br><br>还有一层：<b>工具结果回填进上下文之后，和你的系统提示词就是同一段无差别的文本</b>——模型看不到「这段来自网页、那段来自你」。一份被读进来的文档里如果写着「忽略之前的指示」，它照样当指示读。<b>提示注入的根就在这里。</b></div></div>
       </div>
     </div>
   </div>
@@ -431,7 +474,7 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
 <section class="slide" data-act="工具调用">
   <div class="hd"><h2>一次完整往返，谁在做什么</h2></div>
   <div class="bd">
-    <svg viewBox="0 0 1160 460" width="100%" height="460" style="display:block">
+    <svg viewBox="0 0 1160 460" style="width:100%;height:auto;display:block">
       <g font-family="PingFang SC,Hiragino Sans GB,-apple-system,sans-serif">
         <rect x="20"  y="20" width="180" height="40" rx="5" fill="#f4f7fb" stroke="#94a3b8" stroke-width="1.5"/>
         <text x="110" y="45" font-size="14" fill="#1f2937" text-anchor="middle">用户</text>
@@ -454,13 +497,13 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
         <text x="590" y="142" font-size="13" fill="#2563eb" text-anchor="middle">拼好上下文 ＋ 工具清单，发过去</text>
 
         <line x1="750" y1="200" x2="438" y2="200" stroke="#7c3aed" stroke-width="1.5"/><polygon points="430,200 440,195 440,205" fill="#7c3aed"/>
-        <text x="590" y="192" font-size="13" fill="#7c3aed" text-anchor="middle">「我要调用 X，参数是 Y」——只是意图</text>
+        <text x="590" y="192" font-size="13" fill="#7c3aed" text-anchor="middle">「我要调用 X，参数是 Y」——只是意图，一轮可以同时给出好几个</text>
 
         <rect x="350" y="222" width="160" height="30" rx="4" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/>
         <text x="430" y="242" font-size="12" fill="#c2410c" text-anchor="middle">校验参数 · 权限判断</text>
 
         <line x1="430" y1="290" x2="1042" y2="290" stroke="#0e9f6e" stroke-width="1.5"/><polygon points="1050,290 1040,285 1040,295" fill="#0e9f6e"/>
-        <text x="740" y="282" font-size="13" fill="#0e9f6e" text-anchor="middle">真正执行的是这一步，由宿主发起</text>
+        <text x="740" y="282" font-size="13" fill="#0e9f6e" text-anchor="middle">真正执行的是这一步，由宿主发起（可以是并发的几次）</text>
 
         <line x1="1050" y1="330" x2="438" y2="330" stroke="#0e9f6e" stroke-width="1.5"/><polygon points="430,330 440,325 440,335" fill="#0e9f6e"/>
         <text x="740" y="322" font-size="13" fill="#0e9f6e" text-anchor="middle">结果回到宿主</text>
@@ -472,7 +515,115 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
         <text x="430" y="417" font-size="13" fill="#5b6675" text-anchor="middle">这轮还要调工具就回到第二步，否则出最终回答</text>
       </g>
     </svg>
-    <div class="cap mt">这张图只画<b>谁在什么时候做什么</b>。中间那份「调用意图」和「结果」具体长什么样、字段怎么定义、由谁来写这份约定——是接口层的问题，<b>本章不展开。</b></div>
+    <div class="cap mt">这张图只画<b>谁在什么时候做什么</b>。中间那份「调用意图」和「结果」具体长什么样、字段怎么定义、由谁来写这份约定——是接口层的问题，<b>本章不展开。</b><br><br>另外，图上为了看得清只画了一次调用。实际一轮里模型常常<b>一次给出好几个调用意图</b>，互不依赖的那些宿主会并发执行——这是把多步任务的墙上时间压下来的主要手段，也是「它看起来同时在查三个地方」的真实来源。</div>
+  </div>
+</section>
+
+<section class="slide" data-act="工具调用">
+  <div class="hd"><h2>一次往返之外：这个圈转几十轮会发生什么</h2></div>
+  <div class="bd">
+    <div class="p mb">真实任务从来不是一次往返，是<b>同一个圈转十几到几十轮</b>。轮数一多，两个上一页看不见的问题就冒出来了。</div>
+    <svg viewBox="0 0 1168 270" style="width:100%;height:auto;display:block">
+      <defs><marker id="m14" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+        <path d="M0,0 L9,4.5 L0,9 z" fill="#94a3b8"/></marker></defs>
+      <rect x="40" y="48" width="190" height="56" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="135" y="82" text-anchor="middle" font-size="15" fill="#2563eb">模型决定下一步</text>
+      <rect x="310" y="48" width="190" height="56" rx="8" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/>
+      <text x="405" y="82" text-anchor="middle" font-size="15" fill="#c2410c">宿主执行</text>
+      <line x1="234" y1="76" x2="304" y2="76" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#m14)"/>
+      <line x1="405" y1="108" x2="405" y2="160" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#m14)"/>
+      <rect x="310" y="164" width="190" height="56" rx="8" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="405" y="198" text-anchor="middle" font-size="15" fill="#0e9f6e">结果回填进上下文</text>
+      <path d="M306 192 L135 192 L135 110" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#m14)"/>
+      <text x="222" y="184" text-anchor="middle" font-size="13" fill="#94a3b8">下一轮</text>
+      <text x="270" y="252" text-anchor="middle" font-size="14" fill="#5b6675">上下文每转一圈就长一截，错的那一轮也留在里面</text>
+      <line x1="586" y1="22" x2="586" y2="240" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="5 4"/>
+      <text x="626" y="30" font-size="14" fill="#1f2937">假设它每一步有 95% 做对，那么整件事做对的概率是——</text>
+      <line x1="626" y1="230" x2="1152" y2="230" stroke="#cbd5e1" stroke-width="1.5"/>
+      <rect x="654" y="62" width="60" height="168" rx="3" fill="#0e9f6e"/>
+      <text x="684" y="56" text-anchor="middle" font-size="14" fill="#0e9f6e">95%</text>
+      <text x="684" y="250" text-anchor="middle" font-size="13" fill="#5b6675">1 步</text>
+      <rect x="744" y="94" width="60" height="136" rx="3" fill="#0e9f6e"/>
+      <text x="774" y="88" text-anchor="middle" font-size="14" fill="#0e9f6e">77%</text>
+      <text x="774" y="250" text-anchor="middle" font-size="13" fill="#5b6675">5 步</text>
+      <rect x="834" y="124" width="60" height="106" rx="3" fill="#c2410c"/>
+      <text x="864" y="118" text-anchor="middle" font-size="14" fill="#c2410c">60%</text>
+      <text x="864" y="250" text-anchor="middle" font-size="13" fill="#5b6675">10 步</text>
+      <rect x="924" y="166" width="60" height="64" rx="3" fill="#c2410c"/>
+      <text x="954" y="160" text-anchor="middle" font-size="14" fill="#c2410c">36%</text>
+      <text x="954" y="250" text-anchor="middle" font-size="13" fill="#5b6675">20 步</text>
+      <rect x="1014" y="216" width="60" height="14" rx="3" fill="#dc2626"/>
+      <text x="1044" y="210" text-anchor="middle" font-size="14" fill="#dc2626">8%</text>
+      <text x="1044" y="250" text-anchor="middle" font-size="13" fill="#5b6675">50 步</text>
+      <text x="1120" y="150" text-anchor="middle" font-size="13" fill="#94a3b8">0.95ⁿ</text>
+    </svg>
+    <div class="g3 mt2">
+      <div class="card t-blue"><div class="t blue">① 模型说「做完了」</div>
+        <div class="cap">最常用，也最不可靠。它输出的只是文本——<b>「我已经处理好了」和真的处理好了，在它那里没有任何区别。</b>这句话只能当信号，不能当判据。</div></div>
+      <div class="card t-orange"><div class="t orange">② 轮数 / 词元 / 时间上限</div>
+        <div class="cap"><b>兜底闸门，必须有。</b>没有它，一次解析失败就能让循环空转到把当天预算烧光。触发上限时要把现场留下来，别静默收工。</div></div>
+      <div class="card t-red"><div class="t red">③ 人叫停</div>
+        <div class="cap">长任务必须留这个口子，而且要<b>能在任意一轮中断</b>，不是只能等它跑完。审批点具体卡在哪一步，是上生产时才需要细抠的事。</div></div>
+    </div>
+    <div class="note b-green mt2"><div class="t green">让它不越跑越歪，靠的是这三件事</div>
+      <div class="sub"><b>插校验点</b>：每隔几轮跑一次测试、编译或断言，把「我觉得对」换成「机器说对」。　<b>能把错的那轮摘掉</b>：错误结论留在轨迹里会被后面每一轮反复读到，越读越确信。　<b>能拆就拆</b>：20 步一口气跑完，不如拆成 4 段 5 步、每段都有验收——<b>0.95²⁰ 很惨，但四个 0.95⁵ 各自补救，就完全不同了。</b></div></div>
+  </div>
+</section>
+
+<section class="slide" data-act="工具调用">
+  <div class="hd"><h2>最后一个缺口：它凭什么认为自己干完了</h2></div>
+  <div class="bd">
+    <div class="p mb">ReAct 的 Observation 解决的是「拿外部结果校正推理」，不解决「<b>这件事到底做成没有</b>」。整条链上，这是最后一个、也是最少被讲清的缺口。</div>
+    <svg viewBox="0 0 1168 252" style="width:100%;height:auto;display:block">
+      <defs>
+        <marker id="m14c" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 z" fill="#0e9f6e"/></marker>
+        <marker id="m14r" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 z" fill="#dc2626"/></marker>
+      </defs>
+      <rect x="8" y="8" width="568" height="236" rx="10" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="32" y="37" font-size="17" font-weight="700" fill="#0e9f6e">反馈能被机器判定</text>
+      <text x="32" y="59" font-size="13" fill="#5b6675">编译器 · 单元测试 · 类型检查 · 能不能跑起来</text>
+      <rect x="32" y="78" width="130" height="44" rx="8" fill="#ffffff" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="97" y="106" text-anchor="middle" font-size="15" fill="#1f2937">做一版</text>
+      <line x1="166" y1="100" x2="190" y2="100" stroke="#0e9f6e" stroke-width="1.5" marker-end="url(#m14c)"/>
+      <rect x="194" y="78" width="150" height="44" rx="8" fill="#ffffff" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="269" y="106" text-anchor="middle" font-size="15" fill="#1f2937">机器验一遍</text>
+      <line x1="348" y1="100" x2="372" y2="100" stroke="#0e9f6e" stroke-width="1.5" marker-end="url(#m14c)"/>
+      <rect x="376" y="78" width="130" height="44" rx="8" fill="#ffffff" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="441" y="106" text-anchor="middle" font-size="15" fill="#0e9f6e">过了，交</text>
+      <path d="M269 126 L269 152 L97 152 L97 128" fill="none" stroke="#0e9f6e" stroke-width="1.5" marker-end="url(#m14c)"/>
+      <text x="183" y="146" text-anchor="middle" font-size="13" fill="#0e9f6e">没过，自己改</text>
+      <text x="292" y="196" text-anchor="middle" font-size="15" font-weight="700" fill="#0e9f6e">圈能闭上：它自己就能收敛到对</text>
+      <text x="292" y="224" text-anchor="middle" font-size="13" fill="#5b6675">兜底的是机器，所以敢放手让它自己跑几十轮</text>
+      <rect x="600" y="8" width="560" height="236" rx="10" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
+      <text x="624" y="37" font-size="17" font-weight="700" fill="#dc2626">反馈只有人能给</text>
+      <text x="624" y="59" font-size="13" fill="#5b6675">一份分析写得对不对 · 语气合不合适 · 决策好不好</text>
+      <rect x="624" y="78" width="130" height="44" rx="8" fill="#ffffff" stroke="#dc2626" stroke-width="1.5"/>
+      <text x="689" y="106" text-anchor="middle" font-size="15" fill="#1f2937">做一版</text>
+      <line x1="758" y1="100" x2="782" y2="100" stroke="#dc2626" stroke-width="1.5" marker-end="url(#m14r)"/>
+      <rect x="786" y="78" width="150" height="44" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="6 4"/>
+      <text x="861" y="106" text-anchor="middle" font-size="15" fill="#94a3b8">没人验</text>
+      <line x1="940" y1="100" x2="964" y2="100" stroke="#dc2626" stroke-width="1.5" marker-end="url(#m14r)"/>
+      <rect x="968" y="78" width="130" height="44" rx="8" fill="#ffffff" stroke="#dc2626" stroke-width="1.5"/>
+      <text x="1033" y="106" text-anchor="middle" font-size="15" fill="#dc2626">照样交</text>
+      <path d="M861 126 L861 152 L706 152" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="6 4"/>
+      <line x1="690" y1="146" x2="702" y2="158" stroke="#dc2626" stroke-width="2"/>
+      <line x1="702" y1="146" x2="690" y2="158" stroke="#dc2626" stroke-width="2"/>
+      <text x="790" y="146" text-anchor="middle" font-size="13" fill="#dc2626">这一段不存在</text>
+      <text x="880" y="196" text-anchor="middle" font-size="15" font-weight="700" fill="#dc2626">圈闭不上：它只能自我感觉良好地交差</text>
+      <text x="880" y="224" text-anchor="middle" font-size="13" fill="#5b6675">兜底的只能是人，每一版都得有人过目才算数</text>
+    </svg>
+    <div class="note b-green mt2"><div class="t green">这条线，解释了一个你早就观察到的现象</div>
+      <div class="sub">为什么 Agent 在写代码上像换了个物种，在别的事情上还是那样？<b>不是因为模型更懂代码</b>，是因为代码这个领域自带一整套机器可判定的反馈——编译器、测试、类型检查、运行结果。它能自己跑、自己看红绿、自己改，一轮一轮往对的方向收敛。<b>换成写一份市场分析，没有任何东西能告诉它错了。</b></div></div>
+    <div class="g3 mt2">
+      <div class="card t-green"><div class="t green">判据现成的</div>
+        <div class="cap"><b>写代码</b>：跑测试、看编译。让它每改完一处就自己跑一遍，红了接着改——这是今天 Agent 最靠谱的用法。</div></div>
+      <div class="card t-blue"><div class="t blue">判据要自己造</div>
+        <div class="cap"><b>查数据</b>：让它把 SQL 和命中行数一起交出来，你能复算；而不是只丢给你一句「已核对，共 47 条」。</div></div>
+      <div class="card t-orange"><div class="t orange">判据造不出来就别装</div>
+        <div class="cap"><b>写东西、做判断</b>：明确把人放进环里。硬让它自评，只会得到一个它自己也不信的「已完成」。</div></div>
+    </div>
   </div>
 </section>
 
@@ -498,6 +649,8 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
         </div>
         <div class="note b-red"><div class="t red">这里有一个硬约束</div>
           <div class="cap">上面这些东西<b>共用同一个上下文窗口</b>，而窗口是有限的。<br><br>更要命的是它们<b>互相挤占</b>：工具定义多占 5K，能留给资料和历史的就少 5K。<b>上下文工程本质上是一个预算分配问题</b>——而且是每一轮都在变的预算。</div></div>
+        <div class="note b-purple mt2"><div class="t purple">还有一条和钱直接相关：前缀缓存</div>
+          <div class="cap">上面这张表最终是<b>按顺序拼成一段文本</b>的。推理服务会把算过的前缀缓存住，下一轮命中就不必重算——命中的那部分又便宜又快。<br><br>代价是它<b>只认前缀</b>：开头改一个字，后面全部作废。所以<b>不变的放最前（系统提示、工具定义），每轮都在变的放最后</b>，别在系统提示里塞当前时间这种每轮都不一样的东西。</div></div>
       </div>
     </div>
   </div>
@@ -518,6 +671,12 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
     </div>
     <div class="note b-orange mt2"><div class="t orange">这四种操作解决的是同一个矛盾</div>
       <div class="cap"><b>模型需要足够的信息才能做对事，但信息越多它越容易做错事。</b>——不只是装不下的问题，塞太多本身就会降低效果。下一页说这个。</div></div>
+    <div class="g2 mt2">
+      <div class="note b-blue"><div class="t blue">这四件事，没有一件是模型自己会做的</div>
+        <div class="cap">上下文里放什么、什么时候该把历史压掉、哪一段该拆出去，<b>全部由宿主侧的代码决定</b>。模型只会读你递给它的那一段文本然后续写——它看不到被你写出去的笔记，也不知道自己刚被压缩过。<br><br>所以「上下文工程」这个名字里的<b>工程</b>两个字是实的：它是你要写的调度逻辑，不是一句更好的提示词。</div></div>
+      <div class="note b-orange"><div class="t orange">实际用起来是四种混着上</div>
+        <div class="cap">一次任务里通常是：计划一开始就<b>写出去</b>落成文件，资料按需<b>选进来</b>，历史长了做一次<b>压缩</b>，要读大量原文的活<b>隔离</b>出去单独跑。<br><br>次序上有个经验：<b>能不放进来的就别先放进来</b>——「选进来」做得好，后面三种操作的压力都会小很多；反过来先塞满再拼命压缩，丢的信息最多。</div></div>
+    </div>
   </div>
 </section>
 
@@ -539,6 +698,135 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
           <div class="cap"><b>上下文工程不是「怎么塞进去更多」，是「怎么让该在的在、不该在的不在」。</b><br><br>这条判断在你自己搭 Agent 时会反复用到——每次想往提示里再加一段之前，先问：<b>这段东西不在的话，模型这一步会不会做错？</b>不会，就别加。</div></div>
       </div>
     </div>
+    <div class="note b-green mt2"><div class="t green">这三条都不用靠感觉，是能测出来的</div>
+      <div class="cap">把同一个任务跑三组——<b>原样一组、把关键指令挪到最后一组、把明显无关的资料删掉一组</b>，每组各跑十次，比成功率。差别通常大到不需要统计学就能看出来。<br>另外值得单独测一次的是<b>工具定义</b>：把这一轮用不上的工具从定义里摘掉，看成功率变不变——工具一多，模型选错工具的概率涨得比想象中快。<br>做过这一遍你多半会发现一件反直觉的事：<b>删掉东西带来的提升，常常比再加一段说明更大</b>。而加东西是所有人的第一反应，删东西不是。</div></div>
+  </div>
+</section>
+
+<section class="slide" data-act="上下文工程">
+  <div class="hd"><h2>子 Agent：什么时候该把任务拆出去</h2></div>
+  <div class="bd">
+    <div class="lead">上一页说了塞满会变差。最直接的解法往往不是压缩，是<b>不让一个上下文承担全部</b>——把一段活连同它要读的东西一起交出去，只把结论收回来。</div>
+    <svg viewBox="0 0 1168 210" style="width:100%;height:auto;display:block">
+      <defs><marker id="m17" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+        <path d="M0,0 L9,4.5 L0,9 z" fill="#0e9f6e"/></marker></defs>
+      <rect x="8" y="8" width="520" height="194" rx="10" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
+      <text x="28" y="32" font-size="16" font-weight="700" fill="#dc2626">全塞进一个上下文</text>
+      <rect x="28" y="48" width="472" height="104" rx="8" fill="#ffffff" stroke="#dc2626" stroke-width="1.5"/>
+      <rect x="36" y="60" width="108" height="34" rx="6" fill="#f4f7fb" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="90" y="82" text-anchor="middle" font-size="12" fill="#5b6675">用户需求</text>
+      <rect x="152" y="60" width="108" height="34" rx="6" fill="#f4f7fb" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="206" y="82" text-anchor="middle" font-size="12" fill="#5b6675">文档 A 全文</text>
+      <rect x="268" y="60" width="108" height="34" rx="6" fill="#f4f7fb" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="322" y="82" text-anchor="middle" font-size="12" fill="#5b6675">文档 B 全文</text>
+      <rect x="384" y="60" width="108" height="34" rx="6" fill="#f4f7fb" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="438" y="82" text-anchor="middle" font-size="12" fill="#5b6675">运行日志</text>
+      <rect x="36" y="104" width="108" height="34" rx="6" fill="#f4f7fb" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="90" y="126" text-anchor="middle" font-size="12" fill="#5b6675">中间产物</text>
+      <rect x="152" y="104" width="108" height="34" rx="6" fill="#f4f7fb" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="206" y="126" text-anchor="middle" font-size="12" fill="#5b6675">失败的尝试</text>
+      <rect x="268" y="104" width="108" height="34" rx="6" fill="#f4f7fb" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="322" y="126" text-anchor="middle" font-size="12" fill="#5b6675">工具清单</text>
+      <rect x="384" y="104" width="108" height="34" rx="6" fill="#f4f7fb" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="438" y="126" text-anchor="middle" font-size="12" fill="#5b6675">早期讨论</text>
+      <text x="268" y="178" text-anchor="middle" font-size="13" fill="#dc2626">这一整块每一轮都要重发一遍，而且越往后越乱</text>
+      <rect x="552" y="8" width="608" height="194" rx="10" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="572" y="32" font-size="16" font-weight="700" fill="#0e9f6e">主 Agent 派子 Agent 出去</text>
+      <rect x="776" y="44" width="160" height="42" rx="8" fill="#ffffff" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="856" y="71" text-anchor="middle" font-size="15" fill="#1f2937">主 Agent</text>
+      <text x="950" y="70" font-size="12" fill="#5b6675">只装目标和结论</text>
+      <line x1="856" y1="90" x2="856" y2="104" stroke="#0e9f6e" stroke-width="1.5"/>
+      <line x1="662" y1="104" x2="1050" y2="104" stroke="#0e9f6e" stroke-width="1.5"/>
+      <line x1="662" y1="106" x2="662" y2="124" stroke="#0e9f6e" stroke-width="1.5" marker-end="url(#m17)"/>
+      <line x1="856" y1="106" x2="856" y2="124" stroke="#0e9f6e" stroke-width="1.5" marker-end="url(#m17)"/>
+      <line x1="1050" y1="106" x2="1050" y2="124" stroke="#0e9f6e" stroke-width="1.5" marker-end="url(#m17)"/>
+      <rect x="577" y="126" width="170" height="44" rx="8" fill="#ffffff" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="662" y="146" text-anchor="middle" font-size="13" fill="#1f2937">子 · 查文档 A</text>
+      <text x="662" y="163" text-anchor="middle" font-size="12" fill="#94a3b8">独立上下文</text>
+      <rect x="771" y="126" width="170" height="44" rx="8" fill="#ffffff" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="856" y="146" text-anchor="middle" font-size="13" fill="#1f2937">子 · 查文档 B</text>
+      <text x="856" y="163" text-anchor="middle" font-size="12" fill="#94a3b8">独立上下文</text>
+      <rect x="965" y="126" width="170" height="44" rx="8" fill="#ffffff" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="1050" y="146" text-anchor="middle" font-size="13" fill="#1f2937">子 · 跑一遍测试</text>
+      <text x="1050" y="163" text-anchor="middle" font-size="12" fill="#94a3b8">独立上下文</text>
+      <text x="856" y="192" text-anchor="middle" font-size="13" fill="#0e9f6e">它们读过的原文不进主上下文，主上下文只多出三段结论</text>
+    </svg>
+    <div class="g3 mt2">
+      <div class="card t-green"><div class="t green">什么时候值得拆</div>
+        <div class="cap">子任务<b>要读很多东西，但只需要交回很少的结论</b>——查资料、扫一遍代码库、把十个文件各看一眼。读进去的原文留在子上下文里，主上下文只多一段话。</div></div>
+      <div class="card t-red"><div class="t red">什么时候不该拆</div>
+        <div class="cap">子任务之间<b>需要互相看见</b>的时候。它们各说各话，你拿到三段互相矛盾的结论也没法判谁对。<b>另外：拆一次多一次调用，账单和延迟都往上走。</b></div></div>
+      <div class="card t-blue"><div class="t blue">交代得写清楚</div>
+        <div class="cap">子 Agent 看不见你和主 Agent 说过的任何话。<b>任务、判定标准、要交回什么格式，都得在派它出去的那一刻写明</b>——交代不清，收回来就是一段没法用的自由发挥。</div></div>
+    </div>
+    <div class="note b-orange mt2"><div class="t orange">注意这里说的「子 Agent」是什么</div>
+      <div class="sub">是<b>同一套系统里、主 Agent 自己开出来的执行单元</b>——共用同一套工具、同一份权限、由同一个宿主调度，本质上是上下文的一种切分方式。至于<b>两个各自独立、互不隶属的 Agent 之间怎么互相发现、怎么协作</b>，那是接口层要定的另一套约定，不在本章范围内。</div></div>
+  </div>
+</section>
+
+<section class="slide" data-act="收尾">
+  <div class="hd"><h2>端到端走一遍：让它改一个 bug</h2></div>
+  <div class="bd">
+    <div class="lead">前面每一节单独拿出来都不难。真实的样子是它们<b>同时在起作用</b>——用一个最常见的任务串一遍。</div>
+    <svg viewBox="0 0 1168 232" style="width:100%;height:auto;display:block">
+      <defs><marker id="m17c" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+        <path d="M0,0 L9,4.5 L0,9 z" fill="#94a3b8"/></marker></defs>
+      <rect x="4" y="8" width="272" height="96" rx="8" fill="#fafbfd" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="20" y="34" font-size="13" fill="#1f2937">① 你把问题丢给它：</text>
+      <text x="20" y="54" font-size="13" fill="#1f2937">「登录接口偶尔 500」</text>
+      <rect x="20" y="66" width="68" height="20" rx="5" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="54" y="80" text-anchor="middle" font-size="12" fill="#2563eb">对话格式</text>
+      <line x1="279" y1="56" x2="297" y2="56" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#m17c)"/>
+      <rect x="300" y="8" width="272" height="96" rx="8" fill="#fafbfd" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="316" y="34" font-size="13" fill="#1f2937">② 它先自己想一遍：</text>
+      <text x="316" y="54" font-size="13" fill="#1f2937">并发？超时？先看日志</text>
+      <rect x="316" y="66" width="56" height="20" rx="5" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="344" y="80" text-anchor="middle" font-size="12" fill="#2563eb">思维链</text>
+      <line x1="575" y1="56" x2="593" y2="56" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#m17c)"/>
+      <rect x="596" y="8" width="272" height="96" rx="8" fill="#fafbfd" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="612" y="34" font-size="13" fill="#1f2937">③ 它请求调用：</text>
+      <text x="612" y="54" font-size="13" fill="#1f2937">grep 最近的 500 日志</text>
+      <rect x="612" y="66" width="68" height="20" rx="5" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="646" y="80" text-anchor="middle" font-size="12" fill="#7c3aed">工具调用</text>
+      <line x1="871" y1="56" x2="889" y2="56" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#m17c)"/>
+      <rect x="892" y="8" width="272" height="96" rx="8" fill="#fafbfd" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="908" y="34" font-size="13" fill="#1f2937">④ 宿主真去执行，回填：</text>
+      <text x="908" y="54" font-size="13" fill="#1f2937">「连接池耗尽」</text>
+      <rect x="908" y="66" width="104" height="20" rx="5" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/>
+      <text x="960" y="80" text-anchor="middle" font-size="12" fill="#c2410c">模型／宿主边界</text>
+      <path d="M1028 106 L1028 116 L140 116 L140 126" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#m17c)"/>
+      <rect x="4" y="128" width="272" height="96" rx="8" fill="#fafbfd" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="20" y="154" font-size="13" fill="#1f2937">⑤ 接着想、接着调：</text>
+      <text x="20" y="174" font-size="13" fill="#1f2937">读配置、读调用方代码</text>
+      <rect x="20" y="186" width="68" height="20" rx="5" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/>
+      <text x="54" y="200" text-anchor="middle" font-size="12" fill="#c2410c">多轮循环</text>
+      <line x1="279" y1="176" x2="297" y2="176" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#m17c)"/>
+      <rect x="300" y="128" width="272" height="96" rx="8" fill="#fafbfd" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="316" y="154" font-size="13" fill="#1f2937">⑥ 日志几万行装不下：</text>
+      <text x="316" y="174" font-size="13" fill="#1f2937">只把命中的 20 行留下</text>
+      <rect x="316" y="186" width="80" height="20" rx="5" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="356" y="200" text-anchor="middle" font-size="12" fill="#7c3aed">上下文工程</text>
+      <line x1="575" y1="176" x2="593" y2="176" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#m17c)"/>
+      <rect x="596" y="128" width="272" height="96" rx="8" fill="#fafbfd" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="612" y="154" font-size="13" fill="#1f2937">⑦ 改一行配置，然后：</text>
+      <text x="612" y="174" font-size="13" fill="#1f2937">自己把测试跑一遍</text>
+      <rect x="612" y="186" width="68" height="20" rx="5" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="646" y="200" text-anchor="middle" font-size="12" fill="#0e9f6e">自我验证</text>
+      <line x1="871" y1="176" x2="889" y2="176" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#m17c)"/>
+      <rect x="892" y="128" width="272" height="96" rx="8" fill="#fafbfd" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="908" y="154" font-size="13" fill="#1f2937">⑧ 红了就回到第 ⑤ 步，</text>
+      <text x="908" y="174" font-size="13" fill="#1f2937">绿了才说「改好了」</text>
+      <rect x="908" y="186" width="68" height="20" rx="5" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
+      <text x="942" y="200" text-anchor="middle" font-size="12" fill="#0e9f6e">终止条件</text>
+    </svg>
+    <div class="g2 mt2">
+      <div class="note b-blue"><div class="t blue">整个过程里模型只做了一件事</div>
+        <div class="sub">从头到尾，它都只是在<b>反复地「读一段文本、写一段文本」</b>。日志是宿主 grep 的，配置是宿主改的，测试是宿主跑的。你看到的那种「它在干活」的感觉，是<b>宿主按它的意图把动作真的做了出来</b>——这条边界一次都没有被跨过。</div></div>
+      <div class="note b-green"><div class="t green">这一遍里，哪些是你能调的</div>
+        <div class="sub">思考档位开多高、上下文里留什么、多少轮之后必须停、拿什么当验收判据——<b>这四件事全在你手上，和换不换模型无关。</b>同一个模型，这四件事设得好不好，跑出来的结果可以差很远——<b>「同样的模型，别人跑得动我跑不动」，多半就差在这里，不差在模型上。</b></div></div>
+    </div>
+    <div class="note b-orange mt2"><div class="t orange">换成一件没有测试的事，第 ⑦ ⑧ 步就不存在</div>
+      <div class="sub">整条链会在「它说改好了」这里断掉，后面全靠你自己看。<b>能不能自动跑下去，取决于这件事有没有一个机器能判的判据</b>——不取决于模型聪不聪明。这也是为什么同一个 Agent 在代码仓库里能连着跑几十轮，换到写材料上就只能一段一段交给你确认。</div></div>
   </div>
 </section>
 
@@ -552,6 +840,8 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
       <tr><td>思维链</td><td>答案一步吐出，难题的可用计算量被卡住</td><td>把推理摊到多个词元上，同时把中间结论写成一段可读的文本</td><td class="orange">输出词元大增，成本和延迟按倍数上去</td></tr>
       <tr><td>ReAct</td><td>推理全在脑内，拿不到外部信息也改变不了任何东西</td><td>在提示词里约定思考与行动交替，由外部程序执行并回填结果</td><td class="orange">格式随时会破、参数没类型、工具说明只能塞提示里</td></tr>
       <tr><td>工具调用</td><td>调用意图用自然语言表达，没有任何结构保证</td><td>工具进接口、意图变结构化输出，并且模型被专门训练过</td><td class="orange">依赖模型具备这项能力；接口本身要有一套约定</td></tr>
+      <tr><td class="purple">多轮循环</td><td class="dim">（工程侧，不在链上）</td><td>让这个圈自己转下去，并且规定它什么时候必须停</td><td class="orange">每一步的出错概率按轮连乘，上下文越滚越长</td></tr>
+      <tr><td class="purple">自我验证</td><td class="dim">（工程侧，不在链上）</td><td>把「到底做成没有」交给机器判：测试、编译、断言</td><td class="orange">判据造不出来的领域，只能把人放回环里</td></tr>
       <tr><td class="purple">上下文工程</td><td class="dim">（横向，不在链上）</td><td>管理每一轮到底把什么放进那段有限的输入里</td><td class="orange">压缩会丢信息、隔离会失去全局视野，没有免费的解法</td></tr>
     </table>
   </div>
@@ -568,10 +858,14 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
           <li>解释思维链为什么有效——<b>它增加的是可用计算量，不是聪明程度</b></li>
           <li>说清工具调用把 ReAct 靠自觉维持的那套，<b>落进了训练和接口里</b>——但循环本身没变</li>
           <li>说出模型和宿主的那条边界：<b>模型只输出调用意图，执行的永远是宿主</b></li>
+          <li>说清这个圈为什么必须由外面规定它什么时候停——<b>每一步的成功率是连乘的，二十轮之后 0.95 会变成 0.36</b></li>
+          <li>说清「它凭什么认为自己干完了」：<b>判据能不能被机器判，决定了这件事能不能放手让它自己跑</b>——这也是同一个 Agent 在代码上能连轴转、换到写材料就只能一段一段等你点头的原因</li>
         </ul>
       </div>
-      <div class="card"><div class="t">这一章刻意停在这里</div>
+      <div>
+        <div class="card"><div class="t">这一章刻意停在这里</div>
         <div class="cap mt" style="margin-top:8px">工具调用这一节讲到<b>「模型能输出调用意图、执行的是宿主」</b>就停了。下面这些明确不在本章范围内：<br><br>· <b>那份调用意图具体长什么样</b>——字段怎么定义、参数的类型约定怎么写、真实报文的结构<br>· <b>工具是怎么被接上来的</b>——它可以是宿主里内置的一个函数，也可以来自一个外部服务，这中间有一整套约定<br>· <b>多个 Agent 之间怎么互相委派</b><br><br>这些属于<b>接口怎么定义与传递</b>的范畴，是独立的一层，需要单独讲。<br><br><b>本章交付的是：能力是怎么一步步长出来的。</b>接口层怎么组织，是另一个问题。</div></div>
+      </div>
     </div>
     <div class="note b-purple mt2"><div class="t purple">如果只带走一句话</div>
       <div class="cap">从 Chat 到 Agent，<b>模型本身并没有发生质变——变的是它周围那一圈东西</b>：怎么把历史拼给它、怎么让它先想再答、怎么把它的输出接到真实动作上、怎么在窗口装不下时挑该留什么。<br>
