@@ -132,25 +132,6 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
   <div class="hd"><h2>先看清这一章的结构：三组，不是一串</h2></div>
   <div class="bd">
     <div class="p mb">下面要讲六样东西。<b>把它们排成一串会读错</b>——它们不在同一个层次上，解决的也不是同一个问题。分成三组来看：</div>
-        <div class="mb">
-      <svg viewBox="0 0 1168 190" style="width:100%;height:auto;display:block">
-        <rect x="20" y="26" width="660" height="44" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
-        <text x="350" y="54" text-anchor="middle" font-size="14" fill="#7c3aed">ACI · 抽象层：接口是写给概率模型看的</text>
-        <line x1="120" y1="70" x2="120" y2="90" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
-        <line x1="350" y1="70" x2="350" y2="90" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
-        <line x1="580" y1="70" x2="580" y2="90" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4"/>
-        <rect x="20" y="90" width="200" height="52" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/><text x="120" y="122" text-anchor="middle" font-size="15" fill="#1f2937">tools</text>
-        <rect x="250" y="90" width="200" height="52" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/><text x="350" y="122" text-anchor="middle" font-size="15" fill="#1f2937">MCP</text>
-        <rect x="480" y="90" width="200" height="52" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/><text x="580" y="122" text-anchor="middle" font-size="15" fill="#1f2937">CLI</text>
-        <path d="M20 154 L20 162 L680 162 L680 154" stroke="#2563eb" stroke-width="1.5" fill="none"/>
-        <text x="350" y="184" text-anchor="middle" font-size="13" fill="#2563eb">同一个问题：模型怎么让一台机器替它做事</text>
-        <line x1="720" y1="16" x2="720" y2="180" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="6 5"/>
-        <text x="950" y="20" text-anchor="middle" font-size="13" fill="#0e9f6e">各换了一个维度，不归 ACI 管</text>
-        <rect x="760" y="34" width="380" height="48" rx="8" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/><text x="950" y="64" text-anchor="middle" font-size="14" fill="#1f2937">Skills · 管的是「该怎么做」</text>
-        <rect x="760" y="104" width="380" height="48" rx="8" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/><text x="950" y="134" text-anchor="middle" font-size="14" fill="#1f2937">A2A · 对端是另一个 Agent</text>
-        <text x="950" y="178" text-anchor="middle" font-size="12" fill="#94a3b8">硬塞进 ACI 的框子就理解错了</text>
-      </svg>
-    </div>
     <div class="g3">
       <div class="card t-blue"><div class="t blue">第一组 · 同一族的三样</div>
         <div class="cap"><b>tools　·　MCP　·　CLI</b><br><br>都在回答同一个问题：<b>模型怎么让一台机器替它做事。</b><br><br>差别在于那份约定<b>写在哪儿、由谁维护、怎么传过来</b>。讲完三样之后要抽共通点。</div></div>
@@ -278,30 +259,6 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
 <section class="slide" data-act="tools">
   <div class="hd"><h2>tools 的边界：工具变多之后，和什么时候不该用</h2></div>
   <div class="bd">
-        <div class="mb">
-      <svg viewBox="0 0 1168 214" style="width:100%;height:auto;display:block">
-        <text x="8" y="18" font-size="14" fill="#c2410c">一次任务里，每一轮发过去的东西</text>
-        <text x="92" y="64" text-anchor="end" font-size="13" fill="#5b6675">第 1 轮</text>
-        <rect x="110" y="40" width="280" height="36" rx="5" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/><text x="250" y="63" text-anchor="middle" font-size="12" fill="#c2410c">工具定义（每轮相同）</text>
-        <rect x="392" y="40" width="100" height="36" rx="5" fill="#f4f7fb" stroke="#cbd5e1" stroke-width="1.5"/><text x="442" y="63" text-anchor="middle" font-size="12" fill="#5b6675">系统提示</text>
-        <rect x="494" y="40" width="70" height="36" rx="5" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/><text x="529" y="63" text-anchor="middle" font-size="12" fill="#2563eb">历史</text>
-        <rect x="566" y="40" width="76" height="36" rx="5" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/><text x="604" y="63" text-anchor="middle" font-size="12" fill="#0e9f6e">本轮</text>
-        <text x="92" y="114" text-anchor="end" font-size="13" fill="#5b6675">第 2 轮</text>
-        <rect x="110" y="90" width="280" height="36" rx="5" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/><text x="250" y="113" text-anchor="middle" font-size="12" fill="#c2410c">工具定义（每轮相同）</text>
-        <rect x="392" y="90" width="100" height="36" rx="5" fill="#f4f7fb" stroke="#cbd5e1" stroke-width="1.5"/><text x="442" y="113" text-anchor="middle" font-size="12" fill="#5b6675">系统提示</text>
-        <rect x="494" y="90" width="210" height="36" rx="5" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/><text x="599" y="113" text-anchor="middle" font-size="12" fill="#2563eb">历史</text>
-        <rect x="706" y="90" width="76" height="36" rx="5" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/><text x="744" y="113" text-anchor="middle" font-size="12" fill="#0e9f6e">本轮</text>
-        <text x="92" y="164" text-anchor="end" font-size="13" fill="#5b6675">第 3 轮</text>
-        <rect x="110" y="140" width="280" height="36" rx="5" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/><text x="250" y="163" text-anchor="middle" font-size="12" fill="#c2410c">工具定义（每轮相同）</text>
-        <rect x="392" y="140" width="100" height="36" rx="5" fill="#f4f7fb" stroke="#cbd5e1" stroke-width="1.5"/><text x="442" y="163" text-anchor="middle" font-size="12" fill="#5b6675">系统提示</text>
-        <rect x="494" y="140" width="350" height="36" rx="5" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/><text x="669" y="163" text-anchor="middle" font-size="12" fill="#2563eb">历史</text>
-        <rect x="846" y="140" width="76" height="36" rx="5" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/><text x="884" y="163" text-anchor="middle" font-size="12" fill="#0e9f6e">本轮</text>
-        <path d="M110 180 L110 188 L390 188 L390 180" stroke="#c2410c" stroke-width="1.5" fill="none"/>
-        <text x="250" y="208" text-anchor="middle" font-size="13" fill="#c2410c">这一段一字没变，付了三次</text>
-        <text x="1160" y="92" text-anchor="end" font-size="14" fill="#1f2937">几十个工具就是每轮好几 K 的固定开销</text>
-        <text x="1160" y="120" text-anchor="end" font-size="13" fill="#94a3b8">而且它挤的正是留给资料和历史的那份预算</text>
-      </svg>
-    </div>
     <div class="g2">
       <div>
         <div class="card mb"><div class="t orange">工具一多就出问题</div>
@@ -591,27 +548,6 @@ a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(37,99,235,
 <section class="slide" data-act="CLI">
   <div class="hd"><h2>CLI 强在哪儿：三条别的方案给不了的东西</h2></div>
   <div class="bd">
-        <div class="mb">
-      <svg viewBox="0 0 1168 158" style="width:100%;height:auto;display:block">
-        <defs><marker id="c4a" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0 L8 4 L0 8 z" fill="#94a3b8"/></marker></defs>
-        <text x="8" y="54" font-size="15" fill="#0e9f6e">CLI</text>
-        <rect x="110" y="28" width="650" height="40" rx="8" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/><text x="435" y="53" text-anchor="middle" font-size="13" fill="#1f2937">grep … | xargs … | sort … | head -5</text>
-        <line x1="762" y1="48" x2="796" y2="48" stroke="#94a3b8" stroke-width="2" marker-end="url(#c4a)"/>
-        <rect x="800" y="28" width="140" height="40" rx="8" fill="#f4f7fb" stroke="#cbd5e1" stroke-width="1.5"/><text x="870" y="53" text-anchor="middle" font-size="13" fill="#1f2937">结果</text>
-        <text x="1160" y="53" text-anchor="end" font-size="14" fill="#0e9f6e">1 次往返</text>
-        <text x="8" y="124" font-size="15" fill="#c2410c">专用工具</text>
-        <rect x="110" y="98" width="76" height="40" rx="5" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/><text x="148" y="123" text-anchor="middle" font-size="12" fill="#c2410c">调用</text>
-        <rect x="190" y="98" width="76" height="40" rx="5" fill="#f4f7fb" stroke="#cbd5e1" stroke-width="1.5"/><text x="228" y="123" text-anchor="middle" font-size="12" fill="#5b6675">回执</text>
-        <rect x="278" y="98" width="76" height="40" rx="5" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/><text x="316" y="123" text-anchor="middle" font-size="12" fill="#c2410c">调用</text>
-        <rect x="358" y="98" width="76" height="40" rx="5" fill="#f4f7fb" stroke="#cbd5e1" stroke-width="1.5"/><text x="396" y="123" text-anchor="middle" font-size="12" fill="#5b6675">回执</text>
-        <rect x="446" y="98" width="76" height="40" rx="5" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/><text x="484" y="123" text-anchor="middle" font-size="12" fill="#c2410c">调用</text>
-        <rect x="526" y="98" width="76" height="40" rx="5" fill="#f4f7fb" stroke="#cbd5e1" stroke-width="1.5"/><text x="564" y="123" text-anchor="middle" font-size="12" fill="#5b6675">回执</text>
-        <rect x="614" y="98" width="76" height="40" rx="5" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/><text x="652" y="123" text-anchor="middle" font-size="12" fill="#c2410c">调用</text>
-        <rect x="694" y="98" width="76" height="40" rx="5" fill="#f4f7fb" stroke="#cbd5e1" stroke-width="1.5"/><text x="732" y="123" text-anchor="middle" font-size="12" fill="#5b6675">回执</text>
-        <text x="1160" y="123" text-anchor="end" font-size="14" fill="#c2410c">4 次往返 · 4 段回执 · 4 轮词元</text>
-        <text x="580" y="154" text-anchor="middle" font-size="13" fill="#5b6675">同一件事。上面那条里，中间结果根本不用回到上下文里过一遍</text>
-      </svg>
-    </div>
     <div class="g3 mb">
       <div class="card t-green"><div class="t green">① 可组合</div>
         <div class="cap">管道、重定向、循环，让模型可以<b>一次调用完成多步工作</b>，中间结果不必回到上下文里过一遍。</div>
@@ -734,20 +670,6 @@ some-tool --version</div>
   <div class="hd"><h2>Skills 换了一个维度：管的是「该怎么做」</h2></div>
   <div class="bd">
     <div class="p mb">前面三样解决的都是同一个问题：<b>让模型能做某件事</b>。但真实工作里，「能做」之后往往还差一大截——它做得了，只是没按你们的规矩做。</div>
-        <div class="mb">
-      <svg viewBox="0 0 1168 150" style="width:100%;height:auto;display:block">
-        <defs><marker id="c4b" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0 L8 4 L0 8 z" fill="#94a3b8"/></marker></defs>
-        <rect x="8" y="24" width="372" height="106" rx="8" fill="#fef2f2" stroke="#e2e8f0" stroke-width="1.5"/>
-        <text x="194" y="56" text-anchor="middle" font-size="15" fill="#dc2626">没有工具</text><text x="194" y="90" text-anchor="middle" font-size="14" fill="#1f2937">这件事根本发生不了</text><text x="194" y="118" text-anchor="middle" font-size="12" fill="#94a3b8">缺的是能力</text>
-        <path d="M382 77 L398 77" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#c4b)"/>
-        <rect x="400" y="24" width="372" height="106" rx="8" fill="#fff7ed" stroke="#e2e8f0" stroke-width="1.5"/>
-        <text x="586" y="56" text-anchor="middle" font-size="15" fill="#c2410c">有工具，没规范</text><text x="586" y="90" text-anchor="middle" font-size="14" fill="#1f2937">做得出来，但不合你们的规矩</text><text x="586" y="118" text-anchor="middle" font-size="12" fill="#94a3b8">缺的是做法</text>
-        <path d="M774 77 L790 77" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#c4b)"/>
-        <rect x="792" y="24" width="368" height="106" rx="8" fill="#ecfdf5" stroke="#e2e8f0" stroke-width="1.5"/>
-        <text x="976" y="56" text-anchor="middle" font-size="15" fill="#0e9f6e">工具 + Skill</text><text x="976" y="90" text-anchor="middle" font-size="14" fill="#1f2937">做得出来，而且对</text><text x="976" y="118" text-anchor="middle" font-size="12" fill="#94a3b8">两样都齐了</text>
-        <text x="584" y="16" text-anchor="middle" font-size="13" fill="#5b6675">Skills 不给新能力，它只把第二格变成第三格</text>
-      </svg>
-    </div>
     <div class="g2 mb">
       <div class="card t-blue"><div class="t blue">工具解决的问题：能不能做</div>
         <div class="cap">「读文件」「查数据库」「发请求」——<b>没有工具，这些事根本发生不了</b>。<br><br>工具的说明写的是<b>接口</b>：参数是什么形状、返回什么、有什么限制。</div></div>
@@ -797,23 +719,6 @@ some-tool --version</div>
 <section class="slide" data-act="Skills">
   <div class="hd"><h2>写一个 Skill：四条要点</h2></div>
   <div class="bd">
-        <div class="mb">
-      <svg viewBox="0 0 1168 170" style="width:100%;height:auto;display:block">
-        <rect x="8" y="8" width="440" height="152" rx="8" fill="#fafbfd" stroke="#e2e8f0" stroke-width="1.5"/>
-        <text x="56" y="38" font-family="ui-monospace,Consolas,Menlo,monospace" font-size="14" fill="#1f2937">my-skill/</text>
-        <text x="56" y="68" font-family="ui-monospace,Consolas,Menlo,monospace" font-size="14" fill="#1f2937">├── SKILL.md</text>
-        <text x="56" y="98" font-family="ui-monospace,Consolas,Menlo,monospace" font-size="14" fill="#1f2937">├── templates/weekly.md</text>
-        <text x="56" y="128" font-family="ui-monospace,Consolas,Menlo,monospace" font-size="14" fill="#1f2937">└── scripts/validate.py</text>
-        <text x="56" y="152" font-size="12" fill="#94a3b8">没有编译、没有注册中心——就是一个文件夹</text>
-        <line x1="452" y1="62" x2="472" y2="62" stroke="#cbd5e1" stroke-width="1.5"/>
-        <line x1="452" y1="94" x2="472" y2="94" stroke="#cbd5e1" stroke-width="1.5"/>
-        <line x1="452" y1="124" x2="472" y2="124" stroke="#cbd5e1" stroke-width="1.5"/>
-        <text x="480" y="52" font-size="13" fill="#0e9f6e">① description：把用户可能的说法都列进去</text>
-        <text x="480" y="76" font-size="13" fill="#0e9f6e">② 正文：只写步骤、规则、反例，不写背景</text>
-        <text x="480" y="100" font-size="13" fill="#2563eb">③ 长模板、长示例放这儿——真要用时才读进来</text>
-        <text x="480" y="130" font-size="13" fill="#2563eb">④ 不允许每次结果不一样的步骤，写成脚本别交给模型现做</text>
-      </svg>
-    </div>
     <div class="g2 mb">
       <div class="card t-green"><div class="t green">① description 写触发条件</div>
         <div class="cap">上一页已经说了原因，这里补一句实操：<b>把你能想到的用户说法都列进去</b>。「周报 / 周会材料 / 本周进展 / 这周做了啥」——它是靠字面匹配上下文的，说法覆盖得越全，该触发时越不会漏。</div></div>
@@ -834,25 +739,6 @@ some-tool --version</div>
 <section class="slide" data-act="Skills">
   <div class="hd"><h2>什么时候用它，什么时候别用</h2></div>
   <div class="bd">
-        <div class="mb">
-      <svg viewBox="0 0 1168 176" style="width:100%;height:auto;display:block">
-        <defs><marker id="c4c" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0 L8 4 L0 8 z" fill="#94a3b8"/></marker></defs>
-        <rect x="8" y="54" width="200" height="40" rx="8" fill="#f4f7fb" stroke="#cbd5e1" stroke-width="1.5"/><text x="108" y="79" text-anchor="middle" font-size="14" fill="#1f2937">它到底怎么了？</text>
-        <path d="M208 74 L240 74 L240 32 L272 32" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#c4c)"/>
-        <path d="M208 74 L240 74 L240 112 L272 112" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#c4c)"/>
-        <text x="236" y="40" text-anchor="end" font-size="12" fill="#dc2626">做不出来</text>
-        <text x="236" y="118" text-anchor="end" font-size="12" fill="#c2410c">做出来不对</text>
-        <rect x="276" y="12" width="230" height="40" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/><text x="391" y="37" text-anchor="middle" font-size="14" fill="#dc2626">该加的是工具</text>
-        <text x="524" y="37" font-size="13" fill="#94a3b8">不是规范问题，写多少 Skill 都没用</text>
-        <rect x="276" y="92" width="230" height="40" rx="8" fill="#fff7ed" stroke="#c2410c" stroke-width="1.5"/><text x="391" y="117" text-anchor="middle" font-size="14" fill="#1f2937">规则有几条？</text>
-        <path d="M506 112 L538 112 L538 84 L570 84" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#c4c)"/>
-        <path d="M506 112 L538 112 L538 144 L570 144" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#c4c)"/>
-        <rect x="574" y="64" width="300" height="40" rx="8" fill="#f4f7fb" stroke="#cbd5e1" stroke-width="1.5"/><text x="724" y="89" text-anchor="middle" font-size="13" fill="#1f2937">一两条 → 写进系统提示词</text>
-        <rect x="574" y="124" width="300" height="40" rx="8" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/><text x="724" y="149" text-anchor="middle" font-size="13" fill="#1f2937">一套流程 → 做成 Skill</text>
-        <path d="M874 144 L904 144" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#c4c)"/>
-        <rect x="908" y="124" width="252" height="40" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/><text x="1034" y="149" text-anchor="middle" font-size="13" fill="#1f2937">先定谁维护、多久校一次</text>
-      </svg>
-    </div>
     <div class="g2 mb">
       <div class="card t-green"><div class="t green">适合做成 Skill 的四类</div>
         <div class="ul s">
@@ -877,29 +763,6 @@ some-tool --version</div>
   <div class="hd"><h2>A2A：对面不再是工具，是另一个 Agent</h2></div>
   <div class="bd">
     <div class="p mb">前面所有内容都有一个共同假设：<b>对面是确定的</b>。函数会返回、命令会退出、Server 会应答，行为可预期。A2A 换掉的正是这个假设——<b>对面也是一个模型驱动的东西</b>。</div>
-        <div class="mb">
-      <svg viewBox="0 0 1168 158" style="width:100%;height:auto;display:block">
-        <defs><marker id="c4d" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0 L8 4 L0 8 z" fill="#94a3b8"/></marker></defs>
-        <text x="8" y="12" font-size="13" fill="#5b6675">调用一个工具</text>
-        <rect x="8" y="20" width="170" height="40" rx="8" fill="#f4f7fb" stroke="#cbd5e1" stroke-width="1.5"/><text x="93" y="45" text-anchor="middle" font-size="14" fill="#1f2937">你的 Agent</text>
-        <line x1="178" y1="32" x2="296" y2="32" stroke="#94a3b8" stroke-width="2" marker-end="url(#c4d)"/>
-        <text x="238" y="26" text-anchor="middle" font-size="12" fill="#5b6675">参数</text>
-        <line x1="298" y1="50" x2="180" y2="50" stroke="#94a3b8" stroke-width="2" marker-end="url(#c4d)"/>
-        <rect x="300" y="20" width="220" height="40" rx="8" fill="#f4f7fb" stroke="#cbd5e1" stroke-width="1.5"/><text x="410" y="45" text-anchor="middle" font-size="14" fill="#1f2937">一段确定的程序</text>
-        <text x="1160" y="45" text-anchor="end" font-size="13" fill="#5b6675">毫秒到秒 · 同步等着 · 重试结果一致</text>
-        <text x="8" y="88" font-size="13" fill="#7c3aed">委派给一个 Agent</text>
-        <rect x="8" y="96" width="170" height="40" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/><text x="93" y="121" text-anchor="middle" font-size="14" fill="#1f2937">你的 Agent</text>
-        <line x1="178" y1="106" x2="296" y2="106" stroke="#7c3aed" stroke-width="2" marker-end="url(#c4d)"/>
-        <text x="238" y="100" text-anchor="middle" font-size="12" fill="#7c3aed">一个目标</text>
-        <line x1="298" y1="128" x2="180" y2="128" stroke="#7c3aed" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#c4d)"/>
-        <text x="238" y="152" text-anchor="middle" font-size="12" fill="#7c3aed">中途还可能回来追问</text>
-        <rect x="300" y="90" width="220" height="52" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
-        <text x="410" y="112" text-anchor="middle" font-size="14" fill="#1f2937">对方 Agent</text><text x="410" y="134" text-anchor="middle" font-size="12" fill="#7c3aed">自己规划 · 会犯错</text>
-        <line x1="522" y1="116" x2="596" y2="116" stroke="#7c3aed" stroke-width="2" marker-end="url(#c4d)"/>
-        <rect x="600" y="96" width="240" height="40" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/><text x="720" y="121" text-anchor="middle" font-size="13" fill="#1f2937">一份产出，或一段「做不了」</text>
-        <text x="1160" y="121" text-anchor="end" font-size="13" fill="#7c3aed">几分钟到几小时 · 有状态 · 重试可能不同</text>
-      </svg>
-    </div>
     <table class="tbl mb">
       <tr><th style="width:18%"></th><th style="width:41%">调用一个工具</th><th>委派给一个 Agent</th></tr>
       <tr><td><b>对面是什么</b></td><td>一段确定的程序</td><td class="purple"><b>另一个 Agent，自己会规划、会用工具、会犯错</b></td></tr>
@@ -1046,25 +909,6 @@ some-tool --version</div>
   <div class="hd"><h2>五样东西放进同一张坐标系</h2></div>
   <div class="bd">
     <div class="p mb">开头说过：这不是一串并列的技术。现在可以把那句话补完——<b>它们分布在两个维度上</b>：横轴是「接的是谁」，纵轴是「约定写在哪里」。</div>
-        <div class="mb">
-      <svg viewBox="0 0 1168 172" style="width:100%;height:auto;display:block">
-        <rect x="100" y="4" width="1060" height="26" rx="6" fill="#ecfdf5" stroke="#0e9f6e" stroke-width="1.5"/>
-        <text x="630" y="22" text-anchor="middle" font-size="13" fill="#0e9f6e">Skills · 叠在这一层之上：不接新东西，只约束已有能力的用法</text>
-        <line x1="100" y1="126" x2="1140" y2="126" stroke="#cbd5e1" stroke-width="1.5"/>
-        <line x1="100" y1="126" x2="100" y2="46" stroke="#cbd5e1" stroke-width="1.5"/>
-        <text x="108" y="56" font-size="12" fill="#94a3b8">约定越往上，越不在你手里</text>
-        <circle cx="200" cy="112" r="6" fill="#2563eb"/><text x="200" y="98" text-anchor="middle" font-size="14" fill="#2563eb">tools</text>
-        <circle cx="440" cy="92" r="6" fill="#7c3aed"/><text x="440" y="78" text-anchor="middle" font-size="14" fill="#7c3aed">MCP</text>
-        <circle cx="700" cy="72" r="6" fill="#c2410c"/><text x="700" y="58" text-anchor="middle" font-size="14" fill="#c2410c">CLI</text>
-        <circle cx="1000" cy="78" r="6" fill="#dc2626"/><text x="1000" y="64" text-anchor="middle" font-size="14" fill="#dc2626">A2A</text>
-        <text x="200" y="146" text-anchor="middle" font-size="12" fill="#5b6675">本进程内的代码</text>
-        <text x="440" y="146" text-anchor="middle" font-size="12" fill="#5b6675">另一个进程</text>
-        <text x="700" y="146" text-anchor="middle" font-size="12" fill="#5b6675">整个操作系统</text>
-        <text x="1000" y="146" text-anchor="middle" font-size="12" fill="#5b6675">另一个 Agent</text>
-        <text x="1150" y="168" text-anchor="end" font-size="12" fill="#dc2626">只有 A2A 的对面会自己规划、会犯错</text>
-        <text x="108" y="168" font-size="12" fill="#94a3b8">接的是谁 →</text>
-      </svg>
-    </div>
     <table class="tbl mb">
       <tr><th style="width:13%"></th><th style="width:19%">接的是谁</th><th style="width:24%">约定写在哪里</th><th style="width:22%">解决的问题</th><th>什么时候选它</th></tr>
       <tr><td class="blue"><b>tools</b></td><td>本进程内的代码</td><td>请求里的 schema 与说明</td><td>让模型能做事</td><td>能力只服务你这一个宿主</td></tr>
