@@ -15,6 +15,7 @@
         h1 { font-size: 2rem; color: #1a1a2e; }
 
         .post { display: flex; gap: 1.5rem; align-items: flex-start; }
+        .post + .post { margin-top: 1.75rem; }
         .post-thumb {
             width: 100px; height: 100px; border-radius: 8px; flex-shrink: 0;
             background: #eef6ff; display: flex; align-items: center;
@@ -41,6 +42,15 @@
         <header>
             <h1>Ha2fde's Blog</h1>
         </header>
+
+        <div class="post">
+            <div class="post-thumb" aria-hidden="true">🛡️</div>
+            <div>
+                <div class="post-title"><a href="posts/vulnerability-trust-boundaries.html">能执行代码，就算漏洞吗？</a></div>
+                <div class="post-meta"><time datetime="2026-11-04">2026-11-04</time> · 漏洞研究</div>
+                <div class="post-desc">从信任边界到实际利用，用 DolphinScheduler 和 Gravitino 的公开案例拆解一次漏洞判断。</div>
+            </div>
+        </div>
 
         <div class="post">
             <div class="post-thumb">🧭</div>
