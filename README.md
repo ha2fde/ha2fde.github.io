@@ -1,5 +1,10 @@
 # ha2fde.github.io
 
+我是 Kai，关注网络安全与 AI，也对地理、历史和文化感兴趣。
+
+- [山河之间 · 个人地理志](https://ha2fde.github.io/posts/atlas/)：在地图上看 2025 年河西走廊与 2026 年山西，19 张自己的旅行照片。
+- [技术笔记与作品](https://ha2fde.github.io/)：安全研究、Agent 与系统原理。
+
 个人站点，GitHub Pages 托管：<https://ha2fde.github.io>
 
 分两个区：**对外区**放成品，首页链接、搜索引擎收录；**归档区 `lab/`** 放中间过程和旧版本，首页不链接、`noindex` + `robots.txt` 挡爬虫（仓库是 public，所以这是"不显眼"而非"私密"）。
