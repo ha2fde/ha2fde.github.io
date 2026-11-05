@@ -57,7 +57,7 @@
     const neighbors = trip.neighbors.map(p => { const [x,y] = project(p.coord); return `<text class="neighbor-label" x="${x}" y="${y}" text-anchor="middle">${p.name}</text>`; }).join('');
     const provinceLabel = project(trip.provinceLabel);
     const compact = window.matchMedia('(max-width:600px)').matches;
-    const compactLabels = {taiyuan:[60,7],yanqiu:[-120,-24],tianlongshan:[-65,12],jinci:[-25,57],yungang:[-35,-38],xuankong:[62,-7],yingxian:[-67,2],yanmen:[-47,40],wutai:[58,42]};
+    const compactLabels = {taiyuan:[60,7],yanqiu:[-120,-24],tianlongshan:[-65,12],jinci:[-25,57],wangjia:[45,14],yungang:[-35,-38],xuankong:[62,-7],yingxian:[-67,2],yanmen:[-47,40],wutai:[58,42]};
     // Leader labels separate nearby attractions while keeping pins at their geographic positions.
     const gansuLabels = {
       lanzhou:[[504,325],[500,338]],wuwei:[[474,202],[489,191]],
