@@ -1,16 +1,16 @@
-/* Only recognisable locations are pinned; the remaining frames stay unlocated. */
+/* Gansu photo locations are confirmed by the owner; map pins are approximate landmarks. */
 window.ATLAS = {
   photos: [
     {id:'IMG_7094', trip:'gansu', title:'黄河夜色', subtitle:'兰州 · 黄河铁桥', alt:'夜色里，灯光映在黄河铁桥与河面上', place:'lanzhou', width:1152, height:1536},
     {id:'IMG_7323', trip:'gansu', title:'鸠摩罗什寺', subtitle:'武威 · 寺门与秋树', alt:'秋树掩映下的武威鸠摩罗什寺门楼', place:'wuwei', width:1152, height:1536},
-    {id:'IMG_7516', trip:'gansu', title:'石窟造像', subtitle:'河西沿途 · 石壁与佛像', alt:'石壁环抱中的大型佛教造像', width:1152, height:1536},
-    {id:'IMG_7561', trip:'gansu', title:'旷野与云', subtitle:'河西沿途 · 远山与天光', alt:'辽阔的旷野上，一朵白云停在远山之上', width:1152, height:1536},
+    {id:'IMG_7516', trip:'gansu', title:'天梯山石窟', subtitle:'武威 · 十三号大佛窟', alt:'仰望武威天梯山石窟十三号窟的大佛与两侧造像', place:'tiantishan', width:1152, height:1536},
+    {id:'IMG_7561', trip:'gansu', title:'乌鞘岭', subtitle:'天祝 · 河西走廊东端门户', alt:'乌鞘岭起伏的草坡与远山之上，一朵白云悬在蓝天里', place:'wushaoling', width:1152, height:1536},
     {id:'IMG_7676', trip:'gansu', title:'七彩丹霞', subtitle:'张掖 · 层叠的山色', alt:'阴云之下，张掖七彩丹霞的红黄山层连绵起伏', place:'zhangye', width:1152, height:1536},
-    {id:'IMG_7852', trip:'gansu', title:'峡谷小径', subtitle:'河西沿途 · 岩壁之间', alt:'一条步道穿过高耸的红色峡谷岩壁', width:1152, height:1536},
-    {id:'IMG_8045', trip:'gansu', title:'边关城墙', subtitle:'河西沿途 · 城墙与光影', alt:'古城墙前，陈列的兵器与影子排列在步道旁', width:1152, height:1536},
-    {id:'IMG_8203', trip:'gansu', title:'沙山与蓝天', subtitle:'河西沿途 · 沙的曲线', alt:'金色沙山与深蓝天空，留下简洁的弧线', width:1152, height:1536},
-    {id:'IMG_8250', trip:'gansu', title:'崖壁楼阁', subtitle:'敦煌 · 莫高窟', alt:'敦煌莫高窟崖壁前的多层红色楼阁', place:'dunhuang', width:1152, height:1536},
-    {id:'IMG_8332', trip:'gansu', title:'荒漠遗迹', subtitle:'河西沿途 · 戈壁与时间', alt:'荒漠戈壁上散落的土质遗迹，远处天空云层翻涌', width:1152, height:1536},
+    {id:'IMG_7852', trip:'gansu', title:'平山湖大峡谷', subtitle:'张掖 · 岩壁之间的小径', alt:'张掖平山湖大峡谷内，一条步道穿过层叠的岩壁', place:'pingshanhu', width:1152, height:1536},
+    {id:'IMG_8045', trip:'gansu', title:'嘉峪关关城', subtitle:'嘉峪关 · 城墙与光影', alt:'嘉峪关关城内，陈列的兵器与影子排列在城墙前', place:'jiayuguan', width:1152, height:1536},
+    {id:'IMG_8203', trip:'gansu', title:'鸣沙山月牙泉', subtitle:'敦煌 · 沙山与水面', alt:'敦煌鸣沙山月牙泉景区，金色沙山、蓝天与前景的水面', place:'mingshashan', width:1152, height:1536},
+    {id:'IMG_8250', trip:'gansu', title:'莫高窟', subtitle:'敦煌 · 崖壁楼阁', alt:'敦煌莫高窟崖壁前的多层红色楼阁', place:'dunhuang', width:1152, height:1536},
+    {id:'IMG_8332', trip:'gansu', title:'锁阳城遗址', subtitle:'瓜州 · 塔尔寺遗址大塔', alt:'瓜州锁阳城旁，塔尔寺遗址的大塔与戈壁上的建筑遗迹', place:'suoyang', width:1152, height:1536},
     {id:'IMG_1548', trip:'shanxi', title:'双塔映秋', subtitle:'太原 · 秋树与水面', alt:'太原双塔与秋树倒映在水面上', place:'taiyuan', width:1152, height:1536},
     {id:'IMG_1708', trip:'shanxi', title:'水边一刻', subtitle:'山西沿途 · 安静的停留', alt:'平静湖面上浮着水鸟，岸边是秋树与远山', width:1536, height:1152},
     {id:'IMG_1762', trip:'shanxi', title:'山中楼阁', subtitle:'山西沿途 · 层叠的屋檐', alt:'山林和岩壁之间，重叠的古建屋檐向外伸展', width:1152, height:1536},
@@ -26,14 +26,21 @@ window.ATLAS = {
       kicker:'GANSU / 甘肃省', defaultPlace:'zhangye', year:'2025.10',
       title:'十帧河西，留住一个秋天。', intro:'2025 年十月 · 从黄河夜色，到沙山与石窟。',
       geoLabel:'读地图 / 河西走廊',
-      geography:'河西不是一条画出来的直线。祁连山与北侧的山地、荒漠之间，狭长的平地展开；冰雪融水滋养绿洲，也让沿途的城与路有了依托。兰州是这组照片的起点，并不位于河西走廊腹地。',
+      geography:'从乌鞘岭向西，祁连山与北侧的山地、荒漠之间，狭长的平地展开。冰雪融水滋养绿洲，也让沿途的城与路有了依托。兰州是这组甘肃照片的起点，乌鞘岭则是河西走廊的东端门户。',
       source:'https://www.forestry.gov.cn/c/www/mlzgxczrbhd/149760.jhtml',
-      provinceLabel:[105.8,34.9], neighbors:[{name:'青 海',coord:[98.5,35.9]},{name:'内 蒙 古',coord:[103.3,40.1]}],
+      indexLine:['lanzhou','wushaoling','tiantishan','wuwei','zhangye','pingshanhu','jiayuguan','suoyang','dunhuang','mingshashan'],
+      provinceLabel:[105.8,33.8], neighbors:[{name:'青 海',coord:[98.5,35.9]},{name:'内 蒙 古',coord:[106.5,41.0]}],
       points:[
         {id:'lanzhou',name:'兰州',en:'LANZHOU',coord:[103.834,36.061],label:[23,21],photo:'IMG_7094',tag:'黄河 / 城市',title:'从一条河，走进西北。',body:'夜里的铁桥与河面，是这组甘肃影像的开场。把兰州放回省域地图，再向西北看，河西走廊的方向便清楚起来。'},
         {id:'wuwei',name:'武威',en:'WUWEI',coord:[102.638,37.928],label:[22,2],photo:'IMG_7323',tag:'寺院 / 文化',title:'把寺门放回它的城市。',body:'一座寺院的门楼，也是一处认识城市的入口。镜头中的鸠摩罗什寺，给武威留下了一个具体而安静的印象。'},
+        {id:'tiantishan',name:'天梯山石窟',en:'TIANTISHAN GROTTOES',coord:[102.745,37.564],label:[40,5],photo:'IMG_7516',tag:'石窟 / 造像',title:'仰望一尊佛，也追问一段交流。',body:'天梯山石窟十三号大佛窟里，主尊与两侧造像占满视野。把这里与敦煌、云冈连在一起看，石窟也成为理解文化如何沿路传播的一条线索。',source:'https://www.gswbj.gov.cn/a/2026/07/17/28921.html',sourceLabel:'文旅资料'},
+        {id:'wushaoling',name:'乌鞘岭',en:'WUSHAOLING',coord:[102.850,37.200],label:[40,30],photo:'IMG_7561',tag:'山岭 / 地理门户',title:'越过山岭，走廊开始展开。',body:'乌鞘岭是河西走廊的东端门户。照片里的草坡、远山与一朵白云，给这个地图上的地理节点留下了具体的形状。',source:'https://www.gswbj.gov.cn/a/2026/09/28/29655.html',sourceLabel:'地理背景'},
         {id:'zhangye',name:'张掖',en:'ZHANGYE',coord:[100.073,38.97],label:[-22,28],photo:'IMG_7676',tag:'丹霞 / 地貌',title:'山的颜色，也有层次。',body:'丹霞的红与黄沿着山势铺开。先看眼前的纹理，再看地图上它与绿洲、山地的位置关系，风景就不只是一个取景框。'},
-        {id:'dunhuang',name:'敦煌',en:'DUNHUANG',coord:[94.809,40.042],label:[-14,-24],photo:'IMG_8250',tag:'石窟 / 文化交流',title:'在走廊西端，遇见石窟。',body:'莫高窟把建筑、造像与壁画的历史汇聚在崖壁之间。与山西的云冈放在一起看，两段旅行也因佛教艺术多了一条可追索的线索。',source:'https://whc.unesco.org/en/list/440/'}
+        {id:'pingshanhu',name:'平山湖大峡谷',en:'PINGSHANHU CANYON',coord:[100.670,39.120],label:[10,-35],photo:'IMG_7852',tag:'峡谷 / 岩层',title:'走进岩壁之间，换一种尺度。',body:'从远处看，岩层是风景里的纹理；走入平山湖大峡谷，它们又成为身体两侧高耸的墙。小径让人近距离看见岩石的层次与风化留下的形状。',source:'https://www.zhangye.gov.cn/dzdt/tszy/202505/t20250520_1403468_ghb.html',sourceLabel:'地貌资料'},
+        {id:'jiayuguan',name:'嘉峪关',en:'JIAYUGUAN PASS',coord:[98.217,39.802],label:[0,-25],photo:'IMG_8045',tag:'关城 / 通道',title:'一座关城，站在道路与山河之间。',body:'城墙前的兵器与地面的影子，是嘉峪关关城里的一处细节。把视线再放回地图，关城与走廊、往来道路之间的关系，也值得继续追问。'},
+        {id:'mingshashan',name:'鸣沙山月牙泉',en:'MINGSHA DUNES',coord:[94.670,40.090],label:[-30,30],photo:'IMG_8203',tag:'沙山 / 泉水',title:'沙的曲线，与水面相遇。',body:'在鸣沙山月牙泉，沙山、蓝天与水面进入同一幅画面。细看沙脊的弧线，再想它与绿洲的位置关系，眼前的风景也多了一层地理意味。'},
+        {id:'dunhuang',name:'莫高窟',en:'MOGAO CAVES',coord:[94.809,40.042],label:[20,-25],photo:'IMG_8250',tag:'石窟 / 文化交流',title:'在走廊西端，遇见石窟。',body:'莫高窟把建筑、造像与壁画的历史汇聚在崖壁之间。与山西的云冈放在一起看，两段旅行也因佛教艺术多了一条可追索的线索。',source:'https://whc.unesco.org/en/list/440/'},
+        {id:'suoyang',name:'锁阳城',en:'SUOYANG CITY',coord:[96.214,40.253],label:[5,28],photo:'IMG_8332',tag:'古城 / 寺院遗址',title:'戈壁上的塔，留住古城的回声。',body:'这座塔属于锁阳城旁的塔尔寺遗址。大塔与残墙留在开阔的戈壁里，让人继续想象城、寺院与沿途生活曾经怎样彼此相连。',source:'https://www.gswbj.gov.cn/a/2022/08/12/14723.html',sourceLabel:'考古资料'}
       ]
     },
     shanxi: {

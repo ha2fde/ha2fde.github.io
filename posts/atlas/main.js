@@ -51,16 +51,25 @@
       const y = project([minLon,lat])[1];
       grid += `<line class="map-grid" x1="22" x2="698" y1="${y}" y2="${y}"/><text class="map-grid-label" x="4" y="${y-5}">${lat}°</text>`;
     }
-    const routeOrder = tripId === 'gansu' ? ['lanzhou','wuwei','zhangye','dunhuang'] : ['jinci','taiyuan','yungang','xuankong','yingxian','yanmen','wutai'];
+    const routeOrder = trip.indexLine || ['jinci','taiyuan','yungang','xuankong','yingxian','yanmen','wutai'];
     const route = routeOrder.map(id => project(trip.points.find(p => p.id === id).coord));
     const routePath = route.map((p,i) => `${i ? 'L' : 'M'}${p.join(',')}`).join(' ');
     const neighbors = trip.neighbors.map(p => { const [x,y] = project(p.coord); return `<text class="neighbor-label" x="${x}" y="${y}" text-anchor="middle">${p.name}</text>`; }).join('');
     const provinceLabel = project(trip.provinceLabel);
     const compact = window.matchMedia('(max-width:600px)').matches;
-    const compactLabels = {lanzhou:[30,25],wuwei:[30,-2],zhangye:[-30,36],dunhuang:[-20,-33],taiyuan:[48,15],jinci:[-40,42],yungang:[-35,-38],xuankong:[62,-7],yingxian:[-67,2],yanmen:[-47,40],wutai:[58,42]};
+    const compactLabels = {taiyuan:[48,15],jinci:[-40,42],yungang:[-35,-38],xuankong:[62,-7],yingxian:[-67,2],yanmen:[-47,40],wutai:[58,42]};
+    // Leader labels separate nearby attractions while keeping pins at their geographic positions.
+    const gansuLabels = {
+      lanzhou:[[504,325],[500,338]],wuwei:[[474,202],[489,191]],
+      tiantishan:[[514,231],[516,231]],wushaoling:[[478,269],[485,279]],
+      zhangye:[[347,231],[352,245]],pingshanhu:[[388,142],[385,133]],
+      jiayuguan:[[277,113],[281,94]],mingshashan:[[131,183],[158,196]],
+      dunhuang:[[169,104],[164,95]],suoyang:[[247,187],[247,198]]
+    };
     const markers = trip.points.map(p => {
       const [x,y] = project(p.coord);
-      const [dx,dy] = compact ? compactLabels[p.id] : p.label;
+      const position = tripId === 'gansu' ? gansuLabels[p.id]?.[compact ? 1 : 0] : null;
+      const [dx,dy] = position ? [position[0]-x,position[1]-y] : (compactLabels[p.id] && compact ? compactLabels[p.id] : p.label);
       const anchor = dx < -15 ? 'end' : dx > 15 ? 'start' : 'middle';
       return `<g class="map-marker" role="button" tabindex="0" aria-label="查看${p.name}的照片与介绍" aria-pressed="false" data-place="${p.id}" transform="translate(${x},${y})"><circle class="map-hit" r="18"/><line class="marker-leader" x1="0" y1="0" x2="${dx*.78}" y2="${dy*.75}"/><circle class="marker-halo" r="11"/><circle class="marker-dot" r="4"/><text class="marker-label" x="${dx}" y="${dy}" dominant-baseline="middle" text-anchor="${anchor}">${p.name}</text></g>`;
     }).join('');
@@ -88,7 +97,7 @@
     const p = trip.points[placeIndex];
     const photo = photos.get(p.photo);
     $('#place-counter').textContent = `PLACE ${pad(placeIndex+1)} / ${pad(trip.points.length)}`;
-    $('#place-detail').innerHTML = `<div class="place-top"><span class="place-name">${p.name}</span><span class="place-english">${p.en}</span></div><button class="place-photo" type="button" data-open-photo="${photo.id}" aria-label="查看${photo.title}大图"><img src="${imagePath(photo.id)}" alt="${photo.alt}" width="${photo.width}" height="${photo.height}"></button><p class="place-tag">${p.tag}</p><h3 class="place-headline">${p.title}</h3><p class="place-body">${p.body}</p>${p.source?`<a class="place-source" href="${p.source}" target="_blank" rel="noopener noreferrer">文化背景 · UNESCO ↗</a>`:''}`;
+    $('#place-detail').innerHTML = `<div class="place-top"><span class="place-name">${p.name}</span><span class="place-english">${p.en}</span></div><button class="place-photo" type="button" data-open-photo="${photo.id}" aria-label="查看${photo.title}大图"><img src="${imagePath(photo.id)}" alt="${photo.alt}" width="${photo.width}" height="${photo.height}"></button><p class="place-tag">${p.tag}</p><h3 class="place-headline">${p.title}</h3><p class="place-body">${p.body}</p>${p.source?`<a class="place-source" href="${p.source}" target="_blank" rel="noopener noreferrer">${p.sourceLabel || '文化背景 · UNESCO'} ↗</a>`:''}`;
     $$('[data-place]').forEach(el => {
       const selected = el.dataset.place === placeId;
       el.classList.toggle('is-selected', selected);

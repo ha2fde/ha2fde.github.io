@@ -1,9 +1,9 @@
 # ha2fde.github.io
 
-我是 Kai，关注网络安全与 AI，也对地理、历史和文化感兴趣。
+关注技术与 AI，也对地理、历史和文化感兴趣。
 
 - [山河之间 · 个人地理志](https://ha2fde.github.io/posts/atlas/)：在地图上看 2025 年河西走廊与 2026 年山西，19 张自己的旅行照片。
-- [技术笔记与作品](https://ha2fde.github.io/)：安全研究、Agent 与系统原理。
+- [技术笔记与作品](https://ha2fde.github.io/)：AI、Agent 与系统原理。
 
 个人站点，GitHub Pages 托管：<https://ha2fde.github.io>
 
