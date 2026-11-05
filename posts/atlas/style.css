@@ -8,3 +8,9 @@
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation:none!important;transition:none!important}}
 
 @media(max-width:600px){.marker-label{font-size:22px;stroke-width:5px}.map-grid-label{font-size:13px}.neighbor-label{font-size:22px}.province-title{font-size:30px}.north-label,.scale-label{font-size:15px}.marker-dot{r:6;stroke-width:2.5}.marker-halo{r:14}.map-hit{r:27}.map-marker.is-selected .marker-dot{r:7}}
+
+/* The map is the landing content; no cover or journey overview precedes it. */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.site-header{height:72px}
+.atlas-section{padding-top:28px}
+@media(max-width:600px){.atlas-section{padding-top:18px}}
