@@ -1,4 +1,4 @@
-/* Gansu photo locations are confirmed by the owner; map pins are approximate landmarks. */
+/* Photo locations are confirmed by the owner; map pins are approximate landmarks. */
 window.ATLAS = {
   photos: [
     {id:'IMG_7094', trip:'gansu', title:'黄河夜色', subtitle:'兰州 · 黄河铁桥', alt:'夜色里，灯光映在黄河铁桥与河面上', place:'lanzhou', width:1152, height:1536},
@@ -12,7 +12,7 @@ window.ATLAS = {
     {id:'IMG_8250', trip:'gansu', title:'莫高窟', subtitle:'敦煌 · 崖壁楼阁', alt:'敦煌莫高窟崖壁前的多层红色楼阁', place:'dunhuang', width:1152, height:1536},
     {id:'IMG_8332', trip:'gansu', title:'锁阳城遗址', subtitle:'瓜州 · 塔尔寺遗址大塔', alt:'瓜州锁阳城旁，塔尔寺遗址的大塔与戈壁上的建筑遗迹', place:'suoyang', width:1152, height:1536},
     {id:'IMG_1548', trip:'shanxi', title:'永祚寺双塔', subtitle:'太原 · 双塔公园里的双塔寺', alt:'从太原双塔公园水边远望永祚寺（双塔寺）的双塔与秋树', place:'taiyuan', width:1152, height:1536},
-    {id:'IMG_1708', trip:'shanxi', title:'水边一刻', subtitle:'山西沿途 · 安静的停留', alt:'平静湖面上浮着水鸟，岸边是秋树与远山', width:1536, height:1152},
+    {id:'IMG_1708', trip:'shanxi', title:'雁丘园', subtitle:'太原 · 汾河景区', alt:'太原雁丘园水面上浮着水鸟，岸边是秋树与远山', place:'yanqiu', width:1536, height:1152},
     {id:'IMG_1762', trip:'shanxi', title:'天龙山石窟', subtitle:'太原 · 漫山阁（第9窟）', alt:'天龙山石窟第9窟外，漫山阁依崖壁而建，层层屋檐掩映在山林之间', place:'tianlongshan', width:1152, height:1536},
     {id:'IMG_1791', trip:'shanxi', title:'晋祠', subtitle:'太原 · 三晋名泉', alt:'晋祠三晋名泉建筑，屋檐、匾额与门前石阶', place:'jinci', width:1536, height:1152},
     {id:'IMG_1905', trip:'shanxi', title:'云冈石窟', subtitle:'大同 · 石头中的凝望', alt:'云冈石窟岩壁上的露天佛像与天空', place:'yungang', width:1152, height:1536},
@@ -49,10 +49,11 @@ window.ATLAS = {
       geoLabel:'读地图 / 古建与山河',
       geography:'同在山西，石窟、木塔、关隘与山中寺院，却与地势有着不同的关系。把它们放回地图，就能沿着地理位置，继续追问建筑、道路与文化如何彼此影响。',
       source:'https://whc.unesco.org/en/list/1279/',
-      indexLine:['tianlongshan','jinci','taiyuan','yungang','xuankong','yingxian','yanmen','wutai'],
+      indexLine:['tianlongshan','jinci','taiyuan','yanqiu','yungang','xuankong','yingxian','yanmen','wutai'],
       provinceLabel:[111.25,36.6],neighbors:[{name:'陕 西',coord:[109.7,37.1]},{name:'河 北',coord:[114.55,38.0]},{name:'内 蒙 古',coord:[112.2,40.9]}],
       points:[
         {id:'taiyuan',name:'永祚寺',en:'YONGZUO TEMPLE',coord:[112.599,37.847],label:[35,10],photo:'IMG_1548',tag:'古塔 / 城市公园',title:'在公园里，远望一座寺的双塔。',body:'双塔公园的水面与秋树，把视线引向永祚寺的双塔。永祚寺也被称作双塔寺；公园、寺院与古塔，共同构成这张太原秋日影像。',source:'https://www.cnr.cn/sx/sxgz/20210709/t20210709_525530855.shtml',sourceLabel:'公园与古寺'},
+        {id:'yanqiu',name:'雁丘园',en:'YANQIU GARDEN',coord:[112.480,38.010],label:[-24,-22],photo:'IMG_1708',tag:'汾河 / 诗词',title:'元好问与《雁丘词》',body:'雁丘园位于太原汾河景区，以元好问的《摸鱼儿·雁丘词》为主题。照片里是水鸟、岸边的秋树与远山。',source:'https://paper.people.com.cn/hwbwap/html/2024-01/15/content_26037111.htm',sourceLabel:'元好问与雁丘'},
         {id:'tianlongshan',name:'天龙山石窟',en:'TIANLONGSHAN',coord:[112.383,37.738],label:[-48,-16],photo:'IMG_1762',tag:'石窟 / 护阁',title:'楼阁依崖，石窟藏在屋檐之后。',body:'照片中的楼阁是漫山阁，位于天龙山石窟第9窟外，保护着崖壁上的石刻造像。层叠屋檐、山林与岩石进入同一幅画面，让建筑与地形的关系变得具体。',source:'https://www.xinhuanet.com/local/2021-02/13/c_1127097372.htm',sourceLabel:'石窟与楼阁'},
         {id:'jinci',name:'晋祠',en:'JINCI',coord:[112.445,37.709],label:[-29,30],photo:'IMG_1791',tag:'祠庙 / 建筑',title:'屋檐下，是可以细看的时间。',body:'让视线停在一处屋檐、一块匾额和一段石阶上，古建便有了具体的尺度。晋祠的这一帧，留住的是值得慢慢细看的细节。'},
         {id:'yungang',name:'云冈石窟',en:'YUNGANG',coord:[113.132,40.109],label:[-22,-28],photo:'IMG_1905',tag:'北魏 / 石窟艺术',title:'一面石壁，连接辽阔的世界。',body:'云冈是公元 5 至 6 世纪佛教石窟艺术的重要遗存。站在这些造像前，眼睛先看到形象，地图则让人继续想到远处的交流与传播。',source:'https://whc.unesco.org/en/list/1039/'},
