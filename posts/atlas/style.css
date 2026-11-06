@@ -141,3 +141,16 @@
   .photo-grid.is-henan .frame-title{font-size:12px}
   .photo-grid.is-henan .frame-subtitle{font-size:8px}
 }
+
+.photo-grid.is-henan .frame-source{
+  display:inline-block;
+  margin-top:6px;
+  color:#71816b;
+  font-size:8px;
+  line-height:1.5;
+  letter-spacing:.2px;
+  text-decoration:none;
+  border-bottom:1px solid #d4d9ce;
+}
+.photo-grid.is-henan .frame-source:hover{color:var(--ink);border-color:var(--ink)}
+@media(max-width:480px){.photo-grid.is-henan .frame-source{font-size:7px}}
