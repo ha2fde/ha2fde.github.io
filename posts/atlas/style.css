@@ -232,3 +232,6 @@
 .photo-grid.is-henan .frame-HN_06 img,
 .photo-grid.is-henan .frame-HN_07 img,
 .photo-grid.is-henan .frame-HN_10 img{width:100%;height:100%;object-fit:cover}
+
+/* Keep the ultra-wide Longmen panorama fully visible while matching the Yellow River card frame. */
+.photo-grid.is-henan .frame-HN_01 img{object-fit:contain;background:#ded8cb}
