@@ -13,17 +13,17 @@
   <meta property="og:image" content="https://ha2fde.github.io/posts/atlas/photos/IMG_2075.webp">
   <meta property="og:url" content="https://ha2fde.github.io/posts/atlas/">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232a443b'/%3E%3Cpath d='M10 46 27 19l11 17 7-11 10 21' fill='none' stroke='%23f6f3ec' stroke-width='3'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="style.css?v=20261106-1">
-  <script defer src="maps.js"></script>
-  <script defer src="data.js?v=20261105-6"></script>
-  <script defer src="main.js?v=20261105-6"></script>
+  <link rel="stylesheet" href="style.css?v=20261106-8">
+  <script defer src="maps.js?v=20261106-8"></script>
+  <script defer src="data.js?v=20261106-8"></script>
+  <script defer src="main.js?v=20261106-8"></script>
 </head>
 <body>
   <a class="skip" href="#atlas">跳到旅行地图</a>
   <header class="site-header">
     <a class="wordmark" href="/" aria-label="博客首页">山河之间</a>
     <nav aria-label="主导航">
-      <a href="#atlas">地图</a><a href="#frames">影像</a><a href="#2027">2027 河南</a>
+      <a href="#atlas">地图</a><a href="#frames">影像</a>
       <a class="nav-blog" href="/">博客 <span aria-hidden="true">↗</span></a>
     </nav>
   </header>
@@ -34,7 +34,7 @@
       <div class="trip-tabs" role="group" aria-label="选择旅行地图">
         <button class="trip-tab is-active" data-trip="gansu" aria-pressed="true"><span>01</span><b>甘肃 · 河西走廊</b><small>2025.10</small></button>
         <button class="trip-tab" data-trip="shanxi" aria-pressed="false"><span>02</span><b>山西 · 古建与山河</b><small>2026.10</small></button>
-        <a class="trip-tab trip-tab-preview" href="#2027" aria-label="查看2027年河南行前预览"><span>03</span><b>河南 · 行前预览</b><small>2027.10 ↘</small></a>
+        <button class="trip-tab" data-trip="henan" aria-pressed="false"><span>03</span><b>河南 · 行前计划</b><small>2027</small></button>
       </div>
       <div class="atlas-board">
         <div class="map-pane">
@@ -55,34 +55,13 @@
     <section class="frames-section wrap" id="frames" aria-labelledby="frames-heading">
       <div class="section-heading">
         <div><p class="eyebrow">02 / THROUGH MY LENS</p><h2 id="frames-heading">十帧河西，留住一个秋天。</h2></div>
-        <div class="gallery-filters" role="group" aria-label="选择相册"><button data-gallery="gansu" aria-pressed="true">河西走廊 <span>10</span></button><button data-gallery="shanxi" aria-pressed="false">山西 <span>10</span></button></div>
+        <div class="gallery-filters" role="group" aria-label="选择相册"><button data-gallery="gansu" aria-pressed="true">河西走廊 <span>10</span></button><button data-gallery="shanxi" aria-pressed="false">山西 <span>10</span></button><button data-gallery="henan" aria-pressed="false">河南 <span>10</span></button></div>
       </div>
       <p class="gallery-intro" id="gallery-intro">2025 年十月 · 从黄河夜色，到沙山与石窟。</p>
       <div class="photo-grid" id="photo-grid"></div>
-      <p class="gallery-footnote">照片由我在旅途中拍摄。点击照片可查看大图，使用左右方向键切换。</p>
+      <p class="gallery-footnote" id="gallery-footnote">2025、2026 照片为本人实拍；2027 为行前参考影像。点击照片可查看大图。</p>
     </section>
 
-
-    <section class="preview-section wrap" id="2027" aria-labelledby="preview-heading">
-      <div class="section-heading">
-        <div><p class="eyebrow">03 / THE NEXT JOURNEY</p><h2 id="preview-heading">2027 · 河南，走进中原。</h2></div>
-        <p class="section-aside">行前预览 · 计划中的路线与风景</p>
-      </div>
-      <p class="preview-intro">从河洛故地到黄河古渡，从商周遗址到太行深谷。先把想去的地方放在地图之外，等真正出发，再用自己的镜头替换这些影像。</p>
-      <div class="preview-grid">
-        <figure class="preview-card"><a href="https://commons.wikimedia.org/wiki/File:Longmen_Grottoes_of_Luoyang.jpg" target="_blank" rel="noopener noreferrer"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Longmen_Grottoes_of_Luoyang.jpg?width=1400" alt="洛阳龙门石窟真实摄影" loading="lazy"><span>01 / 洛阳</span></a><figcaption><b>龙门石窟</b><small>北魏至唐 · 石窟艺术</small><a href="https://commons.wikimedia.org/wiki/File:Longmen_Grottoes_of_Luoyang.jpg" target="_blank" rel="noopener noreferrer">摄影与授权信息 ↗</a></figcaption></figure>
-        <figure class="preview-card"><a href="https://commons.wikimedia.org/wiki/File:20240815_Erlitou_Site_01.jpg" target="_blank" rel="noopener noreferrer"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/20240815_Erlitou_Site_01.jpg?width=1400" alt="洛阳二里头遗址实景" loading="lazy"><span>02 / 洛阳</span></a><figcaption><b>二里头遗址</b><small>早期国家 · 考古现场</small><a href="https://commons.wikimedia.org/wiki/File:20240815_Erlitou_Site_01.jpg" target="_blank" rel="noopener noreferrer">摄影与授权信息 ↗</a></figcaption></figure>
-        <figure class="preview-card"><a href="https://commons.wikimedia.org/wiki/File:20260810_Yellow_River_in_Zhengzhou_and_Jiaozuo.jpg" target="_blank" rel="noopener noreferrer"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/20260810_Yellow_River_in_Zhengzhou_and_Jiaozuo.jpg?width=1400" alt="郑州焦作之间的黄河与沁河汇流处航拍" loading="lazy"><span>03 / 黄河</span></a><figcaption><b>黄河与沁河汇流</b><small>荥阳—武陟 · 河流地理</small><a href="https://commons.wikimedia.org/wiki/File:20260810_Yellow_River_in_Zhengzhou_and_Jiaozuo.jpg" target="_blank" rel="noopener noreferrer">Windmemories · CC BY-SA 4.0 ↗</a></figcaption></figure>
-        <figure class="preview-card"><a href="https://commons.wikimedia.org/wiki/File:20221218_Hulaoguan_Village.jpg" target="_blank" rel="noopener noreferrer"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/20221218_Hulaoguan_Village.jpg?width=1400" alt="荥阳汜水镇虎牢关村实景" loading="lazy"><span>04 / 荥阳</span></a><figcaption><b>虎牢关</b><small>成皋形胜 · 古代关隘</small><a href="https://commons.wikimedia.org/wiki/File:20221218_Hulaoguan_Village.jpg" target="_blank" rel="noopener noreferrer">摄影与授权信息 ↗</a></figcaption></figure>
-        <figure class="preview-card"><a href="https://commons.wikimedia.org/wiki/File:20260721_Iron_Pagoda_Park.jpg" target="_blank" rel="noopener noreferrer"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/20260721_Iron_Pagoda_Park.jpg?width=1400" alt="开封铁塔公园实景" loading="lazy"><span>05 / 开封</span></a><figcaption><b>开封铁塔</b><small>北宋 · 城市遗存</small><a href="https://commons.wikimedia.org/wiki/File:20260721_Iron_Pagoda_Park.jpg" target="_blank" rel="noopener noreferrer">摄影与授权信息 ↗</a></figcaption></figure>
-        <figure class="preview-card"><a href="https://commons.wikimedia.org/wiki/File:Exterior,_Yinxu_Museum_20241002-A.jpg" target="_blank" rel="noopener noreferrer"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Exterior,_Yinxu_Museum_20241002-A.jpg?width=1400" alt="安阳殷墟博物馆建筑外观实景" loading="lazy"><span>06 / 安阳</span></a><figcaption><b>殷墟博物馆</b><small>商代晚期 · 甲骨与青铜</small><a href="https://commons.wikimedia.org/wiki/File:Exterior,_Yinxu_Museum_20241002-A.jpg" target="_blank" rel="noopener noreferrer">摄影与授权信息 ↗</a></figcaption></figure>
-        <figure class="preview-card"><a href="https://commons.wikimedia.org/wiki/File:20250629_Songyang_Academy_01.jpg" target="_blank" rel="noopener noreferrer"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/20250629_Songyang_Academy_01.jpg?width=1400" alt="登封嵩阳书院真实摄影" loading="lazy"><span>07 / 登封</span></a><figcaption><b>嵩阳书院</b><small>嵩山 · 书院与古树</small><a href="https://commons.wikimedia.org/wiki/File:20250629_Songyang_Academy_01.jpg" target="_blank" rel="noopener noreferrer">摄影与授权信息 ↗</a></figcaption></figure>
-        <figure class="preview-card"><a href="https://commons.wikimedia.org/wiki/File:Taihang_Mountains_%E5%A4%AA%E8%A1%8C%E5%B1%B1_-_panoramio.jpg" target="_blank" rel="noopener noreferrer"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Taihang_Mountains_%E5%A4%AA%E8%A1%8C%E5%B1%B1_-_panoramio.jpg?width=1400" alt="太行山脉山地全景实景" loading="lazy"><span>08 / 林州</span></a><figcaption><b>太行山脉</b><small>山地纵深 · 峡谷入口</small><a href="https://commons.wikimedia.org/wiki/Category:Linzhou_Taihang_Grand_Canyon" target="_blank" rel="noopener noreferrer">影像来源与授权 ↗</a></figcaption></figure>
-        <figure class="preview-card preview-card-feature"><a href="https://commons.wikimedia.org/wiki/File:Wangxiangyan_-_panoramio.jpg" target="_blank" rel="noopener noreferrer"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Wangxiangyan_-_panoramio.jpg?width=1800" alt="林州王相岩峡谷实景" loading="lazy"><span>09 / 深入太行</span></a><figcaption><b>王相岩</b><small>峡谷徒步 · 走进岩壁之间</small><a href="https://commons.wikimedia.org/wiki/File:Wangxiangyan_-_panoramio.jpg" target="_blank" rel="noopener noreferrer">摄影与授权信息 ↗</a></figcaption></figure>
-        <figure class="preview-card preview-card-feature"><a href="https://commons.wikimedia.org/wiki/File:%E6%9E%97%E5%B7%9E%E5%A4%AA%E8%A1%8C%E5%B1%B1%E6%A1%83%E8%8A%B1%E8%B0%B7%E6%99%AF%E5%8C%BA_2020-10-16_0.jpg" target="_blank" rel="noopener noreferrer"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/%E6%9E%97%E5%B7%9E%E5%A4%AA%E8%A1%8C%E5%B1%B1%E6%A1%83%E8%8A%B1%E8%B0%B7%E6%99%AF%E5%8C%BA_2020-10-16_0.jpg?width=1800" alt="林州太行山桃花谷峡谷内部实景" loading="lazy"><span>10 / 深入太行</span></a><figcaption><b>桃花谷</b><small>溪谷步道 · 沿着山谷继续走</small><a href="https://commons.wikimedia.org/wiki/Category:Peach_Blossom_Valley" target="_blank" rel="noopener noreferrer">影像来源与授权 ↗</a></figcaption></figure>
-      </div>
-      <p class="preview-footnote">以上为行前参考影像，并非本人实拍。图片来自 Wikimedia Commons；每张图片链接至原始文件页，摄影者、许可协议及使用条件以原页标注为准。旅行结束后，再以自己的照片替换。</p>
-    </section>
 
     <div class="colophon wrap">
       <details><summary>关于地图、照片与资料 <span aria-hidden="true">＋</span></summary><div class="source-copy"><p>省界取自 <a href="https://datav.aliyun.com/portal/school/atlas/area_selector" target="_blank" rel="noopener noreferrer">阿里云 DataV GeoAtlas</a> 的甘肃、山西省域数据，仅作个人旅行地点的地理展示，不作导航或测绘用途。地点为景区或城市的概略位置；虚线为地点索引连线。</p><p>河西走廊的地理说明参考 <a href="https://www.forestry.gov.cn/c/www/mlzgxczrbhd/149760.jhtml" target="_blank" rel="noopener noreferrer">国家林业和草原局：走进秘境祁连山</a>。石窟与五台山的文化背景参见 UNESCO 的 <a href="https://whc.unesco.org/en/list/440/" target="_blank" rel="noopener noreferrer">莫高窟</a>、<a href="https://whc.unesco.org/en/list/1039/" target="_blank" rel="noopener noreferrer">云冈石窟</a>与 <a href="https://whc.unesco.org/en/list/1279/" target="_blank" rel="noopener noreferrer">五台山</a>条目。永祚寺与双塔公园参考 <a href="https://wenhua.tylyhy.cn/mjgs/XW518182658370.html" target="_blank" rel="noopener noreferrer">太原市文化馆的永祚寺介绍</a>和 <a href="https://www.cnr.cn/sx/sxgz/20210709/t20210709_525530855.shtml" target="_blank" rel="noopener noreferrer">双塔公园报道</a>；天龙山漫山阁参考 <a href="https://www.xinhuanet.com/local/2021-02/13/c_1127097372.htm" target="_blank" rel="noopener noreferrer">现场图文报道</a>。河西沿途的背景另参考 <a href="https://www.gswbj.gov.cn/a/2026/07/17/28921.html" target="_blank" rel="noopener noreferrer">天梯山石窟</a>、<a href="https://www.gswbj.gov.cn/a/2026/09/28/29655.html" target="_blank" rel="noopener noreferrer">乌鞘岭</a>、<a href="https://www.zhangye.gov.cn/dzdt/tszy/202505/t20250520_1403468_ghb.html" target="_blank" rel="noopener noreferrer">平山湖大峡谷</a>与 <a href="https://www.gswbj.gov.cn/a/2022/08/12/14723.html" target="_blank" rel="noopener noreferrer">锁阳城塔尔寺遗址</a>资料。</p><p>20 张照片由本人在旅途中拍摄，地点均已确认并加入地图索引。公开副本不包含拍摄设备的 EXIF 信息。</p></div></details>
