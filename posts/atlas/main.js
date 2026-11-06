@@ -81,6 +81,7 @@
     $('#province-map').setAttribute('aria-label', `${trip.kicker}旅行地点地图`);
     $('#map-kicker').textContent = trip.kicker;
     $('#map-scale').textContent = trip.year;
+    $('.map-footnote').textContent = tripId==='henan' && !window.henanBoundaryVerified ? '河南省界加载中或不可用时显示概略轮廓；地点坐标仅供行前参考，不用于导航。' : '省域地理示意 · 连线用于定位地点，不代表实际道路或完整行程。';
     $$('#province-map [data-place]').forEach(marker => {
       marker.addEventListener('click', () => selectPlace(marker.dataset.place));
       marker.addEventListener('keydown', e => {
@@ -203,6 +204,7 @@
       const geometry = geo.features?.[0]?.geometry;
       if (geometry && ['Polygon','MultiPolygon'].includes(geometry.type)) {
         boundaries.henan = geometry;
+        window.henanBoundaryVerified = true;
         if (currentTrip === 'henan') { renderMap('henan'); selectPlace(currentPlace,false); }
       }
     }).catch(() => { /* Approximate outline remains; never used for navigation. */ });
