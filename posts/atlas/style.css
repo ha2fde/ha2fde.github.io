@@ -196,3 +196,17 @@
  .photo-grid.is-henan .frame-HN_03>button{aspect-ratio:16/9}
  .photo-grid.is-henan .frame-HN_08>button{aspect-ratio:3/4}
 }
+
+/* The two Wangxiang images are two experiences within the same mapped stop. */
+.photo-grid.is-henan .frame-HN_08,
+.photo-grid.is-henan .frame-HN_09{grid-column:span 2}
+.photo-grid.is-henan .frame-HN_08>button,
+.photo-grid.is-henan .frame-HN_09>button{aspect-ratio:4/3}
+.photo-grid.is-henan .frame-HN_08 img,
+.photo-grid.is-henan .frame-HN_09 img{width:100%;height:100%;object-fit:cover}
+@media(max-width:800px){
+ .photo-grid.is-henan .frame-HN_08,
+ .photo-grid.is-henan .frame-HN_09{grid-column:span 1}
+ .photo-grid.is-henan .frame-HN_08>button,
+ .photo-grid.is-henan .frame-HN_09>button{aspect-ratio:4/5}
+}
