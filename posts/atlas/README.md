@@ -1,4 +1,4 @@
-# 山河之间 · 个人地理志
+# 山河之间
 
 公开页面：<https://ha2fde.github.io/posts/atlas/>
 
