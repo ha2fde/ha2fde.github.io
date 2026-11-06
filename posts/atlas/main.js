@@ -6,8 +6,10 @@
   const $ = s => document.querySelector(s);
   const $$ = s => [...document.querySelectorAll(s)];
   const photos = new Map(data.photos.map(p => [p.id, p]));
-  const imagePath = id => `photos/${id}.webp`;
+  const imagePath = id => photos.get(id)?.url || `photos/${id}.webp`;
   const pad = n => String(n).padStart(2, '0');
+  // Fallback is an explicitly approximate silhouette until GeoAtlas loads.
+  boundaries.henan = {type:'Polygon',coordinates:[[[111.0,34.9],[111.6,35.7],[112.8,36.3],[114.3,36.5],[115.4,35.8],[116.5,35.0],[116.6,33.6],[115.8,32.2],[115.0,31.4],[113.8,31.4],[112.9,32.3],[111.2,33.4],[110.3,34.1],[111.0,34.9]]]};
   let currentTrip = 'gansu';
   let currentPlace = '';
   let currentGallery = 'gansu';
@@ -75,7 +77,7 @@
     }).join('');
     const scaleKm = tripId === 'gansu' ? 200 : 100;
     const scalePixels = scaleKm / 111.2 * scale;
-    $('#province-map').innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="group" aria-labelledby="province-title province-description"><title id="province-title">${trip.kicker}旅行地点地图</title><desc id="province-description">真实省界上的旅行影像地点。可用 Tab 选择地名，按回车或空格查看。连线只表示地点关系。</desc><defs><pattern id="map-hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><line x1="0" x2="0" y1="0" y2="9" stroke="#afbf9e" stroke-width="1"/></pattern></defs>${grid}${neighbors}<path class="province-shadow" d="${d}"/><path class="province-outline" d="${d}" fill-rule="evenodd"/><path class="province-hatch" d="${d}" fill-rule="evenodd"/><text class="province-title" x="${provinceLabel[0]}" y="${provinceLabel[1]}" text-anchor="middle">${tripId==='gansu'?'甘 肃':'山 西'}</text><path class="map-route" d="${routePath}"/>${markers}<g transform="translate(672,43)" aria-hidden="true"><text class="north-label" text-anchor="middle" y="-12">N</text><path class="north-line" d="M0 31V0M-5 9 0 0 5 9" fill="none"/></g><g transform="translate(39,424)" aria-hidden="true"><path class="scale-line" d="M0 -5V0H${scalePixels}V-5" fill="none"/><text class="scale-label" x="0" y="15">${scaleKm} km</text></g></svg>`;
+    $('#province-map').innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="group" aria-labelledby="province-title province-description"><title id="province-title">${trip.kicker}旅行地点地图</title><desc id="province-description">真实省界上的旅行影像地点。可用 Tab 选择地名，按回车或空格查看。连线只表示地点关系。</desc><defs><pattern id="map-hatch" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><line x1="0" x2="0" y1="0" y2="9" stroke="#afbf9e" stroke-width="1"/></pattern></defs>${grid}${neighbors}<path class="province-shadow" d="${d}"/><path class="province-outline" d="${d}" fill-rule="evenodd"/><path class="province-hatch" d="${d}" fill-rule="evenodd"/><text class="province-title" x="${provinceLabel[0]}" y="${provinceLabel[1]}" text-anchor="middle">${tripId==='gansu'?'甘 肃':tripId==='shanxi'?'山 西':'河 南'}</text><path class="map-route" d="${routePath}"/>${markers}<g transform="translate(672,43)" aria-hidden="true"><text class="north-label" text-anchor="middle" y="-12">N</text><path class="north-line" d="M0 31V0M-5 9 0 0 5 9" fill="none"/></g><g transform="translate(39,424)" aria-hidden="true"><path class="scale-line" d="M0 -5V0H${scalePixels}V-5" fill="none"/><text class="scale-label" x="0" y="15">${scaleKm} km</text></g></svg>`;
     $('#province-map').setAttribute('aria-label', `${trip.kicker}旅行地点地图`);
     $('#map-kicker').textContent = trip.kicker;
     $('#map-scale').textContent = trip.year;
@@ -128,6 +130,7 @@
     $$('[data-gallery]').forEach(b => b.setAttribute('aria-pressed',String(b.dataset.gallery === tripId)));
     $('#frames-heading').textContent = trip.title;
     $('#gallery-intro').textContent = trip.intro;
+    $('#gallery-footnote').textContent = tripId==='henan'?'2027 为行前参考影像，非本人实拍；点击照片查看大图。摄影来源及授权请通过地点介绍中的链接核对。':'照片由我在旅途中拍摄。点击照片可查看大图，使用左右方向键切换。';
     $('#photo-grid').innerHTML = data.photos.filter(p => p.trip===tripId).map((p,i) => `<figure class="frame"><button type="button" data-open-photo="${p.id}" aria-label="查看${p.title}大图"><img src="${imagePath(p.id)}" alt="${p.alt}" width="${p.width}" height="${p.height}" loading="lazy" decoding="async"></button><figcaption><span class="frame-title">${p.title}</span><span class="frame-number">${pad(i+1)}</span></figcaption><span class="frame-subtitle">${p.subtitle}</span></figure>`).join('');
   }
 
@@ -151,7 +154,7 @@
     $('#lightbox-image').alt = p.alt;
     $('#lightbox-caption').textContent = `${p.title} · ${data.trips[p.trip].year}`;
     $('#lightbox-count').textContent = `${pad(lightboxIndex+1)} / ${pad(lightboxPhotos.length)}`;
-    $('#lightbox-title').textContent = p.trip==='gansu'?'甘肃 · 河西走廊':'山西 · 古建与山河';
+    $('#lightbox-title').textContent = p.trip==='gansu'?'甘肃 · 河西走廊':p.trip==='shanxi'?'山西 · 古建与山河':'河南 · 行前预览';
   }
   function stepPhoto(delta) {
     if (!lightboxPhotos.length) return;
@@ -193,5 +196,15 @@
     renderMap(currentTrip);
     selectPlace(currentPlace, false);
   });
+  // Load the real Henan province boundary when available, then redraw the active map.
+  fetch('https://geo.datav.aliyun.com/areas_v3/bound/410000.json')
+    .then(r => { if (!r.ok) throw Error('GeoAtlas unavailable'); return r.json(); })
+    .then(geo => {
+      const geometry = geo.features?.[0]?.geometry;
+      if (geometry && ['Polygon','MultiPolygon'].includes(geometry.type)) {
+        boundaries.henan = geometry;
+        if (currentTrip === 'henan') { renderMap('henan'); selectPlace(currentPlace,false); }
+      }
+    }).catch(() => { /* Approximate outline remains; never used for navigation. */ });
   setTrip(currentTrip);
 })();
