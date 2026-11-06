@@ -154,3 +154,45 @@
 }
 .photo-grid.is-henan .frame-source:hover{color:var(--ink);border-color:var(--ink)}
 @media(max-width:480px){.photo-grid.is-henan .frame-source{font-size:7px}}
+
+/* Henan gallery refinement only: the first two landscape stories share one frame system. */
+.photo-grid.is-henan .frame-HN_01,
+.photo-grid.is-henan .frame-HN_03{grid-column:span 2}
+.photo-grid.is-henan .frame-HN_01>button,
+.photo-grid.is-henan .frame-HN_03>button{
+  aspect-ratio:16/9;
+  min-height:0;
+  height:auto;
+}
+.photo-grid.is-henan .frame-HN_01>button{background:#ded8cb}
+.photo-grid.is-henan .frame-HN_01 img{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+.photo-grid.is-henan .frame-HN_03 img{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.photo-grid.is-henan .frame-HN_02>button,
+.photo-grid.is-henan .frame-HN_06>button,
+.photo-grid.is-henan .frame-HN_07>button,
+.photo-grid.is-henan .frame-HN_09>button{aspect-ratio:4/3}
+.photo-grid.is-henan .frame-HN_02 img,
+.photo-grid.is-henan .frame-HN_06 img,
+.photo-grid.is-henan .frame-HN_07 img,
+.photo-grid.is-henan .frame-HN_09 img{width:100%;height:100%;object-fit:cover}
+.photo-grid.is-henan .frame-HN_08>button{aspect-ratio:3/4}
+.photo-grid.is-henan .frame-HN_08 img{width:100%;height:100%;object-fit:cover}
+.photo-grid.is-henan .frame-HN_10>button{aspect-ratio:2/3}
+.photo-grid.is-henan .frame-HN_10 img{width:100%;height:100%;object-fit:cover}
+@media(max-width:800px){
+ .photo-grid.is-henan .frame-HN_01,
+ .photo-grid.is-henan .frame-HN_03{grid-column:1/-1}
+ .photo-grid.is-henan .frame-HN_01>button,
+ .photo-grid.is-henan .frame-HN_03>button{aspect-ratio:16/9}
+ .photo-grid.is-henan .frame-HN_08>button{aspect-ratio:3/4}
+}
