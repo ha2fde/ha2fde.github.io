@@ -153,7 +153,7 @@
     const galleryPhotos = data.photos.filter(p => p.trip===tripId).sort((a,b) => tripId==='henan' ? henanOrder.indexOf(a.id)-henanOrder.indexOf(b.id) : 0);
     $('#photo-grid').classList.toggle('is-henan', tripId==='henan');
     $('#frames-heading').textContent = tripId==='gansu'?'十帧河西，留住一个秋天。':tripId==='shanxi'?'十帧山西，走近古建与山河。':'十帧中原，从黄河走向太行。';
-    $('#photo-grid').innerHTML = galleryPhotos.map((p,i) => `<figure class="frame${tripId==='henan'?' frame-'+p.id:'' }"><button type="button" data-open-photo="${p.id}" aria-label="查看${p.title}大图"><img src="${imagePath(p.id)}" alt="${p.alt}" width="${p.width}" height="${p.height}" loading="lazy" decoding="async"></button><figcaption><span class="frame-title">${p.title}</span><span class="frame-number">${pad(i+1)}</span></figcaption><span class="frame-subtitle">${p.subtitle}</span></figure>`).join('');
+    $('#photo-grid').innerHTML = galleryPhotos.map((p,i) => `<figure class="frame${tripId==='henan'?' frame-'+p.id:'' }"><button type="button" data-open-photo="${p.id}" aria-label="查看${p.title}大图"><img src="${imagePath(p.id)}" alt="${p.alt}" width="${p.width}" height="${p.height}" loading="lazy" decoding="async"></button><figcaption><span class="frame-title">${p.title}</span><span class="frame-number">${pad(i+1)}</span></figcaption><span class="frame-subtitle">${p.subtitle}</span>${tripId==='henan'&&p.source?'<a class="frame-source" href="'+p.source+'" target="_blank" rel="noopener noreferrer">'+(p.sourceLabel||'照片来源与授权')+' ↗</a>':''}</figure>`).join('');
   }
 
   const lightbox = $('#lightbox');
