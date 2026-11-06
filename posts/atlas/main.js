@@ -44,7 +44,7 @@
     const project = ([lon,lat]) => [xOffset + (lon - minLon) * lonFactor * scale, height - yOffset - (lat - minLat) * scale];
     const d = polygons.map(poly => poly.map(ring => ring.map((p,i) => `${i ? 'L' : 'M'}${project(p).map(v=>v.toFixed(2)).join(',')}`).join(' ') + 'Z').join(' ')).join(' ');
     let grid = '';
-    const gridStep = tripId === 'gansu' ? 2 : 1;
+    const gridStep = tripId === 'gansu' ? 2 : 2;
     for (let lon = Math.ceil(minLon / gridStep) * gridStep; lon <= maxLon; lon += gridStep) {
       const x = project([lon,minLat])[0];
       grid += `<line class="map-grid" x1="${x}" x2="${x}" y1="24" y2="440"/><text class="map-grid-label" x="${x+4}" y="455">${lon}° E</text>`;
@@ -59,20 +59,37 @@
     const neighbors = trip.neighbors.map(p => { const [x,y] = project(p.coord); return `<text class="neighbor-label" x="${x}" y="${y}" text-anchor="middle">${p.name}</text>`; }).join('');
     const provinceLabel = project(trip.provinceLabel);
     const compact = window.matchMedia('(max-width:600px)').matches;
-    const compactLabels = {taiyuan:[60,7],yanqiu:[-120,-24],tianlongshan:[-65,12],jinci:[-25,57],wangjia:[45,14],yungang:[-35,-38],xuankong:[62,-7],yingxian:[-67,2],yanmen:[-47,40],wutai:[58,42]};
-    // Leader labels separate nearby attractions while keeping pins at their geographic positions.
-    const gansuLabels = {
-      lanzhou:[[504,325],[500,338]],wuwei:[[474,202],[489,191]],
-      tiantishan:[[514,231],[516,231]],wushaoling:[[478,269],[485,279]],
-      zhangye:[[347,231],[352,245]],pingshanhu:[[388,142],[385,133]],
-      jiayuguan:[[277,113],[281,94]],mingshashan:[[131,183],[158,196]],
-      dunhuang:[[169,104],[164,95]],suoyang:[[247,187],[247,198]]
+    const preferredOffsets = {
+      gansu: {lanzhou:[28,20],wuwei:[26,-16],tiantishan:[35,18],wushaoling:[-28,22],zhangye:[-30,-18],pingshanhu:[30,-28],jiayuguan:[30,-18],mingshashan:[-34,22],dunhuang:[-30,-20],suoyang:[30,22]},
+      shanxi: {taiyuan:[34,-14],yanqiu:[-34,-20],tianlongshan:[-48,4],jinci:[-30,34],wangjia:[-34,-18],yungang:[-36,-20],xuankong:[38,-8],yingxian:[-36,18],yanmen:[-40,34],wutai:[38,25]},
+      henan: {longmen:[-34,-24],erlitou:[34,20],huanghe:[-38,-18],hulao:[36,-24],kaifeng:[36,22],yinxu:[34,-20],songyang:[-36,24],taihang:[38,-22],wangxiang:[-40,20],taohua:[42,34]}
+    };
+    const labelBoxes = [];
+    const occupied = (box) => labelBoxes.some(b => !(box.right < b.left-5 || box.left > b.right+5 || box.bottom < b.top-5 || box.top > b.bottom+5));
+    const placeLabel = (p, x, y) => {
+      const preferred = preferredOffsets[tripId]?.[p.id] || p.label || [28,-18];
+      const candidates = [preferred,[-preferred[0],preferred[1]],[preferred[0],-preferred[1]],[-preferred[0],-preferred[1]],[0,-34],[0,34],[54,0],[-54,0],[60,-30],[-60,30],[0,-50],[0,50]];
+      const textWidth = Math.max(22, [...p.name].length * (compact ? 8.2 : 9.1));
+      let chosen = null;
+      for (const [dx,dy] of candidates) {
+        const anchor = dx < -8 ? 'end' : dx > 8 ? 'start' : 'middle';
+        const left = x+dx-(anchor==='end'?textWidth:anchor==='middle'?textWidth/2:0);
+        const box = {left, right:left+textWidth, top:y+dy-8, bottom:y+dy+8};
+        if (box.left>8 && box.right<712 && box.top>25 && box.bottom<440 && !occupied(box)) { chosen={dx,dy,anchor,box}; break; }
+      }
+      if (!chosen) {
+        const [dx,dy]=preferred;
+        const anchor=dx<0?'end':'start';
+        const left=x+dx-(anchor==='end'?textWidth:0);
+        chosen={dx,dy,anchor,box:{left,right:left+textWidth,top:y+dy-8,bottom:y+dy+8}};
+      }
+      labelBoxes.push(chosen.box);
+      return chosen;
     };
     const markers = trip.points.map(p => {
       const [x,y] = project(p.coord);
-      const position = tripId === 'gansu' ? gansuLabels[p.id]?.[compact ? 1 : 0] : null;
-      const [dx,dy] = position ? [position[0]-x,position[1]-y] : (compactLabels[p.id] && compact ? compactLabels[p.id] : p.label);
-      const anchor = dx < -15 ? 'end' : dx > 15 ? 'start' : 'middle';
+      const label = placeLabel(p,x,y);
+      const {dx,dy,anchor}=label;
       return `<g class="map-marker" role="button" tabindex="0" aria-label="查看${p.name}的照片与介绍" aria-pressed="false" data-place="${p.id}" transform="translate(${x},${y})"><circle class="map-hit" r="18"/><line class="marker-leader" x1="0" y1="0" x2="${dx*.78}" y2="${dy*.75}"/><circle class="marker-halo" r="11"/><circle class="marker-dot" r="4"/><text class="marker-label" x="${dx}" y="${dy}" dominant-baseline="middle" text-anchor="${anchor}">${p.name}</text></g>`;
     }).join('');
     const scaleKm = tripId === 'gansu' ? 200 : 100;
