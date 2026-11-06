@@ -235,3 +235,60 @@
 
 /* Keep the ultra-wide Longmen panorama fully visible while matching the Yellow River card frame. */
 .photo-grid.is-henan .frame-HN_01 img{object-fit:contain;background:#ded8cb}
+
+/* National travel footprint: geographic tile-map, independent of the three regional maps. */
+.footprint-section{padding:46px 0 34px;border-bottom:1px solid var(--line)}
+.footprint-heading{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:22px}
+.footprint-heading h2{font-family:var(--serif);font-size:clamp(23px,3vw,34px);font-weight:500;letter-spacing:.04em;margin:7px 0}
+.footprint-heading p:not(.eyebrow){margin:0;color:var(--muted);font-size:13px}
+.footprint-legend{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:12px;padding-bottom:4px}
+.footprint-legend span{display:flex;align-items:center;gap:6px}
+.footprint-legend i{width:9px;height:9px;border-radius:50%;display:inline-block;background:#d8d9d1}
+.footprint-legend i.visited{background:#526f5d}
+.footprint-legend i.planned{background:#b97850}
+.china-tilemap{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));grid-template-rows:repeat(7,42px);gap:7px;max-width:850px;margin:0 auto;padding:18px 12px;background:rgba(233,237,226,.56);border:1px solid var(--line);border-radius:4px}
+.china-tilemap .province{display:flex;align-items:center;justify-content:center;min-width:0;border:1px solid #d9dbd1;background:#f8f6f0;color:#697167;font-size:12px;letter-spacing:.02em}
+.china-tilemap .province.visited{background:#526f5d;border-color:#526f5d;color:#fff}
+.china-tilemap .province.planned{background:#b97850;border-color:#b97850;color:#fff}
+.china-tilemap .tile-xj{grid-column:1/3;grid-row:2/4}
+.china-tilemap .tile-xz{grid-column:2/4;grid-row:5/7}
+.china-tilemap .tile-qh{grid-column:4;grid-row:5}
+.china-tilemap .tile-gs{grid-column:4;grid-row:4}
+.china-tilemap .tile-nx{grid-column:5;grid-row:4}
+.china-tilemap .tile-sc{grid-column:4;grid-row:6}
+.china-tilemap .tile-cq{grid-column:5;grid-row:6}
+.china-tilemap .tile-shx{grid-column:6;grid-row:4}
+.china-tilemap .tile-sx{grid-column:7;grid-row:3}
+.china-tilemap .tile-hn{grid-column:7;grid-row:4}
+.china-tilemap .tile-hb{grid-column:7;grid-row:2}
+.china-tilemap .tile-bj{grid-column:8;grid-row:2}
+.china-tilemap .tile-tj{grid-column:9;grid-row:2}
+.china-tilemap .tile-nm{grid-column:5/8;grid-row:1}
+.china-tilemap .tile-yn{grid-column:4;grid-row:7}
+.china-tilemap .tile-gz{grid-column:5;grid-row:7}
+.china-tilemap .tile-hn2{grid-column:6;grid-row:6}
+.china-tilemap .tile-hub{grid-column:6;grid-row:5}
+.china-tilemap .tile-ah{grid-column:8;grid-row:4}
+.china-tilemap .tile-sd{grid-column:9;grid-row:3}
+.china-tilemap .tile-js{grid-column:9;grid-row:4}
+.china-tilemap .tile-sh{grid-column:10;grid-row:4}
+.china-tilemap .tile-zj{grid-column:10;grid-row:5}
+.china-tilemap .tile-jx{grid-column:8;grid-row:6}
+.china-tilemap .tile-fj{grid-column:9;grid-row:6}
+.china-tilemap .tile-gx{grid-column:6;grid-row:7}
+.china-tilemap .tile-gd{grid-column:8;grid-row:7}
+.china-tilemap .tile-hi{grid-column:7;grid-row:7}
+.china-tilemap .tile-hlj{grid-column:11;grid-row:1}
+.china-tilemap .tile-jl{grid-column:11;grid-row:2}
+.china-tilemap .tile-ln{grid-column:10;grid-row:2}
+.china-tilemap .tile-tw{grid-column:11;grid-row:5}
+.china-tilemap .tile-xg{grid-column:9;grid-row:7}
+.china-tilemap .tile-am{grid-column:10;grid-row:7}
+.footprint-note{max-width:850px;margin:12px auto 0;color:var(--muted);font-size:11px;line-height:1.7}
+@media(max-width:640px){
+ .footprint-section{padding:30px 0 24px}
+ .footprint-heading{display:block}
+ .footprint-legend{margin-top:14px}
+ .china-tilemap{grid-template-rows:repeat(7,34px);gap:4px;padding:10px 6px}
+ .china-tilemap .province{font-size:9px;letter-spacing:0}
+}
