@@ -34,3 +34,10 @@
 .preview-footnote{font-size:9px;line-height:1.9;color:var(--muted);text-align:right;margin:25px 0 0}
 @media(max-width:800px){.preview-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 13px}.preview-section{padding-top:70px}.preview-intro{font-size:13px}.preview-card-feature>a{aspect-ratio:4/3}}
 @media(max-width:480px){.preview-grid{gap:19px 10px}.preview-card figcaption b{font-size:13px}.preview-card figcaption small,.preview-card figcaption a{font-size:8px}.preview-footnote{text-align:left}}
+
+/* 2027 navigation */
+.trip-tabs{flex-wrap:wrap}
+.trip-tab-preview{color:var(--ink);text-decoration:none;background:#e9ede2;border-color:#d1d8ca}
+.trip-tab-preview:hover{background:#dfe6d7}
+@media(max-width:800px){.trip-tab{min-width:0;flex:1 1 220px}}
+@media(max-width:600px){.trip-tab{flex-basis:100%;padding:10px 16px}.site-header nav{gap:12px}.site-header nav a{font-size:10px}}
