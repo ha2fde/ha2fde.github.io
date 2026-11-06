@@ -149,7 +149,7 @@
     $('#frames-heading').textContent = trip.title;
     $('#gallery-intro').textContent = trip.intro;
     $('#gallery-footnote').textContent = tripId==='henan'?'2027 为行前参考影像，非本人实拍；点击照片查看大图。摄影来源及授权请通过地点介绍中的链接核对。':'照片由我在旅途中拍摄。点击照片可查看大图，使用左右方向键切换。';
-    const henanOrder = ['HN_01','HN_03','HN_02','HN_07','HN_06','HN_09','HN_08','HN_10','HN_04','HN_05'];
+    const henanOrder = ['HN_01','HN_03','HN_02','HN_07','HN_06','HN_08','HN_10','HN_04','HN_05'];
     const galleryPhotos = data.photos.filter(p => p.trip===tripId).sort((a,b) => tripId==='henan' ? henanOrder.indexOf(a.id)-henanOrder.indexOf(b.id) : 0);
     $('#photo-grid').classList.toggle('is-henan', tripId==='henan');
     $('#frames-heading').textContent = tripId==='gansu'?'十帧河西，留住一个秋天。':tripId==='shanxi'?'十帧山西，走近古建与山河。':'十帧中原，从黄河走向太行。';
