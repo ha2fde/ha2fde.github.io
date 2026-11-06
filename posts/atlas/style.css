@@ -210,3 +210,25 @@
  .photo-grid.is-henan .frame-HN_08>button,
  .photo-grid.is-henan .frame-HN_09>button{aspect-ratio:4/5}
 }
+
+/* Final Henan gallery rules: one card per mapped point; no duplicate Wangxiang card. */
+.photo-grid.is-henan .frame-HN_01,
+.photo-grid.is-henan .frame-HN_03{grid-column:span 1}
+.photo-grid.is-henan .frame-HN_01>button,
+.photo-grid.is-henan .frame-HN_03>button{aspect-ratio:16/9}
+.photo-grid.is-henan .frame-HN_01 img,
+.photo-grid.is-henan .frame-HN_03 img{width:100%;height:100%;object-fit:cover}
+.photo-grid.is-henan .frame-HN_08>button{aspect-ratio:3/4}
+.photo-grid.is-henan .frame-HN_08 img{width:100%;height:100%;object-fit:cover}
+.photo-grid.is-henan .frame-HN_02>button,
+.photo-grid.is-henan .frame-HN_04>button,
+.photo-grid.is-henan .frame-HN_05>button,
+.photo-grid.is-henan .frame-HN_06>button,
+.photo-grid.is-henan .frame-HN_07>button,
+.photo-grid.is-henan .frame-HN_10>button{aspect-ratio:4/3}
+.photo-grid.is-henan .frame-HN_02 img,
+.photo-grid.is-henan .frame-HN_04 img,
+.photo-grid.is-henan .frame-HN_05 img,
+.photo-grid.is-henan .frame-HN_06 img,
+.photo-grid.is-henan .frame-HN_07 img,
+.photo-grid.is-henan .frame-HN_10 img{width:100%;height:100%;object-fit:cover}
