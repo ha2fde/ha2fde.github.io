@@ -36,7 +36,7 @@ window.ATLAS = {
     gansu: {
       kicker:'GANSU / 甘肃省', defaultPlace:'zhangye', year:'2025.10',
       title:'十帧河西，留住一个秋天。', intro:'2025 年十月 · 从黄河夜色，到沙山与石窟。',
-      geoLabel:'读地图 / 河西走廊',
+      geoLabel:'读地图 / 甘肃',
       geography:'从乌鞘岭向西，祁连山与北侧的山地、荒漠之间，狭长的平地展开。冰雪融水滋养绿洲，也让沿途的城与路有了依托。兰州是这组甘肃照片的起点，乌鞘岭则是河西走廊的东端门户。',
       source:'https://www.forestry.gov.cn/c/www/mlzgxczrbhd/149760.jhtml',
       indexLine:['lanzhou','wushaoling','tiantishan','wuwei','zhangye','pingshanhu','jiayuguan','suoyang','dunhuang','mingshashan'],
